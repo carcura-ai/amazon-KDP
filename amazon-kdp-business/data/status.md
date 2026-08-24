@@ -127,14 +127,11 @@ der zwei stärksten Chancen für vollständige Scorecards:
   wie C5, nicht erneut vollständig geprüft.
 C2, C4, C8 erhielten deshalb **keine** vollständige Scorecard (Vorgabe: nur die zwei stärksten).
 
-## Ohne Reihenname / Band 1 — C1 Adventskalender-Rätselbuch (vollständige Scorecard)
+## Ohne Reihenname / Band 1 — C1 Adventskalender-Rätselbuch (vorläufige Scorecard, überholt)
 
-Aktuelle Stufe:             2 — Validierung
-Ergebnis:                   68/100, WEITER PRÜFEN. Bestes Nachfragesignal der Reihe (echte Autocomplete-
-                            Vorschläge, gesunde Rezensionsverteilung), aber Marktlücken-Hypothese nicht frisch
-                            mit Formatdaten belegt und enges Saisonfenster ohne Puffer (~17 von 14–18 Wochen).
-Artefakte:                  amazon-kdp-business/research/validated/2026-08-24-c1-adventskalender.md
-Torbedingung erfüllt:       nein — 68 < 70. Stufe 3 startet nicht.
+**Überholt durch den finalen Nachschärfungslauf vom 2026-08-25 — siehe „Miro Fuchs / Band 1" unten.**
+Vorläufiger Stand war 68/100 auf Basis von Story-Buch-Wettbewerbern (Spekulatius-Reihe), die sich im
+Nachschärfungslauf als nicht direkt vergleichbar herausstellten (keine Rätselbücher). Finaler Stand: 65/100.
 Aktualisiert:                2026-08-24
 
 ## Ohne Reihenname / Band 1 — C7 Zahnarzt-Kinderbuch (vollständige Scorecard)
@@ -152,6 +149,42 @@ Aktualisiert:                2026-08-24
 Keine geprüfte Chance erreicht 70 Punkte. Rangliste: **C3 69 · C1 68 · C7 61 · C5 58** (C2/C4/C8 nur
 kursorisch verglichen, keine vollständige Scorecard). Laut Entscheidungsregel wird nichts erzwungen — Stufe 3
 startet für keine Chance. Nichts veröffentlicht oder kostenpflichtig ausgeführt.
+
+## Miro Fuchs / Band 1 — Miros Lichterwald-Adventskalender (C1-Nachschärfung)
+
+Aktuelle Stufe:             3 — Buchentwicklung (kontrolliertes Pilotprojekt, Nutzerausnahme vom
+                            Standard-Tor ≥70+STARTEN — siehe unten)
+Letzte abgeschlossene:      2 am 2026-08-25 (finaler Nachschärfungslauf) — 65/100
+Ergebnis der letzten Stufe: C1-Erstlauf fälschlich auf Story-Buch-Konkurrenz gestützt (Spekulatius-Reihe,
+                            keine Rätselbücher). Gezielte Direktsuche (`C1B`) fand die echten 5 direkten
+                            Rätselbuch-Wettbewerber (max. 77 Rez.) — dünnere, aber reale Nachfrage.
+                            Skript um Altersangabe-Erfassung erweitert; Rezensionstext-Erfassung
+                            versucht, aber leer geblieben (Datenlücke, offen benannt). **65/100 —
+                            Band 65–69 ohne Ausschlusskriterium.**
+Nutzerentscheidung:         Explizite Ausnahme vom Standard-Orchestrator-Tor: bei 65–69 ohne
+                            Ausschlusskriterium startet ein **kontrolliertes Pilotprojekt** statt der
+                            sonst zwingenden ≥70+STARTEN-Schwelle — angeordnet für genau diesen Lauf.
+Ergebnis Stufe 3:           Vollständiges Konzept-/Manuskriptpaket erstellt: Charakterbibel (Miro, Lotte),
+                            Reihenkonzept (3 Bände), Briefing, Seitenplan (56 S., 24 Tage), vollständiges
+                            Manuskript inkl. Lösungen, 24 Illustration Briefs, Cover-Brief, KDP-Listing
+                            (Titel/Beschreibung/7 Keywords/Kategorien), Preis-/Margenrechnung mit live
+                            abgerufenen KDP-Sätzen (2,15 €/Exemplar bei 8,99 €), vollständige
+                            Upload-Anleitung, Compliance-Selbstprüfung.
+Artefakte:
+  - amazon-kdp-business/research/validated/2026-08-24-c1-adventskalender.md
+  - amazon-kdp-business/research/raw/2026-08-24/live-215735/ (C1B)
+  - amazon-kdp-business/books/series/miro-fuchs/ (vollständiges Paket, siehe Dateiliste im Ordner)
+  - amazon-kdp-business/reports/compliance/2026-08-25-miros-lichterwald-adventskalender.md
+Torbedingung erfüllt:       nein für Standard-Stufe 3 (kein STARTEN) — **ja** für die vom Nutzer
+                            angeordnete Pilot-Ausnahme (65–69, kein Ausschlusskriterium)
+Stufe 4 (Figurenkonsistenz): nicht durchlaufen — kein Referenzbogen, keine echten Illustrationen
+Stufe 6 (Compliance):       NICHT FREIGEGEBEN (7 offene Punkte, siehe Compliance-Bericht) — Stufen 4–7
+                            stehen aus, keine Veröffentlichung, keine Bestellung, keine Kontoverknüpfung
+Nächster Schritt:           Illustrationen produzieren → Figurenkonsistenz-Freigabe → Layout → Lektorat
+                            → erneute Compliance-Prüfung. Erst danach Nutzerfreigabe zur Veröffentlichung.
+Blockiert durch:            fehlende Illustrationen, fehlendes menschliches Lektorat, fehlende
+                            Figurenkonsistenz-Freigabe (alle Stufe 4/6, noch nicht angefordert)
+Aktualisiert:               2026-08-25
 
 <!--
 Vorlage je Buch:

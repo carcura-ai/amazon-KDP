@@ -188,6 +188,8 @@ async function produktDaten(page, asin) {
       });
     const preisKandidaten = [...document.querySelectorAll('.a-price .a-offscreen')]
       .map((e) => e.textContent.trim()).filter(Boolean);
+    const rezensionsAuszuege = [...document.querySelectorAll('[data-hook="review-body"] span, [data-hook="review-collapsed"] span')]
+      .map((e) => e.textContent.trim()).filter((t2) => t2 && t2.length > 15).slice(0, 5);
     return {
       titel: t('#productTitle'),
       preisText: preisKandidaten[0] || t('#price') || t('#kindle-price'),
@@ -196,6 +198,7 @@ async function produktDaten(page, asin) {
       formatText: t('#productSubtitle'),
       details,
       bsrText: (document.body.innerText.match(/Amazon Bestseller-Rang:?[\s\S]{0,400}/) || [null])[0],
+      rezensionsAuszuege,
     };
   });
 
@@ -208,6 +211,8 @@ async function produktDaten(page, asin) {
   };
   const seitenK = ersterTreffer([/Seitenzahl/i, /Print-Länge/i, /^Taschenbuch/i, /^Gebundene Ausgabe/i]);
   const datumK = ersterTreffer([/Erscheinungstermin/i, /Veröffentlichungsdatum/i, /Publikationsdatum/i]);
+  const altersK = ersterTreffer([/Altersempfehlung/i, /Lesealter/i, /Alter/i]);
+  const altersAusTitel = (roh.titel || '').match(/ab\s+\d+([\s.,-]*\d+)?\s*Jahre?n?/i);
 
   return {
     asin,
@@ -221,6 +226,8 @@ async function produktDaten(page, asin) {
     veroeffentlicht: datumK ? d[datumK] : null,
     bewertung: zahl(roh.bewertungText, { komma: true }),
     rezensionen: zahl(roh.rezensionenText),
+    altersangabe: altersK ? d[altersK] : (altersAusTitel ? altersAusTitel[0] : null),
+    rezensions_auszuege: roh.rezensionsAuszuege,
     bsr_roh: roh.bsrText ? roh.bsrText.replace(/\s+/g, ' ').slice(0, 300) : null,
     // Explizit dokumentieren, was NICHT gefunden wurde:
     fehlende_felder: [
