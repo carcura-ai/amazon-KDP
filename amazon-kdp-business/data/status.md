@@ -11,9 +11,9 @@
 | Eingerichtet am | 2026-08-24 |
 | Marktplatz | amazon.de |
 | KDP-Konto | vorhanden (nicht verknüpft, keine Zugangsdaten gespeichert) |
-| Aktive Bücher | 1 (Stufe 2, WEITER PRÜFEN — noch keine Produktionsfreigabe) |
+| Aktive Bücher | 2 (beide Stufe 2, WEITER PRÜFEN — noch keine Produktionsfreigabe) |
 | Aktive Reihen | 0 |
-| Letzter Trendbericht | 2026-08-24 (Lauf 2) — 8 Chancen, alle „beobachten", keine „verfolgen" |
+| Letzter Trendbericht | 2026-08-24 (Lauf 2) — 8 Chancen; C3 live verifiziert und an Validator übergeben (65/100), übrige 7 „beobachten" |
 
 ## Stufe 1 — Trendrecherche
 
@@ -58,6 +58,23 @@ Aktualisiert:               2026-08-24
 **Einstieg:** Stufe 1 (Trendrecherche) nicht durchlaufen — Grund: Idee vom Nutzer vorgegeben. Ersetzt durch: Nutzereingabe „Beschäftigungsbuch für Kinder von 5 bis 7 Jahren auf langen Autofahrten". Einstieg direkt in Stufe 2, wie im Orchestrator-Skill unter „Einstieg" vorgesehen und hier protokolliert.
 
 **TESTLAUF-Hinweis:** Auf ausdrücklichen Wunsch des Nutzers endet dieser Lauf nach Stufe 2. Es wurde nichts veröffentlicht, bestellt oder verknüpft — es bestand dazu ohnehin kein Anlass, da Stufe 2 keine dieser Aktionen umfasst.
+
+## Ohne Reihenname / Band 1 — C3 Laternenfest/Sankt-Martin-Beschäftigungsbuch
+
+Aktuelle Stufe:             2 — Validierung
+Letzte abgeschlossene:      2 am 2026-08-24
+Ergebnis der letzten Stufe: Live-Verifizierung mit echtem Browser (Playwright/Chromium, lokal, sichtbar) durchgeführt, 7 Wettbewerbstitel erhoben. Opportunity-Scorecard erstellt: 65/100 — WEITER PRÜFEN. Formatlücke bestätigt (alle 7 Titel Bilder-/Vorlesebücher, kein Rätsel-/Beschäftigungsformat), Nachfrage über Jahre belegt (3 Titel mit dreistelligen Rezensionszahlen), aber Autocomplete-Signal aktuell 0, nur 7 statt 10 Titel geprüft, Marge unverifiziert (kein Zugriff auf KDP-Druckkostenrechner in dieser Sitzung).
+Artefakte:
+  - amazon-kdp-business/research/validated/2026-08-24-c3-laternenfest.md
+  - amazon-kdp-business/research/raw/2026-08-24/live-210533/ (C3.json, wettbewerb.csv, zusammenfassung.json)
+Torbedingung erfüllt:       nein — ≥70 Punkte und STARTEN nicht erreicht (65/100, WEITER PRÜFEN). Stufe 3 startet nicht.
+Nächster Schritt:           Offene Fragen aus der Scorecard klären (weitere Wettbewerbstitel, Autocomplete näher am Saisonfenster erneut prüfen, Marge mit aktuellem KDP-Druckkostenrechner nachziehen), dann erneut bewerten.
+Blockiert durch:            fehlende Daten (Marge unverifiziert, unter 10 Wettbewerbstitel geprüft)
+Offene Fragen an Nutzer:
+  1. Weitere Wettbewerbstitel erheben (zusätzliche Suchbegriffe), um auf ≥10 geprüfte Titel zu kommen?
+  2. Autocomplete-Prüfung näher am Saisonfenster (September/Oktober) wiederholen?
+  3. Marge mit aktuellen KDP-Druckkostensätzen nachziehen?
+Aktualisiert:               2026-08-24
 
 <!--
 Vorlage je Buch:

@@ -93,9 +93,9 @@ diesem Lauf einzelne Bestseller-Rang-Werte (BSR) in den Suchzusammenfassungen (s
 | Preisspanne Wettbewerb | keine Daten — unverändert |
 | Rezensionslage | keine belastbaren Zahlen auffindbar — unverändert |
 | Risiken | Regionales Thema; religiöser Bezug erfordert sensible Umsetzung; sehr enges und bereits laufendes Saisonfenster; Marktgröße unbelegt, da kein Vergleichstitel im Zielformat existiert |
-| Quellen | amazon.de/dp/B0DL423GX8 (Fay's Atelier); amazon.de/dp/3579074075 (Weber, „Laterne, Laterne"); amazon.de/dp/1986093417 (Baumann/Janetzko); Prüfdatum 2026-08-24, via WebSearch |
-| Status vs. Vorbericht | **UNVERÄNDERT** — Befund und Einschätzung identisch zu Lauf 1 |
-| Vorläufige Einschätzung | **beobachten** — echte Format-Lücke plausibel, aber weiterhin der einzige Beleg; vor Übergabe an den Validator sollte die Nachfrage zusätzlich geprüft werden (z. B. Autocomplete, sobald Live-Zugriff möglich ist). Wegen des laufenden Saisonfensters ist dies die zeitkritischste Chance dieses Berichts. |
+| Quellen | amazon.de/dp/B0DL423GX8 (Fay's Atelier); amazon.de/dp/3579074075 (Weber, „Laterne, Laterne"); amazon.de/dp/1986093417 (Baumann/Janetzko); Prüfdatum 2026-08-24, via WebSearch. **Live-Verifizierung 2026-08-24 21:05 UTC** (Playwright/Chromium, sichtbar, lokal): 7 Titel mit echten Preisen/Rezensionen/Seitenzahlen erhoben, Autocomplete für 4 Phrasen geprüft (0 Vorschläge) — Rohdaten `research/raw/2026-08-24/live-210533/`. |
+| Status vs. Vorbericht | **AKTUALISIERT** — erstmals mit Live-Daten statt Suchmaschinen-Zusammenfassung geprüft; Lückenbefund bestätigt (alle 7 Titel Bilder-/Vorlesebücher, kein Rätsel-/Beschäftigungsformat) |
+| Vorläufige Einschätzung | **verfolgen (mit Vorbehalt)** — Live-Verifizierung bestätigt Formatlücke und über 17 Jahre wiederkehrende Nachfrage (3 Titel mit dreistelligen Rezensionszahlen), aber Autocomplete liefert aktuell kein Suchsignal und nur 7 statt 10 Titel geprüft. Opportunity-Validator-Scorecard: **65/100, WEITER PRÜFEN** — Schwelle für Stufe 3 (70 Punkte) knapp verfehlt. Siehe `research/validated/2026-08-24-c3-laternenfest.md`. |
 
 ### C4 — Herbst-Rätsel-/Beschäftigungsbuch, altersspezifisch
 
@@ -172,7 +172,7 @@ Prüfung im nächsten regulären Wochenlauf vorgesehen.*
 |---|---|---|
 | C1 | UNVERÄNDERT | Mehr Wettbewerbstitel gefunden (6 statt 3) — Recherche-, keine Marktveränderung; Einschätzung bleibt „beobachten" |
 | C2 | UNVERÄNDERT | Erstmals BSR-Werte sichtbar, 2 weitere Titel gefunden — bestätigt bereits bekannte hohe Wettbewerbsdichte; Einschätzung bleibt „beobachten" |
-| C3 | UNVERÄNDERT | Keine neuen Funde; weiterhin zeitkritisch (Saisonfenster läuft) |
+| C3 | AKTUALISIERT | Live-Verifizierung mit echtem Browser durchgeführt (7 Titel); Lücke bestätigt, Validator-Scorecard 65/100 (WEITER PRÜFEN, Schwelle 70 knapp verfehlt) |
 | C4 | UNVERÄNDERT | Nicht erneut geprüft in diesem Lauf |
 | C5 | UNVERÄNDERT | Nicht erneut geprüft in diesem Lauf |
 | C6 | UNVERÄNDERT | Nicht erneut geprüft in diesem Lauf |
@@ -206,12 +206,13 @@ Vermutungen ohne Datenbeleg — ausdrücklich **nicht** zur Produktionsentscheid
 
 ## Nächster Schritt
 
-Keine der acht Chancen erreicht in diesem Lauf die Einschätzung „verfolgen". Empfehlung
-an den Nutzer, unverändert gegenüber Lauf 1, ergänzt um C8:
+Nachtrag 2026-08-24 (nach Live-Verifizierung): C3 wurde mit echten Browserdaten geprüft
+und an `kdp-opportunity-validator` übergeben — Ergebnis 65/100, WEITER PRÜFEN, Stufe 3
+startet nicht. Die übrigen sieben Chancen bleiben unverändert bei „beobachten".
 
-1. **C3 (Laternenfest)** ist die einzige Chance mit sofortigem Zeitdruck (Saisonfenster
-   läuft bereits) — falls verfolgt werden soll, jetzt an `kdp-opportunity-validator`
-   übergeben, auch ohne vollständige Preis-/Rezensionsdaten.
+1. **C3 (Laternenfest)** ist geprüft — Scorecard liegt vor (65/100, WEITER PRÜFEN).
+   Offene Fragen aus der Scorecard vor erneuter Bewertung klären (siehe
+   `research/validated/2026-08-24-c3-laternenfest.md`).
 2. **C2 (Weihnachten Einzelband)** bleibt das Signal mit der stärksten belegten Nachfrage
    (32 Rezensionen/4,6★), aber auch die dichteste Konkurrenz (mind. 8 Titel) — eine
    Übergabe an den Validator ist möglich, wird aber ohne klare Differenzierung und ohne

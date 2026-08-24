@@ -1,0 +1,162 @@
+{
+  "gestartet": "2026-08-24",
+  "chancen": 1,
+  "titel_gesamt": 7,
+  "abbruch": null,
+  "ergebnisse": [
+    {
+      "id": "C3",
+      "thema": "Laternenfest/Sankt-Martin-Beschäftigungsbuch",
+      "prioritaet": 1,
+      "begruendung_prioritaet": "Einziges Zeitfenster mit sofortigem Druck: Vorlauf 8-10 Wochen, Sankt Martin am 11. November.",
+      "zielalter_hypothese": "5-8 Jahre",
+      "suchbegriffe": [
+        "laternenfest kinderbuch",
+        "sankt martin kinderbuch",
+        "laternenfest beschäftigungsbuch",
+        "sankt martin basteln kinder buch"
+      ],
+      "geprueft_am": "2026-08-24T21:05:35.656Z",
+      "autocomplete": [
+        {
+          "begriff": "laternenfest kinderbuch",
+          "vorschlaege": [],
+          "fehler": null,
+          "geprueft_am": "2026-08-24T21:05:35.921Z"
+        },
+        {
+          "begriff": "sankt martin kinderbuch",
+          "vorschlaege": [],
+          "fehler": null,
+          "geprueft_am": "2026-08-24T21:05:41.991Z"
+        },
+        {
+          "begriff": "laternenfest beschäftigungsbuch",
+          "vorschlaege": [],
+          "fehler": null,
+          "geprueft_am": "2026-08-24T21:05:48.053Z"
+        },
+        {
+          "begriff": "sankt martin basteln kinder buch",
+          "vorschlaege": [],
+          "fehler": null,
+          "geprueft_am": "2026-08-24T21:05:54.120Z"
+        }
+      ],
+      "titel": [
+        {
+          "asin": "383373888X",
+          "url": "https://www.amazon.de/dp/383373888X",
+          "geprueft_am": "2026-08-24T21:06:13.479Z",
+          "titel": "Herbstleuchten und Laternenfest: Geschichten und Lieder unterm Sternenhimmel",
+          "preis_eur": 22,
+          "preis_roh": "22,00€",
+          "seitenzahl": 64,
+          "format": null,
+          "veroeffentlicht": "31. August 2018",
+          "bewertung": 4.3,
+          "rezensionen": 79,
+          "bsr_roh": "Amazon Bestseller-Rang: Nr. 216.949 in Bücher (Siehe Top 100 in Bücher) Nr. 223 in Lieder & Songs für Kinder Nr. 729 in Kinderbücher über das eigene Zuhause Nr. 8.747 in Grundbegriffe für Kinder Kundenrezensionen: 4,3 4,3 von 5 Sternen (79) Informationen zum Autor Folge Autoren, um Neuigkeiten zu Ve",
+          "fehlende_felder": []
+        },
+        {
+          "asin": "3314016115",
+          "url": "https://www.amazon.de/dp/3314016115",
+          "geprueft_am": "2026-08-24T21:06:22.685Z",
+          "titel": "Lumina",
+          "preis_eur": 16,
+          "preis_roh": "16,00€",
+          "seitenzahl": 36,
+          "format": null,
+          "veroeffentlicht": "1. September 2008",
+          "bewertung": 4.8,
+          "rezensionen": 70,
+          "bsr_roh": "Amazon Bestseller-Rang: Nr. 333.218 in Bücher (Siehe Top 100 in Bücher) Nr. 105 in Kinderbücher über Adoption Nr. 122 in Kinderbücher über Waisen & Pflegeheime Nr. 883 in Jahreszeiten für Kinder Kundenrezensionen: 4,8 4,8 von 5 Sternen (70) Informationen zum Autor Folge Autoren, um Neuigkeiten zu Ve",
+          "fehlende_felder": []
+        },
+        {
+          "asin": "3649650665",
+          "url": "https://www.amazon.de/dp/3649650665",
+          "geprueft_am": "2026-08-24T21:06:31.751Z",
+          "titel": "Wer hat die schönste Laterne?",
+          "preis_eur": 10,
+          "preis_roh": "10,00€",
+          "seitenzahl": 14,
+          "format": null,
+          "veroeffentlicht": "1. August 2025",
+          "bewertung": 5,
+          "rezensionen": 3,
+          "bsr_roh": "Amazon Bestseller-Rang: Nr. 57.805 in Bücher (Siehe Top 100 in Bücher) Nr. 835 in Malbücher für Kinder Kundenrezensionen: 5,0 5,0 von 5 Sternen (3) Sicherheits- und Produktressourcen Bilder und Kontakte Sicherheitsbilder und Kontakte Verwandte Produkte zu diesem Artikel Gesponsert DAS GALAKTISCHE VO",
+          "fehlende_felder": []
+        },
+        {
+          "asin": "3765568678",
+          "url": "https://www.amazon.de/dp/3765568678",
+          "geprueft_am": "2026-08-24T21:06:40.582Z",
+          "titel": "Der kleine Hase und die Laterne: Schalte die Laterne ein!",
+          "preis_eur": null,
+          "preis_roh": null,
+          "seitenzahl": 16,
+          "format": null,
+          "veroeffentlicht": "1. September 2020",
+          "bewertung": 4.5,
+          "rezensionen": 158,
+          "bsr_roh": "Amazon Bestseller-Rang: Nr. 606.691 in Bücher (Siehe Top 100 in Bücher) Nr. 16.523 in Beschäftigungsbücher für Kinder Kundenrezensionen: 4,5 4,5 von 5 Sternen (158) Informationen zum Autor Folge Autoren, um Neuigkeiten zu Veröffentlichungen und verbesserte Empfehlungen zu erhalten. Cat Weatherill En",
+          "fehlende_felder": [
+            "preis_eur"
+          ]
+        },
+        {
+          "asin": "3473417475",
+          "url": "https://www.amazon.de/dp/3473417475",
+          "geprueft_am": "2026-08-24T21:06:49.490Z",
+          "titel": "Laterne, Laterne - Bilderbuch ab 2 Jahren, St. Martin Geschichte zum Vorlesen",
+          "preis_eur": null,
+          "preis_roh": null,
+          "seitenzahl": 24,
+          "format": null,
+          "veroeffentlicht": "1. Juli 2021",
+          "bewertung": 4.6,
+          "rezensionen": 39,
+          "bsr_roh": "Amazon Bestseller-Rang: Nr. 117.154 in Bücher (Siehe Top 100 in Bücher) Nr. 375 in Liederbücher für Piano, Stimme & Gitarre Nr. 419 in Jahreszeiten für Kinder Nr. 1.980 in Familie für Kinder Kundenrezensionen: 4,6 4,6 von 5 Sternen (39) Informationen zum Autor Folge Autoren, um Neuigkeiten zu Veröff",
+          "fehlende_felder": [
+            "preis_eur"
+          ]
+        },
+        {
+          "asin": "3551515077",
+          "url": "https://www.amazon.de/dp/3551515077",
+          "geprueft_am": "2026-08-24T21:06:58.790Z",
+          "titel": "Conni-Bilderbücher: Conni und das Laternenfest: Ein stimmungsvolles Mini-Bilderbuch",
+          "preis_eur": null,
+          "preis_roh": null,
+          "seitenzahl": 32,
+          "format": null,
+          "veroeffentlicht": "1. September 2016",
+          "bewertung": 4.4,
+          "rezensionen": 46,
+          "bsr_roh": "Amazon Bestseller-Rang: Nr. 386.946 in Bücher (Siehe Top 100 in Bücher) Nr. 42.901 in Belletristik für Kinder Kundenrezensionen: 4,4 4,4 von 5 Sternen (46) Informationen zum Autor Folge Autoren, um Neuigkeiten zu Veröffentlichungen und verbesserte Empfehlungen zu erhalten. Liane Schneider Die erfolg",
+          "fehlende_felder": [
+            "preis_eur"
+          ]
+        },
+        {
+          "asin": "3219118135",
+          "url": "https://www.amazon.de/dp/3219118135",
+          "geprueft_am": "2026-08-24T21:07:08.243Z",
+          "titel": "Die schönste Laterne der Welt: Bilderbuch",
+          "preis_eur": 16,
+          "preis_roh": "16,00€",
+          "seitenzahl": 32,
+          "format": null,
+          "veroeffentlicht": "13. September 2019",
+          "bewertung": 4.7,
+          "rezensionen": 200,
+          "bsr_roh": "Amazon Bestseller-Rang: Nr. 20.417 in Bücher (Siehe Top 100 in Bücher) Nr. 3 in Kinderbücher über Obdachlosigkeit & Armut Nr. 68 in Mädchenratgeber Nr. 106 in Jahreszeiten für Kinder Kundenrezensionen: 4,7 4,7 von 5 Sternen (200) Seitenanfang über dieses Produkt Ähnlich Vom Autor Rezensionen Die sch",
+          "fehlende_felder": []
+        }
+      ],
+      "fehler": []
+    }
+  ]
+}
