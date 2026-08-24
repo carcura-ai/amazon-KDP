@@ -15,7 +15,40 @@ Das ist **kein** Cookie-Banner, **kein** CAPTCHA und **keine** Anmeldung.
 Kein Browser umgeht eine Sperre, die vor dem Verbindungsaufbau greift.
 Auf einem Rechner mit normalem Internetzugang entfällt sie.
 
-## Aufruf
+## Wichtig: Wo läuft Ihre Sitzung?
+
+Claude Code im **Browser oder in der App** führt Befehle in einer Cloud-Umgebung
+aus — nicht auf Ihrem PC, auch wenn Sie davor sitzen. Dort ist amazon.de gesperrt.
+
+Für die Live-Verifizierung brauchen Sie Claude Code als **CLI in einem Terminal
+auf dem eigenen Rechner**, oder Sie führen die Befehle unten selbst dort aus.
+
+Schnelltest, ob eine Sitzung wirklich lokal läuft:
+
+```bash
+uname -a          # unter Windows-Git-Bash: MINGW64_NT-…
+curl -s -o /dev/null -w '%{http_code}\n' https://www.amazon.de/   # muss 200 sein
+```
+
+## Aufruf unter Windows
+
+Ohne Bash, direkt über Node — funktioniert in PowerShell und in der Eingabe­auf­for­de­rung:
+
+```powershell
+cd amazon-KDP
+npm install playwright
+npx playwright install chromium
+
+node scripts/live-verifikation.mjs --chancen C3 --sichtbar
+```
+
+Voraussetzung ist Node.js (https://nodejs.org, LTS-Version).
+Das Skript prüft selbst zuerst die Erreichbarkeit und bricht sonst mit Exit 4 ab.
+
+Der Bash-Wrapper `live-verifikation.sh` ist für Linux und macOS gedacht; unter
+Windows nehmen Sie den Node-Aufruf oben.
+
+## Aufruf unter Linux und macOS
 
 ```bash
 cd amazon-KDP

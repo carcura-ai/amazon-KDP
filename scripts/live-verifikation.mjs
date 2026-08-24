@@ -54,13 +54,45 @@ Suchbegriffe stehen in amazon-kdp-business/data/suchbegriffe.json
   process.exit(0);
 }
 
-// Playwright erst nach der Hilfe laden, damit `--hilfe` auch ohne
+// Erreichbarkeit zuerst prüfen — plattformunabhängig, ohne Bash.
+// So scheitert der Lauf sofort und verständlich statt erst nach Minuten.
+// Das macht das Skript unter Windows direkt aufrufbar:
+//   node scripts/live-verifikation.mjs --chancen C3 --sichtbar
+if (!process.argv.includes('--ohne-vorabpruefung')) {
+  process.stdout.write('Erreichbarkeit von amazon.de prüfen... ');
+  try {
+    const c = new AbortController();
+    const t = setTimeout(() => c.abort(), 20000);
+    const r = await fetch(BASIS, { signal: c.signal, redirect: 'follow' });
+    clearTimeout(t);
+    if (r.status === 403 || r.status === 503) throw new Error(`HTTP ${r.status}`);
+    console.log(`erreichbar (HTTP ${r.status})`);
+  } catch (e) {
+    console.log('FEHLGESCHLAGEN');
+    console.error(`
+amazon.de ist von diesem Rechner aus nicht erreichbar: ${e.message.split('\n')[0]}
+
+Mögliche Ursachen:
+  - Netzwerk- oder Proxy-Richtlinie blockiert die Verbindung
+  - kein Internetzugang
+  - die Sitzung läuft in einer Cloud-Umgebung statt auf Ihrem PC
+
+Ein Browser umgeht das nicht — die Sperre greift vor der Seite.
+Prüfen Sie, ob https://www.amazon.de im normalen Browser dieses Rechners lädt.
+`);
+    process.exit(4);
+  }
+}
+
+// Playwright erst nach Hilfe und Vorabprüfung laden, damit `--hilfe` auch ohne
 // installiertes Playwright funktioniert.
 let chromium;
 try {
   ({ chromium } = await import('playwright'));
 } catch {
-  console.error('FEHLER: Playwright fehlt. Installieren mit:  npm install playwright');
+  console.error(`FEHLER: Playwright fehlt. Installieren mit:
+  npm install playwright
+  npx playwright install chromium`);
   process.exit(3);
 }
 
