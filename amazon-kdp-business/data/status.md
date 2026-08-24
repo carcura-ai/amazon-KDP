@@ -63,22 +63,15 @@ Aktualisiert:               2026-08-24
 
 Aktuelle Stufe:             2 — Validierung
 Letzte abgeschlossene:      2 am 2026-08-24
-Ergebnis der letzten Stufe: Live-Verifizierung mit echtem Browser (Playwright/Chromium, lokal, sichtbar) durchgeführt, 7 Wettbewerbstitel erhoben. Opportunity-Scorecard erstellt: 65/100 — WEITER PRÜFEN. Formatlücke bestätigt (alle 7 Titel Bilder-/Vorlesebücher, kein Rätsel-/Beschäftigungsformat), Nachfrage über Jahre belegt (3 Titel mit dreistelligen Rezensionszahlen), aber Autocomplete-Signal aktuell 0, nur 7 statt 10 Titel geprüft, Marge unverifiziert (kein Zugriff auf KDP-Druckkostenrechner in dieser Sitzung).
+Ergebnis der letzten Stufe: Finaler Validierungslauf mit echtem Browser (Playwright/Chromium, lokal, sichtbar), zwei unabhängige Suchläufe (C3 + C3B): 14 Wettbewerbstitel geprüft. Opportunity-Scorecard: **69/100 — WEITER PRÜFEN**, Schwelle 70 um 1 Punkt verfehlt. Formatlücke bestätigt (0 von 14 Titeln ein Rätsel-/Beschäftigungsformat), Nachfrage über Jahre belegt (4 Titel mit dreistelligen Rezensionszahlen: 200/158/194/248), aber 10 von 10 Autocomplete-Phrasen ohne Vorschlag. Marge mit live abgerufenen KDP-Druckkosten-/Tantiemesätzen gerechnet: Deckungsbeitrag ≈ 2,15 €/Exemplar.
 Artefakte:
   - amazon-kdp-business/research/validated/2026-08-24-c3-laternenfest.md
-  - amazon-kdp-business/research/raw/2026-08-24/live-210533/ (C3.json, wettbewerb.csv, zusammenfassung.json)
-Torbedingung erfüllt:       nein — ≥70 Punkte und STARTEN nicht erreicht (65/100, WEITER PRÜFEN). Stufe 3 startet nicht.
-Nächster Schritt:           Offene Fragen aus der Scorecard klären (weitere Wettbewerbstitel, Autocomplete näher am Saisonfenster erneut prüfen, Marge mit aktuellem KDP-Druckkostenrechner nachziehen), dann erneut bewerten.
-Blockiert durch:            fehlende Daten (Marge unverifiziert, unter 10 Wettbewerbstitel geprüft)
-Offene Fragen an Nutzer:    keine — finaler Lauf abgeschlossen, siehe unten
+  - amazon-kdp-business/research/raw/2026-08-24/live-210533/, live-211918/ (C3 + C3B)
+Torbedingung erfüllt:       nein — ≥70 Punkte und STARTEN nicht erreicht (69/100, WEITER PRÜFEN). Stufe 3 startet nicht.
+Nächster Schritt:           Keiner für C3 — laut Entscheidungsregel gestoppt, siehe C5/C6-Eintrag unten.
+Blockiert durch:            Torbedingung nicht erfüllt (69 < 70)
+Offene Fragen an Nutzer:    keine
 Aktualisiert:               2026-08-24 (finaler Lauf)
-
-**Finaler Validierungslauf (2026-08-24, ersetzt den vorherigen Zwischenstand):** 14 statt 7 Titel geprüft
-(zwei unabhängige Suchläufe, C3 + C3B), Rezensions-Fehler korrigiert (79 ist zweistellig, nicht dreistellig —
-richtig sind 200/158/194/248 als dreistellige Werte), Marge erstmals mit live abgerufenen KDP-Druckkosten-
-und Tantiemesätzen gerechnet (Deckungsbeitrag ≈2,15 €/Exemplar). **Ergebnis: 69/100, WEITER PRÜFEN — Schwelle
-70 um 1 Punkt verfehlt.** Keine künstliche Anpassung der Schwelle. Stufe 3 startet für C3 nicht.
-Artefakt: `amazon-kdp-business/research/validated/2026-08-24-c3-laternenfest.md`
 
 ## Ohne Reihenname / Band 1 — C5/C6 Vergleich ganzjährige Nische (Entscheidungsregel nach C3-Stopp)
 
@@ -100,14 +93,65 @@ Ergebnis:                   C5 (Restaurant) und C6 (Wartezimmer) live verifizier
 Artefakte:
   - amazon-kdp-business/research/raw/2026-08-24/live-212314/C5.json
   - amazon-kdp-business/research/raw/2026-08-24/live-212314/C6.json
-Torbedingung erfüllt:       nein — es liegt noch keine Opportunity-Validator-Scorecard für C5 vor. Diese
-                            Live-Verifizierung wählt nur die stärkere Nische aus; ≥70 Punkte/STARTEN wurden
-                            nicht geprüft. Stufe 3 startet nicht automatisch.
-Nächster Schritt:           Falls C5 weiterverfolgt werden soll: vollständige Opportunity-Validator-Scorecard
-                            für C5 erstellen (inkl. Preisdaten nachziehen, da preis_eur überall fehlt).
-Blockiert durch:            keine Nutzerfreigabe nötig für die Live-Verifizierung selbst; Scorecard/Stufe 3
-                            für C5 noch nicht angefordert
+  - amazon-kdp-business/research/raw/2026-08-24/live-213656/ (C5, C5B — Preis-Selektor korrigiert)
+Torbedingung erfüllt:       nein — C5 wurde danach vollständig validiert (58/100), siehe Eintrag unten
+Nächster Schritt:           siehe C5-Scorecard-Eintrag unten
+Blockiert durch:            keine
 Aktualisiert:               2026-08-24
+
+## Ohne Reihenname / Band 1 — C5 Restaurant-Beschäftigungsbuch (vollständige Scorecard)
+
+Aktuelle Stufe:             2 — Validierung
+Letzte abgeschlossene:      2 am 2026-08-24
+Ergebnis der letzten Stufe: Vollständige Opportunity-Scorecard erstellt, 10 relevante Titel (2 direkte Restaurant-Wettbewerber, 8 benachbarte generische Beschäftigungsbücher, 8 themenfremde Treffer ausgeschlossen). Preis-Selektor im Skript korrigiert (`scripts/live-verifikation.mjs`), dadurch erstmals vollständige Preisdaten. **Ergebnis: 58/100, WEITER PRÜFEN.** Hauptschwäche: drei Hauschka-Verlag-Titel dominieren die Oberkategorie mit ~9.900 Rezensionen (BSR-Ränge 139/323/336 gesamt); die Restaurant-Positionierung selbst hat bereits 2 aktive Wettbewerber (einer 6 Wochen alt).
+Artefakte:
+  - amazon-kdp-business/research/validated/2026-08-24-c5-restaurant.md
+  - amazon-kdp-business/research/raw/2026-08-24/live-213656/
+Torbedingung erfüllt:       nein — 58 < 70. Stufe 3 startet nicht.
+Nächster Schritt:           laut Entscheidungsregel: C1, C2, C4, C7, C8 gebündelt live verifizieren, zwei stärkste vollständig validieren
+Blockiert durch:            Torbedingung nicht erfüllt
+Aktualisiert:               2026-08-24
+
+## Vergleichslauf C1/C2/C4/C7/C8 (Entscheidungsregel nach C5-Stopp)
+
+Live verifiziert am 2026-08-24 (`research/raw/2026-08-24/live-214238/`, 35 Titel). Kurzvergleich zur Auswahl
+der zwei stärksten Chancen für vollständige Scorecards:
+- **C1** (Adventskalender, engere Altersnische): einziges Muster in der gesamten Reihe mit echten
+  Autocomplete-Vorschlägen (6+1), gesunde Rezensionsverteilung (9–1.532) — stärkste Chance.
+- **C7** (Zahnarzt-Kinderbuch): zwei etablierte Titel (875, 580 Rez.), moderate Konkurrenz, ganzjährig —
+  zweitstärkste Chance.
+- C2 (Weihnachten Einzelband): enorme Nachfrage (7.454/9.702 Rez.), aber zwei Titel dominieren die Nische
+  fast vollständig — Konkurrenzmoat zu groß, nicht in die engere Wahl genommen.
+- C4 (Herbst): durchgehend 1–25 Rezensionen, kaum Autocomplete-Signal — zu schwach belegt.
+- C8 (Regentag): dasselbe Hauschka-Dominanzmuster wie C5 (zwei Titel mit 5.523/5.396 Rez.) — strukturell
+  wie C5, nicht erneut vollständig geprüft.
+C2, C4, C8 erhielten deshalb **keine** vollständige Scorecard (Vorgabe: nur die zwei stärksten).
+
+## Ohne Reihenname / Band 1 — C1 Adventskalender-Rätselbuch (vollständige Scorecard)
+
+Aktuelle Stufe:             2 — Validierung
+Ergebnis:                   68/100, WEITER PRÜFEN. Bestes Nachfragesignal der Reihe (echte Autocomplete-
+                            Vorschläge, gesunde Rezensionsverteilung), aber Marktlücken-Hypothese nicht frisch
+                            mit Formatdaten belegt und enges Saisonfenster ohne Puffer (~17 von 14–18 Wochen).
+Artefakte:                  amazon-kdp-business/research/validated/2026-08-24-c1-adventskalender.md
+Torbedingung erfüllt:       nein — 68 < 70. Stufe 3 startet nicht.
+Aktualisiert:                2026-08-24
+
+## Ohne Reihenname / Band 1 — C7 Zahnarzt-Kinderbuch (vollständige Scorecard)
+
+Aktuelle Stufe:             2 — Validierung
+Ergebnis:                   61/100, WEITER PRÜFEN. Reale Nachfrage (875/580 Rez.), aber −4 Risikopunkte
+                            wegen sensiblem Thema ohne Fachprüfung und schwächstes Serienpotenzial der
+                            verglichenen Chancen.
+Artefakte:                  amazon-kdp-business/research/validated/2026-08-24-c7-zahnarzt.md
+Torbedingung erfüllt:       nein — 61 < 70. Stufe 3 startet nicht.
+Aktualisiert:                2026-08-24
+
+## Ergebnis der gesamten Validierungsrunde (2026-08-24)
+
+Keine geprüfte Chance erreicht 70 Punkte. Rangliste: **C3 69 · C1 68 · C7 61 · C5 58** (C2/C4/C8 nur
+kursorisch verglichen, keine vollständige Scorecard). Laut Entscheidungsregel wird nichts erzwungen — Stufe 3
+startet für keine Chance. Nichts veröffentlicht oder kostenpflichtig ausgeführt.
 
 <!--
 Vorlage je Buch:

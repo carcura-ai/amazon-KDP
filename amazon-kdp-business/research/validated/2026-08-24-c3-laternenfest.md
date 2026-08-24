@@ -94,7 +94,7 @@ Plausibilitätsprüfung nach `margenrechnung.md`: Preis in Wettbewerbsspanne —
 - [x] **WEITER PRÜFEN** (50–69 Punkte) — **69/100, Schwelle um 1 Punkt verfehlt**
 - [ ] ABLEHNEN (< 50 Punkte oder Ausschlusskriterium)
 
-**Ausschlusskriterien geprüft:** Keines greift. ≥10 Titel geprüft (14). Konkurrenz nicht „gering ohne Nachfrage" (14 real existierende Titel, teils über Jahre verkauft). Keine Marken-/Lizenzrechte betroffen. Marge unverifiziert war der Stand vor diesem Lauf — jetzt mit realen Sätzen positiv (2,15 €), also keine negative Marge.
+**Ausschlusskriterien geprüft:** Keines greift. ≥10 Titel geprüft (14). Konkurrenz nicht „gering ohne Nachfrage" (14 real existierende Titel, teils über Jahre verkauft). Keine Marken-/Lizenzrechte betroffen. Marge mit realen KDP-Sätzen positiv (2,15 €/Exemplar), keine negative Marge.
 
 **Begründung:** Der finale Lauf bestätigt die Formatlücke deutlich robuster (14 statt 7 Titel, zwei unabhängige Suchstrategien, weiterhin 0 echte Rätsel-/Beschäftigungsbücher) und liefert erstmals eine reale, positive Margenrechnung. Trotzdem bleibt die Nachfrageseite laut Punkteschema gedeckelt: 10 von 10 getesteten Autocomplete-Phrasen liefern kein Suchsignal. **69/100 verfehlt die Schwelle von 70 um exactly 1 Punkt** — keine künstliche Anpassung, die Schwelle gilt wie vorgegeben. Keine Produktionsfreigabe, Stufe 3 startet für C3 **nicht**.
 

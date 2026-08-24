@@ -1,0 +1,337 @@
+{
+  "gestartet": "2026-08-24",
+  "chancen": 2,
+  "titel_gesamt": 16,
+  "abbruch": null,
+  "ergebnisse": [
+    {
+      "id": "C5B",
+      "thema": "Restaurant-Beschäftigungsbuch — gezielte Ergänzungssuche",
+      "prioritaet": 6,
+      "begruendung_prioritaet": "Ergänzung zu C5: abweichende Suchphrasen, um über die bereits bekannten 7 Treffer hinaus weitere Titel und differenziertere Preisdaten zu erhalten.",
+      "zielalter_hypothese": "6-8 Jahre",
+      "suchbegriffe": [
+        "restaurant kinder rätselheft",
+        "kinderkarte restaurant beschäftigung",
+        "wartezeit restaurant kind buch",
+        "kindermenü beschäftigung buch",
+        "buch für kinder im restaurant"
+      ],
+      "geprueft_am": "2026-08-24T21:36:57.244Z",
+      "autocomplete": [
+        {
+          "begriff": "restaurant kinder rätselheft",
+          "vorschlaege": [],
+          "fehler": null,
+          "geprueft_am": "2026-08-24T21:36:57.530Z"
+        },
+        {
+          "begriff": "kinderkarte restaurant beschäftigung",
+          "vorschlaege": [],
+          "fehler": null,
+          "geprueft_am": "2026-08-24T21:37:03.600Z"
+        },
+        {
+          "begriff": "wartezeit restaurant kind buch",
+          "vorschlaege": [],
+          "fehler": null,
+          "geprueft_am": "2026-08-24T21:37:09.667Z"
+        },
+        {
+          "begriff": "kindermenü beschäftigung buch",
+          "vorschlaege": [],
+          "fehler": null,
+          "geprueft_am": "2026-08-24T21:37:15.739Z"
+        },
+        {
+          "begriff": "buch für kinder im restaurant",
+          "vorschlaege": [],
+          "fehler": null,
+          "geprueft_am": "2026-08-24T21:37:21.801Z"
+        }
+      ],
+      "titel": [
+        {
+          "asin": "3881006222",
+          "url": "https://www.amazon.de/dp/3881006222",
+          "geprueft_am": "2026-08-24T21:37:38.843Z",
+          "titel": "Kindergartenblock ab 4 Jahre - Verbinden, vergleichen, Fehler finden: Rätselblock ab 4 Jahre, Beschäftigung für Kinder (Übungshefte & -blöcke für Kindergarten, Vorschule, Einschulung, Band 622)",
+          "preis_eur": 8.9,
+          "preis_roh": "8,90 €",
+          "seitenzahl": 64,
+          "format": null,
+          "veroeffentlicht": "8. Oktober 2024",
+          "bewertung": 4.8,
+          "rezensionen": 5523,
+          "bsr_roh": "Amazon Bestseller-Rang: Nr. 139 in Bücher (Siehe Top 100 in Bücher) Nr. 1 in Kinderbücher über Gegensätze Nr. 1 in Größe & Form für Kinder Nr. 1 in Wimmelbücher für Kinder Kundenrezensionen: 4,8 4,8 von 5 Sternen (5.523) Produktvideos Mandy Naundorf KundenbewertungSuper tolle Aufgaben für die Kleine",
+          "fehlende_felder": []
+        },
+        {
+          "asin": "388100632X",
+          "url": "https://www.amazon.de/dp/388100632X",
+          "geprueft_am": "2026-08-24T21:37:47.600Z",
+          "titel": "Rätselblock ab 7 Jahre - Band 1: Bunter Rätselspaß für Kinder - Kreuzworträtsel, Labyrinth, Konzentrationstraining und logisches Denken fördern (Rätselbücher, Band 632)",
+          "preis_eur": 8.9,
+          "preis_roh": "8,90 €",
+          "seitenzahl": 64,
+          "format": null,
+          "veroeffentlicht": "28. Oktober 2024",
+          "bewertung": 4.7,
+          "rezensionen": 2496,
+          "bsr_roh": "Amazon Bestseller-Rang: Nr. 323 in Bücher (Siehe Top 100 in Bücher) Nr. 2 in Wortspiele für Kinder (Bücher) Nr. 4 in Rätselbücher für Kinder Nr. 5 in Humor Geschenkbücher Kundenrezensionen: 4,7 4,7 von 5 Sternen (2.496) Produktvideos Hauschka Verlag GmbH Kunterbunter Rätselspaß und spielerische Förd",
+          "fehlende_felder": []
+        },
+        {
+          "asin": "3881005528",
+          "url": "https://www.amazon.de/dp/3881005528",
+          "geprueft_am": "2026-08-24T21:37:56.295Z",
+          "titel": "Lass uns basteln – Bastelbuch ab 4 Jahre – Wilde Tiere: Verbastelbuch mit bunten Bastelvorlagen für Mädchen und Jungs (Kreativ - schneiden, kleben, basteln, Band 552)",
+          "preis_eur": 9.9,
+          "preis_roh": "9,90€",
+          "seitenzahl": 64,
+          "format": null,
+          "veroeffentlicht": "8. August 2024",
+          "bewertung": 4.8,
+          "rezensionen": 48,
+          "bsr_roh": "Amazon Bestseller-Rang: Nr. 35.567 in Bücher (Siehe Top 100 in Bücher) Nr. 123 in Kinderbücher über Papierkunst Nr. 2.307 in Beschäftigungsbücher für Kinder Nr. 2.970 in Grundbegriffe für Kinder Kundenrezensionen: 4,8 4,8 von 5 Sternen (48) Informationen zum Autor Folge Autoren, um Neuigkeiten zu Ve",
+          "fehlende_felder": []
+        },
+        {
+          "asin": "3473559830",
+          "url": "https://www.amazon.de/dp/3473559830",
+          "geprueft_am": "2026-08-24T21:38:05.031Z",
+          "titel": "Kindergarten-Rätselspaß für unterwegs - Rätselbuch ab 4 Jahre, Reisespiele für Kinder (Spiel & Spaß - Rätselblock)",
+          "preis_eur": 3.99,
+          "preis_roh": "3,99 €",
+          "seitenzahl": 80,
+          "format": null,
+          "veroeffentlicht": "1. Februar 2014",
+          "bewertung": 4.7,
+          "rezensionen": 3417,
+          "bsr_roh": "Amazon Bestseller-Rang: Nr. 25 in Bücher (Siehe Top 100 in Bücher) Nr. 1 in Rätsel & Quiz für Kinder Nr. 1 in Rätselbücher für Kinder Nr. 2 in Beschäftigungsbücher für Kinder Kundenrezensionen: 4,7 4,7 von 5 Sternen (3.417) Produktleitfäden und Dokumente Konformitätsbescheinigung (PDF) Produktvideos",
+          "fehlende_felder": []
+        },
+        {
+          "asin": "B0F9435583",
+          "url": "https://www.amazon.de/dp/B0F9435583",
+          "geprueft_am": "2026-08-24T21:38:13.293Z",
+          "titel": "Beschäftigungsbuch für Kinder im Restaurant – Rätselspaß für kleine Feinschmecker | Für Kinder von 6–8 Jahren | Mit Lösungen, Tic Tac Toe, Sudoku, ... Mal- & Wortspiele uvm. für Jungen und Mädchen",
+          "preis_eur": 12.95,
+          "preis_roh": "12,95 €",
+          "seitenzahl": 122,
+          "format": null,
+          "veroeffentlicht": "13. Mai 2025",
+          "bewertung": 5,
+          "rezensionen": 12,
+          "bsr_roh": "Amazon Bestseller-Rang: Nr. 73.535 in Bücher (Siehe Top 100 in Bücher) Nr. 10 in Animation & Flash Nr. 12 in Video Nr. 13 in Animationsgrafikdesign Kundenrezensionen: 5,0 5,0 von 5 Sternen (12) Seitenanfang über dieses Produkt Ähnlich Von der Marke Rezensionen Beschäftigungsbuch für Kinder im Restau",
+          "fehlende_felder": []
+        },
+        {
+          "asin": "3910601847",
+          "url": "https://www.amazon.de/dp/3910601847",
+          "geprueft_am": "2026-08-24T21:38:21.656Z",
+          "titel": "Knobeln to go – mein Urlaubsrätselbuch ab 10 Jahren (Rätsel, Reisespiele, Beschäftigung)",
+          "preis_eur": 12.99,
+          "preis_roh": "12,99 €",
+          "seitenzahl": 72,
+          "format": null,
+          "veroeffentlicht": "31. Mai 2025",
+          "bewertung": 4.6,
+          "rezensionen": 17,
+          "bsr_roh": "Amazon Bestseller-Rang: Nr. 8.766 in Bücher (Siehe Top 100 in Bücher) Nr. 21 in Labyrinthe für Kinder Nr. 119 in Rätselbücher für Kinder Nr. 181 in Rätsel & Quiz für Kinder Kundenrezensionen: 4,6 4,6 von 5 Sternen (17) Seitenanfang über dieses Produkt Ähnlich Von der Marke Vom Autor Rezensionen Knob",
+          "fehlende_felder": []
+        },
+        {
+          "asin": "3881006346",
+          "url": "https://www.amazon.de/dp/3881006346",
+          "geprueft_am": "2026-08-24T21:38:30.661Z",
+          "titel": "Rätselblock ab 9 Jahre - Band 1: Bunter Rätselspaß für Kinder - Kreuzworträtsel, Labyrinth, Sudoku, Konzentrationstraining und logisches Denken fördern (Rätselbücher, Band 634)",
+          "preis_eur": 8.9,
+          "preis_roh": "8,90€",
+          "seitenzahl": 64,
+          "format": null,
+          "veroeffentlicht": "12. September 2024",
+          "bewertung": 4.6,
+          "rezensionen": 1870,
+          "bsr_roh": "Amazon Bestseller-Rang: Nr. 336 in Bücher (Siehe Top 100 in Bücher) Nr. 1 in Konfirmation & Kommunion Geschenkbücher Nr. 3 in Wortspiele für Kinder (Bücher) Nr. 5 in Rätselbücher für Kinder Kundenrezensionen: 4,6 4,6 von 5 Sternen (1.870) Produktvideos Hauschka Verlag GmbH Kunterbunter Rätselspaß un",
+          "fehlende_felder": []
+        },
+        {
+          "asin": "3129497803",
+          "url": "https://www.amazon.de/dp/3129497803",
+          "geprueft_am": "2026-08-24T21:38:39.300Z",
+          "titel": "Klett Rätselblock ab 8 Jahre Band 1: 100 kunterbunte Rätsel und Kinderbeschäftigung für Reisen und zu Hause",
+          "preis_eur": 7.95,
+          "preis_roh": "7,95€",
+          "seitenzahl": 192,
+          "format": null,
+          "veroeffentlicht": "15. Juli 2024",
+          "bewertung": 4.8,
+          "rezensionen": 13,
+          "bsr_roh": "Amazon Bestseller-Rang: Nr. 7.066 in Bücher (Siehe Top 100 in Bücher) Nr. 43 in Wortspiele für Kinder (Bücher) Nr. 71 in Kinderbücher über Geheimnisse & Wunder Nr. 98 in Rätselbücher für Kinder Kundenrezensionen: 4,8 4,8 von 5 Sternen (13) Sicherheits- und Produktressourcen Bilder und Kontakte Siche",
+          "fehlende_felder": []
+        }
+      ],
+      "fehler": []
+    },
+    {
+      "id": "C5",
+      "thema": "Restaurant-Beschäftigungsbuch für Kinder",
+      "prioritaet": 6,
+      "begruendung_prioritaet": "Ganzjährig, kein Zeitdruck.",
+      "zielalter_hypothese": "3 Jahre und 6-8 Jahre",
+      "suchbegriffe": [
+        "restaurant beschäftigungsbuch kinder",
+        "beschäftigung kinder unterwegs buch",
+        "kinder beschäftigung essen gehen"
+      ],
+      "geprueft_am": "2026-08-24T21:38:45.307Z",
+      "autocomplete": [
+        {
+          "begriff": "restaurant beschäftigungsbuch kinder",
+          "vorschlaege": [],
+          "fehler": null,
+          "geprueft_am": "2026-08-24T21:38:45.523Z"
+        },
+        {
+          "begriff": "beschäftigung kinder unterwegs buch",
+          "vorschlaege": [],
+          "fehler": null,
+          "geprueft_am": "2026-08-24T21:38:51.599Z"
+        },
+        {
+          "begriff": "kinder beschäftigung essen gehen",
+          "vorschlaege": [],
+          "fehler": null,
+          "geprueft_am": "2026-08-24T21:38:57.664Z"
+        }
+      ],
+      "titel": [
+        {
+          "asin": "B0H27MXS6D",
+          "url": "https://www.amazon.de/dp/B0H27MXS6D",
+          "geprueft_am": "2026-08-24T21:39:13.772Z",
+          "titel": "5-Zutaten Airfryer Kochbuch für Teenager: Express. Knusprig. Kein Küchendrama. Knusprige Ideen für Schule, Sofa und Spät-Hunger.",
+          "preis_eur": 22.99,
+          "preis_roh": "22,99€",
+          "seitenzahl": 144,
+          "format": null,
+          "veroeffentlicht": "17. Mai 2026",
+          "bewertung": 4.7,
+          "rezensionen": 48,
+          "bsr_roh": "Amazon Bestseller-Rang: Nr. 1.611 in Bücher (Siehe Top 100 in Bücher) Nr. 1 in Dämpfen & Garen (Bücher) Nr. 5 in Kochen & Getränke Geschenkbücher Nr. 5 in Sport & Freizeit Geschenkbücher Kundenrezensionen: 4,7 4,7 von 5 Sternen (48) Sicherheits- und Produktressourcen Bilder und Kontakte Sicherheitsb",
+          "fehlende_felder": []
+        },
+        {
+          "asin": "B0H2WYSD1G",
+          "url": "https://www.amazon.de/dp/B0H2WYSD1G",
+          "geprueft_am": "2026-08-24T21:39:22.307Z",
+          "titel": "Kochbuch für Kinder mit nur 5 Zutaten: Einfach kochen, lecker essen und ganz viel Spaß haben",
+          "preis_eur": 22.99,
+          "preis_roh": "22,99€",
+          "seitenzahl": 112,
+          "format": null,
+          "veroeffentlicht": "24. Mai 2026",
+          "bewertung": 4.6,
+          "rezensionen": 15,
+          "bsr_roh": "Amazon Bestseller-Rang: Nr. 3.394 in Bücher (Siehe Top 100 in Bücher) Nr. 17 in Gesundheitslexika & Medikamentenratgeber (Bücher) Nr. 17 in Kochen für Feste & Partys (Bücher) Nr. 18 in Kochen für die Familie (Bücher) Kundenrezensionen: 4,6 4,6 von 5 Sternen (15) Seitenanfang über dieses Produkt Ähnl",
+          "fehlende_felder": []
+        },
+        {
+          "asin": "B0FK9Z3LN9",
+          "url": "https://www.amazon.de/dp/B0FK9Z3LN9",
+          "geprueft_am": "2026-08-24T21:39:30.728Z",
+          "titel": "Das XXL Teenager-Kochbuch: Knallige Rezepte, Food-Hacks & Küchenchaos",
+          "preis_eur": 15.99,
+          "preis_roh": "15,99 €",
+          "seitenzahl": 144,
+          "format": null,
+          "veroeffentlicht": "28. Juli 2025",
+          "bewertung": 4.5,
+          "rezensionen": 178,
+          "bsr_roh": "Amazon Bestseller-Rang: Nr. 3.197 in Bücher (Siehe Top 100 in Bücher) Nr. 4 in Türkische Küche Nr. 17 in Kochen für die Familie (Bücher) Kundenrezensionen: 4,5 4,5 von 5 Sternen (178) Informationen zum Autor Folge Autoren, um Neuigkeiten zu Veröffentlichungen und verbesserte Empfehlungen zu erhalten",
+          "fehlende_felder": []
+        },
+        {
+          "asin": "B0F9435583",
+          "url": "https://www.amazon.de/dp/B0F9435583",
+          "geprueft_am": "2026-08-24T21:39:39.016Z",
+          "titel": "Beschäftigungsbuch für Kinder im Restaurant – Rätselspaß für kleine Feinschmecker | Für Kinder von 6–8 Jahren | Mit Lösungen, Tic Tac Toe, Sudoku, ... Mal- & Wortspiele uvm. für Jungen und Mädchen",
+          "preis_eur": 12.95,
+          "preis_roh": "12,95 €",
+          "seitenzahl": 122,
+          "format": null,
+          "veroeffentlicht": "13. Mai 2025",
+          "bewertung": 5,
+          "rezensionen": 12,
+          "bsr_roh": "Amazon Bestseller-Rang: Nr. 73.535 in Bücher (Siehe Top 100 in Bücher) Nr. 10 in Animation & Flash Nr. 12 in Video Nr. 13 in Animationsgrafikdesign Kundenrezensionen: 5,0 5,0 von 5 Sternen (12) Seitenanfang über dieses Produkt Ähnlich Von der Marke Rezensionen Beschäftigungsbuch für Kinder im Restau",
+          "fehlende_felder": []
+        },
+        {
+          "asin": "B0H5WVWPQ9",
+          "url": "https://www.amazon.de/dp/B0H5WVWPQ9",
+          "geprueft_am": "2026-08-24T21:39:47.153Z",
+          "titel": "Bildschirm aus! Das große Beschäftigungsbuch für Kinder von 4–6 Jahren: Über 100 Rätsel, Suchbilder, Labyrinthe, Punkt-zu-Punkt-Aufgaben, Zählspiele ... für unterwegs, auf Reisen und zu Hause",
+          "preis_eur": 13.95,
+          "preis_roh": "13,95 €",
+          "seitenzahl": 102,
+          "format": null,
+          "veroeffentlicht": "18. Juni 2026",
+          "bewertung": 5,
+          "rezensionen": 12,
+          "bsr_roh": "Amazon Bestseller-Rang: Nr. 7.619 in Bücher (Siehe Top 100 in Bücher) Nr. 3 in Artussagen für Kinder Nr. 15 in Labyrinthe für Kinder Nr. 105 in Rätselbücher für Kinder Kundenrezensionen: 5,0 5,0 von 5 Sternen (12) Sicherheits- und Produktressourcen Bilder und Kontakte Sicherheitsbilder und Kontakte ",
+          "fehlende_felder": []
+        },
+        {
+          "asin": "3473559830",
+          "url": "https://www.amazon.de/dp/3473559830",
+          "geprueft_am": "2026-08-24T21:39:55.563Z",
+          "titel": "Kindergarten-Rätselspaß für unterwegs - Rätselbuch ab 4 Jahre, Reisespiele für Kinder (Spiel & Spaß - Rätselblock)",
+          "preis_eur": 3.99,
+          "preis_roh": "3,99 €",
+          "seitenzahl": 80,
+          "format": null,
+          "veroeffentlicht": "1. Februar 2014",
+          "bewertung": 4.7,
+          "rezensionen": 3417,
+          "bsr_roh": "Amazon Bestseller-Rang: Nr. 25 in Bücher (Siehe Top 100 in Bücher) Nr. 1 in Rätsel & Quiz für Kinder Nr. 1 in Rätselbücher für Kinder Nr. 2 in Beschäftigungsbücher für Kinder Kundenrezensionen: 4,7 4,7 von 5 Sternen (3.417) Produktleitfäden und Dokumente Konformitätsbescheinigung (PDF) Produktvideos",
+          "fehlende_felder": []
+        },
+        {
+          "asin": "B0H9DMRW41",
+          "url": "https://www.amazon.de/dp/B0H9DMRW41",
+          "geprueft_am": "2026-08-24T21:40:03.900Z",
+          "titel": "Restaurant-Beschäftigungsbuch für Kinder ab 3 Jahren | Malen, Rätseln, Suchen und Mitmachen für kleine Restaurantgäste | 100 Seiten Beschäftigung, Ausmalbilder und Rätsel (FarbenGLEICH)",
+          "preis_eur": 8.99,
+          "preis_roh": "8,99 €",
+          "seitenzahl": 102,
+          "format": null,
+          "veroeffentlicht": "15. Juli 2026",
+          "bewertung": null,
+          "rezensionen": null,
+          "bsr_roh": "Amazon Bestseller-Rang: Nr. 259.585 in Bücher (Siehe Top 100 in Bücher) Nr. 264 in Kinderbücher auf Reisen Nr. 1.078 in Reiseliteratur für Kinder Nr. 1.194 in Rätselbücher für Kinder Informationen zum Autor Folge Autoren, um Neuigkeiten zu Veröffentlichungen und verbesserte Empfehlungen zu erhalten.",
+          "fehlende_felder": [
+            "bewertung",
+            "rezensionen"
+          ]
+        },
+        {
+          "asin": "3982615623",
+          "url": "https://www.amazon.de/dp/3982615623",
+          "geprueft_am": "2026-08-24T21:40:13.719Z",
+          "titel": "Das Witzebuch für Erstleser – Tierisch lustiger Lesespaß: Große Schrift, bunte Silbentrennung & coole Tierillustrationen zum Mitlachen und Mitmachen für Kinder ab 6 Jahren (1. Klasse)",
+          "preis_eur": 13.95,
+          "preis_roh": "13,95 €",
+          "seitenzahl": 72,
+          "format": null,
+          "veroeffentlicht": "23. Oktober 2025",
+          "bewertung": 4.2,
+          "rezensionen": 95,
+          "bsr_roh": "Amazon Bestseller-Rang: Nr. 906 in Bücher (Siehe Top 100 in Bücher) Nr. 1 in Kinderbücher über Schildkröten Nr. 1 in Kinderbücher über Landwirtschaft Nr. 2 in Witze für Kinder (Bücher) Kundenrezensionen: 4,2 4,2 von 5 Sternen (95) Seitenanfang über dieses Produkt Ähnlich Von der Marke Vom Autor Reze",
+          "fehlende_felder": []
+        }
+      ],
+      "fehler": []
+    }
+  ]
+}

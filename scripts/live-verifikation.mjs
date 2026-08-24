@@ -186,9 +186,11 @@ async function produktDaten(page, asin) {
         const [k, ...v] = txt.split(':');
         if (k && v.length) details[k.trim()] = v.join(':').trim();
       });
+    const preisKandidaten = [...document.querySelectorAll('.a-price .a-offscreen')]
+      .map((e) => e.textContent.trim()).filter(Boolean);
     return {
       titel: t('#productTitle'),
-      preisText: t('.a-price .a-offscreen') || t('#price') || t('#kindle-price'),
+      preisText: preisKandidaten[0] || t('#price') || t('#kindle-price'),
       bewertungText: t('#acrPopover .a-icon-alt') || t('[data-hook="rating-out-of-text"]'),
       rezensionenText: t('#acrCustomerReviewText'),
       formatText: t('#productSubtitle'),
