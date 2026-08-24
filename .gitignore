@@ -23,3 +23,7 @@ amazon-kdp-business/books/**/*.tiff
 Thumbs.db
 node_modules/
 __pycache__/
+
+# Artefakte des lokalen Playwright-Laufs
+package.json
+package-lock.json

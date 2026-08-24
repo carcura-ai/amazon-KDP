@@ -1,0 +1,99 @@
+[
+  {
+    "id": "C3",
+    "thema": "Laternenfest/Sankt-Martin-Beschäftigungsbuch",
+    "prioritaet": 1,
+    "begruendung_prioritaet": "Einziges Zeitfenster mit sofortigem Druck: Vorlauf 8-10 Wochen, Sankt Martin am 11. November.",
+    "zielalter_hypothese": "5-8 Jahre",
+    "suchbegriffe": [
+      "laternenfest kinderbuch",
+      "sankt martin kinderbuch",
+      "laternenfest beschäftigungsbuch",
+      "sankt martin basteln kinder buch"
+    ]
+  },
+  {
+    "id": "C1",
+    "thema": "Weihnachts-Adventskalender-Rätselbuch, engere Altersnische",
+    "prioritaet": 2,
+    "begruendung_prioritaet": "Vorlauf 14-18 Wochen, Fenster bereits eng.",
+    "zielalter_hypothese": "Lücke bei ab 3",
+    "suchbegriffe": [
+      "adventskalender buch kinder",
+      "rätsel adventskalender kinder",
+      "adventskalender rätselbuch ab 4"
+    ]
+  },
+  {
+    "id": "C2",
+    "thema": "Weihnachten Rätsel-/Beschäftigungsbuch, Einzelband",
+    "prioritaet": 3,
+    "begruendung_prioritaet": "Vorlauf 14-18 Wochen, dichtes Wettbewerbsfeld.",
+    "zielalter_hypothese": "4-6 / 6-8 Jahre",
+    "suchbegriffe": [
+      "weihnachten beschäftigungsbuch kinder",
+      "weihnachten rätselbuch kinder ab 6",
+      "weihnachtsrätsel kinder buch"
+    ]
+  },
+  {
+    "id": "C4",
+    "thema": "Herbst-Rätsel-/Beschäftigungsbuch, altersspezifisch",
+    "prioritaet": 4,
+    "begruendung_prioritaet": "Vorlauf 8-10 Wochen, Fenster läuft.",
+    "zielalter_hypothese": "6-8 Jahre",
+    "suchbegriffe": [
+      "herbst beschäftigungsbuch kinder",
+      "herbst rätselbuch kinder",
+      "herbst malbuch kinder ab 6"
+    ]
+  },
+  {
+    "id": "C8",
+    "thema": "Regentag-Beschäftigungsbuch mit klarer Altersgruppe",
+    "prioritaet": 5,
+    "begruendung_prioritaet": "Ganzjährig, laut Lauf 2 neu; Hauptkonkurrent alt und kritisiert.",
+    "zielalter_hypothese": "offen",
+    "suchbegriffe": [
+      "regentag beschäftigung kind buch",
+      "schlechtwetter beschäftigung kinder buch",
+      "beschäftigungsbuch kinder zuhause"
+    ]
+  },
+  {
+    "id": "C5",
+    "thema": "Restaurant-Beschäftigungsbuch für Kinder",
+    "prioritaet": 6,
+    "begruendung_prioritaet": "Ganzjährig, kein Zeitdruck.",
+    "zielalter_hypothese": "3 Jahre und 6-8 Jahre",
+    "suchbegriffe": [
+      "restaurant beschäftigungsbuch kinder",
+      "beschäftigung kinder unterwegs buch",
+      "kinder beschäftigung essen gehen"
+    ]
+  },
+  {
+    "id": "C6",
+    "thema": "Wartezimmer-Beschäftigungsbuch, dedizierte Positionierung",
+    "prioritaet": 7,
+    "begruendung_prioritaet": "Ganzjährig; laut Lauf 1 kein direkter Vergleichstitel gefunden - Nachfrage muss belegt werden.",
+    "zielalter_hypothese": "offen",
+    "suchbegriffe": [
+      "wartezimmer kinder beschäftigungsbuch",
+      "beschäftigung kind warten buch",
+      "mitnehmbuch kinder klein"
+    ]
+  },
+  {
+    "id": "C7",
+    "thema": "Zahnarzt-Kinderbuch, Mut machen, altersspezifisch",
+    "prioritaet": 8,
+    "begruendung_prioritaet": "Ganzjährig; ab 4 besetzt, Lücke vermutet bei 6-8.",
+    "zielalter_hypothese": "6-8 Jahre",
+    "suchbegriffe": [
+      "zahnarzt kinderbuch",
+      "zahnarzt angst kind buch",
+      "zahnarztbesuch kinder vorlesebuch"
+    ]
+  }
+]
