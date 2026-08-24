@@ -81,3 +81,32 @@ und sind `verifiziert: nein`.
 - amazon.de Bestsellerlisten (direkter Abruf, Live-BSR) — WebFetch durchgehend blockiert
 - Google Trends (Live-Kurve DE) — WebFetch blockiert, kein Ersatz über WebSearch verfügbar
 - amazon.de Autocomplete/Suchvorschläge (Live) — nicht separat abrufbar ohne WebFetch/Browser
+
+## Fortsetzung — Lauf 2, `/kdp-weekly-scan` (Vergleichslauf, selber Kalendertag)
+
+**Hinweis zur Aussagekraft:** Dieser zweite Lauf fand am selben Kalendertag wie der
+erste (2026-08-24) statt. Reale Marktbewegung (BSR, Rezensionszahlen) ist innerhalb
+weniger Stunden nicht zu erwarten und wird hier nicht unterstellt. Ziel dieses Laufs
+war die Prüfung, ob sich die Einschätzung zu C1–C7 ändert, sowie eine erweiterte Suche
+nach bislang nicht erfassten Chancen (Suchmuster aus `quellen-und-methode.md`, Zeilen
+„Gefühl/Situation" und „Lernziel").
+
+| Zeit (UTC) | Quelle/Zweck | Suchanfrage | Ergebnis | erfolgreich |
+|---|---|---|---|---|
+| 20:05 | WebFetch amazon.de Produktseite B0CMX6XB25 (erneuter Test) | — | proxy refused the connection | nein |
+| 20:06 | WebSearch | site:amazon.de weihnachten rätselbuch kinder ab 6 bestseller bewertungen preis | 7 Treffer; erstmals BSR-Werte für Hoffmann (B0CMX6XB25) und Imprint Press sichtbar; 2 zusätzliche Titel (Kate Robinson, Imprint Press ab 8) gegenüber Lauf 1 | ja |
+| 20:07 | WebSearch | site:amazon.de laternenfest sankt martin kinderbuch beschäftigungsbuch rätsel | 9 Treffer, inhaltlich deckungsgleich mit Lauf 1 (weiterhin nur Bilder-/Vorlesebücher) | ja |
+| 20:08 | WebSearch | site:amazon.de "Rätsel Adventskalender" kinder ab 6 bewertungen preis rezensionen | 6 Treffer; 3 zusätzliche Anbieter gegenüber Lauf 1 (Emil Elf, Anna Publishing, Emilie Stein) sowie ein zweiter Hoffmann-Band (B0CKZC8K9D, ab 8) | ja |
+| 20:09 | WebSearch | site:amazon.de wut kinderbuch beschäftigungsbuch ab 5 | Etabliertes Verlagssegment (Loewe/Geisler „Wohin mit meiner Wut?"), keine Beschäftigungsbuch-Lücke erkennbar | ja (keine neue Chance) |
+| 20:10 | WebSearch | site:amazon.de schere schneiden üben buch kinder ab 3 | Mindestens 7 etablierte Konkurrenztitel (Kiddos Press, PRINBOOK, Rason, Massarski, BastelFreunde u. a.) — Nische bereits sehr dicht besetzt | ja (keine neue Chance) |
+| 20:11 | WebSearch | site:amazon.de karneval kinderbuch beschäftigungsbuch fasching 2026 | Vorwiegend Kita-Praxisbücher für Erzieher/Eltern; ein Rätsel-/Malspaß-Titel (Crea Colorina) nur auf amazon.com gefunden, nicht bestätigt auf amazon.de; Saisonfenster laut Kalender erst ab ca. November zeitkritisch — nicht vertieft | ja (nicht vertieft, siehe Begründung) |
+| 20:12 | WebSearch | site:amazon.de neue freunde finden kinderbuch beschäftigungsbuch | Gesättigtes Bilderbuch-Segment inkl. eines bereits existierenden interaktiven Titels „Mission Freunde finden" ab 5 — keine belegbare Lücke | ja (keine neue Chance) |
+| 20:13 | WebSearch | site:amazon.de regentag beschäftigung kind buch bewertungen preis | 8 Treffer; „Regentage-Buch gegen Langeweile" (Heldt, ab 6, 5,98 €) mit wiederkehrender Kritik laut Suchindex-Zusammenfassung: „sehr dünn ausgefallen", „Zielgruppe verfehlt" → Lückenindikator nach `bewertungsraster.md` | ja |
+| 20:14 | WebSearch | "Regentage-Buch gegen Langeweile" Heldt amazon.de Bewertungen Sterne Rezensionen Anzahl | Exakte Sternezahl/Rezensionsanzahl nicht auffindbar; ISBN-Muster (1481871048/1073189317) deutet auf älteren Titel (vermutlich vor 2018) | ja (Sternezahl/Rezensionsanzahl nicht ermittelt) |
+
+**Ergebnis Lauf 2:** WebFetch weiterhin durchgehend blockiert — Einschränkung aus Lauf 1
+unverändert. Für C1–C7 keine Änderung, die die Einschätzung (verfolgen/beobachten/
+verwerfen) verschieben würde; zusätzliche Wettbewerbstitel bei C1/C2 werden als
+Detailergänzung, nicht als Statuswechsel gewertet (Suchvarianz statt Marktbewegung,
+siehe Hinweis oben). Eine neue Chance (Regentag-Beschäftigungsbuch, siehe Bericht C8)
+wurde identifiziert.

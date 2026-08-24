@@ -38,6 +38,22 @@ fi
 
 log "Start Trendscan"
 
+# Bereits vorhandenen Bericht desselben Tages wegsichern, statt ihn zu überschreiben.
+# Ohne das verliert ein zweiter Lauf am selben Tag (etwa nach einem Fehlschlag)
+# den vorherigen Bericht ersatzlos. Das Archiv liegt in einem Unterordner, damit
+# der Vergleich weiterhin den letzten regulären Wochenbericht als Basis nimmt
+# und nicht einen Lauf von vor wenigen Stunden.
+if [ -f "$BERICHTE/$HEUTE-kdp-trends.md" ]; then
+  mkdir -p "$BERICHTE/archiv"
+  ZEIT="$(date +%H%M%S)"
+  for endung in md csv; do
+    [ -f "$BERICHTE/$HEUTE-kdp-trends.$endung" ] && \
+      mv "$BERICHTE/$HEUTE-kdp-trends.$endung" \
+         "$BERICHTE/archiv/$HEUTE-kdp-trends--$ZEIT.$endung"
+  done
+  log "Vorhandener Bericht von heute archiviert nach archiv/$HEUTE-kdp-trends--$ZEIT.*"
+fi
+
 VORHER="$(ls -1 "$BERICHTE"/*-kdp-trends.md 2>/dev/null | wc -l)"
 
 cd "$PROJEKT" || { log "FEHLER: Wechsel nach $PROJEKT nicht möglich."; ABGESCHLOSSEN=1; exit 3; }
