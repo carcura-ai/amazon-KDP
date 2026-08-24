@@ -13,6 +13,26 @@
 | KDP-Konto | vorhanden (nicht verknüpft, keine Zugangsdaten gespeichert) |
 | Aktive Bücher | 1 (Stufe 2, WEITER PRÜFEN — noch keine Produktionsfreigabe) |
 | Aktive Reihen | 0 |
+| Letzter Trendbericht | 2026-08-24 — 7 Chancen, alle „beobachten", keine „verfolgen" |
+
+## Stufe 1 — Trendrecherche
+
+Letzter Lauf:               2026-08-24 (unbeaufsichtigt über `scripts/kdp-weekly-scan.sh`, Exit 0)
+Ergebnis:                   7 Chancen erhoben, alle mit Einschätzung „beobachten",
+                            alle mit `verifiziert: nein`.
+Artefakte:
+  - amazon-kdp-business/reports/trends/2026-08-24-kdp-trends.md
+  - amazon-kdp-business/reports/trends/2026-08-24-kdp-trends.csv
+  - amazon-kdp-business/research/raw/2026-08-24/abrufprotokoll.md
+Torbedingung erfüllt:       **nein** — verlangt ≥ 1 Chance mit „verfolgen", erreicht: 0.
+Grund:                      `WebFetch` in dieser Umgebung für amazon.de und Google Trends
+                            gesperrt. Ohne Autocomplete, Live-Preise, Rezensionszahlen und
+                            BSR reicht die Beleglage nach `bewertungsraster.md` nur für
+                            „beobachten". Das ist die vorgesehene Reaktion, kein Fehler.
+Nächster Schritt:           Lauf auf einem Rechner mit Zugriff auf amazon.de wiederholen,
+                            oder eine Chance gezielt mit manuell gelieferten Daten vertiefen.
+Blockiert durch:            fehlende Daten (Netzsperre der Einrichtungsumgebung)
+Aktualisiert:               2026-08-24
 
 ## Bücher
 
