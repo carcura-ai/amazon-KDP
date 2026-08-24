@@ -13,13 +13,17 @@
 | KDP-Konto | vorhanden (nicht verknüpft, keine Zugangsdaten gespeichert) |
 | Aktive Bücher | 1 (Stufe 2, WEITER PRÜFEN — noch keine Produktionsfreigabe) |
 | Aktive Reihen | 0 |
-| Letzter Trendbericht | 2026-08-24 — 7 Chancen, alle „beobachten", keine „verfolgen" |
+| Letzter Trendbericht | 2026-08-24 (Lauf 2) — 8 Chancen, alle „beobachten", keine „verfolgen" |
 
 ## Stufe 1 — Trendrecherche
 
-Letzter Lauf:               2026-08-24 (unbeaufsichtigt über `scripts/kdp-weekly-scan.sh`, Exit 0)
-Ergebnis:                   7 Chancen erhoben, alle mit Einschätzung „beobachten",
+Letzter Lauf:               2026-08-24, Lauf 2 (unbeaufsichtigt über `scripts/kdp-weekly-scan.sh`, Exit 0)
+Ergebnis:                   8 Chancen erhoben, alle mit Einschätzung „beobachten",
                             alle mit `verifiziert: nein`.
+                            Vergleich gegen Lauf 1: C1–C7 unverändert, C8 (Regentag-
+                            Beschäftigungsbuch) neu. Zeitkritisch bleibt allein C3
+                            (Laternenfest, Vorlauf 8–10 Wochen, Fenster läuft bereits).
+                            Lauf 1 archiviert unter `reports/trends/archiv/`.
 Artefakte:
   - amazon-kdp-business/reports/trends/2026-08-24-kdp-trends.md
   - amazon-kdp-business/reports/trends/2026-08-24-kdp-trends.csv
