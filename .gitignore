@@ -1,0 +1,25 @@
+# Geschäftszahlen aus KDP — bleiben lokal
+amazon-kdp-business/data/kdp-berichte/**
+!amazon-kdp-business/data/kdp-berichte/LIESMICH.md
+
+# Protokolle
+amazon-kdp-business/data/*.log
+
+# Große Binärdateien der Produktion
+amazon-kdp-business/books/**/*.pdf
+amazon-kdp-business/books/**/*.psd
+amazon-kdp-business/books/**/*.tif
+amazon-kdp-business/books/**/*.tiff
+
+# Zugangsdaten — dürfen hier ohnehin nicht entstehen
+.env
+.env.*
+*.key
+*credentials*
+*session*.json
+
+# System
+.DS_Store
+Thumbs.db
+node_modules/
+__pycache__/

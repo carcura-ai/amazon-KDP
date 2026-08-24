@@ -1,0 +1,53 @@
+# Projektstatus
+
+> Wird von `kdp-business-orchestrator` nach **jeder** Stufe fortgeschrieben.
+> Vor jeder Stufe lesen. Nie aus dem Gedächtnis fortsetzen.
+> Aufbau und Regeln: `.claude/skills/kdp-business-orchestrator/references/statusfuehrung.md`
+
+## Systemstatus
+
+| Feld | Wert |
+|---|---|
+| Eingerichtet am | 2026-08-24 |
+| Marktplatz | amazon.de |
+| KDP-Konto | vorhanden (nicht verknüpft, keine Zugangsdaten gespeichert) |
+| Aktive Bücher | 1 (Stufe 2, WEITER PRÜFEN — noch keine Produktionsfreigabe) |
+| Aktive Reihen | 0 |
+
+## Bücher
+
+## Ohne Reihenname / Band 1 — Beschäftigungsbuch Autofahrt 5–7
+
+Aktuelle Stufe:             2 — Validierung
+Letzte abgeschlossene:      2 am 2026-08-24
+Ergebnis der letzten Stufe: Scorecard erstellt, 63/100, WEITER PRÜFEN. Nachfrage über 12 real existierende Wettbewerbstitel belegt, aber Preis/Rezensionen/BSR/Druckkosten mangels Live-Zugriff auf amazon.de und kdp.amazon.com (Proxy blockiert beide Domains in dieser Sitzung) nicht verifizierbar und daher `keine Daten`.
+Artefakte:
+  - amazon-kdp-business/research/validated/2026-08-24-beschaeftigungsbuch-auto-5-7.md
+Torbedingung erfüllt:       nein — ≥70 Punkte und STARTEN nicht erreicht (63/100, WEITER PRÜFEN). Stufe 3 startet nicht.
+Nächster Schritt:           Offene Fragen mit Nutzer klären (Wettbewerbsdaten und KDP-Druckkosten nachziehen), dann Scorecard erneut bewerten.
+Blockiert durch:            fehlende Daten (Live-Zugriff amazon.de/kdp.amazon.com in dieser Sitzung nicht möglich)
+Offene Fragen an Nutzer:
+  1. Wettbewerbsprüfung mit echtem amazon.de-Zugriff wiederholen oder Nutzer liefert Preise/Rezensionen/BSR der 12 gelisteten Titel manuell?
+  2. Margenrechnung nachziehen, sobald KDP-Druckkostenrechner erreichbar ist oder Nutzer aktuelle Sätze mitteilt?
+Aktualisiert:               2026-08-24
+
+**Einstieg:** Stufe 1 (Trendrecherche) nicht durchlaufen — Grund: Idee vom Nutzer vorgegeben. Ersetzt durch: Nutzereingabe „Beschäftigungsbuch für Kinder von 5 bis 7 Jahren auf langen Autofahrten". Einstieg direkt in Stufe 2, wie im Orchestrator-Skill unter „Einstieg" vorgesehen und hier protokolliert.
+
+**TESTLAUF-Hinweis:** Auf ausdrücklichen Wunsch des Nutzers endet dieser Lauf nach Stufe 2. Es wurde nichts veröffentlicht, bestellt oder verknüpft — es bestand dazu ohnehin kein Anlass, da Stufe 2 keine dieser Aktionen umfasst.
+
+<!--
+Vorlage je Buch:
+
+## {{Reihe}} / Band {{n}} — {{Arbeitstitel}}
+
+Aktuelle Stufe:             {{1-8}} — {{Name}}
+Letzte abgeschlossene:      {{n}} am {{JJJJ-MM-TT}}
+Ergebnis der letzten Stufe: {{2-3 Sätze}}
+Artefakte:
+  - {{Pfad}}
+Torbedingung erfüllt:       ja / nein — {{welche}}
+Nächster Schritt:           {{konkret}}
+Blockiert durch:            {{Nutzerfreigabe für X / fehlende Daten / keine}}
+Offene Fragen an Nutzer:    {{Liste oder "keine"}}
+Aktualisiert:               {{JJJJ-MM-TT}}
+-->
