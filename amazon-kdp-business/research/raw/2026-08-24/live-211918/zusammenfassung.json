@@ -1,0 +1,178 @@
+{
+  "gestartet": "2026-08-24",
+  "chancen": 1,
+  "titel_gesamt": 7,
+  "abbruch": null,
+  "ergebnisse": [
+    {
+      "id": "C3B",
+      "thema": "Laternenfest/Sankt-Martin — gezielte Beschäftigungsbuch-Suche (Ergänzungslauf)",
+      "prioritaet": 1,
+      "begruendung_prioritaet": "Ergänzung zu C3: direkte Beschäftigungsbuch-Suchphrasen statt allgemeiner Themensuche, zusätzliche Autocomplete-Varianten (Kindergarten, Rätsel, Malen, Beschäftigung).",
+      "zielalter_hypothese": "5-8 Jahre",
+      "suchbegriffe": [
+        "sankt martin beschäftigungsbuch",
+        "laternenfest rätselbuch kinder",
+        "martinslaterne kindergarten rätsel",
+        "laterne malbuch kinder",
+        "sankt martin rätselheft",
+        "laternenfest ausmalbuch"
+      ],
+      "geprueft_am": "2026-08-24T21:19:18.857Z",
+      "autocomplete": [
+        {
+          "begriff": "sankt martin beschäftigungsbuch",
+          "vorschlaege": [],
+          "fehler": null,
+          "geprueft_am": "2026-08-24T21:19:19.049Z"
+        },
+        {
+          "begriff": "laternenfest rätselbuch kinder",
+          "vorschlaege": [],
+          "fehler": null,
+          "geprueft_am": "2026-08-24T21:19:25.126Z"
+        },
+        {
+          "begriff": "martinslaterne kindergarten rätsel",
+          "vorschlaege": [],
+          "fehler": null,
+          "geprueft_am": "2026-08-24T21:19:31.199Z"
+        },
+        {
+          "begriff": "laterne malbuch kinder",
+          "vorschlaege": [],
+          "fehler": null,
+          "geprueft_am": "2026-08-24T21:19:37.274Z"
+        },
+        {
+          "begriff": "sankt martin rätselheft",
+          "vorschlaege": [],
+          "fehler": null,
+          "geprueft_am": "2026-08-24T21:19:43.377Z"
+        },
+        {
+          "begriff": "laternenfest ausmalbuch",
+          "vorschlaege": [],
+          "fehler": null,
+          "geprueft_am": "2026-08-24T21:19:49.450Z"
+        }
+      ],
+      "titel": [
+        {
+          "asin": "3766638009",
+          "url": "https://www.amazon.de/dp/3766638009",
+          "geprueft_am": "2026-08-24T21:20:07.494Z",
+          "titel": "Sankt Martin (Meine allerersten Bücher)",
+          "preis_eur": null,
+          "preis_roh": null,
+          "seitenzahl": 10,
+          "format": null,
+          "veroeffentlicht": "18. September 2025",
+          "bewertung": 5,
+          "rezensionen": 6,
+          "bsr_roh": "Amazon Bestseller-Rang: Nr. 238.602 in Bücher (Siehe Top 100 in Bücher) Nr. 700 in Jahreszeiten für Kinder Nr. 1.032 in Religion für Kinder (Bücher) Nr. 3.968 in Natur für Kinder (Bücher) Kundenrezensionen: 5,0 5,0 von 5 Sternen (6) Informationen zum Autor Folge Autoren, um Neuigkeiten zu Veröffentl",
+          "fehlende_felder": [
+            "preis_eur"
+          ]
+        },
+        {
+          "asin": "B0C4PZKZWL",
+          "url": "https://www.amazon.de/dp/B0C4PZKZWL",
+          "geprueft_am": "2026-08-24T21:20:16.910Z",
+          "titel": "Sankt Martin. Eine Geschichte für unser Schattentheater: Fertige Figuren zum Spielen und Erzählen. Heiligengeschichten stimmungsvoll für Kinderkirche ... und Figuren für unser Schattentheater)",
+          "preis_eur": null,
+          "preis_roh": null,
+          "seitenzahl": 12,
+          "format": null,
+          "veroeffentlicht": "1. Juli 2024",
+          "bewertung": 4.6,
+          "rezensionen": 21,
+          "bsr_roh": "Amazon Bestseller-Rang: Nr. 339.715 in Bücher (Siehe Top 100 in Bücher) Nr. 90 in Figurentheater (Bücher) Nr. 118 in Kinderbücher über Drama & Theater Nr. 410 in Origami Kundenrezensionen: 4,6 4,6 von 5 Sternen (21) Über die Autoren Folge Autoren, um Neuigkeiten zu Veröffentlichungen und verbesserte",
+          "fehlende_felder": [
+            "preis_eur"
+          ]
+        },
+        {
+          "asin": "3769824474",
+          "url": "https://www.amazon.de/dp/3769824474",
+          "geprueft_am": "2026-08-24T21:20:26.076Z",
+          "titel": "Die Geschichte von Sankt Martin. Erzählschienen-Figurenset: Heiligengeschichte zum Basteln, Gestalten und Erzählen. Religionspädagogik im Kindergarten ... Basteln, Gestalten und Erzählen)",
+          "preis_eur": null,
+          "preis_roh": null,
+          "seitenzahl": 16,
+          "format": null,
+          "veroeffentlicht": "24. August 2020",
+          "bewertung": 4.3,
+          "rezensionen": 59,
+          "bsr_roh": "Amazon Bestseller-Rang: Nr. 456.846 in Bücher (Siehe Top 100 in Bücher) Nr. 122 in Figurentheater (Bücher) Nr. 1.133 in Jahreszeiten für Kinder Nr. 2.162 in Schulratgeber Kundenrezensionen: 4,3 4,3 von 5 Sternen (59) Informationen zum Autor Folge Autoren, um Neuigkeiten zu Veröffentlichungen und ver",
+          "fehlende_felder": [
+            "preis_eur"
+          ]
+        },
+        {
+          "asin": "3785588623",
+          "url": "https://www.amazon.de/dp/3785588623",
+          "geprueft_am": "2026-08-24T21:20:35.343Z",
+          "titel": "Die Geschichte von Sankt Martin: Pappbilderbuch zum Vorlesen und Mitsingen - Mit den Liedern \"Ich geh mit meiner Laterne\" und \"Laterne, Laterne\"",
+          "preis_eur": 8.95,
+          "preis_roh": "8,95€",
+          "seitenzahl": 18,
+          "format": null,
+          "veroeffentlicht": "17. September 2018",
+          "bewertung": 4.8,
+          "rezensionen": 194,
+          "bsr_roh": "Amazon Bestseller-Rang: Nr. 89.011 in Bücher (Siehe Top 100 in Bücher) Nr. 37 in Wohnen & Umzug Geschenkbücher Nr. 96 in Christentum Geschenkbücher Nr. 179 in Religionswissenschaft Kundenrezensionen: 4,8 4,8 von 5 Sternen (194) Informationen zum Autor Folge Autoren, um Neuigkeiten zu Veröffentlichun",
+          "fehlende_felder": []
+        },
+        {
+          "asin": "3766637169",
+          "url": "https://www.amazon.de/dp/3766637169",
+          "geprueft_am": "2026-08-24T21:20:44.013Z",
+          "titel": "Lass uns Sankt Martin feiern (Minis)",
+          "preis_eur": null,
+          "preis_roh": null,
+          "seitenzahl": 24,
+          "format": null,
+          "veroeffentlicht": "25. September 2024",
+          "bewertung": 4.7,
+          "rezensionen": 4,
+          "bsr_roh": "Amazon Bestseller-Rang: Nr. 513.138 in Bücher (Siehe Top 100 in Bücher) Nr. 2.247 in Religion für Kinder (Bücher) Kundenrezensionen: 4,7 4,7 von 5 Sternen (4) Sicherheits- und Produktressourcen Bilder und Kontakte Sicherheitsbilder und Kontakte Verwandte Produkte zu diesem Artikel Gesponsert Die Cha",
+          "fehlende_felder": [
+            "preis_eur"
+          ]
+        },
+        {
+          "asin": "3522304853",
+          "url": "https://www.amazon.de/dp/3522304853",
+          "geprueft_am": "2026-08-24T21:20:53.644Z",
+          "titel": "Die Geschichte von Sankt Martin: Heiligenlegende als Bilderbuch für Kinder ab 3",
+          "preis_eur": 15,
+          "preis_roh": "15,00€",
+          "seitenzahl": 32,
+          "format": null,
+          "veroeffentlicht": "21. August 2017",
+          "bewertung": 4.7,
+          "rezensionen": 248,
+          "bsr_roh": "Amazon Bestseller-Rang: Nr. 183.129 in Bücher (Siehe Top 100 in Bücher) Nr. 258 in Religiöse Literatur für Kinder Nr. 553 in Jahreszeiten für Kinder Nr. 793 in Religion für Kinder (Bücher) Kundenrezensionen: 4,7 4,7 von 5 Sternen (248) Informationen zum Autor Folge Autoren, um Neuigkeiten zu Veröffe",
+          "fehlende_felder": []
+        },
+        {
+          "asin": "3766629611",
+          "url": "https://www.amazon.de/dp/3766629611",
+          "geprueft_am": "2026-08-24T21:21:02.842Z",
+          "titel": "Die Geschichte von Sankt Martin. Farbenprächtiges Pappbilderbuch ab 2 Jahre mit Martinsliedern und -legenden. Was feiern wir am Martinstag? Bilderbuch ... Entdecken (Pappbilderbücher mit Türchen)",
+          "preis_eur": 9.95,
+          "preis_roh": "9,95€",
+          "seitenzahl": 16,
+          "format": null,
+          "veroeffentlicht": "21. September 2022",
+          "bewertung": 4.8,
+          "rezensionen": 13,
+          "bsr_roh": "Amazon Bestseller-Rang: Nr. 604.404 in Bücher (Siehe Top 100 in Bücher) Nr. 1.750 in Wimmelbücher für Kinder Nr. 1.923 in Weihnachten für Kinder Kundenrezensionen: 4,8 4,8 von 5 Sternen (13) Über die Autoren Folge Autoren, um Neuigkeiten zu Veröffentlichungen und verbesserte Empfehlungen zu erhalten",
+          "fehlende_felder": []
+        }
+      ],
+      "fehler": []
+    }
+  ]
+}

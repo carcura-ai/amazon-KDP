@@ -95,7 +95,7 @@ diesem Lauf einzelne Bestseller-Rang-Werte (BSR) in den Suchzusammenfassungen (s
 | Risiken | Regionales Thema; religiöser Bezug erfordert sensible Umsetzung; sehr enges und bereits laufendes Saisonfenster; Marktgröße unbelegt, da kein Vergleichstitel im Zielformat existiert |
 | Quellen | amazon.de/dp/B0DL423GX8 (Fay's Atelier); amazon.de/dp/3579074075 (Weber, „Laterne, Laterne"); amazon.de/dp/1986093417 (Baumann/Janetzko); Prüfdatum 2026-08-24, via WebSearch. **Live-Verifizierung 2026-08-24 21:05 UTC** (Playwright/Chromium, sichtbar, lokal): 7 Titel mit echten Preisen/Rezensionen/Seitenzahlen erhoben, Autocomplete für 4 Phrasen geprüft (0 Vorschläge) — Rohdaten `research/raw/2026-08-24/live-210533/`. |
 | Status vs. Vorbericht | **AKTUALISIERT** — erstmals mit Live-Daten statt Suchmaschinen-Zusammenfassung geprüft; Lückenbefund bestätigt (alle 7 Titel Bilder-/Vorlesebücher, kein Rätsel-/Beschäftigungsformat) |
-| Vorläufige Einschätzung | **verfolgen (mit Vorbehalt)** — Live-Verifizierung bestätigt Formatlücke und über 17 Jahre wiederkehrende Nachfrage (3 Titel mit dreistelligen Rezensionszahlen), aber Autocomplete liefert aktuell kein Suchsignal und nur 7 statt 10 Titel geprüft. Opportunity-Validator-Scorecard: **65/100, WEITER PRÜFEN** — Schwelle für Stufe 3 (70 Punkte) knapp verfehlt. Siehe `research/validated/2026-08-24-c3-laternenfest.md`. |
+| Vorläufige Einschätzung | **verfolgen (mit Vorbehalt)** — Live-Verifizierung bestätigt Formatlücke und über 17 Jahre wiederkehrende Nachfrage (3 Titel mit dreistelligen Rezensionszahlen), aber Autocomplete liefert aktuell kein Suchsignal und nur 7 statt 10 Titel geprüft. Opportunity-Validator-Scorecard: **69/100 (finaler Lauf), WEITER PRÜFEN** — Schwelle für Stufe 3 (70 Punkte) knapp verfehlt. Siehe `research/validated/2026-08-24-c3-laternenfest.md`. |
 
 ### C4 — Herbst-Rätsel-/Beschäftigungsbuch, altersspezifisch
 
@@ -113,29 +113,35 @@ Prüfung im nächsten regulären Wochenlauf vorgesehen.*
 
 ### C5 — Restaurant-Beschäftigungsbuch für Kinder
 
-*In diesem Lauf nicht erneut recherchiert. Befund und Einschätzung aus Lauf 1 unverändert
-übernommen.*
+*Live verifiziert am 2026-08-24 im Rahmen der C3-Entscheidungsregel (C3 blieb bei 69/100 unter der
+70-Punkte-Schwelle). Suche liefert dieselben 7 Titel wie C6 — Amazon trennt beide Positionierungen
+in der organischen Suche nicht. Davon 1 Titel wirklich Restaurant-spezifisch: „Beschäftigungsbuch für
+Kinder im Restaurant" (12 Rez., 5,0★, 122 S., Mai 2025) — realer, aktueller Wettbewerber mit positiver
+früher Traktion. Dominanter Generalist „Kindergarten-Rätselspaß für unterwegs" (3.417 Rez., Rang 25
+gesamt, seit 2014) steht als indirekter Wettbewerber im Raum. Alle Preise fehlen (`preis_eur: null`) —
+echte Datenlücke. Autocomplete für 3 Phrasen: 0 Vorschläge.*
 
 | Feld | Wert |
 |---|---|
 | Kategorie / Nische | Beschäftigungsbuch für die Tischzeit im Restaurant |
 | Zielalter | 3 Jahre und 6–8 Jahre bereits besetzt |
 | Saison / Zeitfenster | ganzjährig |
-| Status vs. Vorbericht | **UNVERÄNDERT (nicht erneut geprüft)** |
-| Vorläufige Einschätzung | **beobachten** (unverändert aus Lauf 1) |
+| Status vs. Vorbericht | **AKTUALISIERT** — live verifiziert 2026-08-24 |
+| Vorläufige Einschätzung | **Als stärkere der beiden ganzjährigen Nischen (C5 vs. C6) ausgewählt** — einziger real existierender, direkt positionierter Wettbewerber mit positiver Traktion. Noch keine Opportunity-Scorecard, Stufe 3 nicht gestartet. |
 
 ### C6 — Wartezimmer-Beschäftigungsbuch für Kinder (dedizierte Positionierung)
 
-*In diesem Lauf nicht erneut recherchiert. Befund und Einschätzung aus Lauf 1 unverändert
-übernommen.*
+*Live verifiziert am 2026-08-24. Identische 7 Suchtreffer wie C5, aber **kein einziger** davon ist
+Wartezimmer-spezifisch — trotz gezielter Suchbegriffe kein dedizierter Wettbewerber gefunden. Autocomplete
+für 3 Phrasen: 0 Vorschläge. Reine Hypothese ohne jedes Marktsignal.*
 
 | Feld | Wert |
 |---|---|
 | Kategorie / Nische | Beschäftigungsbuch, exklusiv auf „Wartezimmer" positioniert |
 | Zielalter | noch offen |
 | Saison / Zeitfenster | ganzjährig |
-| Status vs. Vorbericht | **UNVERÄNDERT (nicht erneut geprüft)** |
-| Vorläufige Einschätzung | **beobachten** (unverändert aus Lauf 1) |
+| Status vs. Vorbericht | **AKTUALISIERT** — live verifiziert 2026-08-24, gegenüber C5 nicht ausgewählt (kein Wettbewerbssignal) |
+| Vorläufige Einschätzung | **schwächer als C5** — kein dedizierter Wettbewerber gefunden trotz gezielter Suche, kein Autocomplete-Signal. Nicht als stärkere Nische ausgewählt. |
 
 ### C7 — Zahnarzt-Kinderbuch „Mut machen", altersspezifische Fortsetzung
 
@@ -172,7 +178,7 @@ Prüfung im nächsten regulären Wochenlauf vorgesehen.*
 |---|---|---|
 | C1 | UNVERÄNDERT | Mehr Wettbewerbstitel gefunden (6 statt 3) — Recherche-, keine Marktveränderung; Einschätzung bleibt „beobachten" |
 | C2 | UNVERÄNDERT | Erstmals BSR-Werte sichtbar, 2 weitere Titel gefunden — bestätigt bereits bekannte hohe Wettbewerbsdichte; Einschätzung bleibt „beobachten" |
-| C3 | AKTUALISIERT | Live-Verifizierung mit echtem Browser durchgeführt (7 Titel); Lücke bestätigt, Validator-Scorecard 65/100 (WEITER PRÜFEN, Schwelle 70 knapp verfehlt) |
+| C3 | AKTUALISIERT | Live-Verifizierung mit echtem Browser durchgeführt (7 Titel); Lücke bestätigt, Validator-Scorecard 69/100 (finaler Lauf) (WEITER PRÜFEN, Schwelle 70 knapp verfehlt) |
 | C4 | UNVERÄNDERT | Nicht erneut geprüft in diesem Lauf |
 | C5 | UNVERÄNDERT | Nicht erneut geprüft in diesem Lauf |
 | C6 | UNVERÄNDERT | Nicht erneut geprüft in diesem Lauf |
@@ -207,10 +213,10 @@ Vermutungen ohne Datenbeleg — ausdrücklich **nicht** zur Produktionsentscheid
 ## Nächster Schritt
 
 Nachtrag 2026-08-24 (nach Live-Verifizierung): C3 wurde mit echten Browserdaten geprüft
-und an `kdp-opportunity-validator` übergeben — Ergebnis 65/100, WEITER PRÜFEN, Stufe 3
+und an `kdp-opportunity-validator` übergeben — Ergebnis 69/100 (finaler Lauf), WEITER PRÜFEN, Stufe 3
 startet nicht. Die übrigen sieben Chancen bleiben unverändert bei „beobachten".
 
-1. **C3 (Laternenfest)** ist geprüft — Scorecard liegt vor (65/100, WEITER PRÜFEN).
+1. **C3 (Laternenfest)** ist geprüft — Scorecard liegt vor (69/100 (finaler Lauf), WEITER PRÜFEN).
    Offene Fragen aus der Scorecard vor erneuter Bewertung klären (siehe
    `research/validated/2026-08-24-c3-laternenfest.md`).
 2. **C2 (Weihnachten Einzelband)** bleibt das Signal mit der stärksten belegten Nachfrage

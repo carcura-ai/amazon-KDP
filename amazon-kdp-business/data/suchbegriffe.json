@@ -13,6 +13,21 @@
     ]
   },
   {
+    "id": "C3B",
+    "thema": "Laternenfest/Sankt-Martin — gezielte Beschäftigungsbuch-Suche (Ergänzungslauf)",
+    "prioritaet": 1,
+    "begruendung_prioritaet": "Ergänzung zu C3: direkte Beschäftigungsbuch-Suchphrasen statt allgemeiner Themensuche, zusätzliche Autocomplete-Varianten (Kindergarten, Rätsel, Malen, Beschäftigung).",
+    "zielalter_hypothese": "5-8 Jahre",
+    "suchbegriffe": [
+      "sankt martin beschäftigungsbuch",
+      "laternenfest rätselbuch kinder",
+      "martinslaterne kindergarten rätsel",
+      "laterne malbuch kinder",
+      "sankt martin rätselheft",
+      "laternenfest ausmalbuch"
+    ]
+  },
+  {
     "id": "C1",
     "thema": "Weihnachts-Adventskalender-Rätselbuch, engere Altersnische",
     "prioritaet": 2,

@@ -11,9 +11,9 @@
 | Eingerichtet am | 2026-08-24 |
 | Marktplatz | amazon.de |
 | KDP-Konto | vorhanden (nicht verknüpft, keine Zugangsdaten gespeichert) |
-| Aktive Bücher | 2 (beide Stufe 2, WEITER PRÜFEN — noch keine Produktionsfreigabe) |
+| Aktive Bücher | 2 (Stufe 2, WEITER PRÜFEN — noch keine Produktionsfreigabe) |
 | Aktive Reihen | 0 |
-| Letzter Trendbericht | 2026-08-24 (Lauf 2) — 8 Chancen; C3 live verifiziert und an Validator übergeben (65/100), übrige 7 „beobachten" |
+| Letzter Trendbericht | 2026-08-24 (Lauf 2) — C3 final validiert (69/100, WEITER PRÜFEN, gestoppt); C5 als stärkste ganzjährige Nische ausgewählt (noch keine Scorecard); übrige „beobachten" |
 
 ## Stufe 1 — Trendrecherche
 
@@ -70,10 +70,43 @@ Artefakte:
 Torbedingung erfüllt:       nein — ≥70 Punkte und STARTEN nicht erreicht (65/100, WEITER PRÜFEN). Stufe 3 startet nicht.
 Nächster Schritt:           Offene Fragen aus der Scorecard klären (weitere Wettbewerbstitel, Autocomplete näher am Saisonfenster erneut prüfen, Marge mit aktuellem KDP-Druckkostenrechner nachziehen), dann erneut bewerten.
 Blockiert durch:            fehlende Daten (Marge unverifiziert, unter 10 Wettbewerbstitel geprüft)
-Offene Fragen an Nutzer:
-  1. Weitere Wettbewerbstitel erheben (zusätzliche Suchbegriffe), um auf ≥10 geprüfte Titel zu kommen?
-  2. Autocomplete-Prüfung näher am Saisonfenster (September/Oktober) wiederholen?
-  3. Marge mit aktuellen KDP-Druckkostensätzen nachziehen?
+Offene Fragen an Nutzer:    keine — finaler Lauf abgeschlossen, siehe unten
+Aktualisiert:               2026-08-24 (finaler Lauf)
+
+**Finaler Validierungslauf (2026-08-24, ersetzt den vorherigen Zwischenstand):** 14 statt 7 Titel geprüft
+(zwei unabhängige Suchläufe, C3 + C3B), Rezensions-Fehler korrigiert (79 ist zweistellig, nicht dreistellig —
+richtig sind 200/158/194/248 als dreistellige Werte), Marge erstmals mit live abgerufenen KDP-Druckkosten-
+und Tantiemesätzen gerechnet (Deckungsbeitrag ≈2,15 €/Exemplar). **Ergebnis: 69/100, WEITER PRÜFEN — Schwelle
+70 um 1 Punkt verfehlt.** Keine künstliche Anpassung der Schwelle. Stufe 3 startet für C3 nicht.
+Artefakt: `amazon-kdp-business/research/validated/2026-08-24-c3-laternenfest.md`
+
+## Ohne Reihenname / Band 1 — C5/C6 Vergleich ganzjährige Nische (Entscheidungsregel nach C3-Stopp)
+
+Aktuelle Stufe:             1 — Trendrecherche (Live-Verifizierung, noch keine Validator-Scorecard)
+Letzte abgeschlossene:      Live-Verifizierung am 2026-08-24
+Ergebnis:                   C5 (Restaurant) und C6 (Wartezimmer) live verifiziert. Beide Suchen liefern
+                            dieselben 7 Titel — Amazon unterscheidet die beiden Positionierungen in der
+                            organischen Suche nicht. Davon ist nur 1 Titel wirklich Restaurant-spezifisch
+                            ("Beschäftigungsbuch für Kinder im Restaurant", 12 Rez., 5,0★, Mai 2025) — ein
+                            echter, aktueller Proof-of-Concept-Wettbewerber mit positiver früher Traktion.
+                            Für Wartezimmer wurde trotz gezielter Suche **kein einziger** dedizierter
+                            Wettbewerber gefunden — reine Hypothese ohne jedes Signal. Beide Nischen stehen
+                            zusätzlich im Schatten eines dominanten Generalisten-Titels ("Kindergarten-
+                            Rätselspaß für unterwegs", 3.417 Rezensionen, Rang 25 gesamt, seit 2014 am Markt).
+                            Alle 14 Preise fehlen (`preis_eur: null`) — echte Datenlücke, nicht erfunden.
+                            Autocomplete für 6 getestete Phrasen (3× Restaurant, 3× Wartezimmer): 0 Vorschläge.
+                            **Auswahl: C5 (Restaurant) ist die stärkere Nische** — belegt durch einen realen,
+                            aktuellen Wettbewerber mit positiver Traktion; C6 hat kein einziges Signal.
+Artefakte:
+  - amazon-kdp-business/research/raw/2026-08-24/live-212314/C5.json
+  - amazon-kdp-business/research/raw/2026-08-24/live-212314/C6.json
+Torbedingung erfüllt:       nein — es liegt noch keine Opportunity-Validator-Scorecard für C5 vor. Diese
+                            Live-Verifizierung wählt nur die stärkere Nische aus; ≥70 Punkte/STARTEN wurden
+                            nicht geprüft. Stufe 3 startet nicht automatisch.
+Nächster Schritt:           Falls C5 weiterverfolgt werden soll: vollständige Opportunity-Validator-Scorecard
+                            für C5 erstellen (inkl. Preisdaten nachziehen, da preis_eur überall fehlt).
+Blockiert durch:            keine Nutzerfreigabe nötig für die Live-Verifizierung selbst; Scorecard/Stufe 3
+                            für C5 noch nicht angefordert
 Aktualisiert:               2026-08-24
 
 <!--
