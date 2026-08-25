@@ -1,0 +1,43 @@
+{
+  "stilblock": "warm children's book illustration, thick slightly irregular ink outlines, flat colors without gradients, rounded child-friendly proportions, no photorealism, simple flat ground shadow only, no text in image, square 1:1 composition",
+  "negative": "text, watermark, logo, signature, extra limbs, extra fingers, extra tail, deformed paws, blurry, photorealistic, adult human proportions, scary, dark horror shadows, brand logo, clothed fox in full outfit, realistic fur texture, franchise character, Disney style, anime style",
+  "figuren": {
+    "miro": "young rounded chibi fox character, warm reddish-brown fur (#C7622D), light cream belly (#F3E4D3), bright turquoise tail tip (#2FB8AC), wearing only a small braided fir-twig bracelet with one wooden bead, big friendly eyes, no other clothing",
+    "lotte": "young rounded owl character, blue-grey feathers (#7C8FA6), round glasses made of two small twigs, perched pose",
+    "rosa": "adult badger character (Waldtante Rosa), green cloak (#3E7A4C), larger and rounder than Miro and Lotte, kind face",
+    "igel": "small round hedgehog character, orange knitted hat (#E08A2B), soft non-threatening spines",
+    "maus": "tiny round mouse character, yellow ribbon (#F2C744), big ears"
+  },
+  "seiten": [
+    {"seite": 5, "tag": 1, "szene": "snowy forest edge, early Advent, light snowfall", "figuren": ["miro"], "pose": "searching, scratching ear with paw"},
+    {"seite": 7, "tag": 2, "szene": "entrance of Miro's tree-hollow home", "figuren": ["miro"], "pose": "looking up at the sky, wishing for a star"},
+    {"seite": 9, "tag": 3, "szene": "pile of pinecones outside the hollow", "figuren": ["miro", "lotte"], "pose": "lotte tilts head asking a question, miro counts on paws"},
+    {"seite": 11, "tag": 4, "szene": "inside the hollow, a clothesline with winter items", "figuren": ["miro", "lotte", "rosa"], "pose": "miro puzzled in front of a pile of clothes, rosa small in background"},
+    {"seite": 13, "tag": 5, "szene": "undergrowth at dusk", "figuren": ["miro"], "pose": "sneaking carefully, one paw raised"},
+    {"seite": 15, "tag": 6, "szene": "clearing with falling snow", "figuren": ["miro"], "pose": "concentrating, tongue out, drawing in the snow"},
+    {"seite": 17, "tag": 7, "szene": "path lined with trees toward the festival", "figuren": ["miro"], "pose": "happily holding a paintbrush"},
+    {"seite": 19, "tag": 8, "szene": "undergrowth in moonlight, silhouettes only", "figuren": ["miro", "igel", "maus"], "pose": "only dark silhouettes visible, no facial detail needed"},
+    {"seite": 21, "tag": 9, "szene": "denser thicket", "figuren": ["miro"], "pose": "slightly frustrated, ear-scratch gesture"},
+    {"seite": 23, "tag": 10, "szene": "clearing with a small young fir tree", "figuren": ["miro", "lotte"], "pose": "lotte pointing at the tree"},
+    {"seite": 25, "tag": 11, "szene": "hollow interior, set table", "figuren": ["miro", "rosa"], "pose": "rosa smiling, holding a plate of cookies"},
+    {"seite": 27, "tag": 12, "szene": "crossroads with lanterns lined up", "figuren": ["miro", "lotte", "rosa", "igel"], "pose": "each holding their own colored lantern"},
+    {"seite": 29, "tag": 13, "szene": "snowy clearing with paw prints", "figuren": ["miro"], "pose": "searching, paw prints trailing in snow"},
+    {"seite": 31, "tag": 14, "szene": "frozen forest stream", "figuren": ["miro"], "pose": "balancing carefully at the stream edge"},
+    {"seite": 33, "tag": 15, "szene": "forest path section with dense trees", "figuren": ["miro"], "pose": "painting happily, satisfied expression"},
+    {"seite": 35, "tag": 16, "szene": "tree canopy at night, silhouettes only", "figuren": ["lotte"], "pose": "silhouette only, perched on a branch"},
+    {"seite": 37, "tag": 17, "szene": "dense forest, long winding path", "figuren": ["miro"], "pose": "hurrying, tail flowing behind"},
+    {"seite": 39, "tag": 18, "szene": "hollow craft corner", "figuren": ["lotte"], "pose": "focused, painting a large star"},
+    {"seite": 41, "tag": 19, "szene": "festival meadow with many tracks in snow", "figuren": ["miro"], "pose": "counting with paw raised, other animals small in background"},
+    {"seite": 43, "tag": 20, "szene": "festival meadow, preparation", "figuren": ["miro", "lotte", "rosa", "igel", "maus"], "pose": "each carrying their own colored item"},
+    {"seite": 45, "tag": 21, "szene": "festival tree at dusk", "figuren": ["miro"], "pose": "searching at the base of the tree trunk"},
+    {"seite": 47, "tag": 22, "szene": "decorated hollow entrance", "figuren": ["miro"], "pose": "painting, garland in paw"},
+    {"seite": 49, "tag": 23, "szene": "whole path to the festival", "figuren": ["miro", "lotte"], "pose": "both painting together"},
+    {"seite": 51, "tag": 24, "szene": "festival meadow, all lights on, all animals gathered", "figuren": ["miro", "lotte", "rosa", "igel", "maus"], "pose": "everyone celebrating, miro with full bead bracelet"}
+  ],
+  "cover": {
+    "szene": "stylized twilight lantern forest, few large shapes, no background clutter",
+    "figuren": ["miro"],
+    "pose": "joyful, holding a lantern/candle high, fir-twig bracelet visible",
+    "hinweis": "Titeltext und Layout separat gemäß cover-brief.md, nicht Teil des generierten Bildes"
+  }
+}

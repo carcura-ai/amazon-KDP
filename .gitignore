@@ -10,6 +10,9 @@ amazon-kdp-business/books/**/*.pdf
 amazon-kdp-business/books/**/*.psd
 amazon-kdp-business/books/**/*.tif
 amazon-kdp-business/books/**/*.tiff
+amazon-kdp-business/books/**/druckdaten/**/*.png
+amazon-kdp-business/books/**/druckdaten/**/*.jpg
+amazon-kdp-business/books/**/druckdaten/**/*.jpeg
 
 # Zugangsdaten — dürfen hier ohnehin nicht entstehen
 .env

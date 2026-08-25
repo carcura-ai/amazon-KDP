@@ -8,7 +8,9 @@
 
 ## Verbindliche Regeln (jede Doppelseite)
 
-- Figuren: Miro und Lotte exakt nach `character-bibles/miro.md` / `lotte.md`, inkl. Farbcodes
+- Figuren: Miro und Lotte exakt nach `character-bibles/miro.md` / `lotte.md`, Nebenfiguren (Waldtante
+  Rosa, Igel, Maus) exakt nach `character-bibles/nebenfiguren.md` — Farbcodes sind dort für die
+  Zuordnungsrätsel Tag 4/12/20 lösungsrelevant und müssen exakt eingehalten werden
 - Verboten: Marken, Logos, Schrift im Bild, reale Personen, geschützte Figuren, Künstlerimitation
 - Perspektive: durchgängig Augenhöhe der Figuren, keine Untersicht
 - Anschnitt: linke Seite randabfallend, rechte Rätselseite mit weißem Rand für Druckklarheit

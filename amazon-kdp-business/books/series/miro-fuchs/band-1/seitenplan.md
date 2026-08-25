@@ -6,7 +6,10 @@
 | Trimmgröße | 21,59 × 21,59 cm (8,5 × 8,5 Zoll, quadratisch) |
 | Farbe | Schwarzweiß |
 | Bindung | KDP Taschenbuch |
-| Innenrand (Gutter) | nach aktueller KDP-Tabelle für 56 Seiten zu prüfen — **[vor Upload im KDP-Vorschautool bestätigen, Prüfdatum notieren]** |
+| Innenrand (Gutter) | 0,375 Zoll (9,6 mm) für 56 Seiten (Band 24–150 Seiten) — live geprüft 2026-08-25, kdp.amazon.com/help/topic/GVBQ3CMEQW3W2VL6 |
+| Außenrand (oben/unten/außen) | mind. 0,25 Zoll (6,4 mm) — dieselbe Quelle |
+| Beschnittzugabe | 0,125 Zoll (3,2 mm) pro Kante bei randabfallenden Elementen — dieselbe Quelle |
+| Seitengröße mit Beschnitt | 8,625 × 8,75 Zoll (Trimm 8,5×8,5 Zoll + 0,125" außen + 0,125" oben/unten) |
 
 ## Vorspann (Seiten 1–4)
 
@@ -58,9 +61,19 @@ F Schwungübung · G Ausmalen nach Muster · H Schattenrätsel
 | 55 | Miro und Lotte feiern das Lichterfest — Abschlussbild, kein Rätsel |
 | 56 | Ausblick auf Band 2 („Miro Fuchs geht weiter"), an Erwachsene gerichtet, keine Kaufaufforderung an Kinder |
 
+## Produktionsstand Druckdaten
+
+- [x] 24 Rätselgrafiken (rechte Seiten 6–52, gerade) **programmatisch erzeugt** statt mit KI —
+  garantiert korrekte Anzahl/eindeutig lösbare Wege (Labyrinthe, Punkte-Reihenfolge, Zählobjekte).
+  Quelle: `scripts/generate-raetselgrafiken.py`, Ausgabe in `druckdaten/raetselgrafiken/`.
+- [ ] 24 Szenenseiten (linke Seiten 5–51, ungerade, Miro/Lotte-Illustrationen) — KI-generiert via
+  Fooocus, Status siehe `druckdaten/README.md`
+- [ ] Vorspann/Nachspann-Seiten (1–4, 53–56) — Text vorhanden (`manuskript.md`), Layout aussteht
+
 ## Prüfpunkte
 
-- [ ] Seitenzahl (56) gegen aktuelle KDP-Bindungsvorgaben geprüft
+- [x] Seitenzahl (56) gegen aktuelle KDP-Bindungsvorgaben geprüft — 56 liegt im Standardband
+  24–150 Seiten (Taschenbuch-Mindestseitenzahl 24 erfüllt), live geprüft 2026-08-25
 - [ ] Keine leere Seite ohne Absicht
 - [x] Aktivitäten wechseln sich in 8er-Rotation ab — kein Monotonieblock
 - [x] Schwierigkeit steigt sichtbar in 3 Stufen (Tag 1–8 / 9–16 / 17–24)

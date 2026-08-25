@@ -4,6 +4,18 @@
 > gerendertes Bild — Bildproduktion (Illustration oder KI-Generierung mit anschließender
 > Prüfmatrix) und Coverlayout sind eigene, noch ausstehende Arbeitsschritte.
 
+## Exakte Covermaße (live geprüft 2026-08-25, kdp.amazon.com/help/topic/G201953020, für Taschenbuch 8,5×8,5 Zoll, 56 Seiten SW auf weißem Papier)
+
+| Maß | Wert |
+|---|---|
+| Trimmgröße je Seite | 8,5 × 8,5 Zoll (21,59 × 21,59 cm) |
+| Beschnittzugabe | 0,125 Zoll (3,2 mm) an allen Außenkanten |
+| Buchrücken (Spine) | 56 × 0,002252" = 0,126 Zoll (3,2 mm) |
+| Gesamtbreite Vollcover (Rückseite+Rücken+Vorderseite+Beschnitt) | 0,125 + 8,5 + 0,126 + 8,5 + 0,125 = **17,376 Zoll** |
+| Gesamthöhe Vollcover | 0,125 + 8,5 + 0,125 = **8,75 Zoll** |
+| Text-Sicherheitsabstand zur Trimmlinie | mind. 0,125 Zoll (3,2 mm) nach innen |
+| Rückentext | **entfällt** — 56 Seiten liegen unter der 79-Seiten-Mindestgrenze für Rückentext |
+
 ## Miniaturtest-Anforderung
 
 Titel und Miro müssen auf Daumennagelgröße (Suchergebnisliste) noch erkennbar sein — daher: großer

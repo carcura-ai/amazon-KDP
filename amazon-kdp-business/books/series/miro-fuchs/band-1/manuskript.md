@@ -37,7 +37,10 @@ Aufgabe der Illustration (`illustration-briefs.md`) — hier stehen Text, Rätse
 ### Tag 2 — Punkte verbinden
 > Miro will einen Stern für seine Höhle.
 > Verbinde die Punkte 1 bis 5!
-**Lösung:** Fünf Punkte ergeben einen einfachen fünfzackigen Stern.
+**Lösung:** Fünf Punkte ergeben einen einfachen fünfzackigen Stern. **Konstruktionshinweis für die
+Illustration (Solvability):** Punkte müssen auf den 5 Sternzacken liegen und in der Reihenfolge
+1→2→3→4→5→zurück zu 1 im Zickzack (Pentagramm-Reihenfolge) nummeriert sein — bei Nummerierung im
+Kreis entsteht stattdessen ein Fünfeck. Gilt sinngemäß für Tag 10 und Tag 18.
 
 ### Tag 3 — Zählen
 > Lotte fragt: Wie viele Zapfen hat Miro schon?
@@ -46,8 +49,8 @@ Aufgabe der Illustration (`illustration-briefs.md`) — hier stehen Text, Rätse
 
 ### Tag 4 — Zuordnen
 > Miros Wintersachen liegen durcheinander.
-> Welcher Schal gehört zu welchem Tier?
-**Lösung:** Roter Schal → Miro, blaue Mütze → Lotte, grüner Handschuh → Waldtante Rosa.
+> Welches Kleidungsstück hat die gleiche Farbe wie sein Tier?
+**Lösung (farbcodiert, jedes Kleidungsstück hat die Farbe seines Tieres):** Roter Schal → Miro (rotbraunes Fell), blaue Mütze → Lotte (blaugraues Gefieder), grüner Handschuh → Waldtante Rosa (grüner Umhang laut Illustration Brief). **Lektorat-Korrektur:** Instruktion vorher inkonsistent zur Lösung (fragte nur nach „Schal", Lösung nannte drei verschiedene Kleidungsstücke) — behoben, Solvability jetzt über Farbcode statt Ratens.
 
 ### Tag 5 — Suchbild
 > Etwas Glänzendes versteckt sich im Unterholz.
@@ -62,12 +65,18 @@ Aufgabe der Illustration (`illustration-briefs.md`) — hier stehen Text, Rätse
 ### Tag 7 — Ausmalen nach Muster
 > Der Weg zum Lichterfest braucht Farbe.
 > Male die Kreise rot, die Sterne grün!
-**Lösung:** 5 Kreise rot, 5 Sterne grün.
+**Lösung:** 5 Kreise rot, 5 Sterne grün. **Solvability-Hinweis:** Regel steht als Text UND als
+kleines vorgemaltes Beispiel (1 roter Kreis, 1 grüner Stern bereits ausgemalt) direkt am Bildrand —
+3-Jährige brauchen ein visuelles Vorbild, die Textregel allein reicht nicht. Gilt sinngemäß für
+Tag 15 und Tag 23 (dort zusätzlich: die ersten 2 Musterglieder der Farbfolge bereits vorgemalt).
 
 ### Tag 8 — Schattenrätsel
 > Ein Schatten huscht durchs Unterholz.
 > Welcher Schatten gehört zu welchem Tier?
 **Lösung:** Runder Schatten → Igel, spitzer Schatten → Fuchs Miro, kleiner Schatten → Maus.
+**Solvability-Hinweis:** Die 3 Silhouetten müssen sich stark in Größe UND Umriss unterscheiden
+(nicht nur fein schattiert) — für 3-Jährige grob genug, um ohne Lesen zuzuordnen. Gilt sinngemäß
+für Tag 16.
 
 ### Tag 9 — Labyrinth
 > Miro verliert seine zweite Perle im Gestrüpp.
@@ -85,9 +94,12 @@ Aufgabe der Illustration (`illustration-briefs.md`) — hier stehen Text, Rätse
 **Lösung:** 7 Plätzchen auf dem Teller.
 
 ### Tag 12 — Zuordnen
-> Alle Waldfreunde brauchen eine Laterne.
-> Welche Laterne passt zu welchem Tier?
-**Lösung:** Runde Laterne → Igel, sternförmige Laterne → Miro, kleine Laterne → Maus, große Laterne → Waldtante Rosa.
+> Jede Laterne hat die Farbe seines Tieres.
+> Welche Laterne gehört zu welchem Tier?
+**Lösung (farbcodiert nach `character-bibles/nebenfiguren.md`):** Orange Laterne → Igel, türkise
+Laterne → Miro (Schwanzspitzenfarbe), gelbe Laterne → Maus, grüne Laterne → Waldtante Rosa.
+**Lektorat-Korrektur:** vorher arbiträre Form-Zuordnung ohne erkennbare Regel (nicht lösbar durch
+Schlussfolgern) — durch Farbcode ersetzt.
 
 ### Tag 13 — Suchbild
 > Im Schnee liegt etwas Vergessenes.
@@ -125,9 +137,12 @@ Aufgabe der Illustration (`illustration-briefs.md`) — hier stehen Text, Rätse
 **Lösung:** 9 Waldtiere im großen Bild.
 
 ### Tag 20 — Zuordnen
-> Jeder bringt etwas zum Fest mit.
+> Jedes Geschenk hat die Farbe seines Tieres.
 > Wer bringt was mit?
-**Lösung:** Miro → Kerzen, Lotte → Sterne, Waldtante Rosa → Plätzchen, Igel → Tannenzapfen, Maus → Glöckchen.
+**Lösung (farbcodiert):** Türkise Kerzen → Miro, blaue Sterne → Lotte, grüne Plätzchen → Waldtante
+Rosa, orange Tannenzapfen → Igel, gelbe Glöckchen → Maus. Passt zusätzlich zur bisherigen
+Geschichte (Rosa brachte schon an Tag 11 Plätzchen, Miro sammelt seit Tag 1 Kerzenlicht) — das
+Farbschema bleibt aber die eigentliche Lösungsregel für das Kind, die Story ist Bonus für Vorleser.
 
 ### Tag 21 — Suchbild
 > Die letzte Perle ist versteckt.
