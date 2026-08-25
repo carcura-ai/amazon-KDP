@@ -48,7 +48,23 @@ Fellfarbe, Wärme der Illustration) trifft den Charakterbogen gut.
 | Seed | **434343** (fest) |
 | Übrige Einstellungen | identisch zu Miro (Modell, Performance, Aspect Ratio, Styles) |
 | Positiv-Prompt | `..., young rounded owl character named Lotte, blue-grey feathers, round glasses made of two small twigs, perched pose, character reference sheet, turnaround sheet, ...` (vollständig siehe `scripts/fooocus-generate.mjs`) |
-| Status | Generierung läuft / Ergebnis siehe unten |
+| Ergebnisdatei | `referenzblatt-lotte.png` (lokal, .gitignore) |
+| Generiert am | 2026-08-25, gestartet ca. 19:30 Uhr, fertig 20:57 Uhr (~87 Min.) |
+
+## Figurenkonsistenz-Prüfung Lotte gegen `character-bibles/lotte.md`
+
+| Merkmal aus Character Bible | Im generierten Bild? | Bewertung |
+|---|---|---|
+| Blaugraues Gefieder | Teilweise — mehrere Panels zeigen dunkelblaues/weißes Gefieder statt blaugrau, andere Panels zeigen graue oder braune/beige Varianten | **Abweichung** |
+| Runde Brille aus zwei Ästchen | **Nein** — keine erkennbare Brille als Accessoire, die großen Augen mit dunklem Rand wirken nur brillenartig (typischer niedlicher Eulen-Cartoon-Stil, kein Ästchen-Accessoire) | **Abweichung** |
+| Sitzende Pose (Ast) | Ja, die meisten Panels zeigen Lotte auf einem Ast sitzend | Trifft zu |
+| Rundliche, kindgerechte Proportionen | Ja | Trifft zu |
+| **Ein** konsistentes Design über das ganze Blatt | **Nein** — das Blatt zeigt mehrere sichtbar unterschiedliche Eulen-Varianten (blau/weiß, grau/braun, komplett beige), keine elf Ansichten derselben Figur | **Abweichung** |
+| Keine Markenähnlichkeit | Ja, kein erkennbarer Bezug zu bekannten Eulenfiguren | Trifft zu |
+
+**Ergebnis: NICHT figurenkonsistent.** Stärkere Abweichung als bei Miro — das Modell hat mehrere
+unterschiedliche Farbvarianten statt einer einzelnen konsistenten Figur erzeugt, das Ästchen-
+Brillen-Accessoire fehlt vollständig.
 
 **Bekannte kleine Prompt-Ungenauigkeit:** Der Ausdruckstext übernimmt „scratching ear with paw"
 unverändert aus der gemeinsamen Vorlage — für eine Eule wäre „with wing" passender. Nicht vor dem
@@ -57,8 +73,18 @@ bei einer eventuellen Neu-Generierung zu beheben.
 
 ## Gesamtergebnis dieser Stufe
 
-Referenzbilder liegen vor, sind aber **nicht ohne Weiteres freigabefähig** — Miro weicht in Farbe/
-Accessoire von der Character Bible ab. Wie angeordnet: keine 24 Szenenbilder erzeugt, bevor die
-Figurenkonsistenz bestanden ist. Diese ist aktuell **nicht bestanden** — Entscheidung liegt beim
-Nutzer (Character Bible an das generierte Bild anpassen, oder Prompt schärfen und neu generieren,
-mit ca. 90 Minuten Rechenzeit je Versuch auf dieser Hardware zu rechnen).
+Beide Referenzblätter liegen vor (Miro: `referenzblatt-miro.png`, Lotte: `referenzblatt-lotte.png`),
+sind aber **nicht freigabefähig** — beide weichen von ihrer Character Bible ab (Miro: Kennfarbe/
+Accessoire falsch platziert; Lotte: kein einzelnes konsistentes Design, Brillen-Accessoire fehlt).
+Wie angeordnet: keine der 24 Szenenillustrationen erzeugt, bevor die Figurenkonsistenz bestanden ist.
+Diese ist für **beide Figuren nicht bestanden**.
+
+**Optionen für den Nutzer:**
+1. Character Bible an die generierten Designs anpassen (pragmatisch, kein weiterer Rechenaufwand).
+2. Prompt schärfen (Accessoires expliziter/isolierter beschreiben, „single consistent character,
+   not multiple variants") und neu generieren — ca. 90 Minuten Rechenzeit je Versuch auf dieser
+   CPU-only-Hardware, siehe `gpu-check.md`.
+3. Diese Bilder als Stil-/Grobreferenz akzeptieren und die Detailkorrektur (Schwanzspitze, Armband,
+   Brille) im nächsten Illustrationsschritt manuell/gezielt nachschärfen.
+
+Lauf stoppt hier für die visuelle Freigabe durch den Nutzer, wie angeordnet.

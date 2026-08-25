@@ -194,11 +194,13 @@ reine Positionierung trivial lösbar). Vollständige Prüfung aller 24 Rätsel: 
 Abweichungen gefunden und behoben (siehe `lektorat.md`, dritte Runde). GPU-Prüfung: keine nutzbare
 GPU (`gpu-check.md`). Fooocus-Bildgenerierung per **Playwright-Steuerung der sichtbaren
 Weboberfläche** (nicht interne API, wie angeordnet) erfolgreich durchgeführt — Referenzblätter für
-Miro (fertig, ~94 Min. Rechenzeit) und Lotte (läuft) erzeugt, feste Seeds/Modell/Prompts vollständig
-dokumentiert in `druckdaten/referenzblaetter.md`. **Figurenkonsistenz noch nicht bestanden**: Miro
-weicht von der Character Bible ab (türkise Kennfarbe als Schärpe statt Schwanzspitze, Armband fehlt).
-Wie angeordnet: keine der 24 Szenenillustrationen gestartet, bevor Figurenkonsistenz besteht — Lauf
-stoppt hier für die Nutzerfreigabe der Figuren.
+Miro (fertig, ~94 Min. Rechenzeit) und Lotte (fertig, ~87 Min.) erzeugt, feste Seeds/Modell/Prompts
+vollständig dokumentiert in `druckdaten/referenzblaetter.md`. **Figurenkonsistenz für BEIDE Figuren
+nicht bestanden**: Miro weicht ab (türkise Kennfarbe als Schärpe statt Schwanzspitze, Armband fehlt),
+Lotte weicht stärker ab (mehrere unterschiedliche Farbvarianten statt einer konsistenten Figur,
+Ästchen-Brille fehlt). Wie angeordnet: keine der 24 Szenenillustrationen gestartet, bevor
+Figurenkonsistenz besteht. Fooocus-Server beendet. Lauf stoppt hier für die Nutzerfreigabe der
+Figuren — 3 Optionen zur Wahl in `druckdaten/referenzblaetter.md`.
 
 **Vorheriger autonomer Nachtlauf (2026-08-25 früh, unbeaufsichtigt bis zum damaligen technischen Blocker):**
 Lektorat durchgeführt (7 Logikfehler in Rätseln behoben über zwei Prüfrunden, siehe `lektorat.md`).
