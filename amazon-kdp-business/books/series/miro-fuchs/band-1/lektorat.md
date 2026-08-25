@@ -45,6 +45,21 @@ Labyrinthe (Tag 1, 9, 17), Zählaufgaben (Tag 3, 11, 19), Suchbilder (Tag 5, 13,
 Schwungübungen (Tag 6, 14, 22) haben je genau eine richtige Lösung ohne Zusatzregel-Bedarf — bei
 Schwungübungen ist laut Konzept explizit jede Ausführung „richtig" (keine Lösbarkeitsanforderung).
 
+## Zweite Prüfrunde — nach visueller Kontrolle der generierten Rätselgrafiken (2026-08-25)
+
+Nach Erzeugung der 24 Rätselgrafiken (`scripts/generate-raetselgrafiken.py`) wurden Stichproben visuell
+geprüft. Dabei ein weiterer Fehler gefunden und behoben:
+
+| # | Tag | Problem | Korrektur |
+|---|---|---|---|
+| 7 | Tag 4 | Textlabel „Roter Schal" stimmte nicht mit der tatsächlich gerenderten Farbe (türkis, Miros Schwanzspitzenfarbe) überein — Text und Grafik widersprachen sich | Label auf „Türkiser Schal" korrigiert, in `manuskript.md` und `generate-raetselgrafiken.py` synchron gehalten |
+
+Labyrinth (Tag 1) und Punkte-verbinden (Tag 2, Pentagramm-Reihenfolge) stichprobenartig visuell
+geprüft — Labyrinth hat einen eindeutigen Weg, Sternform entsteht korrekt aus der Punktreihenfolge.
+**Empfehlung:** vor Druckfreigabe alle 24 generierten Grafiken einmal vollständig durchsehen (nicht nur
+Stichprobe) — das ist der Sinn von Prüfpunkt „Rätselgrafiken selbst mit Lösungstext gegenprüfen" in
+`illustration-briefs.md`, hier nur teilweise durchgeführt.
+
 ## Verbleibender offener Punkt
 
 Die tatsächliche Zeichnung (Labyrinth-Wegführung, exakte Objektzahlen, Musterfolgen) existiert noch

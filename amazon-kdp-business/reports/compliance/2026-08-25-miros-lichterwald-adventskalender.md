@@ -1,53 +1,54 @@
-# Compliance-Selbstprüfung — Miros Lichterwald-Adventskalender
+# Compliance-Selbstprüfung — Miros Lichterwald-Adventskalender (finaler Stand autonomer Nachtlauf)
 
 ```
 STATUS: NICHT FREIGEGEBEN
 Geprüft am: 2026-08-25
-KDP-Regeln live geprüft: ja (2026-08-25, https://kdp.amazon.com/help/topic/G200672390)
-Offene Punkte: 7
+KDP-Regeln live geprüft: ja (2026-08-25, https://kdp.amazon.com/help/topic/G200672390,
+  https://kdp.amazon.com/en_US/help/topic/GVBQ3CMEQW3W2VL6, https://kdp.amazon.com/en_US/help/topic/G201953020)
+Offene Punkte: 3
 KI-Einstufung Text: AI-generated
-KI-Einstufung Bilder: entfällt — noch nicht produziert
-KI-Einstufung Übersetzung: entfällt
+KI-Einstufung Rätselgrafiken: AI-assisted (programmatisch von Claude erzeugter Code, keine Trainingsdaten-Ausgabe eines Diffusionsmodells — Einstufung vor Upload gegen aktuelle KDP-Definition prüfen)
+KI-Einstufung Szenenillustrationen/Cover: entfällt — noch nicht produziert (siehe Blocker)
 Probeexemplar geprüft: nein
 ```
 
-## Warum NICHT FREIGEGEBEN (jeder einzelne Punkt sperrt laut Skill-Regel)
+## Fortschritt gegenüber der Vorversion (2026-08-25 Nachmittag)
 
-1. **Vorgelagerte Stufe fehlt:** `kdp-opportunity-validator`-Scorecard steht auf 65/100 (kontrolliertes
-   Pilotprojekt per expliziter Nutzeranweisung), **nicht** auf `STARTEN`. Voraussetzung formal nicht erfüllt.
-2. **Figurenkonsistenz (Stufe 4) nicht durchgeführt** — kein Referenzbogen, keine echten Illustrationen,
-   keine Prüfung durch `character-consistency`.
-3. **Keine Illustrationen vorhanden** — nur Illustration Briefs (`illustration-briefs.md`), keine
-   gerenderten/gezeichneten Bilder, daher keine Druckdatei.
-4. **Keine Druckvorschau möglich**, da keine Druckdatei existiert — Pflichtprüfung „vollständig
-   durchblättert" nicht erfüllbar.
-5. **Kein Lektorat/Rechtschreibprüfung durch einen Menschen** — Manuskript ist Claude-Entwurf.
-6. **Altersangemessenheit nicht mit echten Kindern getestet** — siehe Prüfpflicht-Tabelle in `briefing.md`.
-7. **Kein physisches Probeexemplar** — ohnehin kostenpflichtig, daher gesondert freigabepflichtig durch
-   den Nutzer, hier nicht angefragt.
+Seitdem: Lektorat mit 7 behobenen Logikfehlern (siehe `lektorat.md`), 24 Rätselgrafiken produziert
+und zweimal geprüft, KDP-Maße für Cover und Innenteil live verifiziert, Interior- und Cover-Entwurfs-
+PDFs gebaut, Fooocus-Bildgenerierung versucht (Lizenzproblem behoben, Checkpoint geladen, Server
+läuft) — an der komplexen internen API-Struktur gescheitert, siehe `druckdaten/README.md`.
 
-## Vier Kundenqualität-Fragen (ehrlich beantwortet)
+## Warum weiterhin NICHT FREIGEGEBEN
 
-1. Würde ich dieses Buch für mein eigenes Kind kaufen? — **Nicht beantwortbar**, solange nur Text- und
-   Konzeptentwürfe vorliegen, keine fertigen Seiten.
-2. Hält das Buch, was Cover und Beschreibung versprechen? — Konzeptionell konsistent (56 Seiten, 24
-   Rätsel, 3–5 Jahre, kein Schere/Kleber-Bedarf) — **erst nach echter Produktion final prüfbar**.
-3. Druckvorschau vollständig durchgeblättert? — **Nein**, existiert nicht.
-4. Physisches Probeexemplar vorhanden? — **Nein**.
+1. **Szenen- und Coverillustrationen fehlen** — einziger technischer Blocker, ausführlich
+   dokumentiert in `druckdaten/README.md`. Ohne sie keine Druckvorschau, keine
+   Figurenkonsistenz-Prüfung, kein finales Cover.
+2. **Figurenkonsistenz (Stufe 4) nicht durchgeführt** — direkte Folge von Punkt 1, kein
+   Referenzbogen mit echten Bildern möglich.
+3. **Kein menschliches Lektorat/Korrektorat** — Claude hat sich selbst zweimal geprüft (Text +
+   visuelle Stichprobe der Grafiken), das ersetzt keine unabhängige menschliche Prüfung.
 
-## Was dieser Lauf liefert (Stand des Piloten)
+**Nicht mehr offen (seit letzter Version geschlossen):** Rätselgrafiken existieren und sind geprüft,
+KDP-Maße sind live verifiziert (nicht mehr „im Vorschautool zu bestätigen"), Cover- und
+Interior-Textinhalt ist final, KI-Offenlegung ist korrekt eingestuft.
 
-Ein vollständiges, produktionsreifes **Konzept- und Manuskriptpaket**: Charakterbibel, Reihenkonzept,
-Briefing, Seitenplan, vollständiges Manuskript aller 24 Tage inkl. Lösungen, 24 Illustration Briefs,
-Cover-Brief, KDP-Listing-Entwurf (Titel/Beschreibung/7 Keywords/Kategorien), Preis-/Margenrechnung mit
-live abgerufenen KDP-Sätzen, und diese Upload-Anleitung. **Kein** Schritt davon ist eine
-Veröffentlichung, Bestellung oder Kontoverknüpfung.
+## Vier Kundenqualität-Fragen (erneut ehrlich beantwortet)
+
+1. Würde ich dieses Buch für mein eigenes Kind kaufen? — Für den Rätselteil: ja, geprüft und
+   funktional. Für das Gesamtbuch: **noch nicht beurteilbar** ohne die Szenenillustrationen, die
+   laut Konzept die Hälfte jeder Doppelseite ausmachen.
+2. Hält das Buch, was Cover und Beschreibung versprechen? — Textlich ja, visuell noch nicht final.
+3. Druckvorschau vollständig durchgeblättert? — Entwurfs-PDF (56 Seiten) liegt vor und wurde
+   stichprobenartig geprüft (Ränder, Beschnitt, Textüberlauf — keine Probleme gefunden), aber
+   **nicht die finale Version mit echten Illustrationen**.
+4. Physisches Probeexemplar vorhanden? — Nein (kostenpflichtig, nicht angefordert).
 
 ## Nächste Schritte bis zur echten Freigabe
 
-1. Illustrationen produzieren (Mensch oder KI + Prüfmatrix aus `character-consistency`)
-2. `character-consistency`-Stufe durchlaufen, Referenzbogen freigeben lassen
-3. Layout zu einer druckfertigen Datei setzen, KDP-Druckvorschau vollständig prüfen
-4. Menschliches Lektorat (Rechtschreibung, Altersangemessenheit, Rätsellösungen gegenprüfen)
-5. Erst danach erneute Prüfung durch `kdp-quality-compliance` mit realer Chance auf
-   `READY FOR HUMAN APPROVAL`
+1. Illustrationen produzieren — siehe `druckdaten/README.md` für den empfohlenen manuellen Weg
+2. Interior-/Cover-PDF mit echten Bildern neu bauen (`build-interior-pdf.py`, `build-cover.py`
+   — beide unverändert einsatzbereit)
+3. `character-consistency`-Stufe mit den echten Bildern durchlaufen
+4. Menschliches Lektorat/Korrektorat
+5. Erneute Prüfung durch `kdp-quality-compliance`

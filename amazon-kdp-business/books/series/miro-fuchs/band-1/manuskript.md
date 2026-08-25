@@ -50,7 +50,11 @@ Kreis entsteht stattdessen ein Fünfeck. Gilt sinngemäß für Tag 10 und Tag 18
 ### Tag 4 — Zuordnen
 > Miros Wintersachen liegen durcheinander.
 > Welches Kleidungsstück hat die gleiche Farbe wie sein Tier?
-**Lösung (farbcodiert, jedes Kleidungsstück hat die Farbe seines Tieres):** Roter Schal → Miro (rotbraunes Fell), blaue Mütze → Lotte (blaugraues Gefieder), grüner Handschuh → Waldtante Rosa (grüner Umhang laut Illustration Brief). **Lektorat-Korrektur:** Instruktion vorher inkonsistent zur Lösung (fragte nur nach „Schal", Lösung nannte drei verschiedene Kleidungsstücke) — behoben, Solvability jetzt über Farbcode statt Ratens.
+**Lösung (farbcodiert nach `character-bibles/nebenfiguren.md`, jedes Kleidungsstück hat die Farbe
+seines Tieres):** Türkiser Schal → Miro (Schwanzspitzenfarbe #2FB8AC), blaue Mütze → Lotte
+(Gefiederfarbe #7C8FA6), grüner Handschuh → Waldtante Rosa (Umhang #3E7A4C). **Lektorat-Korrektur
+(zweite Runde, nach visueller Prüfung der generierten Grafik):** „Roter Schal" widersprach der
+tatsächlich gerenderten Farbe (türkis) — Textlabel korrigiert, damit Text und Grafik übereinstimmen.
 
 ### Tag 5 — Suchbild
 > Etwas Glänzendes versteckt sich im Unterholz.

@@ -186,6 +186,23 @@ Blockiert durch:            fehlende Illustrationen, fehlendes menschliches Lekt
                             Figurenkonsistenz-Freigabe (alle Stufe 4/6, noch nicht angefordert)
 Aktualisiert:               2026-08-25
 
+**Autonomer Nachtlauf (2026-08-25, unbeaufsichtigt bis zum technischen Blocker):**
+Lektorat durchgeführt (7 Logikfehler in Rätseln behoben über zwei Prüfrunden, siehe `lektorat.md`).
+24 Rätselgrafiken programmatisch erzeugt und geprüft (`scripts/generate-raetselgrafiken.py`) — bewusst
+kein KI-Bild für Labyrinthe/Zählaufgaben, da Code Korrektheit garantiert, ein Diffusionsmodell nicht.
+KDP-Cover-/Innenteil-Maße live geprüft (Bleed 0,125", Gutter 0,375", Vollcover 17,376×8,75"). Interior-
+und Cover-Entwurfs-PDFs gebaut (`build-interior-pdf.py`, `build-cover.py`). Upload-Ordner mit
+Metadaten-Checkliste zusammengestellt (`upload/LIESMICH.md`).
+**Bildgenerierung (Fooocus) versucht:** Lizenzproblem erkannt und behoben (Juggernaut XL erfordert
+kommerzielle Sondervereinbarung → auf SDXL Base 1.0/RAIL++-M umgestellt), 6,46-GB-Checkpoint via
+Start-BitsTransfer erfolgreich geladen (erster Versuch am 10-Minuten-Zeitlimit der Hintergrund-
+Ausführung gescheitert), Fooocus-Server lief nachweislich lokal. **Blockiert an:** Fooocus hat keine
+einfache API — der Generieren-Button hängt an einer >100-Parameter-Sitzungskette, die ohne
+verantwortbares Risiko (CPU-only, kein visuelles Feedback über Nacht) nicht blind automatisierbar ist.
+**Einziger verbleibender Blocker**, ausführlich dokumentiert in `druckdaten/README.md`. Alle anderen
+angeforderten Schritte vollständig abgeschlossen. Nichts veröffentlicht, bestellt, kostenpflichtig
+ausgeführt oder bei KDP angemeldet.
+
 <!--
 Vorlage je Buch:
 

@@ -289,7 +289,7 @@ def main():
         6: labyrinth(1, 4, "Hilf Miro durch den Wald zur Kerze!"),
         8: punkte_verbinden(STERN5, "Verbinde die Punkte 1 bis 5!"),
         10: zaehlen(4, "Zaehle die Tannenzapfen!", "zapfen", 3),
-        12: zuordnen([("Roter Schal", "miro"), ("Blaue Muetze", "lotte"), ("Gruener Handschuh", "rosa")], "Welches Kleidungsstueck hat die Farbe seines Tieres?"),
+        12: zuordnen([("Tuerkiser Schal", "miro"), ("Blaue Muetze", "lotte"), ("Gruener Handschuh", "rosa")], "Welches Kleidungsstueck hat die Farbe seines Tieres?"),
         14: suchbild(3, "Finde 3 Gloeckchen im Bild!", 5),
         16: schwungubung("schneeflocke", "Fahre die Linie mit dem Stift nach!"),
         18: ausmalen_muster(10, [(210, 50, 50), (60, 140, 70)], "Male die Kreise rot, die Sterne gruen!", 2),
