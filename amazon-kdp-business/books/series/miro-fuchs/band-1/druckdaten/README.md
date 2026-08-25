@@ -1,4 +1,10 @@
-# Druckdaten — Produktionsstand und der eine verbleibende Blocker
+# Druckdaten — Produktionsstand
+
+> **Update 2026-08-25 (Folgelauf):** Der unten beschriebene Fooocus-API-Blocker ist gelöst — die
+> Generierung läuft jetzt per Playwright-Steuerung der sichtbaren Weboberfläche statt über die
+> interne Gradio-API. Siehe `referenzblaetter.md` und `gpu-check.md` für den aktuellen Stand
+> (Referenzblätter Miro/Lotte erzeugt, Figurenkonsistenz noch nicht bestanden, 24 Szenenbilder
+> bewusst noch nicht gestartet). Der Rest dieser Datei beschreibt den vorherigen Stand.
 
 Stand: 2026-08-25 (autonomer Nachtlauf). Alle Bilddateien (`*.png`, `*.pdf`) liegen nur lokal
 (`.gitignore`) — hier steht, was existiert und wo.

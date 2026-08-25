@@ -32,7 +32,12 @@ Aufgabe der Illustration (`illustration-briefs.md`) — hier stehen Text, Rätse
 ### Tag 1 — Labyrinth
 > Miro findet den Weg zur ersten Kerze nicht.
 > Hilf Miro durch den Wald zur Kerze!
-**Lösung:** Ein Weg führt von Miro links unten zur Kerze rechts oben, zwei Sackgassen als Ablenkung.
+**Lösung:** Ein Weg führt von Miro (oben links) zur Kerze (unten rechts) — der Labyrinth-Generator
+erzeugt einen „perfekten" Irrgarten (keine Schleifen, genau ein Pfad zwischen Start und Ziel), das ist
+algorithmisch garantiert, nicht geschätzt. **Korrektur (dritte Lektoratsrunde, 2026-08-25):** Vorherige
+Beschreibung nannte die falschen Ecken (unten links/oben rechts) und eine nicht verifizierte genaue
+Sackgassenzahl — auf die tatsächliche Startposition und die algorithmische Garantie korrigiert. Gilt
+sinngemäß für Tag 9 und Tag 17.
 
 ### Tag 2 — Punkte verbinden
 > Miro will einen Stern für seine Höhle.
@@ -49,12 +54,12 @@ Kreis entsteht stattdessen ein Fünfeck. Gilt sinngemäß für Tag 10 und Tag 18
 
 ### Tag 4 — Zuordnen
 > Miros Wintersachen liegen durcheinander.
-> Welches Kleidungsstück hat die gleiche Farbe wie sein Tier?
-**Lösung (farbcodiert nach `character-bibles/nebenfiguren.md`, jedes Kleidungsstück hat die Farbe
-seines Tieres):** Türkiser Schal → Miro (Schwanzspitzenfarbe #2FB8AC), blaue Mütze → Lotte
-(Gefiederfarbe #7C8FA6), grüner Handschuh → Waldtante Rosa (Umhang #3E7A4C). **Lektorat-Korrektur
-(zweite Runde, nach visueller Prüfung der generierten Grafik):** „Roter Schal" widersprach der
-tatsächlich gerenderten Farbe (türkis) — Textlabel korrigiert, damit Text und Grafik übereinstimmen.
+> Welches Kleidungsstück hat das gleiche Muster wie sein Tier?
+**Lösung (SW-Muster nach `character-bibles/nebenfiguren.md` — Innenteil ist Schwarz-Weiß, Farbe
+funktioniert dort nicht als Lösungsregel):** Schal mit Sternen-Muster → Miro, Mütze mit Wellen-Muster
+→ Lotte, Handschuh mit Blätter-Muster → Waldtante Rosa. **Korrektur (dritte Lektoratsrunde,
+2026-08-25):** Farbcode-Lösung durch SW-Muster ersetzt — der Innenteil wird Schwarz-Weiß gedruckt,
+Farbe war als Lösungsregel technisch nicht umsetzbar.
 
 ### Tag 5 — Suchbild
 > Etwas Glänzendes versteckt sich im Unterholz.
@@ -68,11 +73,15 @@ tatsächlich gerenderten Farbe (türkis) — Textlabel korrigiert, damit Text un
 
 ### Tag 7 — Ausmalen nach Muster
 > Der Weg zum Lichterfest braucht Farbe.
-> Male die Kreise rot, die Sterne grün!
-**Lösung:** 5 Kreise rot, 5 Sterne grün. **Solvability-Hinweis:** Regel steht als Text UND als
-kleines vorgemaltes Beispiel (1 roter Kreis, 1 grüner Stern bereits ausgemalt) direkt am Bildrand —
-3-Jährige brauchen ein visuelles Vorbild, die Textregel allein reicht nicht. Gilt sinngemäß für
-Tag 15 und Tag 23 (dort zusätzlich: die ersten 2 Musterglieder der Farbfolge bereits vorgemalt).
+> Male abwechselnd rot und grün — der erste Kreis zeigt dir, wie!
+**Lösung:** 10 Kreise im Wechsel Rot-Grün-Rot-Grün… **Solvability-Hinweis:** Regel steht als Text UND
+als vorgemaltes Beispiel (die ersten 2 Kreise bereits ausgemalt) direkt im Bild — 3-Jährige brauchen
+ein visuelles Vorbild. Gilt sinngemäß für Tag 15 und Tag 23 (3-farbige Musterfolge, ebenfalls erste
+Glieder vorgemalt). **Korrektur (dritte Lektoratsrunde, 2026-08-25):** Instruktion nannte zwei
+Formen (Kreise/Sterne), die generierte Grafik zeichnet aber durchgehend gleichförmige Kreise in
+Positions-Farbfolge — Text an die tatsächliche Grafik angepasst, damit beides übereinstimmt. Farbe
+bleibt hier zulässig: Es ist eine Ausmalanweisung, die der Erwachsene vorliest, das Kind malt mit
+eigenen Stiften — keine gedruckte Lösungsregel wie bei Tag 4/12/20.
 
 ### Tag 8 — Schattenrätsel
 > Ein Schatten huscht durchs Unterholz.
@@ -85,7 +94,8 @@ für Tag 16.
 ### Tag 9 — Labyrinth
 > Miro verliert seine zweite Perle im Gestrüpp.
 > Hilf Miro durch den größeren Wald!
-**Lösung:** Ein Weg mit einer Abzweigung, drei Sackgassen als Ablenkung.
+**Lösung:** Eindeutiger Weg von oben links nach unten rechts, algorithmisch als „perfekter" Irrgarten
+garantiert (siehe Tag 1).
 
 ### Tag 10 — Punkte verbinden
 > Lotte zeigt Miro einen Tannenbaum.
@@ -98,12 +108,12 @@ für Tag 16.
 **Lösung:** 7 Plätzchen auf dem Teller.
 
 ### Tag 12 — Zuordnen
-> Jede Laterne hat die Farbe seines Tieres.
+> Jede Laterne hat das Muster seines Tieres.
 > Welche Laterne gehört zu welchem Tier?
-**Lösung (farbcodiert nach `character-bibles/nebenfiguren.md`):** Orange Laterne → Igel, türkise
-Laterne → Miro (Schwanzspitzenfarbe), gelbe Laterne → Maus, grüne Laterne → Waldtante Rosa.
-**Lektorat-Korrektur:** vorher arbiträre Form-Zuordnung ohne erkennbare Regel (nicht lösbar durch
-Schlussfolgern) — durch Farbcode ersetzt.
+**Lösung (SW-Muster nach `character-bibles/nebenfiguren.md`):** Laterne mit Punkte-Muster → Igel,
+Laterne mit Sterne-Muster → Miro, Laterne mit Streifen-Muster → Maus, Laterne mit Blätter-Muster →
+Waldtante Rosa. **Korrektur (dritte Lektoratsrunde, 2026-08-25):** Farbcode durch SW-Muster ersetzt
+(Innenteil Schwarz-Weiß).
 
 ### Tag 13 — Suchbild
 > Im Schnee liegt etwas Vergessenes.
@@ -128,7 +138,8 @@ Schlussfolgern) — durch Farbcode ersetzt.
 ### Tag 17 — Labyrinth
 > Miro will schnell zur letzten Lichtung.
 > Hilf Miro durch den langen Wald!
-**Lösung:** Ein Weg mit zwei Abzweigungen, vier Sackgassen als Ablenkung.
+**Lösung:** Eindeutiger Weg von oben links nach unten rechts, algorithmisch als „perfekter" Irrgarten
+garantiert (siehe Tag 1).
 
 ### Tag 18 — Punkte verbinden
 > Lotte malt einen großen Stern.
@@ -141,12 +152,16 @@ Schlussfolgern) — durch Farbcode ersetzt.
 **Lösung:** 9 Waldtiere im großen Bild.
 
 ### Tag 20 — Zuordnen
-> Jedes Geschenk hat die Farbe seines Tieres.
+> Jedes Geschenk hat das Muster seines Tieres.
 > Wer bringt was mit?
-**Lösung (farbcodiert):** Türkise Kerzen → Miro, blaue Sterne → Lotte, grüne Plätzchen → Waldtante
-Rosa, orange Tannenzapfen → Igel, gelbe Glöckchen → Maus. Passt zusätzlich zur bisherigen
-Geschichte (Rosa brachte schon an Tag 11 Plätzchen, Miro sammelt seit Tag 1 Kerzenlicht) — das
-Farbschema bleibt aber die eigentliche Lösungsregel für das Kind, die Story ist Bonus für Vorleser.
+**Lösung (SW-Muster):** Kerzen mit Sterne-Muster → Miro, Präsentkarten mit Wellen-Muster → Lotte,
+Plätzchen mit Blätter-Muster → Waldtante Rosa, Tannenzapfen mit Punkte-Muster → Igel, Glöckchen mit
+Streifen-Muster → Maus. Passt zusätzlich zur bisherigen Geschichte (Rosa brachte schon an Tag 11
+Plätzchen, Miro sammelt seit Tag 1 Kerzenlicht) — das Musterschema bleibt die eigentliche
+Lösungsregel für das Kind, die Story ist Bonus für Vorleser. **Korrektur (dritte Lektoratsrunde,
+2026-08-25):** Farbcode durch SW-Muster ersetzt (Innenteil Schwarz-Weiß); „blaue Sterne" für Lotte
+war zusätzlich in sich widersprüchlich (Sterne sind Miros Muster, nicht Lottes) — behoben zu
+„Präsentkarten mit Wellen-Muster".
 
 ### Tag 21 — Suchbild
 > Die letzte Perle ist versteckt.
@@ -166,7 +181,9 @@ Farbschema bleibt aber die eigentliche Lösungsregel für das Kind, die Story is
 ### Tag 24 — Finale: großes Suchbild
 > Das große Lichterfest beginnt!
 > Finde alle 24 Perlen im Festbild!
-**Lösung:** 24 Perlen verteilt im großen Festbild, nummeriert 1–24 zur Selbstkontrolle.
+**Lösung:** 24 Perlen verteilt im großen Festbild, nummeriert 1–24 zur Selbstkontrolle. **Korrektur
+(dritte Lektoratsrunde, 2026-08-25):** Die Nummerierung war zunächst nur im Text behauptet, nicht
+tatsächlich gezeichnet — `suchbild()` um einen `nummeriert`-Modus ergänzt, jetzt real umgesetzt.
 
 ## Nachspann
 

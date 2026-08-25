@@ -186,7 +186,21 @@ Blockiert durch:            fehlende Illustrationen, fehlendes menschliches Lekt
                             Figurenkonsistenz-Freigabe (alle Stufe 4/6, noch nicht angefordert)
 Aktualisiert:               2026-08-25
 
-**Autonomer Nachtlauf (2026-08-25, unbeaufsichtigt bis zum technischen Blocker):**
+**Folgelauf (2026-08-25, Nachmittag): Kritischer Farbfehler behoben + Referenzblätter erzeugt.**
+Zuordnungsrätsel Tag 4/12/20 nutzten Farbe als Lösungsregel im geplant Schwarz-Weiß gedruckten
+Innenteil — technisch nicht funktionsfähig. Behoben durch 5 SW-Muster (Sterne/Wellen/Blätter/Punkte/
+Streifen statt Farbcode), Zuordnungsrätsel mischen jetzt zusätzlich Zeilenreihenfolge (vorher durch
+reine Positionierung trivial lösbar). Vollständige Prüfung aller 24 Rätsel: 6 weitere Text/Grafik-
+Abweichungen gefunden und behoben (siehe `lektorat.md`, dritte Runde). GPU-Prüfung: keine nutzbare
+GPU (`gpu-check.md`). Fooocus-Bildgenerierung per **Playwright-Steuerung der sichtbaren
+Weboberfläche** (nicht interne API, wie angeordnet) erfolgreich durchgeführt — Referenzblätter für
+Miro (fertig, ~94 Min. Rechenzeit) und Lotte (läuft) erzeugt, feste Seeds/Modell/Prompts vollständig
+dokumentiert in `druckdaten/referenzblaetter.md`. **Figurenkonsistenz noch nicht bestanden**: Miro
+weicht von der Character Bible ab (türkise Kennfarbe als Schärpe statt Schwanzspitze, Armband fehlt).
+Wie angeordnet: keine der 24 Szenenillustrationen gestartet, bevor Figurenkonsistenz besteht — Lauf
+stoppt hier für die Nutzerfreigabe der Figuren.
+
+**Vorheriger autonomer Nachtlauf (2026-08-25 früh, unbeaufsichtigt bis zum damaligen technischen Blocker):**
 Lektorat durchgeführt (7 Logikfehler in Rätseln behoben über zwei Prüfrunden, siehe `lektorat.md`).
 24 Rätselgrafiken programmatisch erzeugt und geprüft (`scripts/generate-raetselgrafiken.py`) — bewusst
 kein KI-Bild für Labyrinthe/Zählaufgaben, da Code Korrektheit garantiert, ein Diffusionsmodell nicht.

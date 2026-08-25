@@ -9,8 +9,10 @@
 ## Verbindliche Regeln (jede Doppelseite)
 
 - Figuren: Miro und Lotte exakt nach `character-bibles/miro.md` / `lotte.md`, Nebenfiguren (Waldtante
-  Rosa, Igel, Maus) exakt nach `character-bibles/nebenfiguren.md` — Farbcodes sind dort für die
-  Zuordnungsrätsel Tag 4/12/20 lösungsrelevant und müssen exakt eingehalten werden
+  Rosa, Igel, Maus) exakt nach `character-bibles/nebenfiguren.md` — Farbcodes gelten nur für Cover/
+  Referenzbilder. Für den SW-Innenteil sind stattdessen die dort festgelegten **SW-Muster** (Miro
+  Sterne, Lotte Wellen, Rosa Blätter, Igel Punkte, Maus Streifen) für die Zuordnungsrätsel Tag 4/12/20
+  lösungsrelevant — Farbe funktioniert im Schwarz-Weiß-Druck nicht als Lösungsregel
 - Verboten: Marken, Logos, Schrift im Bild, reale Personen, geschützte Figuren, Künstlerimitation
 - Perspektive: durchgängig Augenhöhe der Figuren, keine Untersicht
 - Anschnitt: linke Seite randabfallend, rechte Rätselseite mit weißem Rand für Druckklarheit

@@ -22,14 +22,69 @@ MARGIN = int(0.4 * DPI)  # Innenrand/Sicherheitsabstand
 INK = (30, 30, 30)
 WHITE = (255, 255, 255)
 
-# Farbcodes aus character-bibles/ (fuer Zuordnungsraetsel Tag 4/12/20)
-FARBEN = {
-    "miro": (47, 184, 172),      # Miro Schwanzspitze (türkis)
-    "lotte": (124, 143, 166),    # Lotte Gefieder (blaugrau)
-    "rosa": (62, 122, 76),       # Waldtante Rosa Umhang (gruen)
-    "igel": (224, 138, 43),      # Igel Muetze (orange)
-    "maus": (242, 199, 68),      # Maus Schleife (gelb)
+# SW-Muster aus character-bibles/nebenfiguren.md (fuer Zuordnungsraetsel Tag 4/12/20).
+# Farbe funktioniert im Schwarz-Weiss-Innenteil nicht als Loesungsregel -- jede Figur
+# bekommt stattdessen ein eindeutig unterscheidbares Strichmuster.
+MUSTER = {
+    "miro": "sterne",
+    "lotte": "wellen",
+    "rosa": "blaetter",
+    "igel": "punkte",
+    "maus": "streifen",
 }
+
+
+def muster_zeichnen(zielbild, cx, cy, r, muster):
+    """Zeichnet ein eindeutiges SW-Muster in einen Kreis (Umriss + Fuellmuster).
+    Nutzt eine Kachel mit Kreismaske, damit Musterlinien sauber am Kreisrand
+    abgeschnitten werden (wichtig fuer 'streifen', die sonst ueberstehen)."""
+    d = int(r * 2)
+    tile = Image.new("RGB", (d, d), WHITE)
+    tdraw = ImageDraw.Draw(tile)
+    tc = r
+    if muster == "sterne":
+        for dx, dy, s in [(-r * 0.4, -r * 0.3, r * 0.28), (r * 0.35, r * 0.1, r * 0.25), (0, r * 0.45, r * 0.2)]:
+            _stern(tdraw, tc + dx, tc + dy, s)
+    elif muster == "wellen":
+        import math
+        for i in range(-2, 3):
+            y = tc + i * r * 0.32
+            pts = [(tc + t / 100 * r * 0.9, y + math.sin(t / 15) * r * 0.12) for t in range(-100, 101, 5)]
+            tdraw.line(pts, fill=INK, width=5)
+    elif muster == "blaetter":
+        import math
+        for ang in (0, 120, 240):
+            rad = math.radians(ang)
+            lx, ly = tc + math.cos(rad) * r * 0.35, tc + math.sin(rad) * r * 0.35
+            tdraw.ellipse([lx - r * 0.32, ly - r * 0.18, lx + r * 0.32, ly + r * 0.18], outline=INK, width=5)
+            tdraw.line([(lx - r * 0.3, ly), (lx + r * 0.3, ly)], fill=INK, width=3)
+    elif muster == "punkte":
+        for gx in (-1, 0, 1):
+            for gy in (-1, 0, 1):
+                px, py = tc + gx * r * 0.42, tc + gy * r * 0.42
+                tdraw.ellipse([px - r * 0.1, py - r * 0.1, px + r * 0.1, py + r * 0.1], fill=INK)
+    elif muster == "streifen":
+        for off in range(-4, 5):
+            x0 = off * r * 0.35
+            tdraw.line([(x0, d), (x0 + d, 0)], fill=INK, width=9)
+
+    mask = Image.new("L", (d, d), 0)
+    ImageDraw.Draw(mask).ellipse([0, 0, d, d], fill=255)
+    zielbild.paste(tile, (int(cx - r), int(cy - r)), mask)
+    ImageDraw.Draw(zielbild).ellipse([cx - r, cy - r, cx + r, cy + r], outline=INK, width=6)
+
+
+def _stern(draw, cx, cy, s, fill=None):
+    import math
+    pts = []
+    for i in range(10):
+        ang = math.radians(-90 + i * 36)
+        rad = s if i % 2 == 0 else s * 0.4
+        pts.append((cx + math.cos(ang) * rad, cy + math.sin(ang) * rad))
+    if fill:
+        draw.polygon(pts, fill=fill)
+    else:
+        draw.polygon(pts, outline=INK, width=3)
 
 
 def neue_seite():
@@ -96,11 +151,12 @@ def labyrinth(seed, groesse, titel):
             if y == rows - 1:
                 draw.line([(px, py + cell), (px + cell, py + cell)], fill=INK, width=lw)
 
-    # Start (Miro, Kreis türkis) und Ziel (Kerze, gelber Stern)
+    # Start (Miro, gefuellter Kreis) und Ziel (Kerze, gefuellter Stern) -- SW, per Form unterscheidbar
     r = cell // 3
-    draw.ellipse([ox + r, oy + r, ox + 3 * r, oy + 3 * r], fill=FARBEN["miro"])
+    sx, sy = ox + 2 * r, oy + 2 * r
+    draw.ellipse([sx - r, sy - r, sx + r, sy + r], fill=INK)
     ex, ey = ox + (cols - 1) * cell + cell // 2, oy + (rows - 1) * cell + cell // 2
-    draw.ellipse([ex - r, ey - r, ex + r, ey + r], fill=(230, 180, 40))
+    _stern(draw, ex, ey, r * 1.1, fill=INK)
     return img
 
 
@@ -153,28 +209,42 @@ def zaehlen(anzahl, titel, form="zapfen", seed=0):
 
 # --------------------------------------------------------------------- Zuordnen
 
-def zuordnen(paare, titel):
-    """paare: Liste von (item_label, farbname) -- linke Spalte Item, rechte Spalte Tiername in gleicher Farbe."""
+def zuordnen(paare, titel, seed=42):
+    """paare: Liste von (item_label, figur) -- linke Spalte Item-Symbol mit SW-Muster,
+    rechte Spalte Tier-Symbol mit demselben Muster, aber in ANDERER Zeilenreihenfolge
+    (deterministisch gemischt) -- sonst waere die Loesung durch reine Zeilen-Ausrichtung
+    trivial und keine echte Zuordnungsaufgabe. Loesungsregel = Muster, nicht Position."""
+    random.seed(seed)
     img = neue_seite()
     draw = ImageDraw.Draw(img)
     kopfzeile(draw, titel)
     top = MARGIN * 3
     n = len(paare)
     step = (PAGE_PX - top - MARGIN) // n
-    f = schrift(44)
-    for i, (label, farbe) in enumerate(paare):
+    f = schrift(40)
+    rechts_reihenfolge = list(range(n))
+    while True:
+        random.shuffle(rechts_reihenfolge)
+        if all(rechts_reihenfolge[i] != i for i in range(n)):
+            break
+    r_icon = 70
+    for i, (label, figur) in enumerate(paare):
         y = top + i * step + step // 2
-        col = FARBEN[farbe]
-        draw.ellipse([MARGIN, y - 50, MARGIN + 100, y + 50], fill=col)
-        draw.text((MARGIN + 130, y - 22), label, fill=INK, font=f)
-        draw.ellipse([PAGE_PX - MARGIN - 100, y - 50, PAGE_PX - MARGIN, y + 50], fill=col)
-        draw.text((PAGE_PX - MARGIN - 260, y - 22), farbe.capitalize(), fill=INK, font=f)
+        muster_zeichnen(img, MARGIN + r_icon, y, r_icon, MUSTER[figur])
+        draw.text((MARGIN + r_icon * 2 + 30, y - 20), label, fill=INK, font=f)
+    for slot, quelle_i in enumerate(rechts_reihenfolge):
+        label, figur = paare[quelle_i]
+        y = top + slot * step + step // 2
+        muster_zeichnen(img, PAGE_PX - MARGIN - r_icon, y, r_icon, MUSTER[figur])
+        bbox = draw.textbbox((0, 0), figur.capitalize(), font=f)
+        w = bbox[2] - bbox[0]
+        draw.text((PAGE_PX - MARGIN - r_icon * 2 - 30 - w, y - 20), figur.capitalize(), fill=INK, font=f)
     return img
 
 
 # --------------------------------------------------------------------- Suchbild
 
-def suchbild(anzahl_ziel, titel, seed):
+def suchbild(anzahl_ziel, titel, seed, nummeriert=False, mindestabstand=200):
     random.seed(seed)
     img = neue_seite()
     draw = ImageDraw.Draw(img)
@@ -183,16 +253,25 @@ def suchbild(anzahl_ziel, titel, seed):
     positions = []
     tries = 0
     total = anzahl_ziel + random.randint(8, 12)
-    while len(positions) < total and tries < 6000:
+    while len(positions) < total and tries < 20000:
         tries += 1
         x = random.randint(MARGIN + 80, PAGE_PX - MARGIN - 80)
         y = random.randint(top + 80, PAGE_PX - MARGIN - 80)
-        if all((x - px) ** 2 + (y - py) ** 2 > 200 ** 2 for px, py in positions):
+        if all((x - px) ** 2 + (y - py) ** 2 > mindestabstand ** 2 for px, py in positions):
             positions.append((x, y))
+    # Harte Pruefung statt stillschweigend zu wenige Zielobjekte auszuliefern --
+    # "richtige Anzahl" ist eine Kernanforderung, kein Best-Effort.
+    assert len(positions) >= anzahl_ziel, (
+        f"suchbild: nur {len(positions)} Positionen gepackt, {anzahl_ziel} Ziele gefordert "
+        f"(Seed {seed}) -- mindestabstand verkleinern oder Seitenflaeche vergroessern"
+    )
+    f = schrift(34) if nummeriert else None
     for i, (x, y) in enumerate(positions):
         if i < anzahl_ziel:
             draw.ellipse([x - 35, y - 35, x + 35, y + 35], outline=(200, 40, 40), width=8)
             draw.ellipse([x - 15, y - 15, x + 15, y + 15], fill=(230, 180, 40))
+            if nummeriert:
+                draw.text((x - 10, y - 75), str(i + 1), fill=INK, font=f)
         else:
             draw.ellipse([x - 30, y - 40, x + 30, y + 40], fill=(90, 140, 90))
     return img
@@ -289,15 +368,15 @@ def main():
         6: labyrinth(1, 4, "Hilf Miro durch den Wald zur Kerze!"),
         8: punkte_verbinden(STERN5, "Verbinde die Punkte 1 bis 5!"),
         10: zaehlen(4, "Zaehle die Tannenzapfen!", "zapfen", 3),
-        12: zuordnen([("Tuerkiser Schal", "miro"), ("Blaue Muetze", "lotte"), ("Gruener Handschuh", "rosa")], "Welches Kleidungsstueck hat die Farbe seines Tieres?"),
+        12: zuordnen([("Schal", "miro"), ("Muetze", "lotte"), ("Handschuh", "rosa")], "Welches Kleidungsstueck hat das gleiche Muster wie sein Tier?"),
         14: suchbild(3, "Finde 3 Gloeckchen im Bild!", 5),
         16: schwungubung("schneeflocke", "Fahre die Linie mit dem Stift nach!"),
-        18: ausmalen_muster(10, [(210, 50, 50), (60, 140, 70)], "Male die Kreise rot, die Sterne gruen!", 2),
+        18: ausmalen_muster(10, [(210, 50, 50), (60, 140, 70)], "Male abwechselnd rot und gruen!", 2),
         20: schattenraetsel("Welcher Schatten gehoert zu welchem Tier?", 7),
         22: labyrinth(2, 5, "Hilf Miro durch den groesseren Wald!"),
         24: punkte_verbinden(BAUM8, "Verbinde die Punkte 1 bis 8!"),
         26: zaehlen(7, "Zaehle die Plaetzchen auf dem Teller!", "plaetzchen", 11),
-        28: zuordnen([("Orange Laterne", "igel"), ("Tuerkise Laterne", "miro"), ("Gelbe Laterne", "maus"), ("Gruene Laterne", "rosa")], "Welche Laterne hat die Farbe seines Tieres?"),
+        28: zuordnen([("Laterne", "igel"), ("Laterne", "miro"), ("Laterne", "maus"), ("Laterne", "rosa")], "Welche Laterne hat das gleiche Muster wie sein Tier?"),
         30: suchbild(3, "Finde 3 Handschuhe im Winterbild!", 13),
         32: schwungubung("welle", "Fahre die Wellenlinie nach, ohne abzusetzen!"),
         34: ausmalen_muster(18, [(210, 50, 50), (60, 140, 70), (230, 190, 60)], "Male nach dem Muster: Rot, Gruen, Gelb!", 3),
@@ -305,11 +384,11 @@ def main():
         38: labyrinth(3, 6, "Hilf Miro durch den langen Wald!"),
         40: punkte_verbinden(STERN10, "Verbinde die Punkte 1 bis 10!"),
         42: zaehlen(9, "Zaehle alle Waldtiere im Bild!", "tier", 19),
-        44: zuordnen([("Tuerkise Kerzen", "miro"), ("Blaue Sterne", "lotte"), ("Gruene Plaetzchen", "rosa"), ("Orange Zapfen", "igel"), ("Gelbe Gloeckchen", "maus")], "Wer bringt was mit? (Farbcode)"),
+        44: zuordnen([("Kerzen", "miro"), ("Praesentkarte", "lotte"), ("Plaetzchen", "rosa"), ("Zapfen", "igel"), ("Gloeckchen", "maus")], "Wer bringt was mit? (Muster zeigt es)"),
         46: suchbild(3, "Finde 3 Perlen im grossen Festbild!", 21),
         48: schwungubung("schleife", "Fahre die Schleifenlinie nach!"),
         50: ausmalen_muster(24, [(210, 50, 50), (60, 140, 70), (230, 190, 60)], "Male das grosse Bild nach dem Muster!", 4),
-        52: suchbild(24, "Finde alle 24 Perlen im Festbild!", 24),
+        52: suchbild(24, "Finde alle 24 Perlen im Festbild!", 24, nummeriert=True, mindestabstand=160),
     }
 
     for seite_nr, img in sorted(seiten.items()):

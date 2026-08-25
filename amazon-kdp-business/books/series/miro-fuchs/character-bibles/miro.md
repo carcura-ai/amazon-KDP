@@ -15,6 +15,13 @@
 | Begleitfigur | Lotte, die Eule (eigener Datensatz: `lotte.md`) |
 | Verhältnis zu Erwachsenen | Waldtante Rosa hilft bei schweren Stellen, löst aber nie für Miro |
 
+## Schwarz-Weiß-Muster (für Zuordnungsrätsel im SW-Innenteil, Tag 4/12/20)
+
+**Sterne** — feste Kennzeichnung für Miro in allen Rätseln, in denen der SW-Innenteil Farbe nicht
+abbilden kann. Farbe (türkis, siehe unten) bleibt nur für Cover/Referenzbilder gültig, im Innenteil
+zählt ausschließlich das Muster als Lösungsregel — siehe `nebenfiguren.md` für die vollständige
+Muster-Zuordnung aller Figuren.
+
 ## Feste Merkmalskombination (Unterscheidbarkeit)
 
 - Farbabweichung: leuchtend türkisfarbene Schwanzspitze, fester Farbcode `#2FB8AC`

@@ -10,6 +10,10 @@
 | Typischer Satz | „Schau noch einmal genau hin." |
 | Merkmale | Blaugraues Gefieder (`#7C8FA6`), große runde Brille aus zwei Ästchen (kein reales Markenobjekt), sitzt meist auf Miros Baumhöhlen-Ast |
 
+## Schwarz-Weiß-Muster (Zuordnungsrätsel)
+
+**Wellen** — feste Kennzeichnung für Lotte im SW-Innenteil, siehe `nebenfiguren.md`.
+
 ## Originalitätsprüfung
 
 Silhouette und Merkmalskombination (Blaugrau + Ast-Brille) sind bei keiner bekannten Eulenfigur
