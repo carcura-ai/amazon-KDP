@@ -13,6 +13,7 @@ import { findDuplicates } from './duplicates.js';
 import { logActivity, listActivities } from './activities.js';
 
 export const LEAD_STATUS = ['new', 'contact_attempt', 'contacted', 'offer_created', 'offer_sent', 'appointment', 'order', 'won', 'lost'] as const;
+export const LEAD_STATUS_LABEL: Record<string, string> = { new: 'Neu', contact_attempt: 'Kontaktversuch', contacted: 'Kontakt hergestellt', offer_created: 'Angebot erstellt', offer_sent: 'Angebot versendet', appointment: 'Termin vereinbart', order: 'Auftrag', won: 'Abgeschlossen', lost: 'Verloren' };
 export const LEAD_SOURCES = ['google_ads', 'meta_ads', 'website', 'manual', 'phone', 'referral', 'google_business', 'other'] as const;
 
 const leadFields = {
@@ -105,7 +106,7 @@ export default async function leadRoutes(app: FastifyInstance) {
     if (input.phone !== undefined) patch.normalizedPhone = normalizePhone(input.phone);
     if (input.status && input.status !== before.status) {
       patch.lastContactAt = nowIso();
-      logActivity(app.db, ctx.companyId, { leadId: id, customerId: before.customerId, userId: ctx.userId, type: 'status', subject: `Status: ${before.status} → ${input.status}`, content: input.status === 'lost' ? input.lostReason ?? before.lostReason : null });
+      logActivity(app.db, ctx.companyId, { leadId: id, customerId: before.customerId, userId: ctx.userId, type: 'status', subject: `Status: ${LEAD_STATUS_LABEL[before.status] ?? before.status} → ${LEAD_STATUS_LABEL[input.status] ?? input.status}`, content: input.status === 'lost' ? input.lostReason ?? before.lostReason : null });
     }
     app.db.update(leads).set(patch).where(eq(leads.id, id)).run();
     const after = getLead(ctx.companyId, id);

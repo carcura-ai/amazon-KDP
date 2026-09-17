@@ -69,7 +69,7 @@ describe('Leads, Kunden, Fahrzeuge', () => {
     expect(upd.json().status).toBe('contacted');
     expect(upd.json().firstName).toBe('Maxi'); // Teil-Update darf andere Felder nicht zurücksetzen
     const detail = (await app.inject(as(admin, { url: `/api/leads/${leadId}` }))).json();
-    expect(detail.activities.some((a: { type: string; subject: string }) => a.type === 'status' && a.subject.includes('contacted'))).toBe(true);
+    expect(detail.activities.some((a: { type: string; subject: string }) => a.type === 'status' && a.subject.includes('Kontakt hergestellt'))).toBe(true);
     const stats = (await app.inject(as(admin, { url: '/api/leads/stats' }))).json();
     expect(stats.byStatus.contacted).toBe(1);
   });

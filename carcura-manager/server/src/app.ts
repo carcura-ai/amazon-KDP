@@ -20,6 +20,8 @@ import customerRoutes from './modules/crm/customers.routes.js';
 import vehicleRoutes from './modules/crm/vehicles.routes.js';
 import publicLeadRoutes from './modules/crm/public.routes.js';
 import platformRoutes from './modules/platform/routes.js';
+import dashboardRoutes from './modules/dashboard/routes.js';
+import searchRoutes from './modules/search/routes.js';
 import { createRequire } from 'node:module';
 
 declare module 'fastify' {
@@ -97,6 +99,8 @@ export async function buildApp(opts: BuildOptions): Promise<FastifyInstance> {
   await app.register(vehicleRoutes);
   await app.register(publicLeadRoutes);
   await app.register(platformRoutes);
+  await app.register(dashboardRoutes);
+  await app.register(searchRoutes);
 
   // Web-App (Vite-Build) ausliefern, wenn vorhanden
   const webDist = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../web/dist');
