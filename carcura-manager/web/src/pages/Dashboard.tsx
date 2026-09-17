@@ -14,13 +14,19 @@ export function DashboardPage() {
 
   return (
     <>
-      <PageHead title={`Guten Tag, ${me?.user.firstName}`} sub="Überblick aus echten Systemdaten. Umsatz, Termine, Lager und Marketing erscheinen, sobald die Module Daten enthalten." />
+      <PageHead title={`Guten Tag, ${me?.user.firstName}`} sub="Überblick aus echten Systemdaten. Umsatz = ausgestellte Rechnungen nach Rechnungsdatum (brutto)." />
       {q.isLoading || !d ? (
         <Card><Skeleton rows={5} /></Card>
       ) : (
         <div className="stack" style={{ gap: 16 }}>
           <div className="grid cols-4">
-            <Kpi label="Neue Leads (unbearbeitet)" value={d.leads.new} accent delta={`${d.leads.today} heute eingegangen`} />
+            <Kpi label="Umsatz heute" value={fmtMoney(d.revenue.todayCents)} accent delta={`Woche ${fmtMoney(d.revenue.weekCents)}`} />
+            <Kpi label="Umsatz diesen Monat" value={fmtMoney(d.revenue.monthCents)} delta={`${d.revenue.monthCount} Rechnungen · Jahr ${fmtMoney(d.revenue.yearCents)}`} />
+            <Kpi label="Offene Rechnungen" value={fmtMoney(d.revenue.openCents)} delta={`${d.revenue.openCount} offen`} />
+            <Kpi label="Überfällig" value={fmtMoney(d.revenue.overdueCents)} delta={d.revenue.overdueCount ? `${d.revenue.overdueCount} Rechnung${d.revenue.overdueCount === 1 ? '' : 'en'} überfällig` : 'nichts überfällig'} tone={d.revenue.overdueCount ? 'down' : undefined} />
+          </div>
+          <div className="grid cols-4">
+            <Kpi label="Neue Leads (unbearbeitet)" value={d.leads.new} delta={`${d.leads.today} heute eingegangen`} />
             <Kpi label="Leads diese Woche" value={d.leads.thisWeek} delta={weekDelta === null ? `Vorwoche: ${d.leads.lastWeek}` : `${weekDelta > 0 ? '+' : ''}${weekDelta} % zur Vorwoche (${d.leads.lastWeek})`} tone={weekDelta === null ? undefined : weekDelta >= 0 ? 'up' : 'down'} />
             <Kpi label="Offene Leads" value={d.leads.open} delta={d.leads.conversionRateMonth === null ? 'Conversion: noch keine abgeschlossenen Leads diesen Monat' : `Conversion diesen Monat: ${d.leads.conversionRateMonth} %`} />
             <Kpi label="Kunden" value={d.customers.total} delta={`${d.customers.thisMonth} neu diesen Monat · ${d.vehicles.total} Fahrzeuge`} />

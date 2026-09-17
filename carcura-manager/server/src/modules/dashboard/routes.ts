@@ -1,6 +1,6 @@
 import type { FastifyInstance } from 'fastify';
 import { and, eq, gte, lt, sql } from 'drizzle-orm';
-import { leads, customers, vehicles, appointments, orders } from '../../db/schema.js';
+import { leads, customers, vehicles, appointments, orders, invoices } from '../../db/schema.js';
 import { ctxOf } from '../../plugins/auth.js';
 
 /**
@@ -67,11 +67,20 @@ export default async function dashboardRoutes(app: FastifyInstance) {
     const ordersReady = app.db.select({ n: sql<number>`count(*)` }).from(orders).where(and(eq(orders.companyId, ctx.companyId), eq(orders.status, 'finished'))).get()?.n ?? 0;
     const completedMonth = app.db.select({ n: sql<number>`count(*)`, sum: sql<number>`coalesce(sum(${orders.totalCents}),0)` }).from(orders).where(and(eq(orders.companyId, ctx.companyId), eq(orders.status, 'completed'), gte(orders.completedAt, monthStart))).get();
 
+    const dayStr = today.slice(0, 10);
+    const weekStr = weekStart.toISOString().slice(0, 10);
+    const monthStr = monthStart.slice(0, 10);
+    const yearStr = `${now.getFullYear()}-01-01`;
+    const revenue = (from: string) => app.db.select({ s: sql<number>`coalesce(sum(${invoices.totalCents}),0)`, n: sql<number>`count(*)` }).from(invoices).where(and(eq(invoices.companyId, ctx.companyId), sql`${invoices.status} in ('open','sent','overdue','paid')`, gte(invoices.issueDate, from))).get()!;
+    const openInv = app.db.select({ s: sql<number>`coalesce(sum(${invoices.totalCents} - ${invoices.paidCents}),0)`, n: sql<number>`count(*)` }).from(invoices).where(and(eq(invoices.companyId, ctx.companyId), sql`${invoices.status} in ('open','sent','overdue')`)).get()!;
+    const overdueInv = app.db.select({ s: sql<number>`coalesce(sum(${invoices.totalCents} - ${invoices.paidCents}),0)`, n: sql<number>`count(*)` }).from(invoices).where(and(eq(invoices.companyId, ctx.companyId), eq(invoices.status, 'overdue'))).get()!;
+
     const recentLeads = app.db.select().from(leads).where(eq(leads.companyId, ctx.companyId)).orderBy(sql`${leads.createdAt} desc`).limit(6).all();
 
     const hints: Array<{ level: 'info' | 'warn'; text: string; kind: 'fact' | 'calc' }> = [];
     if (newLeads > 0) hints.push({ level: 'warn', kind: 'fact', text: `${newLeads} neue${newLeads === 1 ? 'r' : ''} Lead${newLeads === 1 ? '' : 's'} ohne Kontaktversuch.` });
     if (leadsLastWeek > 0 && leadsThisWeek < leadsLastWeek) hints.push({ level: 'info', kind: 'calc', text: `Diese Woche bisher ${leadsThisWeek} Leads gegenüber ${leadsLastWeek} in der Vorwoche.` });
+    if (overdueInv.n > 0) hints.push({ level: 'warn', kind: 'fact', text: `${overdueInv.n} überfällige Rechnung${overdueInv.n === 1 ? '' : 'en'} mit ${new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'EUR' }).format(overdueInv.s / 100)} offen.` });
     if (ordersReady > 0) hints.push({ level: 'info', kind: 'fact', text: `${ordersReady} fertige${ordersReady === 1 ? 'r' : ''} Auftr${ordersReady === 1 ? 'ag wartet' : 'äge warten'} auf Abholung.` });
     if (leadsLastWeek > 0 && leadsThisWeek > leadsLastWeek) hints.push({ level: 'info', kind: 'calc', text: `Leads liegen diese Woche mit ${leadsThisWeek} über der Vorwoche (${leadsLastWeek}).` });
 
@@ -80,6 +89,7 @@ export default async function dashboardRoutes(app: FastifyInstance) {
       leads: { today: leadsToday, thisWeek: leadsThisWeek, lastWeek: leadsLastWeek, thisMonth: leadsThisMonth, open: openLeads, new: newLeads, conversionRateMonth: closedThisMonth > 0 ? Math.round((wonThisMonth / closedThisMonth) * 1000) / 10 : null, bySource },
       customers: { total: customersTotal, thisMonth: customersThisMonth },
       appointments: { today: appointmentsToday, next7Days: appointmentsWeek, next: nextAppointments },
+      revenue: { todayCents: revenue(dayStr).s, weekCents: revenue(weekStr).s, monthCents: revenue(monthStr).s, yearCents: revenue(yearStr).s, monthCount: revenue(monthStr).n, openCents: openInv.s, openCount: openInv.n, overdueCents: overdueInv.s, overdueCount: overdueInv.n },
       orders: { inProgress: ordersInProgress, ready: ordersReady, completedMonth: completedMonth?.n ?? 0, completedMonthCents: completedMonth?.sum ?? 0 },
       vehicles: { total: vehiclesTotal },
       recentLeads,

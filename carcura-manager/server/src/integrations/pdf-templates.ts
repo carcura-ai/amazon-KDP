@@ -168,3 +168,52 @@ ${items.map((it, i) => `<tr><td class="num">${i + 1}</td><td><b>${esc(it.name)}<
 <table class="totals"><tr><td>Netto</td><td class="num">${money(totals.subtotalCents)}</td></tr>${smallBusiness ? '<tr><td class="small muted" colspan="2">Gemäß § 19 UStG wird keine Umsatzsteuer berechnet.</td></tr>' : totals.vatBreakdown.map((v) => `<tr><td>zzgl. ${v.vatBp / 100} % MwSt.</td><td class="num">${money(v.vatCents)}</td></tr>`).join('')}<tr class="total"><td>Gesamt</td><td class="num">${money(totals.totalCents)}</td></tr></table>
 ${o.notes ? `<h2>Hinweise</h2><div class="pre">${esc(o.notes)}</div>` : ''}`;
 }
+
+/* ------------------------------------------------------------------ Angebot / Rechnung */
+import type { offers, offerItems, invoices, invoiceItems } from '../db/schema.js';
+type LineItem = typeof offerItems.$inferSelect | typeof invoiceItems.$inferSelect;
+type TotalsT = { subtotalCents: number; vatCents: number; totalCents: number; vatBreakdown: Array<{ vatBp: number; netCents: number; vatCents: number }> };
+
+function addressBlock(company: Company, customer: Customer): string {
+  const sender = [company.legalName ?? company.name, company.street, [company.zip, company.city].filter(Boolean).join(' ')].filter(Boolean).join(' · ');
+  const lines = [customer.companyName, [customer.salutation, customer.firstName, customer.lastName].filter(Boolean).join(' ').trim() || null, [customer.street, customer.houseNumber].filter(Boolean).join(' ') || null, [customer.zip, customer.city].filter(Boolean).join(' ') || null].filter(Boolean);
+  return `<div style="margin:6px 0 18px;min-height:34mm"><div style="font-size:7.5pt;color:#777;border-bottom:1px solid #ddd;display:inline-block;padding-bottom:2px;margin-bottom:8px">${esc(sender)}</div><div style="font-size:11pt;line-height:1.5">${lines.map((l) => esc(l)).join('<br>')}</div></div>`;
+}
+
+function itemsTable(items: LineItem[], totals: TotalsT, smallBusiness: boolean): string {
+  return `<table><thead><tr><th>Pos.</th><th>Leistung</th><th class="num">Menge</th><th class="num">Einzelpreis</th><th class="num">Gesamt</th></tr></thead><tbody>
+${items.map((it, i) => `<tr><td class="num">${i + 1}</td><td><b>${esc(it.name)}</b>${it.description ? `<div class="small muted">${esc(it.description)}</div>` : ''}</td><td class="num">${it.quantity}</td><td class="num">${money(it.unitPriceCents)}</td><td class="num">${money(it.totalCents)}</td></tr>`).join('')}
+</tbody></table>
+<table class="totals"><tr><td>Nettobetrag</td><td class="num">${money(totals.subtotalCents)}</td></tr>${smallBusiness ? '' : totals.vatBreakdown.map((v) => `<tr><td>zzgl. ${v.vatBp / 100} % MwSt. auf ${money(v.netCents)}</td><td class="num">${money(v.vatCents)}</td></tr>`).join('')}<tr class="total"><td>Gesamtbetrag</td><td class="num">${money(totals.totalCents)}</td></tr></table>
+${smallBusiness ? '<p class="small muted" style="margin-top:8px">Gemäß § 19 UStG wird keine Umsatzsteuer berechnet.</p>' : ''}`;
+}
+
+export function offerBody(o: typeof offers.$inferSelect, items: LineItem[], company: Company, customer: Customer, vehicle: Vehicle | null, totals: TotalsT): string {
+  return `${addressBlock(company, customer)}
+<div class="grid2" style="margin-bottom:12px"><div><h1>Angebot ${esc(o.offerNumber)}</h1>${o.title ? `<div class="subtitle">${esc(o.title)}</div>` : ''}</div>
+<div class="kv" style="grid-template-columns:110px 1fr"><div>Datum</div><div>${dateDe(o.issueDate)}</div><div>Gültig bis</div><div>${o.validUntil ? dateDe(o.validUntil) : '–'}</div><div>Kundennummer</div><div>${esc(customer.customerNumber)}</div>${vehicle ? `<div>Fahrzeug</div><div>${esc(vehicleLabel(vehicle))}${vehicle.licensePlate ? ', ' + esc(vehicle.licensePlate) : ''}</div>` : ''}</div></div>
+${o.introText ? `<p class="pre" style="margin-bottom:12px">${esc(o.introText)}</p>` : `<p style="margin-bottom:12px">vielen Dank für Ihre Anfrage. Gerne unterbreiten wir Ihnen folgendes Angebot:</p>`}
+${itemsTable(items, totals, company.smallBusiness)}
+${o.notes ? `<p class="pre" style="margin-top:14px">${esc(o.notes)}</p>` : ''}
+<p style="margin-top:14px">Wir freuen uns auf Ihren Auftrag.${o.validUntil ? ` Dieses Angebot ist gültig bis ${dateDe(o.validUntil)}.` : ''}</p>
+${company.invoiceFooter ? `<p class="small muted pre" style="margin-top:14px">${esc(company.invoiceFooter)}</p>` : ''}`;
+}
+
+export function invoiceBody(inv: typeof invoices.$inferSelect, items: LineItem[], company: Company, customer: Customer, vehicle: Vehicle | null, totals: TotalsT, cancelsNumber?: string | null): string {
+  const isStorno = Boolean(inv.cancelsInvoiceId);
+  const title = isStorno ? `Stornorechnung ${esc(inv.invoiceNumber ?? '')}` : inv.invoiceNumber ? `Rechnung ${esc(inv.invoiceNumber)}` : 'Rechnungsentwurf';
+  const bank = [company.bankName ? `Bank: ${company.bankName}` : null, company.iban ? `IBAN: ${company.iban}` : null, company.bic ? `BIC: ${company.bic}` : null].filter(Boolean).join(' · ');
+  const payText = isStorno
+    ? `Diese Stornorechnung hebt die Rechnung ${esc(cancelsNumber ?? '')} auf.`
+    : inv.paidCents >= inv.totalCents && inv.totalCents > 0
+      ? `Der Betrag wurde bereits vollständig beglichen. Vielen Dank.`
+      : `Bitte überweisen Sie den Gesamtbetrag${inv.dueDate ? ` bis zum <b>${dateDe(inv.dueDate)}</b>` : ''} unter Angabe der Rechnungsnummer${inv.paidCents > 0 ? ` (bereits erhalten: ${money(inv.paidCents)}, offen: ${money(inv.totalCents - inv.paidCents)})` : ''}.${bank ? `<br>${esc(bank)}` : ''}`;
+  return `${addressBlock(company, customer)}
+<div class="grid2" style="margin-bottom:12px"><div><h1>${title}</h1>${inv.title ? `<div class="subtitle">${esc(inv.title)}</div>` : ''}</div>
+<div class="kv" style="grid-template-columns:120px 1fr"><div>Rechnungsdatum</div><div>${dateDe(inv.issueDate)}</div><div>Leistungsdatum</div><div>${inv.serviceDate ? dateDe(inv.serviceDate) : dateDe(inv.issueDate)}</div>${inv.dueDate && !isStorno ? `<div>Fällig am</div><div>${dateDe(inv.dueDate)}</div>` : ''}<div>Kundennummer</div><div>${esc(customer.customerNumber)}</div>${vehicle ? `<div>Fahrzeug</div><div>${esc(vehicleLabel(vehicle))}${vehicle.licensePlate ? ', ' + esc(vehicle.licensePlate) : ''}</div>` : ''}</div></div>
+${inv.introText ? `<p class="pre" style="margin-bottom:12px">${esc(inv.introText)}</p>` : ''}
+${itemsTable(items, totals, company.smallBusiness)}
+<p style="margin-top:14px">${payText}</p>
+${inv.notes ? `<p class="pre" style="margin-top:10px">${esc(inv.notes)}</p>` : ''}
+${company.invoiceFooter ? `<p class="small muted pre" style="margin-top:14px">${esc(company.invoiceFooter)}</p>` : ''}`;
+}

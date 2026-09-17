@@ -479,3 +479,120 @@ export const protocolDamages = sqliteTable(
   },
   (t) => [index('protocol_damages_protocol_idx').on(t.protocolId)],
 );
+
+/* ------------------------------------------------------------------ Angebote */
+export const offers = sqliteTable(
+  'offers',
+  {
+    id: text('id').primaryKey(),
+    companyId: text('company_id').notNull().references(() => companies.id),
+    offerNumber: text('offer_number').notNull(),
+    customerId: text('customer_id').notNull(),
+    vehicleId: text('vehicle_id'),
+    leadId: text('lead_id'),
+    orderId: text('order_id'),
+    status: text('status').notNull().default('draft'), // draft | sent | accepted | rejected | expired
+    title: text('title'),
+    introText: text('intro_text'),
+    notes: text('notes'),
+    issueDate: text('issue_date').notNull(),
+    validUntil: text('valid_until'),
+    subtotalCents: integer('subtotal_cents').notNull().default(0),
+    vatCents: integer('vat_cents').notNull().default(0),
+    totalCents: integer('total_cents').notNull().default(0),
+    sentAt: text('sent_at'),
+    acceptedAt: text('accepted_at'),
+    pdfFileId: text('pdf_file_id'),
+    createdByUserId: text('created_by_user_id'),
+    createdAt: ts('created_at'),
+    updatedAt: ts('updated_at'),
+  },
+  (t) => [uniqueIndex('offers_number_unique').on(t.companyId, t.offerNumber), index('offers_customer_idx').on(t.companyId, t.customerId), index('offers_status_idx').on(t.companyId, t.status)],
+);
+
+export const offerItems = sqliteTable(
+  'offer_items',
+  {
+    id: text('id').primaryKey(),
+    companyId: text('company_id').notNull(),
+    offerId: text('offer_id').notNull().references(() => offers.id),
+    serviceId: text('service_id'),
+    name: text('name').notNull(),
+    description: text('description'),
+    quantity: integer('quantity').notNull().default(1),
+    unitPriceCents: integer('unit_price_cents').notNull().default(0),
+    vatBp: integer('vat_bp').notNull().default(1900),
+    totalCents: integer('total_cents').notNull().default(0),
+    sortOrder: integer('sort_order').notNull().default(0),
+  },
+  (t) => [index('offer_items_offer_idx').on(t.offerId)],
+);
+
+/* ------------------------------------------------------------------ Rechnungen */
+export const invoices = sqliteTable(
+  'invoices',
+  {
+    id: text('id').primaryKey(),
+    companyId: text('company_id').notNull().references(() => companies.id),
+    invoiceNumber: text('invoice_number'), // wird erst beim Ausstellen vergeben (lückenlos)
+    customerId: text('customer_id').notNull(),
+    vehicleId: text('vehicle_id'),
+    orderId: text('order_id'),
+    offerId: text('offer_id'),
+    status: text('status').notNull().default('draft'), // draft | sent | open | overdue | paid | cancelled
+    title: text('title'),
+    introText: text('intro_text'),
+    notes: text('notes'),
+    issueDate: text('issue_date'),
+    serviceDate: text('service_date'),
+    dueDate: text('due_date'),
+    subtotalCents: integer('subtotal_cents').notNull().default(0),
+    vatCents: integer('vat_cents').notNull().default(0),
+    totalCents: integer('total_cents').notNull().default(0),
+    paidCents: integer('paid_cents').notNull().default(0),
+    paidAt: text('paid_at'),
+    sentAt: text('sent_at'),
+    issuedAt: text('issued_at'),
+    pdfFileId: text('pdf_file_id'),
+    cancelsInvoiceId: text('cancels_invoice_id'), // Stornorechnung zu …
+    cancelledByInvoiceId: text('cancelled_by_invoice_id'),
+    createdByUserId: text('created_by_user_id'),
+    createdAt: ts('created_at'),
+    updatedAt: ts('updated_at'),
+  },
+  (t) => [uniqueIndex('invoices_number_unique').on(t.companyId, t.invoiceNumber), index('invoices_customer_idx').on(t.companyId, t.customerId), index('invoices_status_idx').on(t.companyId, t.status), index('invoices_issue_idx').on(t.companyId, t.issueDate)],
+);
+
+export const invoiceItems = sqliteTable(
+  'invoice_items',
+  {
+    id: text('id').primaryKey(),
+    companyId: text('company_id').notNull(),
+    invoiceId: text('invoice_id').notNull().references(() => invoices.id),
+    serviceId: text('service_id'),
+    name: text('name').notNull(),
+    description: text('description'),
+    quantity: integer('quantity').notNull().default(1),
+    unitPriceCents: integer('unit_price_cents').notNull().default(0),
+    vatBp: integer('vat_bp').notNull().default(1900),
+    totalCents: integer('total_cents').notNull().default(0),
+    sortOrder: integer('sort_order').notNull().default(0),
+  },
+  (t) => [index('invoice_items_invoice_idx').on(t.invoiceId)],
+);
+
+export const payments = sqliteTable(
+  'payments',
+  {
+    id: text('id').primaryKey(),
+    companyId: text('company_id').notNull(),
+    invoiceId: text('invoice_id').notNull().references(() => invoices.id),
+    amountCents: integer('amount_cents').notNull(),
+    paidAt: text('paid_at').notNull(),
+    method: text('method').notNull().default('transfer'), // cash | transfer | card | paypal | other
+    note: text('note'),
+    createdByUserId: text('created_by_user_id'),
+    createdAt: ts('created_at'),
+  },
+  (t) => [index('payments_invoice_idx').on(t.invoiceId), index('payments_company_date_idx').on(t.companyId, t.paidAt)],
+);

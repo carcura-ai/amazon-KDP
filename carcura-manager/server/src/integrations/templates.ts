@@ -63,3 +63,30 @@ ${signature(company)}`,
 export function reminderShortText(company: Company, customer: Customer, a: Appointment): string {
   return `${salutation(customer)}, wir erinnern an Ihren Termin bei ${company.name}: ${a.title}, ${appointmentWhen(a)}. Passt der Termin nicht, geben Sie uns bitte kurz Bescheid. Viele Grüße, ${company.name}`;
 }
+
+export function offerMailText(company: Company, customer: Customer, offerNumber: string, validUntil: string | null): { subject: string; text: string } {
+  const valid = validUntil ? ` Das Angebot ist gültig bis ${new Intl.DateTimeFormat('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric' }).format(new Date(validUntil))}.` : '';
+  return {
+    subject: `Ihr Angebot ${offerNumber} von ${company.name}`,
+    text: `${salutation(customer)},
+
+vielen Dank für Ihre Anfrage. Im Anhang finden Sie unser Angebot ${offerNumber}.${valid}
+
+Bei Fragen oder für eine Terminvereinbarung melden Sie sich gerne jederzeit.
+
+${[`Ihr Team von ${company.name}`, company.phone ? `Telefon: ${company.phone}` : null, company.email ? `E-Mail: ${company.email}` : null, company.website ?? null].filter(Boolean).join('\n')}`,
+  };
+}
+
+export function invoiceMailText(company: Company, customer: Customer, invoiceNumber: string, totalCents: number, dueDate: string | null): { subject: string; text: string } {
+  const total = new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'EUR' }).format(totalCents / 100);
+  const due = dueDate ? ` Bitte überweisen Sie den Betrag bis zum ${new Intl.DateTimeFormat('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric' }).format(new Date(dueDate))}.` : '';
+  return {
+    subject: `Rechnung ${invoiceNumber} von ${company.name}`,
+    text: `${salutation(customer)},
+
+vielen Dank für Ihren Auftrag. Im Anhang finden Sie die Rechnung ${invoiceNumber} über ${total}.${due}
+
+${[`Ihr Team von ${company.name}`, company.phone ? `Telefon: ${company.phone}` : null, company.email ? `E-Mail: ${company.email}` : null, company.website ?? null].filter(Boolean).join('\n')}`,
+  };
+}

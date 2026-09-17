@@ -55,3 +55,7 @@ export const fmtWeekday = (iso: string) => new Intl.DateTimeFormat('de-DE', { we
 export const toLocalInput = (iso: string) => { const d = new Date(iso); const p = (n: number) => String(n).padStart(2, '0'); return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}T${p(d.getHours())}:${p(d.getMinutes())}`; };
 export const toDateInput = (d: Date) => { const p = (n: number) => String(n).padStart(2, '0'); return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}`; };
 export const fromLocalInput = (v: string) => new Date(v).toISOString();
+
+export const OFFER_STATUS: Record<string, { label: string; tone: string }> = { draft: { label: 'Entwurf', tone: '' }, sent: { label: 'Versendet', tone: 'info' }, accepted: { label: 'Angenommen', tone: 'ok' }, rejected: { label: 'Abgelehnt', tone: 'danger' }, expired: { label: 'Abgelaufen', tone: 'warn' } };
+export const INVOICE_STATUS: Record<string, { label: string; tone: string }> = { draft: { label: 'Entwurf', tone: '' }, open: { label: 'Offen', tone: 'info' }, sent: { label: 'Versendet', tone: 'info' }, overdue: { label: 'Überfällig', tone: 'danger' }, paid: { label: 'Bezahlt', tone: 'ok' }, cancelled: { label: 'Storniert', tone: 'warn' } };
+export const PAYMENT_METHOD: Record<string, string> = { cash: 'Bar', transfer: 'Überweisung', card: 'Karte', paypal: 'PayPal', other: 'Sonstiges' };

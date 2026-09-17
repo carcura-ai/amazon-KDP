@@ -12,6 +12,7 @@ import { VehicleForm } from './Vehicles';
 import { CustomerAppointmentsAndOrders } from './Orders';
 import { DocumentsPanel } from '../components/documents';
 import { ProtocolList } from './Protocol';
+import { CustomerBilling } from './Billing';
 
 const ICONS: Record<string, typeof Phone> = { call: Phone, email: Mail, message: MessageSquare, whatsapp: MessageSquare, note: StickyNote, appointment: Calendar, offer: FileText, invoice: FileText, reminder: Bell, system: Cog, status: ArrowRightLeft };
 
@@ -134,6 +135,7 @@ export function CustomerDetailPage() {
               )}
             </Card>
             <CustomerAppointmentsAndOrders customerId={id} />
+            <CustomerBilling customerId={id} />
             <Card title="Leads">
               {leads.length === 0 ? <p className="muted">Kein Lead verknüpft.</p> : leads.map((l) => <Link key={l.id} to={`/leads/${l.id}`} className="spread" style={{ padding: '6px 0' }}><span>{l.requestedService ?? 'Anfrage'} · {fmtDate(l.createdAt)}</span><Badge tone={LEAD_STATUS[l.status]?.tone}>{LEAD_STATUS[l.status]?.label}</Badge></Link>)}
             </Card>

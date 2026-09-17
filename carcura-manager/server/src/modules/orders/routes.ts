@@ -2,7 +2,7 @@ import type { FastifyInstance } from 'fastify';
 import { z } from 'zod';
 import { and, asc, desc, eq, like, or, sql } from 'drizzle-orm';
 import { orders, orderItems, customers, vehicles, appointments, companies, users, services } from '../../db/schema.js';
-import { parse, zOptionalText, zPagination, zTrimmed, zMoneyCents } from '../../core/validation.js';
+import { parse, zOptionalText, zPagination } from '../../core/validation.js';
 import { newId, nowIso } from '../../core/ids.js';
 import { badRequest, conflict, notFound } from '../../core/errors.js';
 import { writeAudit } from '../../core/audit.js';
@@ -13,15 +13,8 @@ import { logActivity } from '../crm/activities.js';
 export const ORDER_STATUS = ['planned', 'accepted', 'in_progress', 'quality_check', 'finished', 'picked_up', 'completed', 'cancelled'] as const;
 export const ORDER_STATUS_LABEL: Record<string, string> = { planned: 'Geplant', accepted: 'Angenommen', in_progress: 'In Bearbeitung', quality_check: 'Qualitätskontrolle', finished: 'Fertig', picked_up: 'Abgeholt', completed: 'Abgeschlossen', cancelled: 'Storniert' };
 
-const itemSchema = z.object({
-  id: z.string().uuid().optional(),
-  serviceId: z.string().uuid().nullable().optional(),
-  name: zTrimmed(200).min(1),
-  description: zOptionalText(1000),
-  quantity: z.number().int().min(1).max(1000).default(1),
-  unitPriceCents: zMoneyCents.default(0),
-  vatBp: z.number().int().min(0).max(10000).default(1900),
-});
+import { lineItemSchema as itemSchema, computeTotals } from '../../core/lineItems.js';
+export { computeTotals };
 const fields = {
   customerId: z.string().uuid(),
   vehicleId: z.string().uuid().nullable(),
@@ -38,23 +31,6 @@ const fields = {
 };
 const createSchema = z.object({ ...fields, vehicleId: fields.vehicleId.default(null), appointmentId: fields.appointmentId.default(null), userId: fields.userId.default(null), leadId: fields.leadId.default(null), status: fields.status.default('planned'), scheduledAt: fields.scheduledAt.default(null), mileageIn: fields.mileageIn.default(null), items: fields.items.default([]) });
 const updateSchema = z.object(fields).partial();
-
-export interface Totals { subtotalCents: number; vatCents: number; totalCents: number; vatBreakdown: Array<{ vatBp: number; netCents: number; vatCents: number }> }
-
-/** Netto-Preise je Position, MwSt. je Satz; bei Kleinunternehmern (§ 19 UStG) 0 % MwSt. */
-export function computeTotals(items: Array<{ quantity: number; unitPriceCents: number; vatBp: number }>, smallBusiness: boolean): Totals {
-  const byVat = new Map<number, number>();
-  let subtotal = 0;
-  for (const it of items) {
-    const net = it.quantity * it.unitPriceCents;
-    subtotal += net;
-    const bp = smallBusiness ? 0 : it.vatBp;
-    byVat.set(bp, (byVat.get(bp) ?? 0) + net);
-  }
-  const vatBreakdown = [...byVat.entries()].map(([vatBp, netCents]) => ({ vatBp, netCents, vatCents: Math.round((netCents * vatBp) / 10000) })).sort((a, b) => b.vatBp - a.vatBp);
-  const vat = vatBreakdown.reduce((s, v) => s + v.vatCents, 0);
-  return { subtotalCents: subtotal, vatCents: vat, totalCents: subtotal + vat, vatBreakdown };
-}
 
 export default async function orderRoutes(app: FastifyInstance) {
   const getOne = (companyId: string, id: string) => {

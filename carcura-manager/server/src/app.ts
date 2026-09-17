@@ -34,6 +34,8 @@ import { PdfService } from './integrations/pdf.js';
 import fileRoutes from './modules/files/routes.js';
 import protocolRoutes from './modules/protocols/routes.js';
 import printRoutes from './modules/print/routes.js';
+import offerRoutes from './modules/billing/offers.routes.js';
+import invoiceRoutes from './modules/billing/invoices.routes.js';
 import { createRequire } from 'node:module';
 
 declare module 'fastify' {
@@ -133,6 +135,8 @@ export async function buildApp(opts: BuildOptions): Promise<FastifyInstance> {
   await app.register(fileRoutes);
   await app.register(protocolRoutes);
   await app.register(printRoutes);
+  await app.register(offerRoutes);
+  await app.register(invoiceRoutes);
 
   // Web-App (Vite-Build) ausliefern, wenn vorhanden
   const webDist = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../web/dist');

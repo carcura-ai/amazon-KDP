@@ -1,16 +1,17 @@
 import { useEffect, useState, type FormEvent } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Link, useNavigate, useParams, useSearchParams } from 'react-router';
-import { Plus, Trash2, Pencil, Calendar, ArrowRight, FileDown } from 'lucide-react';
+import { Trash2, Pencil, Calendar, ArrowRight, FileDown, Receipt, Plus } from 'lucide-react';
 import { get, post, patch, del, qs } from '../api/client';
-import type { Customer, OrderDetail, OrderRow, Paged, Service, Appointment } from '../api/types';
+import type { Customer, OrderDetail, OrderRow, Paged, Appointment } from '../api/types';
 import { useAuth } from '../app/auth';
 import { Badge, Button, Card, Confirm, Empty, Field, Input, PageHead, Pager, Select, Skeleton, Textarea, useDebounced, useToast } from '../components/ui';
 import { CustomerPicker, VehicleSelect, UserSelect } from '../components/pickers';
-import { fmtDate, fmtDateTime, fmtMoney, fmtNumber, personName, ORDER_STATUS, ORDER_FLOW, inputFromCents, centsFromInput, toLocalInput, fromLocalInput } from '../lib/format';
+import { fmtDate, fmtDateTime, fmtMoney, fmtNumber, personName, ORDER_STATUS, ORDER_FLOW, toLocalInput, fromLocalInput } from '../lib/format';
 import { AppointmentModal } from './Calendar';
 import { DocumentsPanel } from '../components/documents';
 import { ProtocolList } from './Protocol';
+import { LineItemsEditor, ServiceCatalog, addServiceTo, draftsFrom, emptyItem, payloadFrom, type ItemDraft } from '../components/lineItems';
 
 export function OrdersPage() {
   const { can } = useAuth();
@@ -54,20 +55,15 @@ export function OrdersPage() {
   );
 }
 
-interface ItemDraft { id?: string; serviceId: string | null; name: string; description: string; quantity: number; unitPrice: string; vatBp: number }
-const emptyItem = (): ItemDraft => ({ serviceId: null, name: '', description: '', quantity: 1, unitPrice: '', vatBp: 1900 });
-
 export function OrderFormPage() {
   const { id } = useParams();
   const [sp] = useSearchParams();
   const navigate = useNavigate();
   const qc = useQueryClient();
   const toast = useToast();
-  const { me } = useAuth();
   const editing = Boolean(id);
   const existing = useQuery({ queryKey: ['order', id], queryFn: () => get<OrderDetail>(`/api/orders/${id}`), enabled: editing });
   const presetCustomer = useQuery({ queryKey: ['customer', sp.get('customerId')], queryFn: () => get<{ customer: Customer }>(`/api/customers/${sp.get('customerId')}`), enabled: Boolean(sp.get('customerId')) && !editing });
-  const services = useQuery({ queryKey: ['services'], queryFn: () => get<{ items: Service[] }>('/api/services') });
   const [customer, setCustomer] = useState<Customer | null>(null);
   const [f, setF] = useState({ vehicleId: sp.get('vehicleId') || null as string | null, userId: null as string | null, title: sp.get('title') ?? '', notes: '', internalNotes: '', scheduledAt: '', mileageIn: '', appointmentId: sp.get('appointmentId') || null as string | null });
   const [items, setItems] = useState<ItemDraft[]>([emptyItem()]);
@@ -77,33 +73,27 @@ export function OrderFormPage() {
       const { order: o, items: its } = existing.data;
       setCustomer(existing.data.customer);
       setF({ vehicleId: o.vehicleId, userId: o.userId, title: o.title ?? '', notes: o.notes ?? '', internalNotes: o.internalNotes ?? '', scheduledAt: o.scheduledAt ? toLocalInput(o.scheduledAt) : '', mileageIn: o.mileageIn ? String(o.mileageIn) : '', appointmentId: o.appointmentId });
-      setItems(its.length ? its.map((i) => ({ id: i.id, serviceId: i.serviceId, name: i.name, description: i.description ?? '', quantity: i.quantity, unitPrice: inputFromCents(i.unitPriceCents), vatBp: i.vatBp })) : [emptyItem()]);
+      setItems(draftsFrom(its));
       setLoaded(true);
     }
     if (!editing && presetCustomer.data && !customer) setCustomer(presetCustomer.data.customer);
   }, [editing, existing.data, presetCustomer.data, loaded, customer]);
 
-  const smallBusiness = me?.company.smallBusiness ?? false;
-  const valid = items.filter((i) => i.name.trim());
-  const subtotal = valid.reduce((s, i) => s + i.quantity * centsFromInput(i.unitPrice || '0'), 0);
-  const vat = smallBusiness ? 0 : valid.reduce((s, i) => s + Math.round((i.quantity * centsFromInput(i.unitPrice || '0') * i.vatBp) / 10000), 0);
 
   const save = useMutation({
     mutationFn: () => {
-      const payload = { customerId: customer!.id, vehicleId: f.vehicleId, userId: f.userId, appointmentId: f.appointmentId, title: f.title || null, notes: f.notes || null, internalNotes: f.internalNotes || null, scheduledAt: f.scheduledAt ? fromLocalInput(f.scheduledAt) : null, mileageIn: f.mileageIn ? Number(f.mileageIn) : null, items: valid.map((i) => ({ id: i.id, serviceId: i.serviceId, name: i.name.trim(), description: i.description || null, quantity: i.quantity, unitPriceCents: centsFromInput(i.unitPrice || '0'), vatBp: i.vatBp })) };
+      const payload = { customerId: customer!.id, vehicleId: f.vehicleId, userId: f.userId, appointmentId: f.appointmentId, title: f.title || null, notes: f.notes || null, internalNotes: f.internalNotes || null, scheduledAt: f.scheduledAt ? fromLocalInput(f.scheduledAt) : null, mileageIn: f.mileageIn ? Number(f.mileageIn) : null, items: payloadFrom(items) };
       return editing ? patch<OrderDetail>(`/api/orders/${id}`, payload) : post<OrderDetail>('/api/orders', payload);
     },
     onSuccess: (r) => { qc.invalidateQueries({ queryKey: ['orders'] }); qc.invalidateQueries({ queryKey: ['order', r.order.id] }); qc.invalidateQueries({ queryKey: ['appointments'] }); qc.invalidateQueries({ queryKey: ['dashboard'] }); toast.ok(editing ? 'Auftrag gespeichert' : `Auftrag ${r.order.orderNumber} angelegt`); navigate(`/auftraege/${r.order.id}`); },
     onError: (e) => toast.fromError(e),
   });
-  const addService = (svc: Service) => setItems((list) => { const empty = list.findIndex((i) => !i.name.trim()); const it: ItemDraft = { serviceId: svc.id, name: svc.name, description: '', quantity: 1, unitPrice: inputFromCents(svc.priceCents), vatBp: svc.vatBp }; if (empty >= 0) { const c = [...list]; c[empty] = it; return c; } return [...list, it]; });
-  const upd = (i: number, p: Partial<ItemDraft>) => setItems((list) => list.map((it, j) => (j === i ? { ...it, ...p } : it)));
 
   if (editing && existing.isLoading) return <Card><Skeleton /></Card>;
   return (
     <>
       <PageHead crumbs={<><Link to="/auftraege">Aufträge</Link><span>/</span><span>{editing ? existing.data?.order.orderNumber : 'Neu'}</span></>} title={editing ? `Auftrag ${existing.data?.order.orderNumber} bearbeiten` : 'Neuer Auftrag'} />
-      <form onSubmit={(e: FormEvent) => { e.preventDefault(); if (!customer) return toast.error('Bitte Kunden wählen.'); if (!valid.length) return toast.error('Mindestens eine Position angeben.'); save.mutate(); }} className="stack" style={{ gap: 16 }}>
+      <form onSubmit={(e: FormEvent) => { e.preventDefault(); if (!customer) return toast.error('Bitte Kunden wählen.'); if (!payloadFrom(items).length) return toast.error('Mindestens eine Position angeben.'); save.mutate(); }} className="stack" style={{ gap: 16 }}>
         <div className="grid main-side">
           <Card title="Auftragsdaten">
             <div className="form-grid">
@@ -117,32 +107,9 @@ export function OrderFormPage() {
               <Field label="Interne Notizen" className="span-2"><Textarea value={f.internalNotes} onChange={(e) => setF({ ...f, internalNotes: e.target.value })} /></Field>
             </div>
           </Card>
-          <Card title="Leistung hinzufügen">
-            <p className="small muted" style={{ marginBottom: 10 }}>Aus dem Katalog übernehmen oder unten frei eingeben.</p>
-            <div className="stack" style={{ gap: 6 }}>
-              {services.data?.items.map((s) => <button type="button" key={s.id} className="btn sm" style={{ justifyContent: 'space-between' }} onClick={() => addService(s)}><span>{s.name}</span><span className="muted">{s.priceCents ? fmtMoney(s.priceCents) : 'Preis offen'}</span></button>)}
-            </div>
-          </Card>
+          <ServiceCatalog onPick={(s) => addServiceTo(setItems, s)} />
         </div>
-        <Card title="Positionen" tight>
-          <div className="table-wrap"><table className="table items-editor">
-            <thead><tr><th style={{ width: '40%' }}>Leistung</th><th className="num">Menge</th><th className="num">Einzelpreis (€)</th><th className="num hide-mobile">MwSt.</th><th className="num">Gesamt</th><th></th></tr></thead>
-            <tbody>{items.map((it, i) => (
-              <tr key={i}>
-                <td><Input value={it.name} onChange={(e) => upd(i, { name: e.target.value, serviceId: null })} placeholder="Bezeichnung" /><Input value={it.description} onChange={(e) => upd(i, { description: e.target.value })} placeholder="Beschreibung (optional)" style={{ marginTop: 4 }} /></td>
-                <td className="num"><Input type="number" min={1} value={String(it.quantity)} onChange={(e) => upd(i, { quantity: Math.max(1, Number(e.target.value)) })} style={{ width: 72 }} /></td>
-                <td className="num"><Input inputMode="decimal" value={it.unitPrice} onChange={(e) => upd(i, { unitPrice: e.target.value })} style={{ width: 110 }} /></td>
-                <td className="num hide-mobile"><Select value={String(it.vatBp)} onChange={(e) => upd(i, { vatBp: Number(e.target.value) })} style={{ width: 90 }}><option value="1900">19 %</option><option value="700">7 %</option><option value="0">0 %</option></Select></td>
-                <td className="num">{fmtMoney(it.quantity * centsFromInput(it.unitPrice || '0'))}</td>
-                <td><Button type="button" size="sm" variant="ghost" onClick={() => setItems((l) => (l.length > 1 ? l.filter((_, j) => j !== i) : [emptyItem()]))}><Trash2 /></Button></td>
-              </tr>
-            ))}</tbody>
-          </table></div>
-          <div className="row" style={{ padding: 12, justifyContent: 'space-between' }}>
-            <Button type="button" size="sm" onClick={() => setItems((l) => [...l, emptyItem()])}><Plus /> Position</Button>
-            <div className="totals"><div className="l"><span className="muted">Netto</span><span>{fmtMoney(subtotal)}</span></div><div className="l"><span className="muted">{smallBusiness ? 'MwSt. (§ 19 UStG, keine)' : 'MwSt.'}</span><span>{fmtMoney(vat)}</span></div><div className="l total"><span>Gesamt</span><span>{fmtMoney(subtotal + vat)}</span></div></div>
-          </div>
-        </Card>
+        <LineItemsEditor items={items} setItems={setItems} />
         <div className="form-actions"><Button type="button" onClick={() => navigate(-1)}>Abbrechen</Button><Button type="submit" variant="primary" loading={save.isPending}>{editing ? 'Speichern' : 'Auftrag anlegen'}</Button></div>
       </form>
     </>
@@ -161,6 +128,7 @@ export function OrderDetailPage() {
   const invalidate = () => { qc.invalidateQueries({ queryKey: ['order', id] }); qc.invalidateQueries({ queryKey: ['orders'] }); qc.invalidateQueries({ queryKey: ['dashboard'] }); };
   const setStatus = useMutation({ mutationFn: (status: string) => patch(`/api/orders/${id}`, { status }), onSuccess: () => { invalidate(); toast.ok('Status aktualisiert'); setCancel(false); }, onError: (e) => toast.fromError(e) });
   const doDelete = useMutation({ mutationFn: () => del(`/api/orders/${id}`), onSuccess: () => { qc.invalidateQueries({ queryKey: ['orders'] }); toast.ok('Auftrag gelöscht'); navigate('/auftraege'); }, onError: (e) => toast.fromError(e) });
+  const toInvoice = useMutation({ mutationFn: () => post<{ invoice: { id: string } }>('/api/invoices/from-order', { orderId: id }), onSuccess: (r) => { qc.invalidateQueries({ queryKey: ['invoices'] }); toast.ok('Rechnungsentwurf erstellt'); navigate(`/rechnungen/${r.invoice.id}`); }, onError: (e) => toast.fromError(e) });
   if (q.isLoading) return <Card><Skeleton /></Card>;
   if (!q.data) return <Card><div className="empty"><h3>Auftrag nicht gefunden</h3></div></Card>;
   const { order: o, items, customer, vehicle, appointment, user, totals } = q.data;
@@ -175,11 +143,12 @@ export function OrderDetailPage() {
         sub={o.title ?? undefined}
         actions={can('orders:write') && !final ? <>
           <a className="btn" href={`/api/orders/${id}/pdf`} target="_blank" rel="noreferrer"><FileDown /> PDF</a>
+          {can('invoices:write') ? <Button onClick={() => toInvoice.mutate()} loading={toInvoice.isPending}><Receipt /> Rechnung</Button> : null}
           {next ? <Button variant="primary" onClick={() => setStatus.mutate(next)} loading={setStatus.isPending}>{ORDER_STATUS[next]?.label} <ArrowRight /></Button> : null}
           <Link className="btn" to={`/auftraege/${id}/bearbeiten`}><Pencil /> Bearbeiten</Link>
           {!appointment ? <Button onClick={() => setAppt(true)}><Calendar /> Termin</Button> : null}
           <Button variant="danger" onClick={() => setCancel(true)}>Stornieren</Button>
-        </> : o.status === 'planned' || o.status === 'cancelled' ? <Button variant="danger" onClick={() => doDelete.mutate()}><Trash2 /></Button> : null}
+        </> : <>{can('invoices:write') && o.status === 'completed' ? <Button onClick={() => toInvoice.mutate()} loading={toInvoice.isPending}><Receipt /> Rechnung erstellen</Button> : null}<a className="btn" href={`/api/orders/${id}/pdf`} target="_blank" rel="noreferrer"><FileDown /> PDF</a>{o.status === 'planned' || o.status === 'cancelled' ? <Button variant="danger" onClick={() => doDelete.mutate()}><Trash2 /></Button> : null}</>}
       />
       <div className="flow" style={{ marginBottom: 18 }}>{ORDER_FLOW.map((s, i) => <span key={s} className={`step ${i < idx ? 'done' : ''} ${s === o.status ? 'current' : ''}`}>{ORDER_STATUS[s]?.label}</span>)}{o.status === 'cancelled' ? <span className="step current" style={{ background: 'var(--danger)' }}>Storniert</span> : null}</div>
       <div className="grid main-side">

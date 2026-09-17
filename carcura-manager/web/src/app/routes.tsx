@@ -15,6 +15,7 @@ import { PlatformPage } from '../pages/Platform';
 import { CalendarPage } from '../pages/Calendar';
 import { OrdersPage, OrderFormPage, OrderDetailPage } from '../pages/Orders';
 import { ProtocolPage } from '../pages/Protocol';
+import { OffersPage, OfferFormPage, OfferDetailPage, InvoicesPage, InvoiceFormPage, InvoiceDetailPage } from '../pages/Billing';
 
 function FullscreenLoader() {
   return (
@@ -51,6 +52,14 @@ export function AppRoutes() {
         <Route path="/auftraege/neu" element={<OrderFormPage />} />
         <Route path="/auftraege/:id" element={<OrderDetailPage />} />
         <Route path="/auftraege/:id/bearbeiten" element={<OrderFormPage />} />
+        <Route path="/angebote" element={<OffersPage />} />
+        <Route path="/angebote/neu" element={<OfferFormPage />} />
+        <Route path="/angebote/:id" element={<OfferDetailPage />} />
+        <Route path="/angebote/:id/bearbeiten" element={<OfferFormPage />} />
+        <Route path="/rechnungen" element={<InvoicesPage />} />
+        <Route path="/rechnungen/neu" element={<InvoiceFormPage />} />
+        <Route path="/rechnungen/:id" element={<InvoiceDetailPage />} />
+        <Route path="/rechnungen/:id/bearbeiten" element={<InvoiceFormPage />} />
         <Route path="/protokolle/neu" element={<ProtocolPage />} />
         <Route path="/protokolle/:id" element={<ProtocolPage />} />
         <Route path="/einstellungen/*" element={<SettingsPage />} />

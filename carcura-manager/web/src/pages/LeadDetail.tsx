@@ -51,7 +51,7 @@ export function LeadDetailPage() {
         sub={<span className="row"><Badge tone={LEAD_STATUS[lead.status]?.tone}>{LEAD_STATUS[lead.status]?.label ?? lead.status}</Badge><span>{LEAD_SOURCE[lead.source] ?? lead.source}{lead.sourceDetail ? ` · ${lead.sourceDetail}` : ''}</span><span className="dim">Eingang {fmtDateTime(lead.createdAt)}</span></span>}
         actions={can('leads:write') ? (
           <>
-            {lead.customerId ? <Link className="btn" to={`/kunden/${lead.customerId}`}>Zur Kundenakte</Link> : <Button variant="primary" onClick={() => setConvert(true)}><ArrowRightLeft /> In Kunde umwandeln</Button>}
+            {lead.customerId ? <><Link className="btn primary" to={`/angebote/neu?customerId=${lead.customerId}&leadId=${lead.id}&title=${encodeURIComponent(lead.requestedService ?? '')}`}>Angebot erstellen</Link><Link className="btn" to={`/kunden/${lead.customerId}`}>Zur Kundenakte</Link></> : <Button variant="primary" onClick={() => setConvert(true)}><ArrowRightLeft /> In Kunde umwandeln</Button>}
             <Button onClick={() => setEdit(true)}><Pencil /> Bearbeiten</Button>
             {!lead.customerId ? <Button variant="danger" onClick={() => setRemove(true)}><Trash2 /></Button> : null}
           </>
