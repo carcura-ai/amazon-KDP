@@ -31,6 +31,7 @@ export async function api<T = unknown>(url: string, init: RequestInit & { json?:
 export const get = <T>(url: string) => api<T>(url);
 export const post = <T>(url: string, json?: unknown) => api<T>(url, { method: 'POST', json: json ?? {} });
 export const patch = <T>(url: string, json: unknown) => api<T>(url, { method: 'PATCH', json });
+export const put = <T>(url: string, json: unknown) => api<T>(url, { method: 'PUT', json });
 export const del = <T>(url: string) => api<T>(url, { method: 'DELETE' });
 
 export function qs(params: Record<string, string | number | boolean | undefined | null>): string {

@@ -1,9 +1,9 @@
 import { useEffect, useState, type FormEvent } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Route, Routes, NavLink } from 'react-router';
-import { Download, DatabaseBackup, RefreshCw, Upload, Trash2 as TrashIcon, Plus, Copy } from 'lucide-react';
-import { get, post, patch, del } from '../api/client';
-import type { SystemStatus, BackupInfo, Company, User, Service } from '../api/types';
+import { Download, DatabaseBackup, RefreshCw, Upload, Trash2 as TrashIcon, Plus, Copy, ShieldCheck, ShieldOff } from 'lucide-react';
+import { get, post, patch, del, put } from '../api/client';
+import type { PrivacySettings, SystemStatus, BackupInfo, Company, User, Service } from '../api/types';
 import { useAuth, applyBranding } from '../app/auth';
 import { Badge, Button, Card, Confirm, Empty, Field, Input, Kpi, Modal, PageHead, Select, Skeleton, Textarea, useToast } from '../components/ui';
 import { fmtDateTime, fmtMoney, inputFromCents, centsFromInput, ROLE_LABEL } from '../lib/format';
@@ -20,13 +20,14 @@ const PERM_LABEL: Record<string, string> = {
 export function SettingsPage() {
   const { can } = useAuth();
   const tabs = [
-    { to: '.', label: 'Unternehmen & Branding', show: can('settings:manage') },
+    { to: '/einstellungen', label: 'Unternehmen & Branding', show: can('settings:manage') },
     { to: 'leistungen', label: 'Leistungen', show: can('settings:manage') },
     { to: 'benutzer', label: 'Benutzer & Rollen', show: can('users:manage') },
     { to: 'email', label: 'E-Mail-Versand', show: can('integrations:manage') },
     { to: 'integrationen', label: 'Integrationen', show: can('integrations:manage') },
     { to: 'audit', label: 'Audit-Log', show: can('audit:read') },
     { to: 'system', label: 'System & Sicherung', show: can('backups:manage') },
+    { to: 'konto', label: 'Konto & Datenschutz', show: true },
   ].filter((t) => t.show);
   return (
     <>
@@ -40,6 +41,7 @@ export function SettingsPage() {
         <Route path="integrationen" element={<IntegrationsSettings />} />
         <Route path="audit" element={<AuditLog />} />
         <Route path="system" element={<SystemSettings />} />
+        <Route path="konto" element={<AccountAndPrivacy />} />
       </Routes>
     </>
   );
@@ -173,6 +175,7 @@ function UsersSettings() {
   const perms = useQuery({ queryKey: ['role-permissions'], queryFn: () => get<{ roles: string[]; permissions: string[]; byRole: Record<string, string[]> }>('/api/company/role-permissions') });
   const [create, setCreate] = useState(false);
   const [reset, setReset] = useState<User | null>(null);
+  const reset2fa = useMutation({ mutationFn: (id: string) => post(`/api/users/${id}/2fa/reset`), onSuccess: () => toast.ok('2FA zurückgesetzt'), onError: (e) => toast.fromError(e) });
   const [role, setRole] = useState('employee');
   const [rolePerms, setRolePerms] = useState<string[] | null>(null);
   useEffect(() => { if (perms.data) setRolePerms(perms.data.byRole[role] ?? []); }, [perms.data, role]);
@@ -197,7 +200,7 @@ function UsersSettings() {
                 <td><Select value={u.role} disabled={u.id === me?.user.id} onChange={(e) => updateUser.mutate({ id: u.id, role: e.target.value })} style={{ width: 'auto' }}>{Object.entries(ROLE_LABEL).map(([k, v]) => <option key={k} value={k}>{v}</option>)}</Select></td>
                 <td>{u.isActive ? <Badge tone="ok">aktiv</Badge> : <Badge tone="danger">deaktiviert</Badge>}</td>
                 <td className="muted hide-mobile">{fmtDateTime(u.lastLoginAt)}</td>
-                <td className="num"><div className="row" style={{ justifyContent: 'flex-end' }}><Button size="sm" onClick={() => setReset(u)}>Passwort</Button>{u.id !== me?.user.id ? <Button size="sm" variant={u.isActive ? 'danger' : undefined} onClick={() => updateUser.mutate({ id: u.id, isActive: !u.isActive })}>{u.isActive ? 'Deaktivieren' : 'Aktivieren'}</Button> : null}</div></td>
+                <td className="num"><div className="row" style={{ justifyContent: 'flex-end' }}><Button size="sm" onClick={() => setReset(u)}>Passwort</Button><Button size="sm" variant="ghost" title="Zwei-Faktor-Authentifizierung zurücksetzen (z. B. Handy verloren)" onClick={() => { if (window.confirm(`2FA für ${u.firstName} ${u.lastName} zurücksetzen? Die Person meldet sich danach nur mit Passwort an und sollte 2FA neu einrichten.`)) reset2fa.mutate(u.id); }}><ShieldOff /></Button>{u.id !== me?.user.id ? <Button size="sm" variant={u.isActive ? 'danger' : undefined} onClick={() => updateUser.mutate({ id: u.id, isActive: !u.isActive })}>{u.isActive ? 'Deaktivieren' : 'Aktivieren'}</Button> : null}</div></td>
               </tr>
             ))}</tbody>
           </table></div>
@@ -502,5 +505,81 @@ function SystemSettings() {
       {remove ? <Confirm title="Sicherung löschen?" text={`${remove.name} wird endgültig gelöscht.`} confirmLabel="Löschen" danger loading={doRemove.isPending} onConfirm={() => doRemove.mutate(remove.name)} onClose={() => setRemove(null)} /> : null}
       {update ? <Confirm title="Update installieren?" text="Vorher wird eine vollständige Sicherung erstellt. Danach werden Code und Abhängigkeiten aktualisiert und die Anwendung neu gestartet. Das dauert je nach Internetverbindung einige Minuten; währenddessen ist die Anwendung nicht erreichbar." confirmLabel="Sicherung erstellen und Update starten" loading={doUpdate.isPending} onConfirm={() => doUpdate.mutate()} onClose={() => setUpdate(false)} /> : null}
     </div>
+  );
+}
+
+function AccountAndPrivacy() {
+  const { me, can, refresh } = useAuth();
+  const toast = useToast();
+  const [setup, setSetup] = useState<{ secret: string; otpauthUrl: string; qrSvg: string } | null>(null);
+  const [code, setCode] = useState('');
+  const [backup, setBackup] = useState<string[] | null>(null);
+  const [disable, setDisable] = useState(false);
+  const [pw, setPw] = useState(''); const [pwCode, setPwCode] = useState('');
+  const start = useMutation({ mutationFn: () => post<{ secret: string; otpauthUrl: string; qrSvg: string }>('/api/auth/2fa/setup'), onSuccess: (r) => { setSetup(r); setCode(''); }, onError: (e) => toast.fromError(e, '2FA') });
+  const enable = useMutation({ mutationFn: () => post<{ backupCodes: string[] }>('/api/auth/2fa/enable', { code }), onSuccess: async (r) => { setBackup(r.backupCodes); setSetup(null); await refresh(); toast.ok('Zwei-Faktor-Authentifizierung aktiv'); }, onError: (e) => toast.fromError(e, '2FA') });
+  const doDisable = useMutation({ mutationFn: () => post('/api/auth/2fa/disable', { password: pw, code: pwCode }), onSuccess: async () => { setDisable(false); setPw(''); setPwCode(''); await refresh(); toast.ok('Zwei-Faktor-Authentifizierung deaktiviert'); }, onError: (e) => toast.fromError(e, '2FA') });
+  const enabled = Boolean(me?.twoFactorEnabled);
+  return (
+    <div className="stack" style={{ gap: 16 }}>
+      {me?.mustSetup2fa ? <Card><div className="row"><ShieldOff style={{ color: 'var(--danger)' }} /><b>Für Administratoren ist die Zwei-Faktor-Authentifizierung Pflicht.</b><span className="muted">Bitte jetzt einrichten, danach steht das System wieder vollständig zur Verfügung.</span></div></Card> : null}
+      <Card title="Zwei-Faktor-Authentifizierung (2FA)" actions={enabled ? <Badge tone="ok">aktiv</Badge> : <Badge tone="warn">nicht aktiv</Badge>}>
+        <p className="muted small">Zusätzlich zum Passwort wird beim Anmelden ein 6-stelliger Code aus einer Authenticator-App verlangt (Apple Passwörter, Google Authenticator, Microsoft Authenticator, 1Password). Empfohlen für alle Benutzer, dringend empfohlen, sobald das System aus dem Internet erreichbar ist.</p>
+        {!enabled && !setup ? <div style={{ marginTop: 12 }}><Button variant="primary" onClick={() => start.mutate()} loading={start.isPending}><ShieldCheck /> 2FA einrichten</Button></div> : null}
+        {setup ? (
+          <div className="grid cols-2" style={{ marginTop: 14, alignItems: 'start' }}>
+            <div style={{ background: '#fff', padding: 10, borderRadius: 10, width: 'fit-content' }} dangerouslySetInnerHTML={{ __html: setup.qrSvg }} />
+            <div className="stack" style={{ gap: 10 }}>
+              <p className="small">1. Authenticator-App öffnen → Konto hinzufügen → QR-Code scannen.<br />Manuell: Schlüssel <span className="mono" style={{ userSelect: 'all' }}>{setup.secret}</span></p>
+              <p className="small">2. Den angezeigten Code eingeben, um die Einrichtung zu bestätigen:</p>
+              <form onSubmit={(e: FormEvent) => { e.preventDefault(); enable.mutate(); }} className="row"><Input inputMode="numeric" autoComplete="one-time-code" value={code} onChange={(e) => setCode(e.target.value)} placeholder="123456" style={{ width: 140 }} /><Button type="submit" variant="primary" loading={enable.isPending}>Aktivieren</Button><Button type="button" onClick={() => setSetup(null)}>Abbrechen</Button></form>
+            </div>
+          </div>
+        ) : null}
+        {backup ? (
+          <div style={{ marginTop: 14 }}>
+            <p><b>Wiederherstellungscodes</b> – jetzt ausdrucken oder im Passwort-Manager speichern. Jeder Code funktioniert einmal, falls das Handy nicht verfügbar ist. Sie werden nicht noch einmal angezeigt.</p>
+            <div className="mono" style={{ display: 'grid', gridTemplateColumns: 'repeat(2, max-content)', gap: '6px 28px', padding: 12, background: 'var(--bg-hover)', borderRadius: 8, userSelect: 'all' }}>{backup.map((b) => <span key={b}>{b}</span>)}</div>
+            <div className="row" style={{ marginTop: 10 }}><Button onClick={() => { void navigator.clipboard?.writeText(backup.join('\n')); toast.ok('Kopiert'); }}><Copy /> Kopieren</Button><Button variant="primary" onClick={() => setBackup(null)}>Ich habe die Codes gesichert</Button></div>
+          </div>
+        ) : null}
+        {enabled && !disable ? <div style={{ marginTop: 12 }}><Button onClick={() => setDisable(true)}><ShieldOff /> 2FA deaktivieren</Button></div> : null}
+        {disable ? (
+          <form onSubmit={(e: FormEvent) => { e.preventDefault(); doDisable.mutate(); }} className="form-grid" style={{ marginTop: 12 }}>
+            <Field label="Passwort"><Input type="password" autoComplete="current-password" value={pw} onChange={(e) => setPw(e.target.value)} required /></Field>
+            <Field label="Aktueller Code oder Wiederherstellungscode"><Input value={pwCode} onChange={(e) => setPwCode(e.target.value)} required /></Field>
+            <div className="form-actions span-2"><Button type="button" onClick={() => setDisable(false)}>Abbrechen</Button><Button type="submit" variant="danger" loading={doDisable.isPending}>Deaktivieren</Button></div>
+          </form>
+        ) : null}
+      </Card>
+      {can('settings:manage') ? <PrivacySettingsCard /> : null}
+    </div>
+  );
+}
+
+function PrivacySettingsCard() {
+  const qc = useQueryClient();
+  const toast = useToast();
+  const q = useQuery({ queryKey: ['privacy-settings'], queryFn: () => get<{ settings: PrivacySettings; https: boolean; publicUrl: string }>('/api/privacy/settings') });
+  const [f, setF] = useState<PrivacySettings | null>(null);
+  useEffect(() => { if (q.data && !f) setF(q.data.settings); }, [q.data, f]);
+  const save = useMutation({ mutationFn: () => put<{ settings: PrivacySettings }>('/api/privacy/settings', f), onSuccess: () => { qc.invalidateQueries({ queryKey: ['privacy-settings'] }); qc.invalidateQueries({ queryKey: ['me'] }); toast.ok('Datenschutz-Einstellungen gespeichert'); }, onError: (e) => toast.fromError(e) });
+  const run = useMutation({ mutationFn: () => post<{ summary: string }>('/api/privacy/retention/run'), onSuccess: (r) => toast.ok(`Aufbewahrungslauf: ${r.summary}`), onError: (e) => toast.fromError(e) });
+  if (!f || !q.data) return <Card><Skeleton /></Card>;
+  const num = (k: keyof PrivacySettings) => (e: { target: { value: string } }) => setF({ ...f, [k]: Number(e.target.value) });
+  return (
+    <Card title="Datenschutz: Aufbewahrung und Datenweitergabe">
+      <p className="muted small">Fristen nach dem Löschkonzept (docs/06). Rechnungen, Angebote und Aufträge unterliegen der steuerlichen Aufbewahrung (8 bzw. 10 Jahre) und werden nie automatisch gelöscht. Die Fristen hier betreffen nur Daten ohne gesetzliche Aufbewahrungspflicht. Änderungen mit Datenschutzbeauftragtem oder Steuerberater abstimmen.</p>
+      <form onSubmit={(e: FormEvent) => { e.preventDefault(); save.mutate(); }} className="form-grid" style={{ marginTop: 12 }}>
+        <Field label="Verlorene Leads löschen nach (Monate)" hint="Unbeantwortete Leads nach der doppelten Frist"><Input type="number" min={1} max={120} value={String(f.leadRetentionMonths)} onChange={num('leadRetentionMonths')} /></Field>
+        <Field label="Versandprotokoll E-Mails (Monate)"><Input type="number" min={1} max={120} value={String(f.emailLogRetentionMonths)} onChange={num('emailLogRetentionMonths')} /></Field>
+        <Field label="Audit-Log aufbewahren (Monate)" hint="Nachweis von Änderungen; Empfehlung 24"><Input type="number" min={6} max={240} value={String(f.auditRetentionMonths)} onChange={num('auditRetentionMonths')} /></Field>
+        <Field label="Inaktive Kunden automatisch anonymisieren nach (Jahre)" hint="0 = aus. Betrifft nur deaktivierte Kunden."><Input type="number" min={0} max={30} value={String(f.inactiveCustomerYears)} onChange={num('inactiveCustomerYears')} /></Field>
+        <label className="check span-2"><input type="checkbox" checked={f.assistantPersonalData} onChange={(e) => setF({ ...f, assistantPersonalData: e.target.checked })} /> KI-Assistent darf Kundennamen und Kontaktdaten sehen (sonst nur Kundennummern). Erfordert einen Auftragsverarbeitungsvertrag mit Anthropic.</label>
+        <label className="check span-2"><input type="checkbox" checked={f.require2faForAdmins} onChange={(e) => setF({ ...f, require2faForAdmins: e.target.checked })} /> Zwei-Faktor-Authentifizierung für Administratoren erzwingen</label>
+        <div className="small muted span-2">Verbindung: {q.data.https ? <Badge tone="ok">HTTPS ({q.data.publicUrl})</Badge> : <Badge tone="warn">ohne HTTPS ({q.data.publicUrl})</Badge>} {q.data.https ? '– Transportverschlüsselung aktiv, Cookies nur über HTTPS, HSTS gesetzt.' : '– nur im lokalen Netz vertretbar. Für Zugriff aus dem Internet ist HTTPS Pflicht (PUBLIC_URL in .env, Tunnel oder Server mit Zertifikat).'}</div>
+        <div className="form-actions span-2"><Button type="button" onClick={() => run.mutate()} loading={run.isPending} style={{ marginRight: 'auto' }}>Aufbewahrungslauf jetzt ausführen</Button><Button type="submit" variant="primary" loading={save.isPending}>Speichern</Button></div>
+      </form>
+    </Card>
   );
 }

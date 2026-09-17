@@ -33,6 +33,9 @@ export function publicCompany(c: typeof companies.$inferSelect) {
   return rest;
 }
 
+import { issueChallenge } from './twofa.routes.js';
+import { privacySettings } from '../privacy/settings.js';
+
 export default async function authRoutes(app: FastifyInstance) {
   app.post('/api/auth/login', { config: { rateLimit: { max: 10, timeWindow: '1 minute' } } }, async (req, reply) => {
     const { email, password } = parse(loginSchema, req.body);
@@ -60,6 +63,11 @@ export default async function authRoutes(app: FastifyInstance) {
       writeAudit(app.db, { companyId: user.companyId, userId: user.id, ip: req.ip }, { action: 'auth.login_failed', entityType: 'user', entityId: user.id });
       throw generic;
     }
+    if (user.totpEnabledAt && user.totpSecretEnc) {
+      // Zweiter Faktor erforderlich: noch keine Sitzung, nur eine kurzlebige Challenge
+      app.db.update(users).set({ failedLoginCount: 0, lockedUntil: null }).where(eq(users.id, user.id)).run();
+      return { ok: false, requires2fa: true, challenge: issueChallenge(app, user.id) };
+    }
     app.db.update(users).set({ failedLoginCount: 0, lockedUntil: null, lastLoginAt: nowIso() }).where(eq(users.id, user.id)).run();
     const sessionId = createSession(app.db, app.config, user, { ip: req.ip, userAgent: req.headers['user-agent'] });
     reply.setCookie(SESSION_COOKIE, sessionId, app.cookieOptions);
@@ -77,7 +85,9 @@ export default async function authRoutes(app: FastifyInstance) {
     const ctx = ctxOf(req);
     const user = app.db.select().from(users).where(eq(users.id, ctx.userId)).get()!;
     const company = app.db.select().from(companies).where(eq(companies.id, ctx.companyId)).get()!;
-    return { user: publicUser(user), company: publicCompany(company), permissions: [...ctx.permissions] };
+    const privacy = privacySettings(company);
+    const twoFactorEnabled = Boolean(user.totpEnabledAt);
+    return { user: publicUser(user), company: publicCompany(company), permissions: [...ctx.permissions], twoFactorEnabled, mustSetup2fa: privacy.require2faForAdmins && user.role === 'admin' && !twoFactorEnabled };
   });
 
   app.post('/api/auth/change-password', { preHandler: app.requireAuth() }, async (req) => {

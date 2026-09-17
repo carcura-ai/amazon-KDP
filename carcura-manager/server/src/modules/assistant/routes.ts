@@ -3,6 +3,7 @@ import { z } from 'zod';
 import { and, asc, desc, eq } from 'drizzle-orm';
 import { assistantMessages, companies } from '../../db/schema.js';
 import { parse, zTrimmed } from '../../core/validation.js';
+import { privacySettings } from '../privacy/settings.js';
 import { badRequest } from '../../core/errors.js';
 import { writeAudit } from '../../core/audit.js';
 import { newId } from '../../core/ids.js';
@@ -74,10 +75,10 @@ export default async function assistantRoutes(app: FastifyInstance) {
     if (!f) throw badRequest('KI-Assistent nicht eingerichtet. Unter Einstellungen → Integrationen den Anthropic-API-Key hinterlegen.');
     const convId = conversationId ?? newId();
     const history = app.db.select({ role: assistantMessages.role, content: assistantMessages.content }).from(assistantMessages).where(and(eq(assistantMessages.companyId, ctx.companyId), eq(assistantMessages.conversationId, convId), eq(assistantMessages.userId, ctx.userId))).orderBy(asc(assistantMessages.createdAt)).all() as Array<{ role: 'user' | 'assistant'; content: string }>;
-    const company = app.db.select({ name: companies.name }).from(companies).where(eq(companies.id, ctx.companyId)).get()!;
+    const company = app.db.select({ name: companies.name, settingsJson: companies.settingsJson }).from(companies).where(eq(companies.id, ctx.companyId)).get()!;
     let result;
     try {
-      result = await runAssistant(app, ctx.companyId, company.name, f.config, history, question, app.fetchFn);
+      result = await runAssistant(app, ctx.companyId, company.name, f.config, history, question, app.fetchFn, privacySettings(company).assistantPersonalData);
       app.integrations.setStatus(ctx.companyId, 'claude', 'ok', null, true);
     } catch (err) {
       const message = describeAiError(err);

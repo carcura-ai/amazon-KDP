@@ -18,6 +18,8 @@ export function LoginPage() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  const [challenge, setChallenge] = useState<string | null>(null);
+  const [code, setCode] = useState('');
   const branding = useQuery({ queryKey: ['branding'], queryFn: () => get<Branding>(`/api/branding${new URLSearchParams(window.location.search).get('mandant') ? `?slug=${encodeURIComponent(new URLSearchParams(window.location.search).get('mandant') ?? '')}` : ''}`), staleTime: 60_000 });
   const b = branding.data;
   useEffect(() => { if (b) { applyBranding(b.primaryColor, b.secondaryColor); document.title = `${b.name} · ${b.productName}`; } }, [b]);
@@ -27,7 +29,12 @@ export function LoginPage() {
     setBusy(true);
     setError(null);
     try {
-      await post('/api/auth/login', { email, password });
+      if (challenge) {
+        await post('/api/auth/2fa/verify', { challenge, code });
+      } else {
+        const r = await post<{ requires2fa?: boolean; challenge?: string }>('/api/auth/login', { email, password });
+        if (r.requires2fa && r.challenge) { setChallenge(r.challenge); setCode(''); return; }
+      }
       await refresh();
       navigate(loc.state?.from && loc.state.from !== '/login' ? loc.state.from : '/', { replace: true });
     } catch (err) {
@@ -49,9 +56,20 @@ export function LoginPage() {
             </div>
           </div>
           <form onSubmit={submit} className="stack">
-            <Field label="E-Mail-Adresse"><Input type="email" autoComplete="username" required value={email} onChange={(e) => setEmail(e.target.value)} autoFocus /></Field>
-            <Field label="Passwort" error={error ?? undefined}><Input type="password" autoComplete="current-password" required value={password} onChange={(e) => setPassword(e.target.value)} /></Field>
-            <Button type="submit" variant="primary" className="block" loading={busy}><LogIn /> Anmelden</Button>
+            {challenge ? (
+              <>
+                <p className="muted small">Zweiter Faktor: Bitte den 6-stelligen Code aus der Authenticator-App eingeben. Alternativ ein Wiederherstellungscode.</p>
+                <Field label="Sicherheitscode" error={error ?? undefined}><Input inputMode="numeric" autoComplete="one-time-code" required autoFocus value={code} onChange={(e) => setCode(e.target.value)} placeholder="123 456" /></Field>
+                <Button type="submit" variant="primary" className="block" loading={busy}><LogIn /> Bestätigen</Button>
+                <button type="button" className="btn ghost block" onClick={() => { setChallenge(null); setError(null); }}>Zurück</button>
+              </>
+            ) : (
+              <>
+                <Field label="E-Mail-Adresse"><Input type="email" autoComplete="username" required value={email} onChange={(e) => setEmail(e.target.value)} autoFocus /></Field>
+                <Field label="Passwort" error={error ?? undefined}><Input type="password" autoComplete="current-password" required value={password} onChange={(e) => setPassword(e.target.value)} /></Field>
+                <Button type="submit" variant="primary" className="block" loading={busy}><LogIn /> Anmelden</Button>
+              </>
+            )}
           </form>
           {b?.poweredBy ? <p className="small dim" style={{ textAlign: 'center', marginTop: 14 }}>{b.poweredBy}</p> : null}
           {isNativeApp ? <p className="small" style={{ textAlign: 'center', marginTop: 14 }}><a href="capacitor://localhost/index.html?change=1" style={{ color: 'var(--fg-muted)' }}>Server-Adresse ändern</a></p> : null}

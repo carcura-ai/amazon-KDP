@@ -215,3 +215,11 @@ Push-Benachrichtigungen sind auf iOS ab 16.4 für Home-Bildschirm-Apps möglich 
 Optional liegt unter `app/` eine native Capacitor-Hülle mit Build-Workflows (TestFlight mit Apple
 Developer Program, oder unsignierte IPA für AltStore). Diese Variante ist vorbereitet, aber nicht der
 empfohlene Weg; Details in `app/README.md` und `app/ALTSTORE.md`.
+
+## Datenschutz und Sicherheit
+
+Prüfbericht, Verzeichnis der Verarbeitungstätigkeiten, TOM, Löschkonzept und Informationstexte:
+`06-datenschutz-und-sicherheit.md`. Einstellungen im System: Einstellungen → Konto & Datenschutz
+(2FA je Benutzer, Aufbewahrungsfristen, KI-Datenfreigabe, 2FA-Pflicht für Administratoren).
+Löschung nach Art. 17: Kundenakte → Löschen (anonymisiert bei aufbewahrungspflichtigen Belegen).
+Auskunft nach Art. 15: Kundenakte → Export. Täglicher Aufbewahrungslauf 03:45.

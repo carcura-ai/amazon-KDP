@@ -7,7 +7,7 @@ export interface Company {
   smallBusiness: boolean; invoiceFooter: string | null; paymentTermsDays: number; reminderDaysBefore: number; settingsJson: string; isActive: boolean;
   productName: string; poweredBy: string | null;
 }
-export interface Me { user: User; company: Company; permissions: string[] }
+export interface Me { user: User; company: Company; permissions: string[]; twoFactorEnabled: boolean; mustSetup2fa: boolean }
 export interface Paged<T> { items: T[]; total: number; page: number; pageSize: number }
 
 export interface Lead {
@@ -137,3 +137,4 @@ export interface SystemStatus {
 }
 export interface Branding { name: string; productName: string; primaryColor: string; secondaryColor: string; hasLogo: boolean; slug: string | null; poweredBy: string | null }
 export interface ImportResult { total: number; created: number; skipped: Array<{ row: number; name: string; reason: string }>; columns: Record<string, string>; dryRun: boolean }
+export interface PrivacySettings { leadRetentionMonths: number; emailLogRetentionMonths: number; auditRetentionMonths: number; jobLogRetentionDays: number; inactiveCustomerYears: number; assistantPersonalData: boolean; require2faForAdmins: boolean }

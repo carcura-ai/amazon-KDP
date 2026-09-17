@@ -9,6 +9,7 @@ import { runRecurringExpenses } from './jobs/recurring.js';
 import { runScheduledReports } from './modules/reports/generator.js';
 import { runCompetitorScanAll } from './modules/competitors/routes.js';
 import { applyPendingRestore } from './integrations/backup.js';
+import { runRetention } from './modules/privacy/retention.js';
 
 async function main() {
   const config = loadConfig();
@@ -30,6 +31,7 @@ async function main() {
     const info = await app.backups.create('auto');
     return `${info.name} (${Math.round(info.sizeBytes / 1024)} KB)`;
   } });
+  scheduler.register({ type: 'privacy.retention', cron: '45 3 * * *', runOnStart: true, handler: async () => runRetention(dbHandle.db, app.storage) });
   scheduler.register({ type: 'sessions.cleanup', cron: '15 3 * * *', handler: async () => `${purgeExpiredSessions(dbHandle.db)} Sessions entfernt` });
   app.addHook('onClose', async () => scheduler.stop());
   const shutdown = async (signal: string) => {

@@ -43,6 +43,7 @@ export function AppRoutes() {
       </Routes>
     );
   }
+  if (me.mustSetup2fa && !loc.pathname.startsWith('/einstellungen/konto')) return <Navigate to="/einstellungen/konto" replace />;
   return (
     <Routes>
       <Route path="/login" element={<Navigate to="/" replace />} />

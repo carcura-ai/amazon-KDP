@@ -250,3 +250,38 @@ Diesen Schritt können wir gemeinsam erledigen, sobald die öffentliche Adresse 
 | Handy erreicht den Manager nicht | `HOST=0.0.0.0` in `.env`, Neustart, gleiche WLAN, Windows-Firewall-Abfrage beim ersten Start mit „Zulassen“ bestätigen |
 
 Alle technischen Details, Umgebungsvariablen und Zeitpläne stehen in `docs\05-betrieb.md`.
+
+---
+
+## Teil 8 – Datenschutz und Sicherheit (Pflichtprogramm, 1 Stunde)
+
+Das System erfüllt die technischen Anforderungen der DSGVO und die Grundschutz-Empfehlungen des BSI
+(Details, Vorlagen und Prüfergebnis in `docs\06-datenschutz-und-sicherheit.md`). Diese Punkte musst du
+selbst erledigen, weil sie außerhalb der Software liegen:
+
+1. **BitLocker einschalten** (Windows: Einstellungen → Datenschutz und Sicherheit → Geräteverschlüsselung
+   bzw. Systemsteuerung → BitLocker). Ohne Festplattenverschlüsselung sind alle Kundendaten bei
+   Diebstahl des Laptops lesbar. Wiederherstellungsschlüssel im Passwort-Manager ablegen.
+2. **Zwei-Faktor-Authentifizierung** für dich und alle Administratoren: Einstellungen → Konto & Datenschutz
+   → „2FA einrichten“, QR-Code mit der Authenticator-App scannen (Apple Passwörter, Google Authenticator),
+   Wiederherstellungscodes ausdrucken. Dann „2FA für Administratoren erzwingen“ aktivieren.
+3. **Jeder Mitarbeiter ein eigenes Konto** mit passender Rolle, keine geteilten Passwörter, Konten beim
+   Austritt sofort deaktivieren. Mitarbeiter schriftlich auf Vertraulichkeit verpflichten (Vorlage der IHK).
+4. **Datenschutzhinweise für Kunden**: Text aus Abschnitt E der Doku in die Website-Datenschutzerklärung
+   und auf das Annahmeprotokoll/Auftragsformular übernehmen, Aushang in der Werkstatt.
+5. **Verzeichnis der Verarbeitungstätigkeiten** aus Abschnitt D übernehmen, Angaben prüfen, ablegen.
+6. **Auftragsverarbeitungsverträge** abschließen: E-Mail-Anbieter, Windsor.ai, bei Nutzung Anthropic,
+   Cloud für Sicherungen. Liste in Abschnitt F.
+7. **Sicherungen außer Haus**: Ordner `data\backups` wöchentlich auf USB-Stick oder verschlüsselt in
+   die Cloud kopieren. Schlüsseldatei `data\app-secret.key` separat im Passwort-Manager sichern.
+8. **HTTPS**, sobald das System aus dem Internet erreichbar ist (Teil 6). Ohne HTTPS nur im eigenen WLAN
+   betreiben; Gäste-WLAN getrennt halten.
+9. **Löschfristen prüfen**: Einstellungen → Konto & Datenschutz. Voreinstellungen: verlorene Anfragen
+   12 Monate, Versandprotokoll 12 Monate, Audit-Log 24 Monate. Rechnungen bleiben 10 Jahre.
+10. **Auskunft und Löschung auf Kundenwunsch**: Kundenakte → „Export“ liefert die vollständige Auskunft
+    als Datei; „Löschen“ entfernt alle personenbezogenen Daten und behält nur die steuerlich
+    aufbewahrungspflichtigen Belege unter einem Pseudonym.
+
+Ein Datenschutzbeauftragter ist erst ab etwa 20 ständig mit Datenverarbeitung beschäftigten Personen
+Pflicht. Für Verträge, Datenschutzerklärung und den späteren Verkauf an andere Betriebe einen Anwalt
+mit Schwerpunkt IT-Recht einbeziehen; die Doku enthält dafür alle technischen Angaben.

@@ -17,5 +17,6 @@
 | 17–18 | Mandantenfähigkeit geprüft (jede Tabelle mit `company_id`, Betreiber-Ebene mit Kennzahlen je Mandant), White-Label (Produktname, Herstellerhinweis, Logo/Farben auf Anmeldeseite, PDFs, E-Mails), Aufgaben-Modul, CSV-Import/-Export, Gesamtexport (JSON) | erledigt |
 | 19 | Sicherungen (täglich 02:30, manuell, Download, Upload, Wiederherstellung mit Sicherheitskopie), Update aus der Oberfläche mit Sicherung davor, Start-/Update-/Installationsskripte (Windows, macOS, Linux), CLI für Wartung | erledigt |
 | 20 | Gesamttest: 61 Server-Tests, 8 Browser-Suiten (Desktop und Mobil, Überlaufprüfung), Dokumentation und README | erledigt |
+| 21 | Datenschutz- und Sicherheitsprüfung (DSGVO/BSI): Löschkonzept mit Anonymisierung, Auskunftsexport, Aufbewahrungsläufe, Zwei-Faktor-Authentifizierung (TOTP), Sicherheits-Header, KI-Pseudonymisierung, Prüfbericht mit VVT-, TOM- und Informationstext-Vorlagen (`06-datenschutz-und-sicherheit.md`) | erledigt |
 
 Jede Phase endet mit: Tests grün, Typecheck grün, Commit, Aktualisierung dieser Tabelle.

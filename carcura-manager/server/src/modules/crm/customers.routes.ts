@@ -11,6 +11,8 @@ import { nextNumber } from '../../core/numbering.js';
 import { ctxOf } from '../../plugins/auth.js';
 import { findDuplicates } from './duplicates.js';
 import { logActivity, listActivities, ACTIVITY_TYPES } from './activities.js';
+import { anonymizeCustomer, deleteCustomerCompletely, hasRetentionDocuments } from '../privacy/anonymize.js';
+import { customerDossier } from '../privacy/routes.js';
 
 const customerFields = {
   type: z.enum(['private', 'business']),
@@ -123,14 +125,11 @@ export default async function customerRoutes(app: FastifyInstance) {
     const { hard } = parse(z.object({ hard: z.coerce.boolean().default(false) }), req.query);
     const before = getCustomer(ctx.companyId, id);
     if (hard) {
-      app.db.transaction((tx) => {
-        tx.run(sql`delete from activities where company_id = ${ctx.companyId} and customer_id = ${id}`);
-        tx.delete(vehicles).where(and(eq(vehicles.customerId, id), eq(vehicles.companyId, ctx.companyId))).run();
-        tx.update(leads).set({ customerId: null }).where(and(eq(leads.customerId, id), eq(leads.companyId, ctx.companyId))).run();
-        tx.delete(customers).where(eq(customers.id, id)).run();
-      });
-      writeAudit(app.db, ctx, { action: 'customer.delete_hard', entityType: 'customer', entityId: id, before: { customerNumber: before.customerNumber } });
-      return { ok: true, deleted: true };
+      // Löschkonzept: mit aufbewahrungspflichtigen Belegen wird anonymisiert, sonst vollständig gelöscht
+      const retention = hasRetentionDocuments(app.db, ctx.companyId, id);
+      const result = retention ? anonymizeCustomer(app.db, app.storage, ctx.companyId, id) : deleteCustomerCompletely(app.db, app.storage, ctx.companyId, id);
+      writeAudit(app.db, ctx, { action: retention ? 'customer.anonymize' : 'customer.delete_hard', entityType: 'customer', entityId: id, before: { customerNumber: before.customerNumber }, after: { ...result, mode: retention ? 'anonymized' : 'deleted' } });
+      return { ok: true, deleted: !retention, anonymized: retention, ...result };
     }
     app.db.update(customers).set({ isActive: false, updatedAt: nowIso() }).where(eq(customers.id, id)).run();
     writeAudit(app.db, ctx, { action: 'customer.deactivate', entityType: 'customer', entityId: id });
@@ -160,15 +159,9 @@ export default async function customerRoutes(app: FastifyInstance) {
   app.get('/api/customers/:id/export', { preHandler: app.requireAuth('customers:read') }, async (req, reply) => {
     const ctx = ctxOf(req);
     const { id } = req.params as { id: string };
-    const customer = getCustomer(ctx.companyId, id);
-    const data = {
-      exportedAt: nowIso(),
-      customer,
-      vehicles: app.db.select().from(vehicles).where(and(eq(vehicles.customerId, id), eq(vehicles.companyId, ctx.companyId))).all(),
-      activities: listActivities(app.db, ctx.companyId, { customerId: id }, 10000),
-    };
+    const data = customerDossier(app, ctx.companyId, id);
     writeAudit(app.db, ctx, { action: 'customer.export', entityType: 'customer', entityId: id });
-    reply.header('Content-Disposition', `attachment; filename="kunde-${customer.customerNumber}.json"`);
+    reply.header('Content-Disposition', `attachment; filename="kunde-${data.customer.customerNumber}.json"`);
     return data;
   });
 }

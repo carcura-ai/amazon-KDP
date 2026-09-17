@@ -63,4 +63,4 @@ Drittdiensten werden mit AES-256-GCM verschlüsselt gespeichert und nie an den B
 der Sicherung und muss separat aufbewahrt werden. Dieses Repository darf keine `.env`, keinen
 `data/`-Ordner und keine Schlüssel enthalten.
 
-Weitere Informationen: `docs/05-betrieb.md`.
+Weitere Informationen: `docs/05-betrieb.md`. Datenschutz und Sicherheit (DSGVO, BSI-Grundschutz): `docs/06-datenschutz-und-sicherheit.md`.

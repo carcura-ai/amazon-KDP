@@ -81,7 +81,7 @@ export function CustomerDetailPage() {
   const [remove, setRemove] = useState(false);
   const q = useQuery({ queryKey: ['customer', id], queryFn: () => get<{ customer: Customer; vehicles: Vehicle[]; leads: Lead[]; activities: Activity[]; duplicates: DuplicateHit[] }>(`/api/customers/${id}`) });
   const invalidate = () => { qc.invalidateQueries({ queryKey: ['customer', id] }); qc.invalidateQueries({ queryKey: ['customers'] }); };
-  const doDelete = useMutation({ mutationFn: () => del(`/api/customers/${id}?hard=true`), onSuccess: () => { qc.invalidateQueries({ queryKey: ['customers'] }); toast.ok('Kunde gelöscht'); navigate('/kunden'); }, onError: (e) => toast.fromError(e) });
+  const doDelete = useMutation({ mutationFn: () => del(`/api/customers/${id}?hard=true`), onSuccess: () => { qc.invalidateQueries({ queryKey: ['customers'] }); toast.ok('Kunde gelöscht bzw. anonymisiert'); navigate('/kunden'); }, onError: (e) => toast.fromError(e) });
 
   if (q.isLoading) return <Card><Skeleton rows={6} /></Card>;
   if (!q.data) return <Card><div className="empty"><h3>Kunde nicht gefunden</h3></div></Card>;
@@ -159,7 +159,7 @@ export function CustomerDetailPage() {
       {tab === 'history' ? <Card title="Kommunikationshistorie" actions={can('customers:write') ? <ActivityForm url={`/api/customers/${id}/activities`} onSaved={invalidate} /> : null}><Timeline items={activities} /></Card> : null}
       {edit ? <CustomerForm customer={c} onClose={() => { setEdit(false); invalidate(); }} /> : null}
       {addVehicle ? <VehicleForm customerId={id} onClose={() => { setAddVehicle(false); invalidate(); }} /> : null}
-      {remove ? <Confirm title="Kunde endgültig löschen?" text="Kundenakte, Fahrzeuge und Historie werden unwiderruflich entfernt (DSGVO-Löschung). Für ein Archiv stattdessen deaktivieren." confirmLabel="Endgültig löschen" danger loading={doDelete.isPending} onConfirm={() => doDelete.mutate()} onClose={() => setRemove(false)} /> : null}
+      {remove ? <Confirm title="Kunde endgültig löschen?" text="Löschung nach Art. 17 DSGVO: Kontaktdaten, Notizen, Historie, Aufgaben, Fotos und Unterschriften werden unwiderruflich entfernt. Liegen Angebote, Aufträge oder Rechnungen vor, bleiben diese wegen der steuerlichen Aufbewahrungspflicht unter einem Pseudonym erhalten. Für ein Archiv stattdessen deaktivieren." confirmLabel="Endgültig löschen" danger loading={doDelete.isPending} onConfirm={() => doDelete.mutate()} onClose={() => setRemove(false)} /> : null}
     </>
   );
 }

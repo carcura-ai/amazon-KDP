@@ -49,6 +49,8 @@ import taskRoutes from './modules/tasks/routes.js';
 import importExportRoutes from './modules/crm/importexport.routes.js';
 import systemRoutes from './modules/system/routes.js';
 import brandingRoutes from './modules/company/branding.routes.js';
+import twoFactorRoutes from './modules/auth/twofa.routes.js';
+import privacyRoutes from './modules/privacy/routes.js';
 import { createRequire } from 'node:module';
 
 declare module 'fastify' {
@@ -116,10 +118,17 @@ export async function buildApp(opts: BuildOptions): Promise<FastifyInstance> {
   await app.register(multipart, { limits: { fileSize: MAX_FILE_BYTES, files: 20 } });
   await app.register(authPlugin);
 
+  // Sicherheits-Header (BSI APP.3.1 / OWASP): CSP ohne Fremdquellen, kein Framing durch Dritte, keine Browser-APIs außer Kamera
+  const https = opts.config.publicUrl.startsWith('https://');
+  const CSP = "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self'; frame-src 'self' blob:; media-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'self'";
   app.addHook('onSend', async (_req, reply) => {
     reply.header('X-Content-Type-Options', 'nosniff');
     reply.header('X-Frame-Options', 'SAMEORIGIN');
     reply.header('Referrer-Policy', 'same-origin');
+    reply.header('Permissions-Policy', 'camera=(self), microphone=(), geolocation=(), payment=(), usb=()');
+    reply.header('Cross-Origin-Opener-Policy', 'same-origin');
+    reply.header('Content-Security-Policy', CSP);
+    if (https) reply.header('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
   });
 
   app.setErrorHandler((err, req, reply) => {
@@ -173,6 +182,8 @@ export async function buildApp(opts: BuildOptions): Promise<FastifyInstance> {
   await app.register(importExportRoutes);
   await app.register(systemRoutes);
   await app.register(brandingRoutes);
+  await app.register(twoFactorRoutes);
+  await app.register(privacyRoutes);
 
   // Web-App (Vite-Build) ausliefern, wenn vorhanden
   const webDist = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../web/dist');
