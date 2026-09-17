@@ -256,6 +256,8 @@ function IntegrationsSettings() {
         ) : <Skeleton rows={2} />}
         <div className="form-actions"><Button variant="danger" onClick={() => setRotate(true)}><RefreshCw /> Token neu erzeugen</Button></div>
       </Card>
+      <ClaudeCard />
+      <PlacesCard />
       <MarketingIntegrationCard type="windsor" title="Windsor.ai (empfohlen: eine Anbindung für Google Ads, Meta Ads, GA4, Instagram und Meta Lead Ads)" intro="API-Key aus dem Windsor.ai-Konto. Konto-IDs sind optional (leer = alle verbundenen Konten). Meta Lead-Formulare werden automatisch als Leads importiert." fields={[{ key: 'apiKey', label: 'API-Key', secret: true }, { key: 'googleAdsAccount', label: 'Google-Ads-Konto (z. B. 919-151-5213)' }, { key: 'metaAccount', label: 'Meta-Werbekonto-ID' }, { key: 'ga4Account', label: 'GA4-Property-ID' }, { key: 'instagramAccount', label: 'Instagram-Konto-ID' }, { key: 'leadsAccount', label: 'Facebook-Seiten-ID (Lead Ads)' }]} />
       <MarketingIntegrationCard type="google_ads" title="Google Ads API (direkt)" intro="Developer-Token aus dem Google-Ads-API-Center, OAuth-Client (Client-ID/-Secret) und ein Refresh-Token mit Zugriff auf das Kundenkonto." fields={[{ key: 'developerToken', label: 'Developer-Token', secret: true }, { key: 'clientId', label: 'OAuth Client-ID' }, { key: 'clientSecret', label: 'OAuth Client-Secret', secret: true }, { key: 'refreshToken', label: 'Refresh-Token', secret: true }, { key: 'customerId', label: 'Kundennummer (xxx-xxx-xxxx)' }, { key: 'loginCustomerId', label: 'Verwaltungskonto (optional)' }]} />
       <MarketingIntegrationCard type="meta_ads" title="Meta Marketing API (direkt)" intro="System-User-Token mit ads_read und die Werbekonto-ID (act_…)." fields={[{ key: 'accessToken', label: 'Access-Token', secret: true }, { key: 'adAccountId', label: 'Werbekonto-ID' }]} />
@@ -382,6 +384,44 @@ function MarketingIntegrationCard({ type, title, intro, fields }: { type: string
           <div className="form-actions">{q.data?.configured ? <><Button type="button" variant="danger" onClick={() => remove.mutate()} style={{ marginRight: 'auto' }}>Entfernen</Button><Button type="button" onClick={() => test.mutate()} loading={test.isPending}>Verbindung testen</Button></> : null}<Button type="submit" variant="primary" loading={save.isPending}>Speichern</Button></div>
         </form>
       ) : null}
+    </Card>
+  );
+}
+
+function ClaudeCard() {
+  const qc = useQueryClient();
+  const toast = useToast();
+  const q = useQuery({ queryKey: ['integration', 'claude'], queryFn: () => get<{ configured: boolean; model: string; models: string[]; status: string | null; lastError: string | null }>('/api/integrations/claude') });
+  const [key, setKey] = useState('');
+  const [model, setModel] = useState('claude-opus-5');
+  const [open, setOpen] = useState(false);
+  useEffect(() => { if (q.data) setModel(q.data.model); }, [q.data]);
+  const save = useMutation({ mutationFn: () => fetch('/api/integrations/claude', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ apiKey: key || undefined, model }) }).then(async (r) => { if (!r.ok) throw new Error((await r.json()).message); }), onSuccess: () => { qc.invalidateQueries({ queryKey: ['integration', 'claude'] }); qc.invalidateQueries({ queryKey: ['assistant-status'] }); toast.ok('Gespeichert'); setKey(''); }, onError: (e) => toast.fromError(e) });
+  const remove = useMutation({ mutationFn: () => del('/api/integrations/claude'), onSuccess: () => { qc.invalidateQueries({ queryKey: ['integration', 'claude'] }); toast.ok('Entfernt'); } });
+  return (
+    <Card title="KI-Business-Assistent (Claude)" actions={<div className="row">{q.data?.configured ? <Badge tone={q.data.status === 'error' ? 'danger' : 'ok'}>{q.data.status === 'error' ? 'Fehler' : 'eingerichtet'}</Badge> : <Badge>nicht eingerichtet</Badge>}<Button size="sm" onClick={() => setOpen(!open)}>{open ? 'Schließen' : q.data?.configured ? 'Bearbeiten' : 'Einrichten'}</Button></div>}>
+      <p className="muted small">Anthropic-API-Key (console.anthropic.com). Der Assistent erhält nur aggregierte Kennzahlen aus dem System, keine Dokumente oder Bilder. Kosten fallen je Anfrage beim Anbieter an; Opus 5 liefert die beste Analysequalität, Sonnet 5 ist günstiger.</p>
+      {q.data?.lastError ? <div className="dup-box" style={{ marginTop: 8 }}>{q.data.lastError}</div> : null}
+      {open ? <form onSubmit={(e: FormEvent) => { e.preventDefault(); save.mutate(); }} style={{ marginTop: 14 }}><div className="form-grid"><Field label="API-Key" hint={q.data?.configured ? 'Leer lassen, um den gespeicherten Key zu behalten.' : undefined}><Input type="password" autoComplete="off" value={key} onChange={(e) => setKey(e.target.value)} placeholder={q.data?.configured ? '••••••' : 'sk-ant-…'} /></Field><Field label="Modell"><Select value={model} onChange={(e) => setModel(e.target.value)}>{(q.data?.models ?? ['claude-opus-5']).map((m) => <option key={m}>{m}</option>)}</Select></Field></div><div className="form-actions">{q.data?.configured ? <Button type="button" variant="danger" style={{ marginRight: 'auto' }} onClick={() => remove.mutate()}>Entfernen</Button> : null}<Button type="submit" variant="primary" loading={save.isPending}>Speichern</Button></div></form> : null}
+    </Card>
+  );
+}
+
+function PlacesCard() {
+  const qc = useQueryClient();
+  const toast = useToast();
+  const q = useQuery({ queryKey: ['integration', 'google_places'], queryFn: () => get<{ configured: boolean; config?: { queries: string[]; lat: number | null; lng: number | null; radiusKm: number | null; ownPlaceId: string | null }; status?: string; lastError?: string | null; lastSyncAt?: string | null }>('/api/integrations/google_places') });
+  const [f, setF] = useState({ apiKey: '', queries: 'Fahrzeugaufbereitung Köln', radiusKm: '30', lat: '', lng: '', ownPlaceId: '' });
+  const [open, setOpen] = useState(false);
+  const [loaded, setLoaded] = useState(false);
+  useEffect(() => { if (q.data?.config && !loaded) { const c = q.data.config; setF({ apiKey: '', queries: c.queries.join('\n'), radiusKm: String(c.radiusKm ?? 30), lat: c.lat?.toString() ?? '', lng: c.lng?.toString() ?? '', ownPlaceId: c.ownPlaceId ?? '' }); setLoaded(true); } }, [q.data, loaded]);
+  const save = useMutation({ mutationFn: () => fetch('/api/integrations/google_places', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ apiKey: f.apiKey || undefined, queries: f.queries.split('\n').map((x) => x.trim()).filter(Boolean), radiusKm: Number(f.radiusKm) || 30, lat: f.lat ? Number(f.lat.replace(',', '.')) : null, lng: f.lng ? Number(f.lng.replace(',', '.')) : null, ownPlaceId: f.ownPlaceId || null }) }).then(async (r) => { if (!r.ok) throw new Error((await r.json()).message); }), onSuccess: () => { qc.invalidateQueries({ queryKey: ['integration', 'google_places'] }); qc.invalidateQueries({ queryKey: ['competitors'] }); toast.ok('Gespeichert'); setF({ ...f, apiKey: '' }); }, onError: (e) => toast.fromError(e) });
+  const remove = useMutation({ mutationFn: () => del('/api/integrations/google_places'), onSuccess: () => { qc.invalidateQueries({ queryKey: ['integration', 'google_places'] }); setLoaded(false); toast.ok('Entfernt'); } });
+  return (
+    <Card title="Wettbewerber-Monitoring (Google Places API)" actions={<div className="row">{q.data?.configured ? <Badge tone={q.data.status === 'error' ? 'danger' : q.data.status === 'ok' ? 'ok' : 'info'}>{q.data.status === 'error' ? 'Fehler' : q.data.status === 'ok' ? 'aktiv' : 'gespeichert'}</Badge> : <Badge>nicht eingerichtet</Badge>}<Button size="sm" onClick={() => setOpen(!open)}>{open ? 'Schließen' : q.data?.configured ? 'Bearbeiten' : 'Einrichten'}</Button></div>}>
+      <p className="muted small">API-Key aus der Google Cloud Console mit aktivierter „Places API (New)“. Wöchentlich werden die Suchbegriffe (eine je Zeile, z. B. „Fahrzeugaufbereitung Köln“) im Umkreis abgefragt: Bewertungen, Rezensionen, Website. Nur öffentliche Daten über die offizielle API.</p>
+      {q.data?.lastError ? <div className="dup-box" style={{ marginTop: 8 }}>{q.data.lastError}</div> : null}
+      {open ? <form onSubmit={(e: FormEvent) => { e.preventDefault(); save.mutate(); }} style={{ marginTop: 14 }}><div className="form-grid"><Field label="API-Key" hint={q.data?.configured ? 'Leer lassen, um den gespeicherten Key zu behalten.' : undefined} className="span-2"><Input type="password" autoComplete="off" value={f.apiKey} onChange={(e) => setF({ ...f, apiKey: e.target.value })} placeholder={q.data?.configured ? '••••••' : ''} /></Field><Field label="Suchbegriffe (eine je Zeile)" className="span-2"><Textarea value={f.queries} onChange={(e) => setF({ ...f, queries: e.target.value })} /></Field><Field label="Umkreis (km)"><Input type="number" min={1} max={200} value={f.radiusKm} onChange={(e) => setF({ ...f, radiusKm: e.target.value })} /></Field><Field label="Eigene Place-ID (optional)"><Input value={f.ownPlaceId} onChange={(e) => setF({ ...f, ownPlaceId: e.target.value })} /></Field><Field label="Breitengrad (optional)"><Input value={f.lat} onChange={(e) => setF({ ...f, lat: e.target.value })} placeholder="50.94" /></Field><Field label="Längengrad (optional)"><Input value={f.lng} onChange={(e) => setF({ ...f, lng: e.target.value })} placeholder="6.96" /></Field></div><div className="form-actions">{q.data?.configured ? <Button type="button" variant="danger" style={{ marginRight: 'auto' }} onClick={() => remove.mutate()}>Entfernen</Button> : null}<Button type="submit" variant="primary" loading={save.isPending}>Speichern</Button></div></form> : null}
     </Card>
   );
 }

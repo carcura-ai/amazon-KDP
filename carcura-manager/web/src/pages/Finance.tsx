@@ -3,7 +3,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { ChevronLeft, ChevronRight, Plus, Pencil, Trash2, Repeat } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, Legend } from 'recharts';
 import { get, post, patch, del, qs } from '../api/client';
-import type { Expense, FinanceOverview, RecurringExpense } from '../api/types';
+import type { Expense, FinanceOverview, RecurringExpense, ServicePricing } from '../api/types';
 import { useAuth } from '../app/auth';
 import { Badge, Button, Card, Confirm, Empty, Field, Input, Kpi, Modal, PageHead, Select, Skeleton, Tabs, Textarea, useToast } from '../components/ui';
 import { fmtDate, fmtMoney, inputFromCents, centsFromInput, toDateInput, HINT_KIND, INTERVAL_LABEL, PAY_METHOD_ALL } from '../lib/format';
@@ -23,7 +23,7 @@ function shift(date: string, period: Period, n: number): string {
 
 export function FinancePage() {
   const { can } = useAuth();
-  const [tab, setTab] = useState<'overview' | 'expenses' | 'recurring'>('overview');
+  const [tab, setTab] = useState<'overview' | 'expenses' | 'recurring' | 'pricing'>('overview');
   const [period, setPeriod] = useState<Period>('month');
   const [date, setDate] = useState(toDateInput(new Date()));
   const ov = useQuery({ queryKey: ['finance', period, date], queryFn: () => get<FinanceOverview>(`/api/finance/overview${qs({ period, date })}`) });
@@ -32,7 +32,7 @@ export function FinancePage() {
   return (
     <>
       <PageHead title="Finanzen" sub="Einnahmen aus Rechnungen, Ausgaben, Gewinn und Liquidität. Alle Beträge netto, sofern nicht anders angegeben." actions={can('finance:write') ? <Button variant="primary" onClick={() => setTab('expenses')}><Plus /> Ausgabe</Button> : null} />
-      <Tabs value={tab} onChange={setTab} items={[{ id: 'overview', label: 'Übersicht' }, { id: 'expenses', label: 'Ausgaben' }, { id: 'recurring', label: 'Wiederkehrende Kosten' }]} />
+      <Tabs value={tab} onChange={setTab} items={[{ id: 'overview', label: 'Übersicht' }, { id: 'expenses', label: 'Ausgaben' }, { id: 'recurring', label: 'Wiederkehrende Kosten' }, { id: 'pricing', label: 'Preisanalyse' }]} />
       {tab === 'overview' ? (
         <div className="stack" style={{ gap: 16 }}>
           <Card tight>
@@ -87,6 +87,7 @@ export function FinancePage() {
       ) : null}
       {tab === 'expenses' ? <ExpensesTab /> : null}
       {tab === 'recurring' ? <RecurringTab /> : null}
+      {tab === 'pricing' ? <PricingTab /> : null}
     </>
   );
 }
@@ -212,5 +213,20 @@ function RecurringModal({ rec, onClose }: { rec: Partial<RecurringExpense>; onCl
         <div className="form-actions"><Button type="button" onClick={onClose}>Abbrechen</Button><Button type="submit" variant="primary" loading={m.isPending}>Speichern</Button></div>
       </form>
     </Modal>
+  );
+}
+
+function PricingTab() {
+  const [days, setDays] = useState(90);
+  const q = useQuery({ queryKey: ['pricing', days], queryFn: () => get<{ items: ServicePricing[]; avgMarginPct: number | null; avgHourlyYieldCents: number | null }>(`/api/analysis/pricing?days=${days}`) });
+  const d = q.data;
+  return (
+    <div className="stack" style={{ gap: 16 }}>
+      <div className="row"><span className="muted small">Zeitraum:</span><div className="seg">{[90, 180, 365].map((n) => <button key={n} className={days === n ? 'active' : ''} onClick={() => setDays(n)}>{n} Tage</button>)}</div>{d ? <span className="muted small" style={{ marginLeft: 'auto' }}>Ø Marge {d.avgMarginPct ?? '–'} % · Ø Stundenertrag {d.avgHourlyYieldCents === null ? '–' : fmtMoney(d.avgHourlyYieldCents)}</span> : null}</div>
+      <Card tight title="Leistungen: Nachfrage, Umsatz, Marge, Stundenertrag">
+        <p className="small muted" style={{ padding: '10px 14px 0' }}>Marge = (abgerechneter Preis − Materialkosten) ÷ Preis. Stundenertrag = Marge je Stunde kalkulierter Arbeitszeit. Berechnung aus Rechnungen (Aufträge, wenn noch keine Rechnung existiert). Preise werden nie automatisch geändert – Hinweise sind Vorschläge.</p>
+        {q.isLoading ? <Skeleton /> : <div className="table-wrap"><table className="table"><thead><tr><th>Leistung</th><th className="num">Listenpreis</th><th className="num">Buchungen</th><th className="num hide-mobile">Trend</th><th className="num">Umsatz</th><th className="num">Marge</th><th className="num hide-mobile">Ertrag/Std.</th><th>Hinweise</th></tr></thead><tbody>{d?.items.map((i) => <tr key={i.serviceId}><td><div className="primary">{i.name}</div><div className="secondary">{i.category ?? ''}{i.avgPriceCents !== null && i.avgPriceCents !== i.priceCents ? ` · Ø abgerechnet ${fmtMoney(i.avgPriceCents)}` : ''}</div></td><td className="num">{i.priceCents ? fmtMoney(i.priceCents) : <Badge tone="warn">fehlt</Badge>}</td><td className="num">{i.bookings90}</td><td className="num hide-mobile">{i.demandTrendPct === null ? '–' : <span style={{ color: i.demandTrendPct >= 0 ? 'var(--ok)' : 'var(--danger)' }}>{i.demandTrendPct >= 0 ? '+' : ''}{i.demandTrendPct} %</span>}</td><td className="num">{fmtMoney(i.revenue90Cents)}</td><td className="num">{i.marginPct === null ? '–' : `${i.marginPct} %`}</td><td className="num hide-mobile">{i.hourlyYieldCents === null ? '–' : fmtMoney(i.hourlyYieldCents)}</td><td>{i.hints.length ? <div className="stack" style={{ gap: 4 }}>{i.hints.map((h, k) => <span key={k} className="small" style={{ color: 'var(--warn)' }}>{h}</span>)}</div> : <span className="dim small">–</span>}</td></tr>)}</tbody></table></div>}
+      </Card>
+    </div>
   );
 }

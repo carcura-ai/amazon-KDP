@@ -98,3 +98,35 @@ verschlüsselt in der Datenbank und werden nie an den Browser gesendet.
 **Attribution:** Kosten pro Lead und ROAS beziehen sich auf Leads bzw. Kunden, deren Quelle im CRM `google_ads`
 oder `meta_ads` ist (Website-Formular mit gclid → Google Ads; Meta Lead Ads → Meta). Leads, die telefonisch
 eingehen, müssen mit der richtigen Quelle erfasst werden, sonst werden Werbekosten ohne Leads gemeldet.
+
+## Berichte (Woche / Monat / Jahr)
+
+Berichte werden vom Zeitplaner automatisch erstellt: Wochenbericht montags 06:00, Monatsbericht am 1. um 06:30,
+Jahresbericht am 2. Januar um 07:00 (jeweils für die letzte abgeschlossene Periode). Unter „Berichte“ kann
+jederzeit ein Bericht manuell erzeugt werden, auch für die laufende Periode. Jeder Bericht wird als PDF abgelegt
+und, falls SMTP eingerichtet ist, an die Admin-Adresse des Mandanten gesendet. Aufbau je Bereich:
+Fakten (gemessen) → Was hat sich verändert (berechnet) → Mögliche Ursachen (Interpretation) → Empfehlungen (Vorschlag).
+Bei fehlenden Daten steht „Nicht genügend Daten“ bzw. „Keine … erfasst“; es werden keine Werte geschätzt.
+
+## KI-Business-Assistent (Claude)
+
+Einrichtung unter Einstellungen → Integrationen → „KI-Business-Assistent (Claude)“: Anthropic-API-Key
+(console.anthropic.com) und Modell (Standard `claude-opus-5`). Der Key wird verschlüsselt gespeichert und nie an
+den Browser gesendet. Der Assistent erhält **keine** Dokumente oder Rohdaten, sondern ruft ausschließlich definierte
+Werkzeuge auf (Kennzahlen, Lead-Funnel, Kampagnen, offene Rechnungen, Ausgaben, inaktive Kunden, Auslastung,
+Lager, Kundensuche, Berichte). Die dabei übermittelten Werte enthalten Kundennamen/Kontaktdaten nur bei den
+Werkzeugen „Kundensuche“, „inaktive Kunden“ und „offene Rechnungen“ – das ist im Datenschutzhinweis des Mandanten
+zu berücksichtigen (Auftragsverarbeitung mit Anthropic, Daten werden laut Anthropic-API-Bedingungen nicht zum
+Training verwendet). Kosten: pro Frage einige Cent (je nach Werkzeugaufrufen); Token-Verbrauch wird je Antwort
+gespeichert. Fehler (ungültiger Key, Limit, Überlastung) werden verständlich angezeigt.
+
+## Wettbewerber-Monitoring (Google Places API)
+
+Einrichtung unter Einstellungen → Integrationen → „Wettbewerber-Monitoring“: Google-Cloud-API-Key mit aktivierter
+**Places API (New)**, Suchbegriffe (z. B. „Fahrzeugaufbereitung“, „Autoaufbereitung“), Standort (Breite/Länge) und
+Radius. Der Scan läuft montags 05:00 und manuell über „Jetzt scannen“. Abgerufen werden nur öffentliche Daten des
+Google-Unternehmensprofils (Name, Adresse, Website, Bewertung, Anzahl Rezensionen). Kein Scraping, keine Umgehung
+von Zugriffsbeschränkungen. Der eigene Betrieb wird in der Liste als „eigener“ Eintrag markiert und liefert die
+eigene Bewertungsentwicklung. Wettbewerber ohne API lassen sich manuell mit Notizen (Preise, Leistungen) pflegen.
+Kosten: Google Places „Text Search (Basic/Advanced)“ pro Anfrage; bei wöchentlichem Scan mit wenigen Begriffen
+liegt das im kostenlosen Monatskontingent von Google.

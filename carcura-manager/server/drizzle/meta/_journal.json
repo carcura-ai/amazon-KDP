@@ -43,6 +43,13 @@
       "when": 1789636835863,
       "tag": "0005_marketing",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "6",
+      "when": 1789637345264,
+      "tag": "0006_reports_competitors_assistant",
+      "breakpoints": true
     }
   ]
 }

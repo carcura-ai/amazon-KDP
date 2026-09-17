@@ -147,6 +147,7 @@ export default async function marketingRoutes(app: FastifyInstance) {
     const se = seoAgg(from, toExcl); const sep = seoAgg(prevFrom, prevToExcl);
     const seo = hasSeo ? { clicks: se.clicks, impressions: se.impressions, position: se.position === null ? null : Math.round(se.position * 10) / 10, prev: { clicks: sep.clicks, impressions: sep.impressions }, queries: app.db.select({ name: seoDaily.dimensionValue, clicks: seoDaily.clicks, impressions: seoDaily.impressions, position: seoDaily.position }).from(seoDaily).where(and(eq(seoDaily.companyId, cid), eq(seoDaily.dimensionType, 'query'))).orderBy(desc(seoDaily.clicks)).limit(20).all() } : null;
 
+    const integ = app.integrations.listPublic(cid);
     // Hinweise
     const eur = (c: number) => new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'EUR' }).format(c / 100);
     const hints: Array<{ kind: 'fact' | 'calc' | 'estimate' | 'advice'; level: 'info' | 'warn'; text: string }> = [];
@@ -164,9 +165,9 @@ export default async function marketingRoutes(app: FastifyInstance) {
     }
     if (web && wp.sessions > 0 && w.sessions > wp.sessions * 1.2 && totalLeads <= prevTotalLeads) hints.push({ kind: 'calc', level: 'info', text: `Website-Besucher sind gestiegen (${w.sessions} Sitzungen, +${Math.round(((w.sessions - wp.sessions) / wp.sessions) * 100)} %), die Anfragen jedoch nicht. Landingpage und Formular auf Hürden prüfen.` });
     if (social && social.followers !== null && social.followersPrev !== null && social.followers !== social.followersPrev) hints.push({ kind: 'fact', level: 'info', text: `Instagram-Follower: ${social.followers} (${social.followers - social.followersPrev >= 0 ? '+' : ''}${social.followers - social.followersPrev} im Zeitraum).` });
-    if (totalCost === 0 && totalLeads === 0 && !web) hints.push({ kind: 'fact', level: 'info', text: 'Nicht genügend Daten für eine zuverlässige Aussage. Integrationen unter Einstellungen → Integrationen einrichten und synchronisieren.' });
+    if (totalCost === 0 && !web && !social) hints.push({ kind: 'fact', level: 'info', text: integ.length === 0 ? 'Keine Marketing-Anbindung eingerichtet – unter Einstellungen → Integrationen verbinden und synchronisieren.' : 'Noch keine Werbe- oder Website-Daten im Zeitraum. Bitte „Jetzt synchronisieren“ ausführen; Leads aus dem CRM werden bereits ausgewertet.' });
+    if (hints.length === 0) hints.push({ kind: 'fact', level: 'info', text: 'Keine Auffälligkeiten im Zeitraum.' });
 
-    const integ = app.integrations.listPublic(cid);
     const lastSync = Object.fromEntries(integ.filter((i) => (MARKETING_TYPES as readonly string[]).includes(i.type)).map((i) => [i.type, { at: i.lastSyncAt, status: i.status, error: i.lastError }]));
     return {
       range: { from, to, label: `${from} – ${to}`, prevFrom, prevTo },

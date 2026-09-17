@@ -766,3 +766,81 @@ export const seoDaily = sqliteTable(
   },
   (t) => [uniqueIndex('seo_daily_unique').on(t.companyId, t.date, t.dimensionType, t.dimensionValue), index('seo_daily_date_idx').on(t.companyId, t.date)],
 );
+
+/* ------------------------------------------------------------------ Reports */
+export const reports = sqliteTable(
+  'reports',
+  {
+    id: text('id').primaryKey(),
+    companyId: text('company_id').notNull().references(() => companies.id),
+    type: text('type').notNull(), // weekly | monthly | yearly | competitors
+    periodStart: text('period_start').notNull(),
+    periodEnd: text('period_end').notNull(), // inklusive
+    title: text('title').notNull(),
+    summary: text('summary'),
+    contentJson: text('content_json').notNull(),
+    pdfFileId: text('pdf_file_id'),
+    sentTo: text('sent_to'),
+    generatedAt: ts('generated_at'),
+  },
+  (t) => [index('reports_company_idx').on(t.companyId, t.type, t.periodStart)],
+);
+
+/* ------------------------------------------------------------------ Wettbewerber */
+export const competitors = sqliteTable(
+  'competitors',
+  {
+    id: text('id').primaryKey(),
+    companyId: text('company_id').notNull().references(() => companies.id),
+    placeId: text('place_id'),
+    name: text('name').notNull(),
+    address: text('address'),
+    website: text('website'),
+    phone: text('phone'),
+    lat: real('lat'),
+    lng: real('lng'),
+    source: text('source').notNull().default('manual'), // google_places | manual
+    isOwn: integer('is_own', { mode: 'boolean' }).notNull().default(false),
+    isActive: integer('is_active', { mode: 'boolean' }).notNull().default(true),
+    notes: text('notes'),
+    firstSeenAt: ts('first_seen_at'),
+    lastSeenAt: text('last_seen_at'),
+    createdAt: ts('created_at'),
+    updatedAt: ts('updated_at'),
+  },
+  (t) => [uniqueIndex('competitors_place_unique').on(t.companyId, t.placeId), index('competitors_company_idx').on(t.companyId)],
+);
+
+export const competitorSnapshots = sqliteTable(
+  'competitor_snapshots',
+  {
+    id: text('id').primaryKey(),
+    companyId: text('company_id').notNull(),
+    competitorId: text('competitor_id').notNull().references(() => competitors.id),
+    date: text('date').notNull(),
+    rating: real('rating'),
+    ratingCount: integer('rating_count'),
+    businessStatus: text('business_status'),
+    priceLevel: text('price_level'),
+    createdAt: ts('created_at'),
+  },
+  (t) => [uniqueIndex('competitor_snapshots_unique').on(t.competitorId, t.date)],
+);
+
+/* ------------------------------------------------------------------ KI-Assistent (Verlauf) */
+export const assistantMessages = sqliteTable(
+  'assistant_messages',
+  {
+    id: text('id').primaryKey(),
+    companyId: text('company_id').notNull().references(() => companies.id),
+    userId: text('user_id').notNull(),
+    conversationId: text('conversation_id').notNull(),
+    role: text('role').notNull(), // user | assistant
+    content: text('content').notNull(),
+    toolsUsedJson: text('tools_used_json'),
+    inputTokens: integer('input_tokens'),
+    outputTokens: integer('output_tokens'),
+    createdAt: ts('created_at'),
+  },
+  (t) => [index('assistant_conv_idx').on(t.companyId, t.conversationId, t.createdAt)],
+);

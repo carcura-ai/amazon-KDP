@@ -110,3 +110,10 @@ export interface MarketingOverview {
   hints: Array<{ kind: 'fact' | 'calc' | 'estimate' | 'advice'; level: 'info' | 'warn'; text: string }>;
 }
 export interface IntegrationInfo { id: string; type: string; name: string | null; public: Record<string, unknown>; status: string; lastSyncAt: string | null; lastError: string | null; isActive: boolean; updatedAt: string }
+
+export interface ReportMetric { label: string; value: number; prev: number; unit: 'eur' | 'n' | 'pct' }
+export interface ReportSection { title: string; metrics: ReportMetric[]; facts: string[]; changes: string[]; reasons: string[]; actions: string[]; table?: { head: string[]; rows: string[][] } }
+export interface ReportContent { type: string; period: { from: string; to: string; label: string; prevFrom: string; prevTo: string }; sections: ReportSection[]; summary: string; months?: Array<{ label: string; revenueCents: number; expensesCents: number; leads: number; orders: number }>; generatedAt: string }
+export interface ReportRow { id: string; type: string; periodStart: string; periodEnd: string; title: string; summary: string | null; pdfFileId: string | null; sentTo: string | null; generatedAt: string }
+export interface Competitor { id: string; name: string; address: string | null; website: string | null; phone: string | null; source: string; isOwn: boolean; notes: string | null; firstSeenAt: string; lastSeenAt: string | null; latest: { date: string; rating: number | null; ratingCount: number | null; businessStatus: string | null } | null; ratingChange30: number | null; reviewsChange30: number | null; reviewsChange7: number | null; isNew: boolean; history: Array<{ date: string; rating: number | null; ratingCount: number | null }> }
+export interface ServicePricing { serviceId: string; name: string; category: string | null; priceCents: number; materialCostCents: number; durationMinutes: number; bookings90: number; bookingsPrev90: number; revenue90Cents: number; avgPriceCents: number | null; marginCents: number; marginPct: number | null; hourlyYieldCents: number | null; demandTrendPct: number | null; hints: string[] }

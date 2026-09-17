@@ -39,6 +39,10 @@ import invoiceRoutes from './modules/billing/invoices.routes.js';
 import inventoryRoutes from './modules/inventory/routes.js';
 import financeRoutes from './modules/finance/routes.js';
 import marketingRoutes from './modules/marketing/routes.js';
+import analysisRoutes from './modules/analysis/routes.js';
+import reportRoutes from './modules/reports/routes.js';
+import assistantRoutes from './modules/assistant/routes.js';
+import competitorRoutes from './modules/competitors/routes.js';
 import { MarketingSync } from './integrations/marketing/sync.js';
 import { createRequire } from 'node:module';
 
@@ -55,6 +59,7 @@ declare module 'fastify' {
     storage: FileStorage;
     pdf: PdfService;
     marketing: MarketingSync;
+    fetchFn: typeof fetch;
   }
 }
 
@@ -83,6 +88,7 @@ export async function buildApp(opts: BuildOptions): Promise<FastifyInstance> {
   app.decorate('storage', new FileStorage(opts.dbHandle.db, opts.config.filesDir));
   const pdf = new PdfService(opts.config.chromiumPath, app.log);
   app.decorate('pdf', pdf);
+  app.decorate('fetchFn', opts.fetchFn ?? fetch);
   app.decorate('marketing', new MarketingSync(opts.dbHandle.db, integrationStore, app.log, opts.fetchFn ?? fetch));
   app.decorate('appVersion', (createRequire(import.meta.url)('../package.json') as { version: string }).version);
   app.decorate('cookieOptions', {
@@ -147,6 +153,10 @@ export async function buildApp(opts: BuildOptions): Promise<FastifyInstance> {
   await app.register(inventoryRoutes);
   await app.register(financeRoutes);
   await app.register(marketingRoutes);
+  await app.register(analysisRoutes);
+  await app.register(reportRoutes);
+  await app.register(assistantRoutes);
+  await app.register(competitorRoutes);
 
   // Web-App (Vite-Build) ausliefern, wenn vorhanden
   const webDist = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../web/dist');

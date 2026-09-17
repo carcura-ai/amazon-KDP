@@ -13,7 +13,7 @@
 | 9 | Angebote, Rechnungen (lückenlose Nummern, Storno, Zahlungen, E-Mail-Versand mit PDF) | erledigt |
 | 10–11 | Lager (Bestände, Bewegungen, Mindestbestand), Finanzen (Ausgaben, wiederkehrende Kosten, Periodenübersicht, Hinweise mit Kennzeichnung) | erledigt |
 | 12–13 | Marketing-Adapter (Windsor.ai inkl. Meta-Lead-Import, Google Ads API, Meta Marketing API, GA4, Search Console), Marketing-Dashboard mit CRM-Attribution, Analyse-Hinweise | erledigt |
-| 14–16 | Reports, KI-Assistent, Wettbewerber | geplant |
+| 14–16 | Berichte (Woche/Monat/Jahr, automatisch + manuell, PDF, Struktur Zahlen → Veränderung → Ursache → Empfehlung), Preisanalyse je Leistung, KI-Business-Assistent (Claude, nur Systemdaten über Werkzeuge), Wettbewerber-Monitoring (Google Places API, manuelle Einträge, wöchentlicher Scan) | erledigt |
 | 17–20 | White-Label, Betreiber-Admin, Backups, Deployment, Gesamttest, Doku | geplant |
 
 Jede Phase endet mit: Tests grün, Typecheck grün, Commit, Aktualisierung dieser Tabelle.
