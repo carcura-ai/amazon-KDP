@@ -9,6 +9,8 @@ import { Button, Card, Confirm, PageHead, Skeleton, useToast } from '../componen
 import { fmtDate, fmtNumber, personName } from '../lib/format';
 import { VehicleForm } from './Vehicles';
 import { Timeline } from './CustomerDetail';
+import { DocumentsPanel } from '../components/documents';
+import { ProtocolList } from './Protocol';
 
 export function VehicleDetailPage() {
   const { id = '' } = useParams();
@@ -47,8 +49,12 @@ export function VehicleDetailPage() {
             <dt>Notizen</dt><dd style={{ whiteSpace: 'pre-wrap' }}>{v.notes ?? '–'}</dd>
           </dl>
         </Card>
-        <Card title="Aufbereitungshistorie"><Timeline items={activities} /><p className="small dim" style={{ marginTop: 10 }}>Aufträge, Protokolle und Bilder erscheinen hier, sobald die Module aktiv sind.</p></Card>
+        <div className="stack" style={{ gap: 16 }}>
+          <ProtocolList filter={{ vehicleId: id }} newParams={{ customerId: c.id, vehicleId: id }} />
+          <Card title="Historie"><Timeline items={activities} /></Card>
+        </div>
       </div>
+      <div style={{ marginTop: 16 }}><Card title="Bilder & Dokumente"><DocumentsPanel filter={{ vehicleId: id }} meta={{ customerId: c.id, vehicleId: id }} /></Card></div>
       {edit ? <VehicleForm customerId={c.id} vehicle={v} onClose={() => setEdit(false)} /> : null}
       {remove ? <Confirm title="Fahrzeug entfernen?" text="Das Fahrzeug wird deaktiviert und aus Listen ausgeblendet." confirmLabel="Entfernen" danger loading={doDelete.isPending} onConfirm={() => doDelete.mutate()} onClose={() => setRemove(false)} /> : null}
     </>

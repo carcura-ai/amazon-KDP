@@ -42,7 +42,7 @@ export function AppShell() {
       {open ? <div className="sidebar-backdrop" onClick={() => setOpen(false)} /> : null}
       <aside className={`sidebar ${open ? 'open' : ''}`}>
         <div className="brand">
-          <div className="brand-mark">{me.company.name.slice(0, 2).toUpperCase()}</div>
+          <div className="brand-mark" style={me.company.logoFileId ? { background: '#fff' } : undefined}>{me.company.logoFileId ? <img src={`/api/company/logo?v=${me.company.logoFileId}`} alt="" style={{ objectFit: 'contain', padding: 3 }} /> : me.company.name.slice(0, 2).toUpperCase()}</div>
           <div style={{ minWidth: 0 }}>
             <div className="brand-name">{me.company.name}</div>
             <div className="brand-sub">Manager</div>

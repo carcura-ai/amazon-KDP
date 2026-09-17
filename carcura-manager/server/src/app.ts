@@ -1,6 +1,7 @@
 import Fastify, { type FastifyInstance } from 'fastify';
 import cookie, { type CookieSerializeOptions } from '@fastify/cookie';
 import rateLimit from '@fastify/rate-limit';
+import multipart from '@fastify/multipart';
 import fastifyStatic from '@fastify/static';
 import fs from 'node:fs';
 import path from 'node:path';
@@ -28,6 +29,11 @@ import orderRoutes from './modules/orders/routes.js';
 import { SecretBox } from './core/crypto.js';
 import { IntegrationStore } from './integrations/store.js';
 import { MailService } from './integrations/mail.js';
+import { FileStorage, MAX_FILE_BYTES } from './integrations/storage.js';
+import { PdfService } from './integrations/pdf.js';
+import fileRoutes from './modules/files/routes.js';
+import protocolRoutes from './modules/protocols/routes.js';
+import printRoutes from './modules/print/routes.js';
 import { createRequire } from 'node:module';
 
 declare module 'fastify' {
@@ -40,6 +46,8 @@ declare module 'fastify' {
     secrets: SecretBox;
     integrations: IntegrationStore;
     mail: MailService;
+    storage: FileStorage;
+    pdf: PdfService;
   }
 }
 
@@ -64,6 +72,9 @@ export async function buildApp(opts: BuildOptions): Promise<FastifyInstance> {
   app.decorate('secrets', secrets);
   app.decorate('integrations', integrationStore);
   app.decorate('mail', new MailService(opts.dbHandle.db, integrationStore));
+  app.decorate('storage', new FileStorage(opts.dbHandle.db, opts.config.filesDir));
+  const pdf = new PdfService(opts.config.chromiumPath, app.log);
+  app.decorate('pdf', pdf);
   app.decorate('appVersion', (createRequire(import.meta.url)('../package.json') as { version: string }).version);
   app.decorate('cookieOptions', {
     path: '/',
@@ -76,6 +87,7 @@ export async function buildApp(opts: BuildOptions): Promise<FastifyInstance> {
 
   await app.register(cookie, { secret: opts.config.appSecret });
   await app.register(rateLimit, { global: false });
+  await app.register(multipart, { limits: { fileSize: MAX_FILE_BYTES, files: 20 } });
   await app.register(authPlugin);
 
   app.addHook('onSend', async (_req, reply) => {
@@ -118,6 +130,9 @@ export async function buildApp(opts: BuildOptions): Promise<FastifyInstance> {
   await app.register(integrationRoutes);
   await app.register(appointmentRoutes);
   await app.register(orderRoutes);
+  await app.register(fileRoutes);
+  await app.register(protocolRoutes);
+  await app.register(printRoutes);
 
   // Web-App (Vite-Build) ausliefern, wenn vorhanden
   const webDist = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../web/dist');
@@ -134,6 +149,9 @@ export async function buildApp(opts: BuildOptions): Promise<FastifyInstance> {
     app.setNotFoundHandler((_req, reply) => reply.status(404).send({ error: 'not_found', message: 'Route nicht gefunden.' }));
   }
 
-  app.addHook('onClose', async () => opts.dbHandle.close());
+  app.addHook('onClose', async () => {
+    await pdf.close();
+    opts.dbHandle.close();
+  });
   return app;
 }

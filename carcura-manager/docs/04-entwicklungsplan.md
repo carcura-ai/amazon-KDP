@@ -9,7 +9,7 @@
 | 5 | CRM: Leads, Kunden, Historie, Duplikate, Website-Lead-Eingang | erledigt |
 | 6 | Fahrzeuge | erledigt |
 | 7 | Kalender, Termine, Aufträge, Erinnerungen (E-Mail automatisch, WhatsApp per Link) | erledigt |
-| 8 | Protokolle, Bilder, Dokumente, PDF | geplant |
+| 8 | Protokolle, Bilder, Dokumente, PDF (Protokoll, Kundenakte, Auftrag) | erledigt |
 | 9 | Angebote, Rechnungen | geplant |
 | 10–11 | Lager, Finanzen, wiederkehrende Ausgaben | geplant |
 | 12–13 | Marketing-Adapter (Windsor, GA4, Google Ads, Meta, GSC), Analytics | geplant |

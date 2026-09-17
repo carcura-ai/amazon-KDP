@@ -401,3 +401,81 @@ export const orderItems = sqliteTable(
   },
   (t) => [index('order_items_order_idx').on(t.orderId)],
 );
+
+/* ------------------------------------------------------------------ Dateien (Bilder, Dokumente, Signaturen, Logo) */
+export const files = sqliteTable(
+  'files',
+  {
+    id: text('id').primaryKey(),
+    companyId: text('company_id').notNull().references(() => companies.id),
+    customerId: text('customer_id'),
+    vehicleId: text('vehicle_id'),
+    orderId: text('order_id'),
+    protocolId: text('protocol_id'),
+    kind: text('kind').notNull(), // image | document | pdf | signature | logo
+    category: text('category').notNull().default('other'), // before | during | after | damage | detail | offer | invoice | protocol | other
+    originalName: text('original_name').notNull(),
+    mimeType: text('mime_type').notNull(),
+    sizeBytes: integer('size_bytes').notNull(),
+    storagePath: text('storage_path').notNull(),
+    thumbPath: text('thumb_path'),
+    displayPath: text('display_path'),
+    sha256: text('sha256'),
+    width: integer('width'),
+    height: integer('height'),
+    caption: text('caption'),
+    sortOrder: integer('sort_order').notNull().default(0),
+    uploadedByUserId: text('uploaded_by_user_id'),
+    createdAt: ts('created_at'),
+  },
+  (t) => [index('files_customer_idx').on(t.companyId, t.customerId), index('files_vehicle_idx').on(t.companyId, t.vehicleId), index('files_order_idx').on(t.companyId, t.orderId), index('files_protocol_idx').on(t.companyId, t.protocolId)],
+);
+
+/* ------------------------------------------------------------------ Fahrzeugprotokolle (Annahme / Übergabe) */
+export const protocols = sqliteTable(
+  'protocols',
+  {
+    id: text('id').primaryKey(),
+    companyId: text('company_id').notNull().references(() => companies.id),
+    protocolNumber: text('protocol_number').notNull(),
+    type: text('type').notNull().default('intake'), // intake (Annahme) | handover (Übergabe)
+    customerId: text('customer_id').notNull(),
+    vehicleId: text('vehicle_id').notNull(),
+    orderId: text('order_id'),
+    status: text('status').notNull().default('draft'), // draft | final
+    mileage: integer('mileage'),
+    fuelLevel: integer('fuel_level'), // 0–100 %
+    exteriorCondition: text('exterior_condition'), // z. B. sauber | leicht verschmutzt | stark verschmutzt
+    interiorCondition: text('interior_condition'),
+    checklistJson: text('checklist_json').notNull().default('{}'), // z. B. { warndreieck: true, verbandskasten: true, ... }
+    notes: text('notes'),
+    customerSignatureFileId: text('customer_signature_file_id'),
+    employeeSignatureFileId: text('employee_signature_file_id'),
+    signedByName: text('signed_by_name'),
+    signedAt: text('signed_at'),
+    pdfFileId: text('pdf_file_id'),
+    finalizedAt: text('finalized_at'),
+    createdByUserId: text('created_by_user_id'),
+    createdAt: ts('created_at'),
+    updatedAt: ts('updated_at'),
+  },
+  (t) => [uniqueIndex('protocols_number_unique').on(t.companyId, t.protocolNumber), index('protocols_vehicle_idx').on(t.companyId, t.vehicleId), index('protocols_customer_idx').on(t.companyId, t.customerId)],
+);
+
+export const protocolDamages = sqliteTable(
+  'protocol_damages',
+  {
+    id: text('id').primaryKey(),
+    companyId: text('company_id').notNull(),
+    protocolId: text('protocol_id').notNull().references(() => protocols.id),
+    area: text('area').notNull(), // front | rear | left | right | roof | interior | wheels | glass | other
+    type: text('type').notNull(), // scratch | dent | paint | stone_chip | crack | stain | tear | wear | other
+    severity: text('severity').notNull().default('minor'), // minor | medium | major
+    description: text('description'),
+    posX: integer('pos_x'), // Position auf der Skizze in Promille (0–1000)
+    posY: integer('pos_y'),
+    fileId: text('file_id'),
+    sortOrder: integer('sort_order').notNull().default(0),
+  },
+  (t) => [index('protocol_damages_protocol_idx').on(t.protocolId)],
+);

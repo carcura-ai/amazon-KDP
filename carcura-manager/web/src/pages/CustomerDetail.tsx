@@ -1,7 +1,7 @@
 import { useState, type FormEvent } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Link, useNavigate, useParams } from 'react-router';
-import { Car, Download, Mail, MessageSquare, Pencil, Phone, Plus, StickyNote, Trash2, Calendar, FileText, Bell, Cog, ArrowRightLeft } from 'lucide-react';
+import { Car, Download, FileDown, Mail, MessageSquare, Pencil, Phone, Plus, StickyNote, Trash2, Calendar, FileText, Bell, Cog, ArrowRightLeft } from 'lucide-react';
 import { get, post, del } from '../api/client';
 import type { Customer, Vehicle, Lead, Activity, DuplicateHit } from '../api/types';
 import { useAuth } from '../app/auth';
@@ -10,6 +10,8 @@ import { ACTIVITY_LABEL, fmtDate, fmtDateTime, fmtNumber, LEAD_SOURCE, LEAD_STAT
 import { CustomerForm } from './Customers';
 import { VehicleForm } from './Vehicles';
 import { CustomerAppointmentsAndOrders } from './Orders';
+import { DocumentsPanel } from '../components/documents';
+import { ProtocolList } from './Protocol';
 
 const ICONS: Record<string, typeof Phone> = { call: Phone, email: Mail, message: MessageSquare, whatsapp: MessageSquare, note: StickyNote, appointment: Calendar, offer: FileText, invoice: FileText, reminder: Bell, system: Cog, status: ArrowRightLeft };
 
@@ -63,7 +65,7 @@ export function ActivityForm({ url, onSaved }: { url: string; onSaved: () => voi
   );
 }
 
-type Tab = 'overview' | 'vehicles' | 'history';
+type Tab = 'overview' | 'vehicles' | 'documents' | 'protocols' | 'history';
 
 export function CustomerDetailPage() {
   const { id = '' } = useParams();
@@ -91,13 +93,14 @@ export function CustomerDetailPage() {
         title={personName(c)}
         sub={<span className="row"><span className="mono">{c.customerNumber}</span><Badge plain>{c.type === 'business' ? 'Firmenkunde' : 'Privatkunde'}</Badge>{tags.map((t) => <Badge key={t} tone="brand" plain>{t}</Badge>)}{!c.isActive ? <Badge tone="danger">deaktiviert</Badge> : null}</span>}
         actions={<>
-          <a className="btn" href={`/api/customers/${id}/export`} download><Download /> Export</a>
+          <a className="btn" href={`/api/customers/${id}/pdf`} target="_blank" rel="noreferrer"><FileDown /> PDF</a>
+          <a className="btn ghost" href={`/api/customers/${id}/export`} download title="Datenexport (JSON)"><Download /></a>
           {can('customers:write') ? <Button onClick={() => setEdit(true)}><Pencil /> Bearbeiten</Button> : null}
           {can('customers:delete') ? <Button variant="danger" onClick={() => setRemove(true)}><Trash2 /></Button> : null}
         </>}
       />
       {duplicates.length > 0 ? <div className="dup-box" style={{ marginBottom: 16 }}>Mögliche Dubletten: {duplicates.map((d) => <Link key={d.id} to={`/kunden/${d.id}`}>{d.label} </Link>)}</div> : null}
-      <Tabs value={tab} onChange={setTab} items={[{ id: 'overview', label: 'Übersicht' }, { id: 'vehicles', label: `Fahrzeuge (${vehicles.length})` }, { id: 'history', label: `Historie (${activities.length})` }]} />
+      <Tabs value={tab} onChange={setTab} items={[{ id: 'overview', label: 'Übersicht' }, { id: 'vehicles', label: `Fahrzeuge (${vehicles.length})` }, { id: 'documents', label: 'Dokumente & Bilder' }, { id: 'protocols', label: 'Protokolle' }, { id: 'history', label: `Historie (${activities.length})` }]} />
       {tab === 'overview' ? (
         <div className="grid main-side">
           <div className="stack" style={{ gap: 16 }}>
@@ -147,6 +150,8 @@ export function CustomerDetailPage() {
           )}
         </Card>
       ) : null}
+      {tab === 'documents' ? <Card title="Dokumente & Bilder"><DocumentsPanel filter={{ customerId: id }} meta={{ customerId: id }} /></Card> : null}
+      {tab === 'protocols' ? <ProtocolList filter={{ customerId: id }} newParams={{ customerId: id, vehicleId: vehicles[0]?.id }} /> : null}
       {tab === 'history' ? <Card title="Kommunikationshistorie" actions={can('customers:write') ? <ActivityForm url={`/api/customers/${id}/activities`} onSaved={invalidate} /> : null}><Timeline items={activities} /></Card> : null}
       {edit ? <CustomerForm customer={c} onClose={() => { setEdit(false); invalidate(); }} /> : null}
       {addVehicle ? <VehicleForm customerId={id} onClose={() => { setAddVehicle(false); invalidate(); }} /> : null}

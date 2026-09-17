@@ -85,7 +85,7 @@ function CompanySettings() {
               <Field label="Hauptfarbe"><div className="row"><input type="color" value={f.primaryColor ?? '#E8F320'} onChange={(e) => setF({ ...f, primaryColor: e.target.value.toUpperCase() })} /><span className="mono">{f.primaryColor}</span></div></Field>
               <Field label="Sekundärfarbe (Text auf Hauptfarbe)"><div className="row"><input type="color" value={f.secondaryColor ?? '#0B0B0C'} onChange={(e) => setF({ ...f, secondaryColor: e.target.value.toUpperCase() })} /><span className="mono">{f.secondaryColor}</span></div></Field>
             </div>
-            <p className="small dim" style={{ marginTop: 10 }}>Das Logo wird mit dem Dokumentenmodul hochladbar und erscheint dann in Oberfläche, PDFs und E-Mails.</p>
+            <LogoUpload hasLogo={Boolean(f.logoFileId)} onChanged={async () => { qc.invalidateQueries({ queryKey: ['company'] }); await refresh(); setF(null); }} />
           </Card>
           <Card title="Rechnungen & Nummernkreise">
             <div className="form-grid">
@@ -321,6 +321,27 @@ function MailSettings() {
             <tbody>{log.data.items.map((m) => <tr key={m.id}><td className="muted">{fmtDateTime(m.createdAt)}</td><td>{m.toAddress}</td><td className="muted">{m.subject}</td><td>{m.status === 'sent' ? <Badge tone="ok">gesendet</Badge> : <Badge tone="danger" >fehlgeschlagen</Badge>}{m.error ? <div className="small dim">{m.error}</div> : null}</td></tr>)}</tbody></table></div>
         )}
       </Card>
+    </div>
+  );
+}
+
+function LogoUpload({ hasLogo, onChanged }: { hasLogo: boolean; onChanged: () => void }) {
+  const toast = useToast();
+  const [busy, setBusy] = useState(false);
+  const upload = async (file: File) => {
+    setBusy(true);
+    try {
+      const fd = new FormData(); fd.append('file', file, file.name);
+      const r = await fetch('/api/company/logo', { method: 'POST', body: fd });
+      if (!r.ok) throw new Error((await r.json()).message);
+      toast.ok('Logo gespeichert'); onChanged();
+    } catch (e) { toast.fromError(e); } finally { setBusy(false); }
+  };
+  return (
+    <div className="row" style={{ marginTop: 14, alignItems: 'center' }}>
+      {hasLogo ? <img src={`/api/company/logo?t=${Date.now()}`} alt="Logo" style={{ maxHeight: 48, maxWidth: 180, background: '#fff', padding: 4, borderRadius: 6 }} /> : <span className="small muted">Kein Logo hinterlegt (PNG mit transparentem Hintergrund empfohlen).</span>}
+      <label className="btn sm">{busy ? <span className="spinner" /> : null} Logo hochladen<input type="file" accept="image/png,image/jpeg,image/webp" style={{ display: 'none' }} onChange={(e) => { const f = e.target.files?.[0]; if (f) void upload(f); e.target.value = ''; }} /></label>
+      {hasLogo ? <Button size="sm" variant="ghost" onClick={async () => { await del('/api/company/logo'); toast.ok('Logo entfernt'); onChanged(); }}>Entfernen</Button> : null}
     </div>
   );
 }

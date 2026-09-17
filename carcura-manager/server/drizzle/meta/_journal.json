@@ -15,6 +15,13 @@
       "when": 1789633878009,
       "tag": "0001_appointments_orders",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1789634728115,
+      "tag": "0002_files_protocols",
+      "breakpoints": true
     }
   ]
 }

@@ -5,7 +5,8 @@ import { buildApp } from '../src/app.js';
 import { SESSION_COOKIE } from '../src/plugins/auth.js';
 
 export async function testApp(): Promise<FastifyInstance> {
-  const config = loadConfig({ dbPath: ':memory:', appSecret: 'test-secret-test-secret-test-secret-1234', dataDir: '/tmp/cm-test', logLevel: 'silent' });
+  const dataDir = `/tmp/cm-test/${process.pid}-${Math.random().toString(36).slice(2)}`;
+  const config = loadConfig({ dbPath: ':memory:', appSecret: 'test-secret-test-secret-test-secret-1234', dataDir, filesDir: `${dataDir}/files`, backupsDir: `${dataDir}/backups`, logLevel: 'silent', chromiumPath: process.env.CHROMIUM_PATH ?? '/opt/pw-browsers/chromium' });
   const dbHandle = openDatabase(':memory:');
   return buildApp({ config, dbHandle, logger: false });
 }

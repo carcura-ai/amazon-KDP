@@ -15,6 +15,7 @@ export interface AppConfig {
   logLevel: string;
   isProduction: boolean;
   publicUrl: string;
+  chromiumPath: string | null;
 }
 
 function readInt(name: string, fallback: number): number {
@@ -63,5 +64,6 @@ export function loadConfig(overrides: Partial<AppConfig> = {}): AppConfig {
     logLevel: overrides.logLevel ?? process.env.LOG_LEVEL ?? 'info',
     isProduction,
     publicUrl: overrides.publicUrl ?? process.env.PUBLIC_URL ?? `http://${host === '0.0.0.0' ? 'localhost' : host}:${port}`,
+    chromiumPath: overrides.chromiumPath ?? process.env.CHROMIUM_PATH ?? null,
   };
 }

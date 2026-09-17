@@ -14,6 +14,7 @@ import { SettingsPage } from '../pages/Settings';
 import { PlatformPage } from '../pages/Platform';
 import { CalendarPage } from '../pages/Calendar';
 import { OrdersPage, OrderFormPage, OrderDetailPage } from '../pages/Orders';
+import { ProtocolPage } from '../pages/Protocol';
 
 function FullscreenLoader() {
   return (
@@ -50,6 +51,8 @@ export function AppRoutes() {
         <Route path="/auftraege/neu" element={<OrderFormPage />} />
         <Route path="/auftraege/:id" element={<OrderDetailPage />} />
         <Route path="/auftraege/:id/bearbeiten" element={<OrderFormPage />} />
+        <Route path="/protokolle/neu" element={<ProtocolPage />} />
+        <Route path="/protokolle/:id" element={<ProtocolPage />} />
         <Route path="/einstellungen/*" element={<SettingsPage />} />
         <Route path="/betreiber" element={<PlatformPage />} />
         <Route path="*" element={<div className="empty"><h3>Seite nicht gefunden</h3></div>} />

@@ -1,7 +1,7 @@
 import { useEffect, useState, type FormEvent } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Link, useNavigate, useParams, useSearchParams } from 'react-router';
-import { Plus, Trash2, Pencil, Calendar, ArrowRight } from 'lucide-react';
+import { Plus, Trash2, Pencil, Calendar, ArrowRight, FileDown } from 'lucide-react';
 import { get, post, patch, del, qs } from '../api/client';
 import type { Customer, OrderDetail, OrderRow, Paged, Service, Appointment } from '../api/types';
 import { useAuth } from '../app/auth';
@@ -9,6 +9,8 @@ import { Badge, Button, Card, Confirm, Empty, Field, Input, PageHead, Pager, Sel
 import { CustomerPicker, VehicleSelect, UserSelect } from '../components/pickers';
 import { fmtDate, fmtDateTime, fmtMoney, fmtNumber, personName, ORDER_STATUS, ORDER_FLOW, inputFromCents, centsFromInput, toLocalInput, fromLocalInput } from '../lib/format';
 import { AppointmentModal } from './Calendar';
+import { DocumentsPanel } from '../components/documents';
+import { ProtocolList } from './Protocol';
 
 export function OrdersPage() {
   const { can } = useAuth();
@@ -172,6 +174,7 @@ export function OrderDetailPage() {
         title={<span className="row">{o.orderNumber}<Badge tone={ORDER_STATUS[o.status]?.tone}>{ORDER_STATUS[o.status]?.label}</Badge></span>}
         sub={o.title ?? undefined}
         actions={can('orders:write') && !final ? <>
+          <a className="btn" href={`/api/orders/${id}/pdf`} target="_blank" rel="noreferrer"><FileDown /> PDF</a>
           {next ? <Button variant="primary" onClick={() => setStatus.mutate(next)} loading={setStatus.isPending}>{ORDER_STATUS[next]?.label} <ArrowRight /></Button> : null}
           <Link className="btn" to={`/auftraege/${id}/bearbeiten`}><Pencil /> Bearbeiten</Link>
           {!appointment ? <Button onClick={() => setAppt(true)}><Calendar /> Termin</Button> : null}
@@ -192,6 +195,7 @@ export function OrderDetailPage() {
           </Card>
           {o.notes ? <Card title="Hinweise für den Kunden"><p style={{ whiteSpace: 'pre-wrap' }}>{o.notes}</p></Card> : null}
           {o.internalNotes ? <Card title="Interne Notizen"><p style={{ whiteSpace: 'pre-wrap' }} className="muted">{o.internalNotes}</p></Card> : null}
+          <Card title="Bilder (vorher / währenddessen / nachher)"><DocumentsPanel filter={{ orderId: id }} meta={{ customerId: o.customerId, vehicleId: o.vehicleId, orderId: id, category: 'before' }} /></Card>
         </div>
         <div className="stack" style={{ gap: 16 }}>
           <Card title="Kunde & Fahrzeug">
@@ -202,6 +206,7 @@ export function OrderDetailPage() {
               <dt>Mitarbeiter</dt><dd>{user ? `${user.firstName} ${user.lastName}` : '–'}</dd>
             </dl>
           </Card>
+          {customer && vehicle ? <ProtocolList filter={{ orderId: id }} newParams={{ customerId: customer.id, vehicleId: vehicle.id, orderId: id }} /> : null}
           <Card title="Zeiten">
             <dl className="dl">
               <dt>Termin</dt><dd>{appointment ? <span>{fmtDateTime(appointment.startsAt)}<div className="small dim">{appointment.title}</div></span> : o.scheduledAt ? fmtDateTime(o.scheduledAt) : '–'}</dd>
