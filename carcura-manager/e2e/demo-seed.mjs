@@ -1,5 +1,5 @@
 // Befüllt eine frische Installation mit realistischen Demo-Daten (nur für Demo/Screenshots).
-import Database from 'better-sqlite3';
+import { DatabaseSync as Database } from 'node:sqlite';
 import sharp from 'sharp';
 import { randomUUID } from 'node:crypto';
 const base = process.env.BASE ?? 'http://127.0.0.1:4800';

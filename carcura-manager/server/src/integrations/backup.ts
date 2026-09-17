@@ -2,7 +2,6 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { ZipArchive } from 'archiver';
 import extractZip from 'extract-zip';
-import type Database from 'better-sqlite3';
 import type { FastifyBaseLogger } from 'fastify';
 
 export type BackupKind = 'auto' | 'manual' | 'pre-update' | 'pre-restore';
@@ -18,7 +17,7 @@ export const PENDING_RESTORE = 'restore-pending.zip';
  * vorgemerkt und beim nächsten Start vor dem Öffnen der Datenbank ausgeführt.
  */
 export class BackupService {
-  constructor(private readonly cfg: BackupConfig, private readonly sqlite: Database.Database, private readonly log: Pick<FastifyBaseLogger, 'info' | 'warn' | 'error'>, private readonly version: string) {
+  constructor(private readonly cfg: BackupConfig, private readonly sqlite: { pragma(text: string): unknown; exec(sql: string): unknown }, private readonly log: Pick<FastifyBaseLogger, 'info' | 'warn' | 'error'>, private readonly version: string) {
     fs.mkdirSync(cfg.backupsDir, { recursive: true });
   }
 

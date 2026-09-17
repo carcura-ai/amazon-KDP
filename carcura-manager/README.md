@@ -15,7 +15,7 @@ scripts/start.cmd        # Windows   (macOS/Linux: bash scripts/start.sh)
 ```
 
 Danach im Browser `http://127.0.0.1:4800` öffnen. Beim ersten Start führt ein Assistent durch die
-Einrichtung von Unternehmen und Administrator. Voraussetzung: Node.js 22 (LTS) und einmalig Internet
+Einrichtung von Unternehmen und Administrator. Voraussetzung: Node.js 22.13 oder neuer (LTS 24) und einmalig Internet
 für die Installation.
 
 Das Startskript hält die Anwendung am Laufen und führt Neustart und Update aus, die unter
@@ -25,7 +25,7 @@ Das Startskript hält die Anwendung am Laufen und führt Neustart und Update aus
 
 | Ordner | Inhalt |
 |---|---|
-| `server/` | Fastify-API (TypeScript, SQLite über Drizzle), Jobs, Integrationen, PDF-Erzeugung, Tests |
+| `server/` | Fastify-API (TypeScript, SQLite über Drizzle auf dem in Node.js eingebauten `node:sqlite`, keine nativen Abhängigkeiten), Jobs, Integrationen, PDF-Erzeugung, Tests |
 | `web/` | React-Oberfläche (Vite), dunkles Design mit Mandantenfarbe, responsiv |
 | `docs/` | Bestandsanalyse, Architektur, Datenmodell, Entwicklungsplan, Betriebshandbuch |
 | `scripts/` | Installation, Start, Update (Windows `.cmd`, macOS/Linux `.sh`) |

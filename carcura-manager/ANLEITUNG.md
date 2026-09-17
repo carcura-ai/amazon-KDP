@@ -14,7 +14,7 @@ Abhängigkeiten.
 Node.js ist die Laufzeitumgebung, in der das Programm läuft. Es ist kostenlos.
 
 1. Browser öffnen und https://nodejs.org aufrufen.
-2. Die Version **„LTS“** (Long Term Support) herunterladen. Es muss **Version 22 oder neuer** sein.
+2. Die Version **„LTS“** (Long Term Support) herunterladen. Es muss **Version 22.13 oder neuer** sein; die aktuelle LTS (24) ist richtig.
 3. Die heruntergeladene Datei (`node-v22….msi`) doppelklicken und mit „Next“ durch das Setup gehen.
    Alle Voreinstellungen so lassen. Wichtig: Die Option „Add to PATH“ muss angehakt bleiben (Standard).
 4. Prüfen: Windows-Taste drücken, `cmd` eingeben, Eingabeaufforderung öffnen, dort tippen:
@@ -28,7 +28,11 @@ macOS: Installer von nodejs.org (`.pkg`) ausführen. Linux: Paket `nodejs` Versi
 ### Schritt 2: Programmordner anlegen
 
 1. Die Datei `carcura-manager.zip` in einen dauerhaften Ordner legen, zum Beispiel `C:\Carcura\`.
-   Nicht auf dem Desktop und nicht in „Downloads“, weil diese Ordner leicht aufgeräumt werden.
+   **Nicht auf den Desktop, nicht in „Downloads“, nicht in „Dokumente“**, weil diese Ordner bei den
+   meisten Windows-Rechnern von OneDrive synchronisiert werden. OneDrive sperrt Dateien während der
+   Installation und lädt tausende Programmdateien in die Cloud. Das Installationsskript bricht in
+   solchen Ordnern absichtlich ab. Ordner anlegen: Explorer → „Dieser PC“ → Laufwerk `C:` → Rechtsklick
+   → Neu → Ordner → `Carcura`.
 2. Rechtsklick auf die ZIP-Datei → „Alle extrahieren…“ → Ziel `C:\Carcura\` bestätigen.
 3. Danach existiert der Ordner `C:\Carcura\carcura-manager\` mit den Unterordnern `server`, `web`,
    `scripts`, `docs` und `e2e`.
@@ -242,6 +246,9 @@ Diesen Schritt können wir gemeinsam erledigen, sobald die öffentliche Adresse 
 |---|---|
 | `node` wird nicht erkannt | Node.js nicht installiert oder Rechner nach der Installation nicht neu gestartet |
 | `install.cmd` bricht bei `npm install` ab | Internet prüfen, Firewall/Virenscanner kurz pausieren, erneut ausführen |
+| Meldung „WARNUNG: Der Ordner liegt unter OneDrive …“ | Ordner nach `C:\Carcura\` verschieben (siehe Schritt 2) und dort `install.cmd` erneut starten |
+| Fehler mit `EPERM`, `operation not permitted` oder `Failed to remove some directories` | Dateien sind durch OneDrive oder den Virenscanner gesperrt. Ordner nach `C:\Carcura\` verschieben, Ordner `node_modules` löschen, `install.cmd` erneut starten |
+| Fehler mit `node-gyp`, `Visual Studio`, `better-sqlite3` | Veraltete Programmversion. Aktuelle ZIP verwenden – die Datenbank braucht seit Version 0.2 keine Kompilierung mehr |
 | Seite `127.0.0.1:4800` lädt nicht | Läuft `start.cmd`? Steht dort ein Fehler? Ist Port 4800 belegt? Dann in `.env` z. B. `PORT=4810` setzen |
 | „Build fehlt“ beim Start | `install.cmd` wurde nicht bis zum Ende ausgeführt, erneut starten |
 | PDF wird nicht erzeugt | Chromium fehlt. In der Eingabeaufforderung im Ordner `carcura-manager` ausführen: `npx playwright install chromium`. Alternativ in `.env` `CHROMIUM_PATH=C:\Program Files\Google\Chrome\Application\chrome.exe` |

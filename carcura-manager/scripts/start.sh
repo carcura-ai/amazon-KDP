@@ -8,7 +8,7 @@ export NODE_ENV="${NODE_ENV:-production}"
 if [ -f .env ]; then set -a; . ./.env; set +a; fi
 if [ ! -f server/dist/index.js ]; then echo "Build fehlt – führe scripts/install.sh aus."; exit 1; fi
 while true; do
-  node server/dist/index.js
+  node --disable-warning=ExperimentalWarning server/dist/index.js
   code=$?
   case $code in
     75) echo "Neustart angefordert …"; sleep 1 ;;

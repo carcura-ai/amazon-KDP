@@ -12,7 +12,7 @@ if not exist server\dist\index.js (
   exit /b 1
 )
 :loop
-node server\dist\index.js
+node --disable-warning=ExperimentalWarning server\dist\index.js
 set code=%errorlevel%
 if "%code%"=="75" (
   echo Neustart angefordert ...

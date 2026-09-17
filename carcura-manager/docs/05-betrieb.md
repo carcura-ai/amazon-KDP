@@ -4,7 +4,7 @@
 
 | Komponente | Version | Hinweis |
 |---|---|---|
-| Node.js | 22.12 oder neuer | https://nodejs.org (LTS) |
+| Node.js | 22.13 oder neuer (LTS 24 empfohlen) | https://nodejs.org (LTS). SQLite ist in Node.js eingebaut (`node:sqlite`), es wird nichts kompiliert |
 | Chromium für PDFs | wird von Playwright installiert | `npx playwright install chromium` (einmalig, ~150 MB) oder `CHROMIUM_PATH` auf ein vorhandenes Chrome/Edge zeigen lassen |
 | Internet | für Marketing-Sync, E-Mail-Versand, Updates | Kernfunktionen (CRM, Kalender, Aufträge, Protokolle, Rechnungen) laufen ohne Internet |
 
