@@ -14,6 +14,13 @@ import setupRoutes from './modules/setup/routes.js';
 import authRoutes from './modules/auth/routes.js';
 import userRoutes from './modules/users/routes.js';
 import companyRoutes from './modules/company/routes.js';
+import serviceRoutes from './modules/crm/services.routes.js';
+import leadRoutes from './modules/crm/leads.routes.js';
+import customerRoutes from './modules/crm/customers.routes.js';
+import vehicleRoutes from './modules/crm/vehicles.routes.js';
+import publicLeadRoutes from './modules/crm/public.routes.js';
+import platformRoutes from './modules/platform/routes.js';
+import { createRequire } from 'node:module';
 
 declare module 'fastify' {
   interface FastifyInstance {
@@ -21,6 +28,7 @@ declare module 'fastify' {
     dbHandle: DbHandle;
     config: AppConfig;
     cookieOptions: CookieSerializeOptions;
+    appVersion: string;
   }
 }
 
@@ -40,6 +48,7 @@ export async function buildApp(opts: BuildOptions): Promise<FastifyInstance> {
   app.decorate('db', opts.dbHandle.db);
   app.decorate('dbHandle', opts.dbHandle);
   app.decorate('config', opts.config);
+  app.decorate('appVersion', (createRequire(import.meta.url)('../package.json') as { version: string }).version);
   app.decorate('cookieOptions', {
     path: '/',
     httpOnly: true,
@@ -76,12 +85,18 @@ export async function buildApp(opts: BuildOptions): Promise<FastifyInstance> {
     return reply.status(500).send({ error: 'internal', message: `Interner Fehler (ID ${errorId}).` });
   });
 
-  app.get('/api/health', async () => ({ ok: true, time: new Date().toISOString() }));
+  app.get('/api/health', async () => ({ ok: true, version: app.appVersion, time: new Date().toISOString() }));
 
   await app.register(setupRoutes);
   await app.register(authRoutes);
   await app.register(userRoutes);
   await app.register(companyRoutes);
+  await app.register(serviceRoutes);
+  await app.register(leadRoutes);
+  await app.register(customerRoutes);
+  await app.register(vehicleRoutes);
+  await app.register(publicLeadRoutes);
+  await app.register(platformRoutes);
 
   // Web-App (Vite-Build) ausliefern, wenn vorhanden
   const webDist = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../web/dist');

@@ -163,6 +163,16 @@ CREATE INDEX `leads_company_status_idx` ON `leads` (`company_id`,`status`);--> s
 CREATE INDEX `leads_email_idx` ON `leads` (`company_id`,`normalized_email`);--> statement-breakpoint
 CREATE INDEX `leads_phone_idx` ON `leads` (`company_id`,`normalized_phone`);--> statement-breakpoint
 CREATE UNIQUE INDEX `leads_external_unique` ON `leads` (`company_id`,`external_id`);--> statement-breakpoint
+CREATE TABLE `number_sequences` (
+	`id` text PRIMARY KEY NOT NULL,
+	`company_id` text NOT NULL,
+	`kind` text NOT NULL,
+	`year` integer DEFAULT 0 NOT NULL,
+	`value` integer DEFAULT 0 NOT NULL,
+	FOREIGN KEY (`company_id`) REFERENCES `companies`(`id`) ON UPDATE no action ON DELETE no action
+);
+--> statement-breakpoint
+CREATE UNIQUE INDEX `number_sequences_unique` ON `number_sequences` (`company_id`,`kind`,`year`);--> statement-breakpoint
 CREATE TABLE `role_permissions` (
 	`id` text PRIMARY KEY NOT NULL,
 	`company_id` text NOT NULL,

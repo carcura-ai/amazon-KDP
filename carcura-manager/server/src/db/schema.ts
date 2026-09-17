@@ -255,6 +255,19 @@ export const activities = sqliteTable(
   (t) => [index('activities_customer_idx').on(t.companyId, t.customerId, t.occurredAt), index('activities_lead_idx').on(t.companyId, t.leadId, t.occurredAt)],
 );
 
+/* ------------------------------------------------------------------ Nummernkreise */
+export const numberSequences = sqliteTable(
+  'number_sequences',
+  {
+    id: text('id').primaryKey(),
+    companyId: text('company_id').notNull().references(() => companies.id),
+    kind: text('kind').notNull(), // customer | invoice | offer | order
+    year: integer('year').notNull().default(0),
+    value: integer('value').notNull().default(0),
+  },
+  (t) => [uniqueIndex('number_sequences_unique').on(t.companyId, t.kind, t.year)],
+);
+
 /* ------------------------------------------------------------------ Jobs */
 export const jobs = sqliteTable(
   'jobs',
