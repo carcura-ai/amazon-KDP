@@ -93,3 +93,20 @@ export interface FinanceOverview {
   series: Array<{ label: string; from: string; revenueNetCents: number; expensesNetCents: number }>;
   hints: Array<{ kind: 'fact' | 'calc' | 'estimate' | 'advice'; level: 'info' | 'warn'; text: string }>;
 }
+
+export interface MarketingSourceStats { source: string; label: string; impressions: number; clicks: number; costCents: number; platformLeads: number; crmLeads: number; wonLeads: number; revenueCents: number; costPerLeadCents: number | null; roas: number | null; ctr: number | null; prev: { costCents: number; crmLeads: number; clicks: number } }
+export interface MarketingOverview {
+  range: { from: string; to: string; label: string; prevFrom: string; prevTo: string };
+  configured: { ads: boolean; web: boolean; social: boolean; seo: boolean };
+  lastSync: Record<string, { at: string | null; status: string; error: string | null }>;
+  totals: { costCents: number; impressions: number; clicks: number; crmLeads: number; wonLeads: number; costPerLeadCents: number | null; conversionRate: number | null; revenueCents: number; roas: number | null };
+  sources: MarketingSourceStats[];
+  leadsBySource: Array<{ source: string; n: number; won: number }>;
+  campaigns: Array<{ source: string; campaignId: string; campaignName: string; impressions: number; clicks: number; costCents: number; platformLeads: number; crmLeads: number }>;
+  series: Array<{ date: string; googleCostCents: number; metaCostCents: number; leads: number; sessions: number }>;
+  web: { sessions: number; users: number; pageviews: number; conversions: number; prev: { sessions: number; users: number }; channels: Array<{ name: string; sessions: number }>; devices: Array<{ name: string; sessions: number }>; landingPages: Array<{ name: string; sessions: number }> } | null;
+  social: { platform: string; followers: number | null; followersPrev: number | null; reach: number; views: number; likes: number; comments: number; shares: number; prev: { reach: number; views: number } } | null;
+  seo: { clicks: number; impressions: number; position: number | null; prev: { clicks: number; impressions: number }; queries: Array<{ name: string; clicks: number; impressions: number; position: number | null }> } | null;
+  hints: Array<{ kind: 'fact' | 'calc' | 'estimate' | 'advice'; level: 'info' | 'warn'; text: string }>;
+}
+export interface IntegrationInfo { id: string; type: string; name: string | null; public: Record<string, unknown>; status: string; lastSyncAt: string | null; lastError: string | null; isActive: boolean; updatedAt: string }

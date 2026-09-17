@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { NavLink, Outlet, useLocation, useNavigate } from 'react-router';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { LayoutDashboard, Users, UserPlus, Car, Settings, LogOut, Menu, Search, ShieldCheck, Building2, CalendarDays, ClipboardList, FileText, Receipt, Package, PiggyBank } from 'lucide-react';
+import { LayoutDashboard, Users, UserPlus, Car, Settings, LogOut, Menu, Search, ShieldCheck, Building2, CalendarDays, ClipboardList, FileText, Receipt, Package, PiggyBank, Megaphone } from 'lucide-react';
 import { useAuth } from './auth';
 import { get, post, qs } from '../api/client';
 import type { SearchHit } from '../api/types';
@@ -19,6 +19,7 @@ const NAV = [
   { to: '/rechnungen', label: 'Rechnungen', icon: Receipt, perm: 'invoices:read' },
   { to: '/lager', label: 'Lager', icon: Package, perm: 'inventory:read' },
   { to: '/finanzen', label: 'Finanzen', icon: PiggyBank, perm: 'finance:read' },
+  { to: '/marketing', label: 'Marketing', icon: Megaphone, perm: 'marketing:read' },
 ];
 
 export function AppShell() {

@@ -256,9 +256,11 @@ function IntegrationsSettings() {
         ) : <Skeleton rows={2} />}
         <div className="form-actions"><Button variant="danger" onClick={() => setRotate(true)}><RefreshCw /> Token neu erzeugen</Button></div>
       </Card>
-      <Card title="Marketing- und Analytics-Anbindungen">
-        <p className="muted">Google Ads, Meta Ads, Google Analytics 4, Search Console und Windsor.ai werden im Marketing-Modul angebunden. Zugangsdaten werden verschlüsselt je Mandant gespeichert und nie an den Browser übertragen.</p>
-      </Card>
+      <MarketingIntegrationCard type="windsor" title="Windsor.ai (empfohlen: eine Anbindung für Google Ads, Meta Ads, GA4, Instagram und Meta Lead Ads)" intro="API-Key aus dem Windsor.ai-Konto. Konto-IDs sind optional (leer = alle verbundenen Konten). Meta Lead-Formulare werden automatisch als Leads importiert." fields={[{ key: 'apiKey', label: 'API-Key', secret: true }, { key: 'googleAdsAccount', label: 'Google-Ads-Konto (z. B. 919-151-5213)' }, { key: 'metaAccount', label: 'Meta-Werbekonto-ID' }, { key: 'ga4Account', label: 'GA4-Property-ID' }, { key: 'instagramAccount', label: 'Instagram-Konto-ID' }, { key: 'leadsAccount', label: 'Facebook-Seiten-ID (Lead Ads)' }]} />
+      <MarketingIntegrationCard type="google_ads" title="Google Ads API (direkt)" intro="Developer-Token aus dem Google-Ads-API-Center, OAuth-Client (Client-ID/-Secret) und ein Refresh-Token mit Zugriff auf das Kundenkonto." fields={[{ key: 'developerToken', label: 'Developer-Token', secret: true }, { key: 'clientId', label: 'OAuth Client-ID' }, { key: 'clientSecret', label: 'OAuth Client-Secret', secret: true }, { key: 'refreshToken', label: 'Refresh-Token', secret: true }, { key: 'customerId', label: 'Kundennummer (xxx-xxx-xxxx)' }, { key: 'loginCustomerId', label: 'Verwaltungskonto (optional)' }]} />
+      <MarketingIntegrationCard type="meta_ads" title="Meta Marketing API (direkt)" intro="System-User-Token mit ads_read und die Werbekonto-ID (act_…)." fields={[{ key: 'accessToken', label: 'Access-Token', secret: true }, { key: 'adAccountId', label: 'Werbekonto-ID' }]} />
+      <MarketingIntegrationCard type="ga4" title="Google Analytics 4 (direkt, Service-Account)" intro="Service-Account in der Google Cloud anlegen, als Betrachter zur GA4-Property hinzufügen, JSON-Schlüssel: client_email und private_key eintragen." fields={[{ key: 'clientEmail', label: 'client_email' }, { key: 'privateKey', label: 'private_key', secret: true, multiline: true }, { key: 'propertyId', label: 'Property-ID (z. B. 548650753)' }]} />
+      <MarketingIntegrationCard type="search_console" title="Google Search Console (direkt, Service-Account)" intro="Service-Account als Nutzer der Property in der Search Console eintragen." fields={[{ key: 'clientEmail', label: 'client_email' }, { key: 'privateKey', label: 'private_key', secret: true, multiline: true }, { key: 'siteUrl', label: 'Property (https://carcura.info/ oder sc-domain:carcura.info)' }]} />
       {rotate ? <Confirm title="Token neu erzeugen?" text="Das alte Token wird sofort ungültig. Die Website muss anschließend das neue Token verwenden." confirmLabel="Neu erzeugen" danger loading={doRotate.isPending} onConfirm={() => doRotate.mutate()} onClose={() => setRotate(false)} /> : null}
     </div>
   );
@@ -343,5 +345,43 @@ function LogoUpload({ hasLogo, onChanged }: { hasLogo: boolean; onChanged: () =>
       <label className="btn sm">{busy ? <span className="spinner" /> : null} Logo hochladen<input type="file" accept="image/png,image/jpeg,image/webp" style={{ display: 'none' }} onChange={(e) => { const f = e.target.files?.[0]; if (f) void upload(f); e.target.value = ''; }} /></label>
       {hasLogo ? <Button size="sm" variant="ghost" onClick={async () => { await del('/api/company/logo'); toast.ok('Logo entfernt'); onChanged(); }}>Entfernen</Button> : null}
     </div>
+  );
+}
+
+function MarketingIntegrationCard({ type, title, intro, fields }: { type: string; title: string; intro: string; fields: Array<{ key: string; label: string; secret?: boolean; multiline?: boolean }> }) {
+  const qc = useQueryClient();
+  const toast = useToast();
+  const q = useQuery({ queryKey: ['integration', type], queryFn: () => get<{ configured: boolean; config?: Record<string, string>; hasSecrets?: Record<string, boolean>; status?: string; lastError?: string | null; lastSyncAt?: string | null }>(`/api/integrations/marketing/${type}`) });
+  const [f, setF] = useState<Record<string, string>>({});
+  const [open, setOpen] = useState(false);
+  const [loaded, setLoaded] = useState(false);
+  useEffect(() => { if (q.data && !loaded) { setF(Object.fromEntries(fields.map((x) => [x.key, q.data?.config?.[x.key] ?? '']))); setLoaded(true); } }, [q.data, loaded, fields]);
+  const invalidate = () => { qc.invalidateQueries({ queryKey: ['integration', type] }); qc.invalidateQueries({ queryKey: ['marketing'] }); };
+  const save = useMutation({ mutationFn: () => fetch(`/api/integrations/marketing/${type}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(Object.fromEntries(Object.entries(f).map(([k, v]) => [k, v || null]))) }).then(async (r) => { if (!r.ok) throw new Error((await r.json()).message); }), onSuccess: () => { invalidate(); toast.ok('Gespeichert'); setF((x) => Object.fromEntries(Object.entries(x).map(([k, v]) => [k, fields.find((fl) => fl.key === k)?.secret ? '' : v]))); }, onError: (e) => toast.fromError(e) });
+  const test = useMutation({ mutationFn: () => post(`/api/integrations/marketing/${type}/test`), onSuccess: () => { invalidate(); toast.ok('Verbindung erfolgreich'); }, onError: (e) => { invalidate(); toast.fromError(e, 'Verbindungstest'); } });
+  const remove = useMutation({ mutationFn: () => del(`/api/integrations/marketing/${type}`), onSuccess: () => { invalidate(); setLoaded(false); toast.ok('Anbindung entfernt'); }, onError: (e) => toast.fromError(e) });
+  const status = q.data?.status;
+  return (
+    <Card title={title} actions={<div className="row">{q.data?.configured ? <Badge tone={status === 'ok' ? 'ok' : status === 'error' ? 'danger' : 'info'}>{status === 'ok' ? 'verbunden' : status === 'error' ? 'Fehler' : 'gespeichert'}</Badge> : <Badge>nicht eingerichtet</Badge>}<Button size="sm" onClick={() => setOpen(!open)}>{open ? 'Schließen' : q.data?.configured ? 'Bearbeiten' : 'Einrichten'}</Button></div>}>
+      <p className="muted small">{intro}</p>
+      {q.data?.lastSyncAt ? <p className="small dim" style={{ marginTop: 6 }}>Letzter Abruf: {fmtDateTime(q.data.lastSyncAt)}</p> : null}
+      {q.data?.lastError ? <div className="dup-box" style={{ marginTop: 8 }}>{q.data.lastError}</div> : null}
+      {open ? (
+        <form onSubmit={(e: FormEvent) => { e.preventDefault(); save.mutate(); }} style={{ marginTop: 14 }}>
+          <div className="form-grid">
+            {fields.map((fl) => {
+              const stored = Boolean(fl.secret && q.data?.hasSecrets?.[fl.key]);
+              const common = { value: f[fl.key] ?? '', onChange: (e: { target: { value: string } }) => setF({ ...f, [fl.key]: e.target.value }), placeholder: stored ? '••••••' : '' };
+              return (
+                <Field key={fl.key} label={fl.label} className={fl.multiline ? 'span-2' : ''} hint={stored ? 'Gespeichert – leer lassen, um zu behalten.' : undefined}>
+                  {fl.multiline ? <Textarea {...common} /> : <Input type={fl.secret ? 'password' : 'text'} autoComplete="off" {...common} />}
+                </Field>
+              );
+            })}
+          </div>
+          <div className="form-actions">{q.data?.configured ? <><Button type="button" variant="danger" onClick={() => remove.mutate()} style={{ marginRight: 'auto' }}>Entfernen</Button><Button type="button" onClick={() => test.mutate()} loading={test.isPending}>Verbindung testen</Button></> : null}<Button type="submit" variant="primary" loading={save.isPending}>Speichern</Button></div>
+        </form>
+      ) : null}
+    </Card>
   );
 }

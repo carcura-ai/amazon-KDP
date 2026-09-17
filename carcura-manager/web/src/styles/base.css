@@ -218,7 +218,7 @@ table.table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
 .hint-list { display: flex; flex-direction: column; gap: 8px; }
 .hint { display: flex; gap: 10px; padding: 10px 12px; border-radius: var(--radius-sm); background: var(--bg-hover); font-size: 13px; }
 .hint.warn { background: var(--warn-soft); }
-.hint .tag { font-size: 10px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--fg-dim); flex: none; padding-top: 3px; width: 64px; }
+.hint .tag { font-size: 10px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--fg-dim); flex: none; padding-top: 3px; width: 80px; }
 .toolbar { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; padding: 12px 14px; border-bottom: 1px solid var(--line); }
 .toolbar input[type='search'] { max-width: 320px; }
 .toolbar select { width: auto; }

@@ -12,7 +12,7 @@
 | 8 | Protokolle, Bilder, Dokumente, PDF (Protokoll, Kundenakte, Auftrag) | erledigt |
 | 9 | Angebote, Rechnungen (lückenlose Nummern, Storno, Zahlungen, E-Mail-Versand mit PDF) | erledigt |
 | 10–11 | Lager (Bestände, Bewegungen, Mindestbestand), Finanzen (Ausgaben, wiederkehrende Kosten, Periodenübersicht, Hinweise mit Kennzeichnung) | erledigt |
-| 12–13 | Marketing-Adapter (Windsor, GA4, Google Ads, Meta, GSC), Analytics | geplant |
+| 12–13 | Marketing-Adapter (Windsor.ai inkl. Meta-Lead-Import, Google Ads API, Meta Marketing API, GA4, Search Console), Marketing-Dashboard mit CRM-Attribution, Analyse-Hinweise | erledigt |
 | 14–16 | Reports, KI-Assistent, Wettbewerber | geplant |
 | 17–20 | White-Label, Betreiber-Admin, Backups, Deployment, Gesamttest, Doku | geplant |
 

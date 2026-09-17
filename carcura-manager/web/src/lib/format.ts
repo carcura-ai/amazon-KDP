@@ -64,3 +64,5 @@ export const HINT_KIND: Record<string, string> = { fact: 'Fakt', calc: 'Berechnu
 export const INTERVAL_LABEL: Record<string, string> = { weekly: 'wöchentlich', monthly: 'monatlich', quarterly: 'vierteljährlich', yearly: 'jährlich' };
 export const PAY_METHOD_ALL: Record<string, string> = { cash: 'Bar', transfer: 'Überweisung', card: 'Karte', paypal: 'PayPal', direct_debit: 'Lastschrift', other: 'Sonstiges' };
 export const fmtQty = (n: number) => new Intl.NumberFormat('de-DE', { maximumFractionDigits: 3 }).format(n);
+
+export const fmtPct = (n?: number | null, digits = 1) => (n === null || n === undefined ? '–' : `${n.toFixed(digits).replace('.', ',')} %`);

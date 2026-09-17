@@ -691,3 +691,78 @@ export const recurringExpenses = sqliteTable(
   },
   (t) => [index('recurring_company_idx').on(t.companyId, t.nextDate)],
 );
+
+/* ------------------------------------------------------------------ Marketing / Analytics (synchronisierte Daten) */
+export const marketingDaily = sqliteTable(
+  'marketing_daily',
+  {
+    id: text('id').primaryKey(),
+    companyId: text('company_id').notNull().references(() => companies.id),
+    source: text('source').notNull(), // google_ads | meta_ads
+    date: text('date').notNull(),
+    campaignId: text('campaign_id').notNull(),
+    campaignName: text('campaign_name').notNull(),
+    impressions: integer('impressions').notNull().default(0),
+    clicks: integer('clicks').notNull().default(0),
+    costCents: integer('cost_cents').notNull().default(0),
+    conversions: real('conversions').notNull().default(0),
+    conversionValueCents: integer('conversion_value_cents').notNull().default(0),
+    reach: integer('reach'),
+    leads: integer('leads'),
+    currency: text('currency').notNull().default('EUR'),
+    fetchedAt: text('fetched_at').notNull(),
+  },
+  (t) => [uniqueIndex('marketing_daily_unique').on(t.companyId, t.source, t.date, t.campaignId), index('marketing_daily_date_idx').on(t.companyId, t.date)],
+);
+
+export const webAnalyticsDaily = sqliteTable(
+  'web_analytics_daily',
+  {
+    id: text('id').primaryKey(),
+    companyId: text('company_id').notNull().references(() => companies.id),
+    date: text('date').notNull(),
+    dimensionType: text('dimension_type').notNull(), // total | channel | device | landing_page
+    dimensionValue: text('dimension_value').notNull().default(''),
+    sessions: integer('sessions').notNull().default(0),
+    users: integer('users').notNull().default(0),
+    pageviews: integer('pageviews').notNull().default(0),
+    conversions: real('conversions').notNull().default(0),
+    fetchedAt: text('fetched_at').notNull(),
+  },
+  (t) => [uniqueIndex('web_daily_unique').on(t.companyId, t.date, t.dimensionType, t.dimensionValue), index('web_daily_date_idx').on(t.companyId, t.date)],
+);
+
+export const socialDaily = sqliteTable(
+  'social_daily',
+  {
+    id: text('id').primaryKey(),
+    companyId: text('company_id').notNull().references(() => companies.id),
+    platform: text('platform').notNull(), // instagram | facebook
+    date: text('date').notNull(),
+    followers: integer('followers'),
+    reach: integer('reach').notNull().default(0),
+    impressions: integer('impressions'),
+    views: integer('views').notNull().default(0),
+    likes: integer('likes').notNull().default(0),
+    comments: integer('comments').notNull().default(0),
+    shares: integer('shares').notNull().default(0),
+    fetchedAt: text('fetched_at').notNull(),
+  },
+  (t) => [uniqueIndex('social_daily_unique').on(t.companyId, t.platform, t.date)],
+);
+
+export const seoDaily = sqliteTable(
+  'seo_daily',
+  {
+    id: text('id').primaryKey(),
+    companyId: text('company_id').notNull().references(() => companies.id),
+    date: text('date').notNull(),
+    dimensionType: text('dimension_type').notNull(), // total | query | page
+    dimensionValue: text('dimension_value').notNull().default(''),
+    clicks: integer('clicks').notNull().default(0),
+    impressions: integer('impressions').notNull().default(0),
+    position: real('position'),
+    fetchedAt: text('fetched_at').notNull(),
+  },
+  (t) => [uniqueIndex('seo_daily_unique').on(t.companyId, t.date, t.dimensionType, t.dimensionValue), index('seo_daily_date_idx').on(t.companyId, t.date)],
+);

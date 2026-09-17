@@ -80,3 +80,21 @@ automatisch alle 10 Minuten (Fenster: `reminderDaysBefore` Tage, Standard 2).
 | E-Mails werden nicht gesendet | Einstellungen → E-Mail-Versand → Versandprotokoll zeigt den SMTP-Fehler |
 | Port belegt | `PORT` in `.env` ändern |
 | Datenbank gesperrt („database is locked“) | zweite Instanz läuft – nur eine Instanz pro Datenordner starten |
+
+## Marketing-Anbindungen
+
+| Anbindung | Benötigte Zugangsdaten | Was wird abgerufen |
+|---|---|---|
+| **Windsor.ai** (empfohlen, bereits für Carcura verbunden) | API-Key aus dem Windsor-Konto; optional Konto-IDs | Google Ads (Kampagnen/Tag), Meta Ads (Kampagnen/Tag inkl. Leads), GA4 (Sitzungen, Kanäle, Geräte, Landingpages), Instagram (Follower, Reichweite, Aufrufe, Likes), **Meta Lead Ads → automatischer Lead-Import ins CRM** |
+| Google Ads API | Developer-Token, OAuth-Client, Refresh-Token, Kundennummer | Kampagnen je Tag (Impressionen, Klicks, Kosten, Conversions) |
+| Meta Marketing API | System-User-Token (ads_read), Werbekonto-ID | Kampagnen je Tag (inkl. Leads aus `actions`) |
+| Google Analytics 4 | Service-Account (JSON-Schlüssel), Property-ID | Sitzungen, Nutzer, Seitenaufrufe, Key Events je Kanal/Gerät/Landingpage |
+| Search Console | Service-Account, Property-URL | Klicks, Impressionen, Position; Top-Suchanfragen und -Seiten |
+
+Der Sync läuft automatisch alle 6 Stunden (letzte 7 Tage) und manuell über „Jetzt synchronisieren“ (30+ Tage).
+Fehler erscheinen unter Einstellungen → Integrationen mit dem Originaltext der API. Alle Zugangsdaten liegen
+verschlüsselt in der Datenbank und werden nie an den Browser gesendet.
+
+**Attribution:** Kosten pro Lead und ROAS beziehen sich auf Leads bzw. Kunden, deren Quelle im CRM `google_ads`
+oder `meta_ads` ist (Website-Formular mit gclid → Google Ads; Meta Lead Ads → Meta). Leads, die telefonisch
+eingehen, müssen mit der richtigen Quelle erfasst werden, sonst werden Werbekosten ohne Leads gemeldet.

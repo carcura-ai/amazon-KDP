@@ -17,6 +17,7 @@ import { OrdersPage, OrderFormPage, OrderDetailPage } from '../pages/Orders';
 import { ProtocolPage } from '../pages/Protocol';
 import { InventoryPage } from '../pages/Inventory';
 import { FinancePage } from '../pages/Finance';
+import { MarketingPage } from '../pages/Marketing';
 import { OffersPage, OfferFormPage, OfferDetailPage, InvoicesPage, InvoiceFormPage, InvoiceDetailPage } from '../pages/Billing';
 
 function FullscreenLoader() {
@@ -64,6 +65,7 @@ export function AppRoutes() {
         <Route path="/rechnungen/:id/bearbeiten" element={<InvoiceFormPage />} />
         <Route path="/lager" element={<InventoryPage />} />
         <Route path="/finanzen" element={<FinancePage />} />
+        <Route path="/marketing" element={<MarketingPage />} />
         <Route path="/protokolle/neu" element={<ProtocolPage />} />
         <Route path="/protokolle/:id" element={<ProtocolPage />} />
         <Route path="/einstellungen/*" element={<SettingsPage />} />
