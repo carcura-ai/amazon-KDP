@@ -1,5 +1,8 @@
 # Carcura Manager als iPhone-App (ohne App Store)
 
+> Kostenloser Weg ohne Apple Developer Program: siehe `ALTSTORE.md` (App-Datei per GitHub bauen,
+> mit AltStore und freier Apple-ID installieren, wöchentliche automatische Verlängerung über den Laptop).
+
 Dieser Ordner enthält die native iOS-Hülle des Managers. Sie wird als echte App auf dem iPhone
 installiert: eigenes Icon auf dem Homescreen, Startbild, Vollbild ohne Browserleiste, Kamera für
 Protokollfotos, gespeicherte Anmeldung. Die Verteilung läuft über **TestFlight**, Apples eigenen

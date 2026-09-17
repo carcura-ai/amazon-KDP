@@ -1,0 +1,60 @@
+name: iOS App-Datei (unsigniert, für AltStore)
+
+# Erzeugt die iPhone-App als unsignierte .ipa-Datei – ohne Apple Developer Program.
+# Die Signierung übernimmt AltStore auf dem iPhone mit einer kostenlosen Apple-ID (siehe carcura-manager/app/ALTSTORE.md).
+on:
+  workflow_dispatch:
+  push:
+    branches: [main, master]
+    paths: ['carcura-manager/app/**', 'carcura-manager/web/**']
+
+concurrency:
+  group: ios-ipa-unsigned
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: macos-15
+    timeout-minutes: 45
+    defaults:
+      run:
+        working-directory: carcura-manager/app
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Xcode-Version wählen
+        run: sudo xcode-select -s "$(ls -d /Applications/Xcode_16*.app | tail -1)"
+
+      - name: Abhängigkeiten installieren
+        run: npm ci || npm install
+
+      - name: Xcode-Projekt, Icons, Info.plist vorbereiten
+        env:
+          BUILD_NUMBER: ${{ github.run_number }}
+        run: bash scripts/ios-prepare.sh
+
+      - name: App ohne Signatur bauen
+        run: |
+          xcodebuild -workspace ios/App/App.xcworkspace -scheme App -configuration Release -sdk iphoneos \
+            -destination 'generic/platform=iOS' -derivedDataPath build/derived build \
+            CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO CODE_SIGNING_ALLOWED=NO \
+            ENABLE_BITCODE=NO ONLY_ACTIVE_ARCH=NO
+
+      - name: IPA-Datei packen
+        run: |
+          rm -rf build/Payload && mkdir -p build/Payload
+          cp -R build/derived/Build/Products/Release-iphoneos/App.app build/Payload/
+          cd build && zip -qry "CarcuraManager-${{ github.run_number }}.ipa" Payload
+          ls -la "CarcuraManager-${{ github.run_number }}.ipa"
+
+      - name: IPA bereitstellen (Download unter „Artifacts“ dieses Laufs)
+        uses: actions/upload-artifact@v4
+        with:
+          name: CarcuraManager-ipa
+          path: carcura-manager/app/build/CarcuraManager-*.ipa
+          retention-days: 90
+          if-no-files-found: error
