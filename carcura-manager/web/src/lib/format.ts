@@ -59,3 +59,8 @@ export const fromLocalInput = (v: string) => new Date(v).toISOString();
 export const OFFER_STATUS: Record<string, { label: string; tone: string }> = { draft: { label: 'Entwurf', tone: '' }, sent: { label: 'Versendet', tone: 'info' }, accepted: { label: 'Angenommen', tone: 'ok' }, rejected: { label: 'Abgelehnt', tone: 'danger' }, expired: { label: 'Abgelaufen', tone: 'warn' } };
 export const INVOICE_STATUS: Record<string, { label: string; tone: string }> = { draft: { label: 'Entwurf', tone: '' }, open: { label: 'Offen', tone: 'info' }, sent: { label: 'Versendet', tone: 'info' }, overdue: { label: 'Überfällig', tone: 'danger' }, paid: { label: 'Bezahlt', tone: 'ok' }, cancelled: { label: 'Storniert', tone: 'warn' } };
 export const PAYMENT_METHOD: Record<string, string> = { cash: 'Bar', transfer: 'Überweisung', card: 'Karte', paypal: 'PayPal', other: 'Sonstiges' };
+
+export const HINT_KIND: Record<string, string> = { fact: 'Fakt', calc: 'Berechnung', estimate: 'Schätzung', advice: 'Empfehlung', forecast: 'Prognose' };
+export const INTERVAL_LABEL: Record<string, string> = { weekly: 'wöchentlich', monthly: 'monatlich', quarterly: 'vierteljährlich', yearly: 'jährlich' };
+export const PAY_METHOD_ALL: Record<string, string> = { cash: 'Bar', transfer: 'Überweisung', card: 'Karte', paypal: 'PayPal', direct_debit: 'Lastschrift', other: 'Sonstiges' };
+export const fmtQty = (n: number) => new Intl.NumberFormat('de-DE', { maximumFractionDigits: 3 }).format(n);

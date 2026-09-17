@@ -11,7 +11,7 @@
 | 7 | Kalender, Termine, Aufträge, Erinnerungen (E-Mail automatisch, WhatsApp per Link) | erledigt |
 | 8 | Protokolle, Bilder, Dokumente, PDF (Protokoll, Kundenakte, Auftrag) | erledigt |
 | 9 | Angebote, Rechnungen (lückenlose Nummern, Storno, Zahlungen, E-Mail-Versand mit PDF) | erledigt |
-| 10–11 | Lager, Finanzen, wiederkehrende Ausgaben | geplant |
+| 10–11 | Lager (Bestände, Bewegungen, Mindestbestand), Finanzen (Ausgaben, wiederkehrende Kosten, Periodenübersicht, Hinweise mit Kennzeichnung) | erledigt |
 | 12–13 | Marketing-Adapter (Windsor, GA4, Google Ads, Meta, GSC), Analytics | geplant |
 | 14–16 | Reports, KI-Assistent, Wettbewerber | geplant |
 | 17–20 | White-Label, Betreiber-Admin, Backups, Deployment, Gesamttest, Doku | geplant |

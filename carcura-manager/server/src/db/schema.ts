@@ -1,4 +1,4 @@
-import { sqliteTable, text, integer, index, uniqueIndex } from 'drizzle-orm/sqlite-core';
+import { sqliteTable, text, integer, real, index, uniqueIndex } from 'drizzle-orm/sqlite-core';
 import { sql } from 'drizzle-orm';
 
 const ts = (name: string) => text(name).notNull().default(sql`(strftime('%Y-%m-%dT%H:%M:%fZ','now'))`);
@@ -595,4 +595,99 @@ export const payments = sqliteTable(
     createdAt: ts('created_at'),
   },
   (t) => [index('payments_invoice_idx').on(t.invoiceId), index('payments_company_date_idx').on(t.companyId, t.paidAt)],
+);
+
+/* ------------------------------------------------------------------ Lager */
+export const inventoryItems = sqliteTable(
+  'inventory_items',
+  {
+    id: text('id').primaryKey(),
+    companyId: text('company_id').notNull().references(() => companies.id),
+    name: text('name').notNull(),
+    sku: text('sku'),
+    manufacturer: text('manufacturer'),
+    category: text('category'),
+    unit: text('unit').notNull().default('Stück'),
+    quantity: real('quantity').notNull().default(0),
+    minQuantity: real('min_quantity').notNull().default(0),
+    purchasePriceCents: integer('purchase_price_cents').notNull().default(0), // je Einheit, netto
+    supplier: text('supplier'),
+    location: text('location'),
+    notes: text('notes'),
+    isActive: integer('is_active', { mode: 'boolean' }).notNull().default(true),
+    createdAt: ts('created_at'),
+    updatedAt: ts('updated_at'),
+  },
+  (t) => [index('inventory_company_idx').on(t.companyId, t.name)],
+);
+
+export const inventoryMovements = sqliteTable(
+  'inventory_movements',
+  {
+    id: text('id').primaryKey(),
+    companyId: text('company_id').notNull(),
+    itemId: text('item_id').notNull().references(() => inventoryItems.id),
+    type: text('type').notNull(), // in | out | adjust
+    delta: real('delta').notNull(), // Vorzeichenbehaftete Mengenänderung
+    quantityAfter: real('quantity_after').notNull(),
+    unitCostCents: integer('unit_cost_cents'),
+    reason: text('reason'),
+    refType: text('ref_type'),
+    refId: text('ref_id'),
+    userId: text('user_id'),
+    createdAt: ts('created_at'),
+  },
+  (t) => [index('inventory_movements_item_idx').on(t.itemId, t.createdAt)],
+);
+
+/* ------------------------------------------------------------------ Ausgaben */
+export const expenses = sqliteTable(
+  'expenses',
+  {
+    id: text('id').primaryKey(),
+    companyId: text('company_id').notNull().references(() => companies.id),
+    date: text('date').notNull(), // YYYY-MM-DD (Belegdatum)
+    category: text('category').notNull().default('Sonstiges'),
+    description: text('description').notNull(),
+    vendor: text('vendor'),
+    netCents: integer('net_cents').notNull().default(0),
+    vatBp: integer('vat_bp').notNull().default(1900),
+    vatCents: integer('vat_cents').notNull().default(0),
+    grossCents: integer('gross_cents').notNull().default(0),
+    paymentMethod: text('payment_method').notNull().default('transfer'),
+    isPaid: integer('is_paid', { mode: 'boolean' }).notNull().default(true),
+    paidAt: text('paid_at'),
+    dueDate: text('due_date'),
+    recurringExpenseId: text('recurring_expense_id'),
+    receiptFileId: text('receipt_file_id'),
+    notes: text('notes'),
+    createdByUserId: text('created_by_user_id'),
+    createdAt: ts('created_at'),
+    updatedAt: ts('updated_at'),
+  },
+  (t) => [index('expenses_company_date_idx').on(t.companyId, t.date), index('expenses_category_idx').on(t.companyId, t.category), uniqueIndex('expenses_recurring_period_unique').on(t.recurringExpenseId, t.date)],
+);
+
+export const recurringExpenses = sqliteTable(
+  'recurring_expenses',
+  {
+    id: text('id').primaryKey(),
+    companyId: text('company_id').notNull().references(() => companies.id),
+    name: text('name').notNull(),
+    category: text('category').notNull().default('Sonstiges'),
+    vendor: text('vendor'),
+    netCents: integer('net_cents').notNull().default(0),
+    vatBp: integer('vat_bp').notNull().default(1900),
+    interval: text('interval').notNull().default('monthly'), // weekly | monthly | quarterly | yearly
+    startDate: text('start_date').notNull(),
+    endDate: text('end_date'),
+    nextDate: text('next_date').notNull(),
+    paymentMethod: text('payment_method').notNull().default('transfer'),
+    autoPaid: integer('auto_paid', { mode: 'boolean' }).notNull().default(true),
+    isActive: integer('is_active', { mode: 'boolean' }).notNull().default(true),
+    notes: text('notes'),
+    createdAt: ts('created_at'),
+    updatedAt: ts('updated_at'),
+  },
+  (t) => [index('recurring_company_idx').on(t.companyId, t.nextDate)],
 );

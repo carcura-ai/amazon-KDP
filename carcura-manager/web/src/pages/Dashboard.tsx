@@ -31,10 +31,11 @@ export function DashboardPage() {
             <Kpi label="Offene Leads" value={d.leads.open} delta={d.leads.conversionRateMonth === null ? 'Conversion: noch keine abgeschlossenen Leads diesen Monat' : `Conversion diesen Monat: ${d.leads.conversionRateMonth} %`} />
             <Kpi label="Kunden" value={d.customers.total} delta={`${d.customers.thisMonth} neu diesen Monat · ${d.vehicles.total} Fahrzeuge`} />
           </div>
-          <div className="grid cols-4">
+          <div className="grid cols-4" style={{ gridTemplateColumns: 'repeat(5, minmax(0, 1fr))' }}>
             <Kpi label="Termine heute" value={d.appointments.today} delta={`${d.appointments.next7Days} in den nächsten 7 Tagen`} />
             <Kpi label="Fahrzeuge in Bearbeitung" value={d.orders.inProgress} delta={d.orders.ready > 0 ? `${d.orders.ready} fertig, wartet auf Abholung` : 'kein fertiges Fahrzeug wartet'} tone={d.orders.ready > 0 ? 'up' : undefined} />
             <Kpi label="Abgeschlossene Aufträge (Monat)" value={d.orders.completedMonth} delta={`Auftragsvolumen ${fmtMoney(d.orders.completedMonthCents)} brutto`} />
+            <Kpi label="Gewinn diesen Monat (netto)" value={fmtMoney(d.finance.profitNetMonthCents)} tone={d.finance.profitNetMonthCents >= 0 ? 'up' : 'down'} delta={`Umsatz ${fmtMoney(d.finance.revenueNetMonthCents)} · Kosten ${fmtMoney(d.finance.expensesNetMonthCents)}${d.finance.lowStockCount ? ` · ${d.finance.lowStockCount} Lagerwarnung${d.finance.lowStockCount === 1 ? '' : 'en'}` : ''}`} />
             <Kpi label="Nächster Termin" value={d.appointments.next[0] ? fmtDateTime(d.appointments.next[0].startsAt) : '–'} delta={d.appointments.next[0] ? `${d.appointments.next[0].title}${d.appointments.next[0].customerName ? ' · ' + d.appointments.next[0].customerName : ''}` : 'kein Termin geplant'} />
           </div>
           <div className="grid main-side">

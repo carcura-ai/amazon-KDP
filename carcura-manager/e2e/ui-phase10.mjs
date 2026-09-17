@@ -1,0 +1,60 @@
+import { chromium } from 'playwright';
+const S = process.env.SHOTS;
+const base = 'http://127.0.0.1:4800';
+const browser = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium' });
+const issues = []; const errors = [];
+async function checkOverflow(page, label) { const r = await page.evaluate(() => ({ sw: document.documentElement.scrollWidth, cw: document.documentElement.clientWidth })); if (r.sw > r.cw + 1) issues.push(`${label}: Overflow ${r.sw} > ${r.cw}`); }
+const shot = (page, name) => page.screenshot({ path: `${S}/${name}.png`, fullPage: true });
+const ctx = await browser.newContext({ viewport: { width: 1440, height: 900 }, locale: 'de-DE' });
+const page = await ctx.newPage(); page.on('pageerror', (e) => errors.push('pageerror: ' + e.message));
+await page.request.post(base + '/api/auth/login', { data: { email: 'admin@carcura.info', password: 'Carcura-2026x' } });
+// Lager
+await page.goto(base + '/lager'); await page.waitForSelector('h1:has-text("Lager")');
+await page.click('button:has-text("Artikel")');
+await page.fill('.modal label:has-text("Produktname") + input', 'Keramikversiegelung 50 ml');
+await page.fill('.modal label:has-text("Kategorie") + input', 'Versiegelung');
+await page.fill('.modal label:has-text("Anfangsbestand") + input', '4');
+await page.fill('.modal label:has-text("Mindestbestand") + input', '3');
+await page.fill('.modal label:has-text("Einkaufspreis") + input', '45');
+await page.click('.modal button:has-text("Speichern")');
+await page.waitForSelector('text=Artikel angelegt');
+await page.waitForSelector('td:has-text("Keramikversiegelung 50 ml")');
+await page.click('button[title="Entnahme"]');
+await page.fill('.modal label:has-text("Menge") + input', '2');
+await page.fill('.modal label:has-text("Grund") + input', 'Auftrag AU-2026-0001');
+await page.click('.modal button:has-text("Buchen")');
+await page.waitForSelector('.badge:has-text("nachbestellen")');
+await checkOverflow(page, 'lager'); await shot(page, '50-lager');
+await page.click('button:has(svg.lucide-history)');
+await page.waitForSelector('.modal td:has-text("Entnahme")'); await shot(page, '51-lager-historie'); await page.keyboard.press('Escape');
+// Finanzen: Ausgabe + wiederkehrend
+await page.goto(base + '/finanzen'); await page.waitForSelector('h1:has-text("Finanzen")');
+await page.click('button:has-text("Ausgaben")');
+await page.click('button:has-text("Ausgabe erfassen")');
+await page.fill('.modal label:has-text("Beschreibung") + input', 'Poliermittel 5 L');
+await page.fill('.modal label:has-text("Bruttobetrag") + input', '119');
+await page.click('.modal button:has-text("Speichern")');
+await page.waitForSelector('text=Ausgabe gespeichert');
+await page.waitForSelector('td:has-text("Poliermittel 5 L")');
+await shot(page, '52-ausgaben');
+await page.click('button:has-text("Wiederkehrende Kosten")');
+await page.click('button:has-text("Anlegen")');
+await page.fill('.modal label:has-text("Bezeichnung") + input', 'Miete Halle');
+await page.fill('.modal label:has-text("Nettobetrag") + input', '800');
+await page.click('.modal button:has-text("Speichern")');
+await page.waitForSelector('td:has-text("Miete Halle")');
+await shot(page, '53-wiederkehrend');
+await page.click('button:has-text("Übersicht")');
+await page.waitForSelector('text=Gewinn (netto, vor Steuern)');
+await page.waitForSelector('.recharts-surface');
+await checkOverflow(page, 'finanzen'); await shot(page, '54-finanzen');
+const kosten = await page.locator('.kpi:has-text("Kosten (netto)") .value').textContent();
+if (!kosten.includes('900,00')) issues.push('Kosten falsch: ' + kosten);
+await page.click('.seg button:has-text("Jahr")'); await page.waitForTimeout(600); await shot(page, '55-finanzen-jahr');
+await page.goto(base + '/'); await page.waitForSelector('text=Gewinn diesen Monat'); await checkOverflow(page, 'dashboard'); await shot(page, '56-dashboard');
+// Mobile
+const mctx = await browser.newContext({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true, locale: 'de-DE' });
+await mctx.addCookies(await ctx.cookies()); const mp = await mctx.newPage(); mp.on('pageerror', (e) => errors.push('mobile pageerror: ' + e.message));
+for (const [path, name, wait] of [['/lager', 'm-lager', 'td'], ['/finanzen', 'm-finanzen', '.recharts-surface'], ['/', 'm-dashboard4', 'text=Gewinn diesen Monat']]) { await mp.goto(base + path); await mp.waitForSelector(wait); await checkOverflow(mp, name); await shot(mp, name); }
+console.log('ISSUES', JSON.stringify(issues)); console.log('ERRORS', JSON.stringify(errors));
+await browser.close();

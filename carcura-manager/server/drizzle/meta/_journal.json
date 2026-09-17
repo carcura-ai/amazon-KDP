@@ -29,6 +29,13 @@
       "when": 1789635505903,
       "tag": "0003_offers_invoices",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "6",
+      "when": 1789636204718,
+      "tag": "0004_inventory_finance",
+      "breakpoints": true
     }
   ]
 }

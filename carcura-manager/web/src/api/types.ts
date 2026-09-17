@@ -37,6 +37,7 @@ export interface Dashboard {
   customers: { total: number; thisMonth: number };
   appointments: { today: number; next7Days: number; next: Array<{ id: string; title: string; startsAt: string; endsAt: string; status: string; type: string; customerName: string | null; vehicleLabel: string | null }> };
   orders: { inProgress: number; ready: number; completedMonth: number; completedMonthCents: number };
+  finance: { revenueNetMonthCents: number; expensesNetMonthCents: number; profitNetMonthCents: number; lowStockCount: number };
   revenue: { todayCents: number; weekCents: number; monthCents: number; yearCents: number; monthCount: number; openCents: number; openCount: number; overdueCents: number; overdueCount: number };
   vehicles: { total: number };
   recentLeads: Lead[];
@@ -76,3 +77,19 @@ export interface Payment { id: string; invoiceId: string; amountCents: number; p
 export interface InvoiceDetail { invoice: Invoice; items: LineItem[]; payments: Payment[]; customer: Customer | null; vehicle: Vehicle | null; order: { id: string; orderNumber: string; status: string } | null; totals: Totals; cancels: { id: string; invoiceNumber: string | null } | null; cancelledBy: { id: string; invoiceNumber: string | null } | null }
 export interface InvoiceRow { invoice: Invoice; customer: Pick<Customer, 'id' | 'customerNumber' | 'firstName' | 'lastName' | 'companyName'> }
 export interface InvoiceStats { openCents: number; openCount: number; overdueCents: number; overdueCount: number; invoicedMonthCents: number; invoicedMonthCount: number; invoicedYearCents: number; paidMonthCents: number }
+
+export interface InventoryItem { id: string; name: string; sku: string | null; manufacturer: string | null; category: string | null; unit: string; quantity: number; minQuantity: number; purchasePriceCents: number; supplier: string | null; location: string | null; notes: string | null; isActive: boolean; isLow: boolean; stockValueCents: number; createdAt: string; updatedAt: string }
+export interface InventoryMovement { id: string; itemId: string; type: string; delta: number; quantityAfter: number; unitCostCents: number | null; reason: string | null; refType: string | null; refId: string | null; userId: string | null; createdAt: string }
+export interface Expense { id: string; date: string; category: string; description: string; vendor: string | null; netCents: number; vatBp: number; vatCents: number; grossCents: number; paymentMethod: string; isPaid: boolean; paidAt: string | null; dueDate: string | null; recurringExpenseId: string | null; receiptFileId: string | null; notes: string | null; createdAt: string }
+export interface RecurringExpense { id: string; name: string; category: string; vendor: string | null; netCents: number; vatBp: number; interval: string; startDate: string; endDate: string | null; nextDate: string; paymentMethod: string; autoPaid: boolean; isActive: boolean; notes: string | null }
+export interface FinanceOverview {
+  period: string; date: string; range: { from: string; to: string; label: string };
+  revenueNetCents: number; revenueVatCents: number; revenueGrossCents: number; invoiceCount: number;
+  expensesNetCents: number; expensesVatCents: number; expensesGrossCents: number; expenseCount: number;
+  profitNetCents: number; marginPct: number | null; paymentsInCents: number; expensesPaidCents: number; cashflowCents: number;
+  openReceivablesCents: number; openPayablesCents: number; vatBalanceCents: number;
+  previous: { revenueNetCents: number; expensesNetCents: number; profitNetCents: number };
+  byCategory: Array<{ category: string; netCents: number; n: number }>;
+  series: Array<{ label: string; from: string; revenueNetCents: number; expensesNetCents: number }>;
+  hints: Array<{ kind: 'fact' | 'calc' | 'estimate' | 'advice'; level: 'info' | 'warn'; text: string }>;
+}
