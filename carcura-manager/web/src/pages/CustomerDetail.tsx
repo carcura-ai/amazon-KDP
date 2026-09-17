@@ -11,6 +11,7 @@ import { CustomerForm } from './Customers';
 import { VehicleForm } from './Vehicles';
 import { CustomerAppointmentsAndOrders } from './Orders';
 import { DocumentsPanel } from '../components/documents';
+import { TaskPanel } from './Tasks';
 import { ProtocolList } from './Protocol';
 import { CustomerBilling } from './Billing';
 
@@ -121,6 +122,7 @@ export function CustomerDetailPage() {
               <Timeline items={activities.slice(0, 5)} />
               {activities.length > 5 ? <Button size="sm" variant="ghost" onClick={() => setTab('history')} style={{ marginTop: 8 }}>Alle {activities.length} Einträge</Button> : null}
             </Card>
+            <TaskPanel filter={{ customerId: id }} />
           </div>
           <div className="stack" style={{ gap: 16 }}>
             <Card title="Fahrzeuge" actions={can('vehicles:write') ? <Button size="sm" onClick={() => setAddVehicle(true)}><Plus /></Button> : null}>

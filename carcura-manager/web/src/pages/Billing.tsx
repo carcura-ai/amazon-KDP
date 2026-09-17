@@ -1,7 +1,7 @@
 import { useEffect, useState, type FormEvent } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Link, useNavigate, useParams, useSearchParams } from 'react-router';
-import { Plus, FileDown, Send, Check, X, ArrowRight, Trash2, Pencil, Banknote, Ban, Receipt } from 'lucide-react';
+import { Download, Plus, FileDown, Send, Check, X, ArrowRight, Trash2, Pencil, Banknote, Ban, Receipt } from 'lucide-react';
 import { get, post, patch, del, qs } from '../api/client';
 import type { Customer, OfferDetail, OfferRow, InvoiceDetail, InvoiceRow, InvoiceStats, Paged, Payment } from '../api/types';
 import { useAuth } from '../app/auth';
@@ -178,7 +178,7 @@ export function InvoicesPage() {
   const stats = useQuery({ queryKey: ['invoices', 'stats'], queryFn: () => get<InvoiceStats>('/api/invoices/stats') });
   return (
     <>
-      <PageHead title="Rechnungen" sub="Rechnungen ausstellen, versenden, Zahlungen erfassen." actions={can('invoices:write') ? <Link className="btn primary" to="/rechnungen/neu"><Plus /> Rechnung</Link> : null} />
+      <PageHead title="Rechnungen" sub="Rechnungen ausstellen, versenden, Zahlungen erfassen." actions={<><a className="btn" href="/api/export/invoices.csv" title="Rechnungsliste als CSV (z. B. für den Steuerberater)"><Download /> CSV</a>{can('invoices:write') ? <Link className="btn primary" to="/rechnungen/neu"><Plus /> Rechnung</Link> : null}</>} />
       {stats.data ? <div className="grid cols-4" style={{ marginBottom: 16 }}><Kpi label="Offen" value={fmtMoney(stats.data.openCents)} delta={`${stats.data.openCount} Rechnung${stats.data.openCount === 1 ? '' : 'en'}`} /><Kpi label="Überfällig" value={fmtMoney(stats.data.overdueCents)} delta={`${stats.data.overdueCount} Rechnung${stats.data.overdueCount === 1 ? '' : 'en'}`} tone={stats.data.overdueCount ? 'down' : undefined} /><Kpi label="Fakturiert diesen Monat" value={fmtMoney(stats.data.invoicedMonthCents)} delta={`${stats.data.invoicedMonthCount} Rechnungen · Jahr ${fmtMoney(stats.data.invoicedYearCents)}`} /><Kpi label="Zahlungseingang Monat" value={fmtMoney(stats.data.paidMonthCents)} /></div> : null}
       <Card tight>
         <div className="toolbar"><input type="search" placeholder="Nummer, Kunde, Titel …" value={q} onChange={(e) => { setQ(e.target.value); setPage(1); }} /><Select value={status} onChange={(e) => { setStatus(e.target.value); setPage(1); }}><option value="">Alle Status</option>{Object.entries(INVOICE_STATUS).map(([k, v]) => <option key={k} value={k}>{v.label}</option>)}</Select></div>

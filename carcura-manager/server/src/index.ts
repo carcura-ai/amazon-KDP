@@ -8,9 +8,11 @@ import { runOverdueCheck } from './jobs/overdue.js';
 import { runRecurringExpenses } from './jobs/recurring.js';
 import { runScheduledReports } from './modules/reports/generator.js';
 import { runCompetitorScanAll } from './modules/competitors/routes.js';
+import { applyPendingRestore } from './integrations/backup.js';
 
 async function main() {
   const config = loadConfig();
+  const restored = await applyPendingRestore(config, console);
   const dbHandle = openDatabase(config.dbPath);
   const app = await buildApp({ config, dbHandle });
   const scheduler = new Scheduler(dbHandle.db, app.log);
@@ -22,6 +24,12 @@ async function main() {
   scheduler.register({ type: 'reports.monthly', cron: '30 6 1 * *', handler: () => runScheduledReports(app, 'monthly') });
   scheduler.register({ type: 'reports.yearly', cron: '0 7 2 1 *', handler: () => runScheduledReports(app, 'yearly') });
   scheduler.register({ type: 'competitors.scan', cron: '0 5 * * 1', runOnStart: true, handler: () => runCompetitorScanAll(app) });
+  scheduler.register({ type: 'backup.daily', cron: '30 2 * * *', runOnStart: true, handler: async () => {
+    const today = new Date().toISOString().slice(0, 10);
+    if (app.backups.list().some((b) => b.kind === 'auto' && b.createdAt.startsWith(today))) return 'Tagessicherung existiert bereits';
+    const info = await app.backups.create('auto');
+    return `${info.name} (${Math.round(info.sizeBytes / 1024)} KB)`;
+  } });
   scheduler.register({ type: 'sessions.cleanup', cron: '15 3 * * *', handler: async () => `${purgeExpiredSessions(dbHandle.db)} Sessions entfernt` });
   app.addHook('onClose', async () => scheduler.stop());
   const shutdown = async (signal: string) => {
@@ -33,6 +41,7 @@ async function main() {
   process.on('SIGTERM', () => void shutdown('SIGTERM'));
   await app.listen({ port: config.port, host: config.host });
   app.log.info(`Oberfläche: ${config.publicUrl}`);
+  if (restored) app.log.warn('Eine Sicherung wurde beim Start wiederhergestellt (Details: data/restore-last.json).');
 }
 
 main().catch((err) => {

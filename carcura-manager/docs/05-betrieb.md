@@ -10,6 +10,17 @@
 
 ## Installation
 
+**Empfohlen (Skripte):**
+
+```
+scripts\install.cmd        Windows: Abhängigkeiten, Chromium, Build, .env
+scripts\start.cmd          Windows: Start (bleibt geöffnet, führt Neustart/Update aus)
+bash scripts/install.sh    macOS/Linux
+bash scripts/start.sh      macOS/Linux
+```
+
+**Manuell:**
+
 ```bash
 cd carcura-manager
 npm install                      # Server- und Web-Abhängigkeiten (Workspaces)
@@ -20,8 +31,13 @@ npm start                        # startet http://127.0.0.1:4800
 
 Beim ersten Aufruf erscheint der **Einrichtungsassistent** (Unternehmen + Administrator).
 
-Windows: Die Befehle in PowerShell ausführen. Ein Autostart lässt sich über den Aufgabenplaner
-(„Bei Anmeldung“ → `node C:\…\carcura-manager\server\dist\index.js`) einrichten.
+**Autostart Windows:** Aufgabenplaner → „Aufgabe erstellen“ → Trigger „Bei Anmeldung“ → Aktion
+`C:\…\carcura-manager\scripts\start.cmd`. Alternativ eine Verknüpfung zu `start.cmd` in den
+Autostart-Ordner (`shell:startup`) legen. **macOS:** `start.sh` als Anmeldeobjekt oder per launchd.
+
+**Zugriff vom Smartphone/Tablet im selben WLAN:** `HOST=0.0.0.0` in `.env` setzen, danach
+`http://<IP-des-Laptops>:4800` aufrufen. Für Zugriff von außerhalb einen HTTPS-Tunnel (z. B. Cloudflare
+Tunnel) oder einen kleinen Server verwenden – dann ist `APP_SECRET` Pflicht.
 
 ## Entwicklung
 
@@ -29,7 +45,8 @@ Windows: Die Befehle in PowerShell ausführen. Ein Autostart lässt sich über d
 npm run dev:server   # Fastify mit Neustart bei Änderungen (Port 4800)
 npm run dev:web      # Vite-Dev-Server (Port 5173, Proxy auf 4800)
 npm test             # Server-Tests (Vitest)
-node e2e/ui-smoke.mjs && node e2e/ui-phase7.mjs && node e2e/ui-phase8.mjs   # Browser-Tests gegen laufenden Server
+# Browser-Tests gegen laufenden Server mit frischem DATA_DIR, in dieser Reihenfolge:
+for s in ui-smoke ui-phase7 ui-phase8 ui-phase9 ui-phase10 ui-phase12 ui-phase14 ui-phase17; do SHOTS=/tmp/shots node e2e/$s.mjs; done
 ```
 
 ## Umgebungsvariablen (`.env` im Ordner `carcura-manager`, Vorlage `.env.example`)
@@ -130,3 +147,59 @@ von Zugriffsbeschränkungen. Der eigene Betrieb wird in der Liste als „eigener
 eigene Bewertungsentwicklung. Wettbewerber ohne API lassen sich manuell mit Notizen (Preise, Leistungen) pflegen.
 Kosten: Google Places „Text Search (Basic/Advanced)“ pro Anfrage; bei wöchentlichem Scan mit wenigen Begriffen
 liegt das im kostenlosen Monatskontingent von Google.
+
+## Aufgaben, Import und Export
+
+- **Aufgaben** (Menüpunkt „Aufgaben“): Rückrufe, Nachfassen, Bestellungen mit Fälligkeit, Priorität, Zuständigem
+  und Bezug zu Kunde, Lead oder Auftrag. Fällige und überfällige Aufgaben erscheinen im Dashboard und als Zähler
+  in der Navigation; in Kunden- und Lead-Akten gibt es ein eigenes Aufgaben-Panel.
+- **CSV-Export** (Excel-kompatibel, Semikolon, UTF-8): Kunden, Leads, Fahrzeuge, Rechnungen (mit Zeitraum, z. B.
+  für den Steuerberater), Ausgaben. Buttons „CSV“ auf den jeweiligen Seiten.
+- **CSV-Import** von Kunden und Leads: Datei wählen → Vorschau (erkannte Spalten, Duplikate nach E-Mail/Telefon
+  werden übersprungen) → Import. Kennzeichen/Marke/Modell legen beim Kundenimport direkt ein Fahrzeug an.
+- **Gesamtexport (JSON)** unter Einstellungen → Unternehmen: alle Daten des Mandanten (Datenportabilität,
+  Archiv, Mandantenwechsel). Der Einzelexport einer Kundenakte (DSGVO-Auskunft) ist in der Kundenakte verfügbar.
+
+## White-Label und Mandanten
+
+Je Mandant: Firmenname, Logo, Haupt-/Sekundärfarbe, **Produktname** (statt „Manager“) und optionaler
+**Herstellerhinweis** („powered by …“). Diese Werte gelten für Oberfläche, Browser-Titel, Anmeldeseite
+(`/login`, bei mehreren Mandanten `/login?mandant=<slug>`), PDFs und E-Mails. Neue Mandanten legt der
+Softwarebetreiber unter „Mandanten“ an (mit Kennzahlen je Mandant: Benutzer, Kunden, Leads, Rechnungen,
+Speicher, letzte Anmeldung). Ein Betreiber-Benutzer wird in der Datenbank mit `is_platform_admin = 1`
+gekennzeichnet (der erste Administrator der Installation ist automatisch Betreiber).
+
+## Sicherungen, Wiederherstellung, Updates
+
+- **Automatisch:** täglich 02:30 (und beim Start, falls heute noch keine Sicherung existiert). Es bleiben die letzten
+  14 automatischen und 20 manuellen Sicherungen erhalten (`data/backups/`).
+- **Manuell:** Einstellungen → System & Sicherung → „Jetzt sichern“; Download als ZIP; Löschen.
+- **Inhalt:** konsistente Kopie der Datenbank (`VACUUM INTO`, WAL-sicher), alle Dateien (Bilder, PDFs, Unterschriften)
+  und ein Manifest. **Nicht enthalten:** `data/app-secret.key` – ohne diesen Schlüssel lassen sich gespeicherte
+  Zugangsdaten (SMTP, API-Keys) nach einer Wiederherstellung auf einem anderen Rechner nicht entschlüsseln.
+  Den Schlüssel deshalb separat sichern (Passwort-Manager).
+- **Wiederherstellung:** aus der Liste oder per Upload einer ZIP-Sicherung. Die Datei wird geprüft und vorgemerkt;
+  beim nächsten Start (über das Startskript automatisch) wird der aktuelle Stand als Sicherheitskopie
+  (`data/backups/pre-restore-…`) beiseitegelegt und die Sicherung eingespielt. Ohne Oberfläche:
+  `node server/dist/cli.js restore <datei.zip>` bei gestopptem Server.
+- **Update:** „Update installieren“ erstellt eine Sicherung und beendet die Anwendung mit Exit-Code 76; das
+  Startskript führt dann `scripts/update` aus (git pull, npm install, Build) und startet neu. Exit-Code 75 = Neustart.
+  Ohne Startskript: Anwendung beenden, `scripts/update.cmd` bzw. `bash scripts/update.sh` ausführen.
+- **3-2-1-Regel:** Sicherungen zusätzlich auf ein externes Laufwerk oder in eine Cloud kopieren (z. B. den Ordner
+  `data/backups` mit OneDrive/Google Drive synchronisieren). Ein Backup auf demselben Laptop schützt nicht vor
+  Diebstahl, Defekt oder Verschlüsselungstrojanern.
+
+## Laufende Jobs (Zeitplaner)
+
+| Job | Zeitpunkt |
+|---|---|
+| Terminerinnerungen (E-Mail) | alle 10 Minuten |
+| Überfällige Rechnungen markieren | täglich 00:05 |
+| Wiederkehrende Kosten buchen | täglich 00:10 |
+| Marketing-Sync (letzte 7 Tage) | alle 6 Stunden |
+| Tagessicherung | täglich 02:30 |
+| Wettbewerber-Scan | montags 05:00 |
+| Wochen-/Monats-/Jahresbericht | Mo 06:00 / 1. 06:30 / 2. Jan 07:00 |
+| Sitzungsbereinigung | täglich 03:15 |
+
+Status und Fehler der letzten Läufe: Einstellungen → System & Sicherung → „Automatische Aufgaben“.

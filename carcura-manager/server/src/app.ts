@@ -44,6 +44,11 @@ import reportRoutes from './modules/reports/routes.js';
 import assistantRoutes from './modules/assistant/routes.js';
 import competitorRoutes from './modules/competitors/routes.js';
 import { MarketingSync } from './integrations/marketing/sync.js';
+import { BackupService } from './integrations/backup.js';
+import taskRoutes from './modules/tasks/routes.js';
+import importExportRoutes from './modules/crm/importexport.routes.js';
+import systemRoutes from './modules/system/routes.js';
+import brandingRoutes from './modules/company/branding.routes.js';
 import { createRequire } from 'node:module';
 
 declare module 'fastify' {
@@ -60,6 +65,9 @@ declare module 'fastify' {
     pdf: PdfService;
     marketing: MarketingSync;
     fetchFn: typeof fetch;
+    backups: BackupService;
+    /** Beendet den Prozess mit Exit-Code (75 = Neustart, 76 = Update) – das Startskript reagiert darauf. */
+    exitFn: (code: number, reason: string) => void;
   }
 }
 
@@ -68,6 +76,7 @@ export interface BuildOptions {
   dbHandle: DbHandle;
   logger?: boolean | object;
   fetchFn?: typeof fetch;
+  exitFn?: (code: number, reason: string) => void;
 }
 
 export async function buildApp(opts: BuildOptions): Promise<FastifyInstance> {
@@ -91,6 +100,8 @@ export async function buildApp(opts: BuildOptions): Promise<FastifyInstance> {
   app.decorate('fetchFn', opts.fetchFn ?? fetch);
   app.decorate('marketing', new MarketingSync(opts.dbHandle.db, integrationStore, app.log, opts.fetchFn ?? fetch));
   app.decorate('appVersion', (createRequire(import.meta.url)('../package.json') as { version: string }).version);
+  app.decorate('backups', new BackupService({ dataDir: opts.config.dataDir, dbPath: opts.config.dbPath, filesDir: opts.config.filesDir, backupsDir: opts.config.backupsDir }, opts.dbHandle.sqlite, app.log, app.appVersion));
+  app.decorate('exitFn', opts.exitFn ?? ((code: number) => { setTimeout(() => { void app.close().finally(() => process.exit(code)); }, 700); }));
   app.decorate('cookieOptions', {
     path: '/',
     httpOnly: true,
@@ -157,6 +168,10 @@ export async function buildApp(opts: BuildOptions): Promise<FastifyInstance> {
   await app.register(reportRoutes);
   await app.register(assistantRoutes);
   await app.register(competitorRoutes);
+  await app.register(taskRoutes);
+  await app.register(importExportRoutes);
+  await app.register(systemRoutes);
+  await app.register(brandingRoutes);
 
   // Web-App (Vite-Build) ausliefern, wenn vorhanden
   const webDist = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../web/dist');

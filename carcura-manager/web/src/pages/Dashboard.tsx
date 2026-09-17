@@ -4,7 +4,7 @@ import { get } from '../api/client';
 import type { Dashboard } from '../api/types';
 import { useAuth } from '../app/auth';
 import { Card, Kpi, PageHead, Skeleton, Badge, Empty } from '../components/ui';
-import { fmtRelative, fmtMoney, fmtDateTime, LEAD_SOURCE, LEAD_STATUS, personName } from '../lib/format';
+import { fmtRelative, fmtMoney, fmtDateTime, fmtDate, LEAD_SOURCE, LEAD_STATUS, personName } from '../lib/format';
 
 export function DashboardPage() {
   const { me } = useAuth();
@@ -68,6 +68,12 @@ export function DashboardPage() {
                     <div><div style={{ fontWeight: 600 }}>{fmtDateTime(a.startsAt)} · {a.title}</div><div className="small muted">{[a.customerName, a.vehicleLabel].filter(Boolean).join(' · ') || 'ohne Kunde'}</div></div>
                   </Link>
                 ))}
+              </Card>
+              <Card title={`Aufgaben heute${d.tasks.overdue ? ` · ${d.tasks.overdue} überfällig` : ''}`} tight actions={<Link className="btn sm" to="/aufgaben">Alle Aufgaben</Link>}>
+                {d.tasks.items.length === 0 ? <p className="muted" style={{ padding: 18 }}>{d.tasks.open ? `Keine Aufgabe für heute fällig (${d.tasks.open} offen).` : 'Keine offenen Aufgaben.'}</p> : d.tasks.items.map((t) => {
+                  const overdue = Boolean(t.dueAt && new Date(t.dueAt).getTime() < new Date().setHours(0, 0, 0, 0));
+                  return <Link key={t.id} to="/aufgaben" className="list-evt" style={{ gridTemplateColumns: '1fr' }}><div><div style={{ fontWeight: 600 }}>{t.title}</div><div className="small" style={{ color: overdue ? 'var(--danger)' : 'var(--fg-muted)' }}>{overdue ? `überfällig seit ${fmtDate(t.dueAt)}` : t.dueAt ? `heute ${fmtDateTime(t.dueAt).slice(-5)} Uhr` : 'ohne Termin'}{t.priority === 'high' ? ' · hohe Priorität' : ''}</div></div></Link>;
+                })}
               </Card>
               <Card title="Hinweise">
                 {d.hints.length === 0 ? <p className="muted">Keine Auffälligkeiten.</p> : (

@@ -13,6 +13,7 @@ import { VehicleDetailPage } from '../pages/VehicleDetail';
 import { SettingsPage } from '../pages/Settings';
 import { PlatformPage } from '../pages/Platform';
 import { CalendarPage } from '../pages/Calendar';
+import { TasksPage } from '../pages/Tasks';
 import { OrdersPage, OrderFormPage, OrderDetailPage } from '../pages/Orders';
 import { ProtocolPage } from '../pages/Protocol';
 import { InventoryPage } from '../pages/Inventory';
@@ -54,6 +55,7 @@ export function AppRoutes() {
         <Route path="/fahrzeuge" element={<VehiclesPage />} />
         <Route path="/fahrzeuge/:id" element={<VehicleDetailPage />} />
         <Route path="/kalender" element={<CalendarPage />} />
+        <Route path="/aufgaben" element={<TasksPage />} />
         <Route path="/auftraege" element={<OrdersPage />} />
         <Route path="/auftraege/neu" element={<OrderFormPage />} />
         <Route path="/auftraege/:id" element={<OrderDetailPage />} />

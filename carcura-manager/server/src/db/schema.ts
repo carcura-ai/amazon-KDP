@@ -36,6 +36,8 @@ export const companies = sqliteTable('companies', {
   paymentTermsDays: integer('payment_terms_days').notNull().default(14),
   reminderDaysBefore: integer('reminder_days_before').notNull().default(2),
   settingsJson: text('settings_json').notNull().default('{}'),
+  productName: text('product_name').notNull().default('Manager'),
+  poweredBy: text('powered_by'),
   websiteLeadToken: text('website_lead_token'),
   isActive: integer('is_active', { mode: 'boolean' }).notNull().default(true),
   createdAt: ts('created_at'),
@@ -843,4 +845,28 @@ export const assistantMessages = sqliteTable(
     createdAt: ts('created_at'),
   },
   (t) => [index('assistant_conv_idx').on(t.companyId, t.conversationId, t.createdAt)],
+);
+
+/* ------------------------------------------------------------------ Aufgaben */
+export const tasks = sqliteTable(
+  'tasks',
+  {
+    id: text('id').primaryKey(),
+    companyId: text('company_id').notNull().references(() => companies.id),
+    title: text('title').notNull(),
+    description: text('description'),
+    status: text('status').notNull().default('open'), // open | done
+    priority: text('priority').notNull().default('normal'), // low | normal | high
+    dueAt: text('due_at'),
+    assignedUserId: text('assigned_user_id'),
+    customerId: text('customer_id'),
+    leadId: text('lead_id'),
+    vehicleId: text('vehicle_id'),
+    orderId: text('order_id'),
+    createdByUserId: text('created_by_user_id'),
+    completedAt: text('completed_at'),
+    createdAt: ts('created_at'),
+    updatedAt: ts('updated_at'),
+  },
+  (t) => [index('tasks_company_status_idx').on(t.companyId, t.status, t.dueAt), index('tasks_customer_idx').on(t.companyId, t.customerId), index('tasks_lead_idx').on(t.companyId, t.leadId)],
 );

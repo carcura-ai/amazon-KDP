@@ -1,9 +1,9 @@
 import { useState, type FormEvent } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Link, useNavigate } from 'react-router';
-import { Plus } from 'lucide-react';
+import { Download, Plus, Upload } from 'lucide-react';
 import { get, post, patch, qs } from '../api/client';
-import type { Customer, Paged, DuplicateHit } from '../api/types';
+import type { Customer, Paged, DuplicateHit, ImportResult } from '../api/types';
 import { useAuth } from '../app/auth';
 import { Badge, Button, Card, Empty, Field, Input, Modal, PageHead, Pager, Select, Skeleton, Textarea, useDebounced, useToast } from '../components/ui';
 import { fmtDate, personName } from '../lib/format';
@@ -14,12 +14,13 @@ export function CustomersPage() {
   const [type, setType] = useState('');
   const [page, setPage] = useState(1);
   const [create, setCreate] = useState(false);
+  const [imp, setImp] = useState(false);
   const dq = useDebounced(q);
   const navigate = useNavigate();
   const list = useQuery({ queryKey: ['customers', { dq, type, page }], queryFn: () => get<Paged<Customer>>(`/api/customers${qs({ q: dq, type, page, pageSize: 50 })}`) });
   return (
     <>
-      <PageHead title="Kunden" sub="Alle Kundenakten mit Fahrzeugen, Historie und Dokumenten." actions={can('customers:write') ? <Button variant="primary" onClick={() => setCreate(true)}><Plus /> Kunde anlegen</Button> : null} />
+      <PageHead title="Kunden" sub="Alle Kundenakten mit Fahrzeugen, Historie und Dokumenten." actions={<><a className="btn" href="/api/export/customers.csv" title="Alle Kunden als CSV (Excel) herunterladen"><Download /> CSV</a>{can('customers:write') ? <Button onClick={() => setImp(true)}><Upload /> Import</Button> : null}{can('customers:write') ? <Button variant="primary" onClick={() => setCreate(true)}><Plus /> Kunde anlegen</Button> : null}</>} />
       <Card tight>
         <div className="toolbar">
           <input type="search" placeholder="Name, Firma, Kundennummer, Telefon, Ort …" value={q} onChange={(e) => { setQ(e.target.value); setPage(1); }} />
@@ -50,6 +51,7 @@ export function CustomersPage() {
         )}
       </Card>
       {create ? <CustomerForm onClose={() => setCreate(false)} /> : null}
+      {imp ? <ImportModal kind="customers" onClose={() => setImp(false)} /> : null}
     </>
   );
 }
@@ -108,6 +110,43 @@ export function CustomerForm({ customer, onClose }: { customer?: Customer; onClo
         </div>
         <div className="form-actions"><Button type="button" onClick={onClose}>Abbrechen</Button><Button type="submit" variant="primary" loading={m.isPending}>{customer ? 'Speichern' : 'Anlegen'}</Button></div>
       </form>
+    </Modal>
+  );
+}
+
+/** CSV-Import (Kunden oder Leads): Datei wählen → Vorschau mit Duplikaten → Import. */
+export function ImportModal({ kind, onClose }: { kind: 'customers' | 'leads'; onClose: () => void }) {
+  const qc = useQueryClient();
+  const toast = useToast();
+  const [csv, setCsv] = useState<string | null>(null);
+  const [fileName, setFileName] = useState('');
+  const [preview, setPreview] = useState<ImportResult | null>(null);
+  const run = useMutation({
+    mutationFn: (dryRun: boolean) => post<ImportResult>(`/api/import/${kind}`, { csv, dryRun }),
+    onSuccess: (r) => { if (r.dryRun) setPreview(r); else { qc.invalidateQueries({ queryKey: [kind] }); qc.invalidateQueries({ queryKey: ['dashboard'] }); toast.ok(`${r.created} ${kind === 'customers' ? 'Kunden' : 'Leads'} importiert${r.skipped.length ? `, ${r.skipped.length} übersprungen` : ''}`); onClose(); } },
+    onError: (e) => toast.fromError(e, 'Import'),
+  });
+  const onFile = (file: File | undefined) => {
+    if (!file) return;
+    setFileName(file.name); setPreview(null);
+    const reader = new FileReader();
+    reader.onload = () => { const text = String(reader.result ?? ''); setCsv(text); };
+    reader.readAsText(file, 'utf-8');
+  };
+  return (
+    <Modal title={kind === 'customers' ? 'Kunden aus CSV importieren' : 'Leads aus CSV importieren'} onClose={onClose}>
+      <p className="muted small">CSV mit Kopfzeile (Semikolon, Komma oder Tabulator). Erkannte Spalten: Vorname, Nachname, Firma, E-Mail, Telefon, Straße, Hausnummer, PLZ, Ort, Notizen, Typ, Quelle{kind === 'customers' ? ', Kennzeichen, Marke, Modell' : ', Leistung, Nachricht'}. Einträge mit bereits vorhandener E-Mail oder Telefonnummer werden übersprungen – es entstehen keine Duplikate.</p>
+      <div className="stack" style={{ marginTop: 12 }}>
+        <input type="file" accept=".csv,text/csv,text/plain" onChange={(e) => onFile(e.target.files?.[0])} />
+        {csv && !preview ? <Button onClick={() => run.mutate(true)} loading={run.isPending}>Vorschau prüfen ({fileName})</Button> : null}
+        {preview ? (
+          <div className="stack" style={{ gap: 8 }}>
+            <div className="row"><Badge tone="ok">{preview.created} neu</Badge><Badge tone={preview.skipped.length ? 'warn' : ''}>{preview.skipped.length} übersprungen</Badge><span className="muted small">{preview.total} Zeilen · Spalten: {Object.keys(preview.columns).join(', ') || 'keine'}</span></div>
+            {preview.skipped.length ? <div className="table-wrap" style={{ maxHeight: 220, overflow: 'auto' }}><table className="table"><thead><tr><th>Zeile</th><th>Name</th><th>Grund</th></tr></thead><tbody>{preview.skipped.slice(0, 100).map((s) => <tr key={s.row}><td className="mono">{s.row}</td><td>{s.name}</td><td className="muted">{s.reason}</td></tr>)}</tbody></table></div> : null}
+          </div>
+        ) : null}
+      </div>
+      <div className="form-actions"><Button type="button" onClick={onClose}>Abbrechen</Button>{preview && preview.created > 0 ? <Button variant="primary" loading={run.isPending} onClick={() => run.mutate(false)}>{preview.created} importieren</Button> : null}</div>
     </Modal>
   );
 }

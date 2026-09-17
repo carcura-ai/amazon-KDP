@@ -1,6 +1,6 @@
 import { useState, type FormEvent } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { ChevronLeft, ChevronRight, Plus, Pencil, Trash2, Repeat } from 'lucide-react';
+import { Download, ChevronLeft, ChevronRight, Plus, Pencil, Trash2, Repeat } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, Legend } from 'recharts';
 import { get, post, patch, del, qs } from '../api/client';
 import type { Expense, FinanceOverview, RecurringExpense, ServicePricing } from '../api/types';
@@ -104,7 +104,7 @@ function ExpensesTab() {
   const q = useQuery({ queryKey: ['expenses', from, to, category], queryFn: () => get<{ items: Expense[]; total: number; sumNetCents: number; sumGrossCents: number }>(`/api/expenses${qs({ from, to, category, pageSize: 200 })}`) });
   const doDelete = useMutation({ mutationFn: (id: string) => del(`/api/expenses/${id}`), onSuccess: () => { qc.invalidateQueries({ queryKey: ['expenses'] }); qc.invalidateQueries({ queryKey: ['finance'] }); toast.ok('Ausgabe gelöscht'); setRemove(null); }, onError: (e) => toast.fromError(e) });
   return (
-    <Card tight title="Ausgaben" actions={can('finance:write') ? <Button size="sm" variant="primary" onClick={() => setEdit({ date: toDateInput(new Date()), vatBp: 1900, isPaid: true, paymentMethod: 'transfer', category: 'Material' })}><Plus /> Ausgabe erfassen</Button> : null}>
+    <Card tight title="Ausgaben" actions={<div className="row"><a className="btn sm" href={`/api/export/expenses.csv?from=${from}&to=${to}`} title="Ausgaben im Zeitraum als CSV"><Download /> CSV</a>{can('finance:write') ? <Button size="sm" variant="primary" onClick={() => setEdit({ date: toDateInput(new Date()), vatBp: 1900, isPaid: true, paymentMethod: 'transfer', category: 'Material' })}><Plus /> Ausgabe erfassen</Button> : null}</div>}>
       <div className="toolbar"><Input type="date" value={from} onChange={(e) => setFrom(e.target.value)} style={{ width: 'auto' }} /><span className="muted">bis</span><Input type="date" value={to} onChange={(e) => setTo(e.target.value)} style={{ width: 'auto' }} /><Select value={category} onChange={(e) => setCategory(e.target.value)}><option value="">Alle Kategorien</option>{CATEGORIES.map((c) => <option key={c}>{c}</option>)}</Select>{q.data ? <span className="muted small" style={{ marginLeft: 'auto' }}>{q.data.total} Buchungen · netto {fmtMoney(q.data.sumNetCents)} · brutto {fmtMoney(q.data.sumGrossCents)}</span> : null}</div>
       {q.isLoading ? <Skeleton /> : q.data?.items.length === 0 ? <Empty title="Keine Ausgaben im Zeitraum" /> : (
         <div className="table-wrap"><table className="table">

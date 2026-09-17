@@ -2,6 +2,8 @@ import type { FastifyInstance } from 'fastify';
 import { and, eq, gte, lt, sql } from 'drizzle-orm';
 import { leads, customers, vehicles, appointments, orders, invoices, expenses, inventoryItems } from '../../db/schema.js';
 import { ctxOf } from '../../plugins/auth.js';
+import { taskStats } from '../tasks/routes.js';
+import { tasks } from '../../db/schema.js';
 
 /**
  * Dashboard-Kennzahlen. Es werden ausschließlich Werte geliefert, die aus echten
@@ -89,8 +91,12 @@ export default async function dashboardRoutes(app: FastifyInstance) {
     if (ordersReady > 0) hints.push({ level: 'info', kind: 'fact', text: `${ordersReady} fertige${ordersReady === 1 ? 'r' : ''} Auftr${ordersReady === 1 ? 'ag wartet' : 'äge warten'} auf Abholung.` });
     if (leadsLastWeek > 0 && leadsThisWeek > leadsLastWeek) hints.push({ level: 'info', kind: 'calc', text: `Leads liegen diese Woche mit ${leadsThisWeek} über der Vorwoche (${leadsLastWeek}).` });
 
+    const tStats = taskStats(app.db, ctx.companyId, now);
+    const taskItems = app.db.select({ id: tasks.id, title: tasks.title, dueAt: tasks.dueAt, priority: tasks.priority, customerId: tasks.customerId, leadId: tasks.leadId }).from(tasks)
+      .where(and(eq(tasks.companyId, ctx.companyId), eq(tasks.status, 'open'), lt(tasks.dueAt, tomorrow))).orderBy(sql`${tasks.dueAt}`).limit(8).all();
     return {
       generatedAt: now.toISOString(),
+      tasks: { ...tStats, items: taskItems },
       leads: { today: leadsToday, thisWeek: leadsThisWeek, lastWeek: leadsLastWeek, thisMonth: leadsThisMonth, open: openLeads, new: newLeads, conversionRateMonth: closedThisMonth > 0 ? Math.round((wonThisMonth / closedThisMonth) * 1000) / 10 : null, bySource },
       customers: { total: customersTotal, thisMonth: customersThisMonth },
       appointments: { today: appointmentsToday, next7Days: appointmentsWeek, next: nextAppointments },

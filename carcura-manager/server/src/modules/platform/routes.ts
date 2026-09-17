@@ -26,11 +26,20 @@ const createSchema = z.object({
 export default async function platformRoutes(app: FastifyInstance) {
   app.get('/api/platform/companies', { preHandler: app.requirePlatformAdmin() }, async () => {
     const rows = app.db
-      .select({ company: companies, userCount: sql<number>`(select count(*) from users u where u.company_id = ${companies.id})` })
+      .select({
+        company: companies,
+        userCount: sql<number>`(select count(*) from users u where u.company_id = companies.id)`,
+        customerCount: sql<number>`(select count(*) from customers c where c.company_id = companies.id)`,
+        leadCount: sql<number>`(select count(*) from leads l where l.company_id = companies.id)`,
+        invoiceCount: sql<number>`(select count(*) from invoices i where i.company_id = companies.id and i.status != 'draft')`,
+        invoiceTotalCents: sql<number>`(select coalesce(sum(total_cents),0) from invoices i where i.company_id = companies.id and i.status in ('open','sent','overdue','paid'))`,
+        filesBytes: sql<number>`(select coalesce(sum(size_bytes),0) from files f where f.company_id = companies.id)`,
+        lastLoginAt: sql<string | null>`(select max(last_login_at) from users u where u.company_id = companies.id)`,
+      })
       .from(companies)
       .orderBy(companies.name)
       .all();
-    return { items: rows.map((r) => ({ ...publicCompany(r.company), userCount: r.userCount })), version: app.appVersion };
+    return { items: rows.map(({ company, ...stats }) => ({ ...publicCompany(company), ...stats })), version: app.appVersion };
   });
 
   app.post('/api/platform/companies', { preHandler: app.requirePlatformAdmin() }, async (req) => {

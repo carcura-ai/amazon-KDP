@@ -1,8 +1,10 @@
-import { useState, type FormEvent } from 'react';
+import { useEffect, useState, type FormEvent } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { useNavigate, useLocation } from 'react-router';
 import { LogIn } from 'lucide-react';
-import { post } from '../api/client';
-import { useAuth } from '../app/auth';
+import { get, post } from '../api/client';
+import type { Branding } from '../api/types';
+import { useAuth, applyBranding } from '../app/auth';
 import { Button, Field, Input } from '../components/ui';
 
 export function LoginPage() {
@@ -13,6 +15,9 @@ export function LoginPage() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  const branding = useQuery({ queryKey: ['branding'], queryFn: () => get<Branding>(`/api/branding${new URLSearchParams(window.location.search).get('mandant') ? `?slug=${encodeURIComponent(new URLSearchParams(window.location.search).get('mandant') ?? '')}` : ''}`), staleTime: 60_000 });
+  const b = branding.data;
+  useEffect(() => { if (b) { applyBranding(b.primaryColor, b.secondaryColor); document.title = `${b.name} · ${b.productName}`; } }, [b]);
 
   const submit = async (e: FormEvent) => {
     e.preventDefault();
@@ -34,10 +39,10 @@ export function LoginPage() {
       <div className="card auth-card">
         <div className="card-body">
           <div className="auth-logo">
-            <div className="brand-mark">M</div>
+            <div className="brand-mark" style={b?.hasLogo ? { background: '#fff' } : undefined}>{b?.hasLogo ? <img src={`/api/branding/logo${b.slug ? `?slug=${encodeURIComponent(b.slug)}` : ''}`} alt="" style={{ objectFit: 'contain', padding: 3, width: '100%', height: '100%' }} /> : (b?.name ?? 'M').charAt(0)}</div>
             <div>
               <h1>Anmelden</h1>
-              <p className="muted small">Zugang zum Management-System</p>
+              <p className="muted small">{b ? `${b.name} · ${b.productName}` : 'Zugang zum Management-System'}</p>
             </div>
           </div>
           <form onSubmit={submit} className="stack">
@@ -45,6 +50,7 @@ export function LoginPage() {
             <Field label="Passwort" error={error ?? undefined}><Input type="password" autoComplete="current-password" required value={password} onChange={(e) => setPassword(e.target.value)} /></Field>
             <Button type="submit" variant="primary" className="block" loading={busy}><LogIn /> Anmelden</Button>
           </form>
+          {b?.poweredBy ? <p className="small dim" style={{ textAlign: 'center', marginTop: 14 }}>{b.poweredBy}</p> : null}
         </div>
       </div>
     </div>

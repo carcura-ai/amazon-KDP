@@ -1,4 +1,5 @@
 import { useState, type FormEvent } from 'react';
+import { Download } from 'lucide-react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Link, useNavigate } from 'react-router';
 import { get, post, patch, qs } from '../api/client';
@@ -16,7 +17,7 @@ export function VehiclesPage() {
   const list = useQuery({ queryKey: ['vehicles', { dq, page }], queryFn: () => get<Paged<Row>>(`/api/vehicles${qs({ q: dq, page, pageSize: 50 })}`) });
   return (
     <>
-      <PageHead title="Fahrzeuge" sub="Alle Fahrzeuge der Kunden. Neue Fahrzeuge werden in der Kundenakte angelegt." />
+      <PageHead title="Fahrzeuge" sub="Alle Fahrzeuge der Kunden. Neue Fahrzeuge werden in der Kundenakte angelegt." actions={<a className="btn" href="/api/export/vehicles.csv"><Download /> CSV</a>} />
       <Card tight>
         <div className="toolbar"><input type="search" placeholder="Kennzeichen, Marke, Modell, VIN …" value={q} onChange={(e) => { setQ(e.target.value); setPage(1); }} /></div>
         {list.isLoading ? <Skeleton rows={6} /> : list.data && list.data.items.length === 0 ? <Empty title="Keine Fahrzeuge" text="Fahrzeuge werden in der Kundenakte hinzugefügt." /> : (

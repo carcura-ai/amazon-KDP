@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { NavLink, Outlet, useLocation, useNavigate } from 'react-router';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { LayoutDashboard, Users, UserPlus, Car, Settings, LogOut, Menu, Search, ShieldCheck, Building2, CalendarDays, ClipboardList, FileText, Receipt, Package, PiggyBank, Megaphone, BarChart3, Sparkles, Radar } from 'lucide-react';
+import { LayoutDashboard, Users, UserPlus, Car, Settings, LogOut, Menu, Search, ShieldCheck, Building2, CalendarDays, ClipboardList, FileText, Receipt, Package, PiggyBank, Megaphone, BarChart3, CheckSquare, Sparkles, Radar } from 'lucide-react';
 import { useAuth } from './auth';
 import { get, post, qs } from '../api/client';
 import type { SearchHit } from '../api/types';
@@ -14,6 +14,7 @@ const NAV = [
   { to: '/kunden', label: 'Kunden', icon: Users, perm: 'customers:read' },
   { to: '/fahrzeuge', label: 'Fahrzeuge', icon: Car, perm: 'vehicles:read' },
   { to: '/kalender', label: 'Kalender', icon: CalendarDays, perm: 'appointments:read' },
+  { to: '/aufgaben', label: 'Aufgaben', icon: CheckSquare, perm: 'tasks:read' },
   { to: '/auftraege', label: 'Aufträge', icon: ClipboardList, perm: 'orders:read' },
   { to: '/angebote', label: 'Angebote', icon: FileText, perm: 'offers:read' },
   { to: '/rechnungen', label: 'Rechnungen', icon: Receipt, perm: 'invoices:read' },
@@ -35,6 +36,8 @@ export function AppShell() {
 
   const leadStats = useQuery({ queryKey: ['leads', 'stats'], queryFn: () => get<{ byStatus: Record<string, number> }>('/api/leads/stats'), enabled: can('leads:read'), refetchInterval: 60_000 });
   const newLeads = leadStats.data?.byStatus.new ?? 0;
+  const taskStats = useQuery({ queryKey: ['tasks', 'stats'], queryFn: () => get<{ open: number; dueToday: number; overdue: number }>('/api/tasks/stats'), enabled: can('tasks:read'), refetchInterval: 60_000 });
+  const dueTasks = (taskStats.data?.dueToday ?? 0) + (taskStats.data?.overdue ?? 0);
 
   const logout = async () => {
     await post('/api/auth/logout');
@@ -53,7 +56,7 @@ export function AppShell() {
           <div className="brand-mark" style={me.company.logoFileId ? { background: '#fff' } : undefined}>{me.company.logoFileId ? <img src={`/api/company/logo?v=${me.company.logoFileId}`} alt="" style={{ objectFit: 'contain', padding: 3 }} /> : me.company.name.slice(0, 2).toUpperCase()}</div>
           <div style={{ minWidth: 0 }}>
             <div className="brand-name">{me.company.name}</div>
-            <div className="brand-sub">Manager</div>
+            <div className="brand-sub">{me.company.productName || 'Manager'}</div>
           </div>
         </div>
         <div className="nav-section">Arbeit</div>
@@ -62,6 +65,7 @@ export function AppShell() {
             <n.icon />
             <span>{n.label}</span>
             {n.to === '/leads' && newLeads > 0 ? <span className="count">{newLeads}</span> : null}
+            {n.to === '/aufgaben' && dueTasks > 0 ? <span className="count" style={taskStats.data?.overdue ? { background: 'var(--danger)', color: '#fff' } : undefined}>{dueTasks}</span> : null}
           </NavLink>
         ))}
         {can('settings:manage') || can('users:manage') ? (
@@ -82,6 +86,7 @@ export function AppShell() {
             </div>
             <button className="btn ghost icon" style={{ marginLeft: 'auto' }} onClick={logout} title="Abmelden" aria-label="Abmelden"><LogOut /></button>
           </div>
+          {me.company.poweredBy ? <div className="small dim" style={{ marginTop: 8, textAlign: 'center' }}>{me.company.poweredBy}</div> : null}
         </div>
       </aside>
       <div className="main">

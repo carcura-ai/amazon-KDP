@@ -38,6 +38,8 @@ const updateSchema = z.object({
   paymentTermsDays: z.number().int().min(0).max(120).optional(),
   reminderDaysBefore: z.number().int().min(0).max(30).optional(),
   settingsJson: z.record(z.string(), z.unknown()).optional(),
+  productName: zTrimmed(60).min(1).optional(),
+  poweredBy: zOptionalText(120),
 });
 
 export default async function companyRoutes(app: FastifyInstance) {

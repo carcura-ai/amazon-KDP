@@ -1,11 +1,11 @@
 import { useEffect, useState, type FormEvent } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Route, Routes, NavLink } from 'react-router';
-import { Plus, RefreshCw, Copy } from 'lucide-react';
+import { Download, DatabaseBackup, RefreshCw, Upload, Trash2 as TrashIcon, Plus, Copy } from 'lucide-react';
 import { get, post, patch, del } from '../api/client';
-import type { Company, User, Service } from '../api/types';
+import type { SystemStatus, BackupInfo, Company, User, Service } from '../api/types';
 import { useAuth, applyBranding } from '../app/auth';
-import { Badge, Button, Card, Confirm, Field, Input, Modal, PageHead, Select, Skeleton, Textarea, useToast } from '../components/ui';
+import { Badge, Button, Card, Confirm, Empty, Field, Input, Kpi, Modal, PageHead, Select, Skeleton, Textarea, useToast } from '../components/ui';
 import { fmtDateTime, fmtMoney, inputFromCents, centsFromInput, ROLE_LABEL } from '../lib/format';
 
 const PERM_LABEL: Record<string, string> = {
@@ -20,12 +20,13 @@ const PERM_LABEL: Record<string, string> = {
 export function SettingsPage() {
   const { can } = useAuth();
   const tabs = [
-    { to: '', label: 'Unternehmen & Branding', show: can('settings:manage') },
+    { to: '.', label: 'Unternehmen & Branding', show: can('settings:manage') },
     { to: 'leistungen', label: 'Leistungen', show: can('settings:manage') },
     { to: 'benutzer', label: 'Benutzer & Rollen', show: can('users:manage') },
     { to: 'email', label: 'E-Mail-Versand', show: can('integrations:manage') },
     { to: 'integrationen', label: 'Integrationen', show: can('integrations:manage') },
     { to: 'audit', label: 'Audit-Log', show: can('audit:read') },
+    { to: 'system', label: 'System & Sicherung', show: can('backups:manage') },
   ].filter((t) => t.show);
   return (
     <>
@@ -38,6 +39,7 @@ export function SettingsPage() {
         <Route path="email" element={<MailSettings />} />
         <Route path="integrationen" element={<IntegrationsSettings />} />
         <Route path="audit" element={<AuditLog />} />
+        <Route path="system" element={<SystemSettings />} />
       </Routes>
     </>
   );
@@ -84,6 +86,8 @@ function CompanySettings() {
             <div className="form-grid">
               <Field label="Hauptfarbe"><div className="row"><input type="color" value={f.primaryColor ?? '#E8F320'} onChange={(e) => setF({ ...f, primaryColor: e.target.value.toUpperCase() })} /><span className="mono">{f.primaryColor}</span></div></Field>
               <Field label="Sekundärfarbe (Text auf Hauptfarbe)"><div className="row"><input type="color" value={f.secondaryColor ?? '#0B0B0C'} onChange={(e) => setF({ ...f, secondaryColor: e.target.value.toUpperCase() })} /><span className="mono">{f.secondaryColor}</span></div></Field>
+              <Field label="Produktname (White-Label)" hint="Erscheint unter dem Firmennamen, im Browser-Titel und auf der Anmeldeseite."><Input value={f.productName ?? ''} onChange={set('productName')} placeholder="Manager" /></Field>
+              <Field label="Herstellerhinweis (optional)" hint="Kleiner Text in Seitenleiste und Anmeldung, z. B. „powered by …“"><Input value={f.poweredBy ?? ''} onChange={set('poweredBy')} /></Field>
             </div>
             <LogoUpload hasLogo={Boolean(f.logoFileId)} onChanged={async () => { qc.invalidateQueries({ queryKey: ['company'] }); await refresh(); setF(null); }} />
           </Card>
@@ -104,7 +108,7 @@ function CompanySettings() {
           </Card>
         </div>
       </div>
-      <div className="form-actions"><Button type="submit" variant="primary" loading={m.isPending}>Speichern</Button></div>
+      <div className="form-actions"><a className="btn" href="/api/export/company.json" style={{ marginRight: 'auto' }} title="Alle Daten des Mandanten als JSON (Datenportabilität, Archiv)"><Download /> Gesamtexport (JSON)</a><Button type="submit" variant="primary" loading={m.isPending}>Speichern</Button></div>
     </form>
   );
 }
@@ -423,5 +427,80 @@ function PlacesCard() {
       {q.data?.lastError ? <div className="dup-box" style={{ marginTop: 8 }}>{q.data.lastError}</div> : null}
       {open ? <form onSubmit={(e: FormEvent) => { e.preventDefault(); save.mutate(); }} style={{ marginTop: 14 }}><div className="form-grid"><Field label="API-Key" hint={q.data?.configured ? 'Leer lassen, um den gespeicherten Key zu behalten.' : undefined} className="span-2"><Input type="password" autoComplete="off" value={f.apiKey} onChange={(e) => setF({ ...f, apiKey: e.target.value })} placeholder={q.data?.configured ? '••••••' : ''} /></Field><Field label="Suchbegriffe (eine je Zeile)" className="span-2"><Textarea value={f.queries} onChange={(e) => setF({ ...f, queries: e.target.value })} /></Field><Field label="Umkreis (km)"><Input type="number" min={1} max={200} value={f.radiusKm} onChange={(e) => setF({ ...f, radiusKm: e.target.value })} /></Field><Field label="Eigene Place-ID (optional)"><Input value={f.ownPlaceId} onChange={(e) => setF({ ...f, ownPlaceId: e.target.value })} /></Field><Field label="Breitengrad (optional)"><Input value={f.lat} onChange={(e) => setF({ ...f, lat: e.target.value })} placeholder="50.94" /></Field><Field label="Längengrad (optional)"><Input value={f.lng} onChange={(e) => setF({ ...f, lng: e.target.value })} placeholder="6.96" /></Field></div><div className="form-actions">{q.data?.configured ? <Button type="button" variant="danger" style={{ marginRight: 'auto' }} onClick={() => remove.mutate()}>Entfernen</Button> : null}<Button type="submit" variant="primary" loading={save.isPending}>Speichern</Button></div></form> : null}
     </Card>
+  );
+}
+
+const fmtBytes = (n: number | null | undefined) => (n === null || n === undefined ? '–' : n < 1048576 ? `${Math.round(n / 1024)} KB` : n < 1073741824 ? `${(n / 1048576).toFixed(1)} MB` : `${(n / 1073741824).toFixed(2)} GB`);
+const BACKUP_KIND: Record<string, string> = { auto: 'automatisch', manual: 'manuell', 'pre-update': 'vor Update', 'pre-restore': 'vor Wiederherstellung' };
+const JOB_LABEL: Record<string, string> = { reminders: 'Terminerinnerungen', 'invoices.overdue': 'Überfällige Rechnungen', 'expenses.recurring': 'Wiederkehrende Kosten', 'marketing.sync': 'Marketing-Sync', 'reports.weekly': 'Wochenbericht', 'reports.monthly': 'Monatsbericht', 'reports.yearly': 'Jahresbericht', 'competitors.scan': 'Wettbewerber-Scan', 'backup.daily': 'Tagessicherung', 'sessions.cleanup': 'Sitzungsbereinigung' };
+
+function SystemSettings() {
+  const qc = useQueryClient();
+  const toast = useToast();
+  const q = useQuery({ queryKey: ['system-status'], queryFn: () => get<SystemStatus>('/api/system/status'), refetchInterval: 30_000 });
+  const backups = useQuery({ queryKey: ['system-backups'], queryFn: () => get<{ items: BackupInfo[] }>('/api/system/backups') });
+  const [restore, setRestore] = useState<BackupInfo | null>(null);
+  const [remove, setRemove] = useState<BackupInfo | null>(null);
+  const [update, setUpdate] = useState(false);
+  const [restarting, setRestarting] = useState<string | null>(null);
+  const refresh = () => { qc.invalidateQueries({ queryKey: ['system-status'] }); qc.invalidateQueries({ queryKey: ['system-backups'] }); };
+  const create = useMutation({ mutationFn: () => post<BackupInfo>('/api/system/backups'), onSuccess: (b) => { refresh(); toast.ok(`Sicherung erstellt (${fmtBytes(b.sizeBytes)})`); }, onError: (e) => toast.fromError(e, 'Sicherung') });
+  const doRemove = useMutation({ mutationFn: (name: string) => del(`/api/system/backups/${name}`), onSuccess: () => { refresh(); setRemove(null); toast.ok('Sicherung gelöscht'); }, onError: (e) => toast.fromError(e) });
+  const doRestore = useMutation({ mutationFn: (name: string) => post<{ staged: boolean; restarting: boolean }>(`/api/system/backups/${name}/restore`), onSuccess: (r) => { refresh(); setRestore(null); if (r.restarting) setRestarting('Wiederherstellung läuft – die Anwendung startet neu …'); else toast.ok('Wiederherstellung vorgemerkt. Sie wird beim nächsten Start der Anwendung ausgeführt.'); }, onError: (e) => toast.fromError(e, 'Wiederherstellung') });
+  const cancelRestore = useMutation({ mutationFn: () => post('/api/system/restore/cancel'), onSuccess: () => { refresh(); toast.ok('Wiederherstellung abgebrochen'); }, onError: (e) => toast.fromError(e) });
+  const upload = useMutation({
+    mutationFn: async (file: File) => { const fd = new FormData(); fd.append('file', file); const r = await fetch('/api/system/restore/upload', { method: 'POST', body: fd }); const body = await r.json().catch(() => ({})); if (!r.ok) throw new Error((body as { message?: string }).message ?? 'Upload fehlgeschlagen'); return body as { restarting: boolean }; },
+    onSuccess: (r) => { refresh(); if (r.restarting) setRestarting('Wiederherstellung läuft – die Anwendung startet neu …'); else toast.ok('Sicherung geprüft und vorgemerkt. Sie wird beim nächsten Start ausgeführt.'); }, onError: (e) => toast.fromError(e, 'Wiederherstellung'),
+  });
+  const doUpdate = useMutation({ mutationFn: () => post<{ backup: BackupInfo }>('/api/system/update'), onSuccess: (r) => { setUpdate(false); setRestarting(`Sicherung ${r.backup.name} erstellt. Update wird installiert, die Anwendung startet danach neu …`); }, onError: (e) => toast.fromError(e, 'Update') });
+  const restart = useMutation({ mutationFn: () => post('/api/system/restart'), onSuccess: () => setRestarting('Die Anwendung startet neu …'), onError: (e) => toast.fromError(e) });
+  useEffect(() => {
+    if (!restarting) return;
+    const t = setInterval(async () => { try { const r = await fetch('/api/health'); if (r.ok) { const j = (await r.json()) as { time: string }; if (new Date(j.time).getTime() > Date.now() - 20_000 && q.data && Date.parse(j.time) > Date.parse(q.data.startedAt) + 3000) { window.location.reload(); } } } catch { /* Server noch nicht erreichbar */ } }, 2500);
+    return () => clearInterval(t);
+  }, [restarting, q.data]);
+  const d = q.data;
+  if (q.isLoading || !d) return <Card><Skeleton /></Card>;
+  return (
+    <div className="stack" style={{ gap: 16 }}>
+      {restarting ? <Card><div className="row"><span className="spinner" /><b>{restarting}</b></div><p className="muted small" style={{ marginTop: 6 }}>Diese Seite lädt automatisch neu, sobald die Anwendung wieder erreichbar ist.</p></Card> : null}
+      {d.pendingRestore ? <Card><div className="spread"><div><b>Wiederherstellung vorgemerkt.</b> <span className="muted">Sie wird beim nächsten Start ausgeführt; der aktuelle Stand wird vorher gesichert.</span></div><Button variant="danger" onClick={() => cancelRestore.mutate()} loading={cancelRestore.isPending}>Abbrechen</Button></div></Card> : null}
+      <div className="grid cols-4">
+        <Kpi label="Letzte Sicherung" value={d.backups.last ? fmtDateTime(d.backups.last.createdAt) : '–'} delta={d.backups.last ? `${BACKUP_KIND[d.backups.last.kind]} · ${fmtBytes(d.backups.last.sizeBytes)}` : 'noch keine Sicherung'} tone={d.backups.last && Date.now() - Date.parse(d.backups.last.createdAt) > 2 * 86_400_000 ? 'down' : undefined} />
+        <Kpi label="Sicherungen" value={d.backups.count} delta={`${fmtBytes(d.backups.totalBytes)} · täglich 02:30, ${d.backups.keepAuto} automatische + ${d.backups.keepManual} manuelle werden behalten`} />
+        <Kpi label="Datenbestand" value={fmtBytes(d.usage.dbBytes + d.usage.filesBytes)} delta={`Datenbank ${fmtBytes(d.usage.dbBytes)} · Dateien ${fmtBytes(d.usage.filesBytes)}`} />
+        <Kpi label="Freier Speicher" value={fmtBytes(d.diskFreeBytes)} delta={`Version ${d.version} · Node ${d.node}`} tone={d.diskFreeBytes !== null && d.diskFreeBytes < 2 * 1073741824 ? 'down' : undefined} />
+      </div>
+      <div className="grid cols-2">
+        <Card title="Sicherungen" tight actions={<div className="row"><label className="btn sm" style={{ cursor: 'pointer' }}><Upload /> Sicherung hochladen<input type="file" accept=".zip" style={{ display: 'none' }} onChange={(e) => { const f = e.target.files?.[0]; if (f && window.confirm(`„${f.name}“ einspielen? Der aktuelle Datenbestand wird vorher gesichert und dann vollständig ersetzt.`)) upload.mutate(f); e.target.value = ''; }} /></label><Button size="sm" variant="primary" onClick={() => create.mutate()} loading={create.isPending}><DatabaseBackup /> Jetzt sichern</Button></div>}>
+          <p className="muted small" style={{ padding: '12px 14px 0' }}>Jede Sicherung enthält die komplette Datenbank und alle Dateien (Bilder, PDFs) als ZIP. Sicherungen regelmäßig auf ein externes Laufwerk oder in eine Cloud kopieren – ein Backup auf demselben Rechner schützt nicht vor Diebstahl oder Defekt.</p>
+          {d.backups.count === 0 ? <Empty title="Noch keine Sicherung" text="Die erste automatische Sicherung entsteht heute Nacht um 02:30 – oder jetzt manuell." /> : (
+            <div className="table-wrap"><table className="table">
+              <thead><tr><th>Zeitpunkt</th><th>Art</th><th className="num">Größe</th><th></th></tr></thead>
+              <tbody>{(backups.data?.items ?? []).map((b) => (
+                <tr key={b.name}><td>{fmtDateTime(b.createdAt)}</td><td><Badge plain>{BACKUP_KIND[b.kind] ?? b.kind}</Badge></td><td className="num">{fmtBytes(b.sizeBytes)}</td>
+                  <td className="num"><div className="row" style={{ justifyContent: 'flex-end' }}><a className="btn sm ghost" href={`/api/system/backups/${b.name}/download`} title="Herunterladen"><Download /></a><Button size="sm" variant="ghost" title="Wiederherstellen" onClick={() => setRestore(b)}><RefreshCw /></Button><Button size="sm" variant="ghost" title="Löschen" onClick={() => setRemove(b)}><TrashIcon /></Button></div></td></tr>
+              ))}</tbody>
+            </table></div>
+          )}
+        </Card>
+        <div className="stack" style={{ gap: 16 }}>
+          <Card title="Update und Neustart">
+            <p className="muted small">{d.launcher ? 'Die Anwendung läuft über das Startskript: Updates werden automatisch installiert (Sicherung → Code aktualisieren → Abhängigkeiten → Build → Neustart).' : 'Die Anwendung läuft nicht über das Startskript (start.cmd / start.sh). Updates: Anwendung beenden, danach scripts/update.cmd bzw. update.sh ausführen – das Skript sichert vorher automatisch.'}</p>
+            <div className="row" style={{ marginTop: 12 }}><Button variant="primary" disabled={!d.launcher} onClick={() => setUpdate(true)}><RefreshCw /> Update installieren</Button><Button disabled={!d.launcher} onClick={() => restart.mutate()} loading={restart.isPending}>Neu starten</Button></div>
+            <div className="small muted" style={{ marginTop: 12 }}>Läuft seit {fmtDateTime(d.startedAt)} · {d.platform} · {d.hostname}<br />Datenordner: <span className="mono">{d.dataDir}</span>{d.restoreLast ? <><br />Letzte Wiederherstellung: {fmtDateTime(d.restoreLast.restoredAt)} (Sicherheitskopie: <span className="mono">{d.restoreLast.safetyCopy}</span>)</> : null}</div>
+          </Card>
+          <Card title="Automatische Aufgaben" tight>
+            <div className="table-wrap"><table className="table">
+              <thead><tr><th>Aufgabe</th><th>Status</th><th>Zeitpunkt</th><th className="hide-mobile">Ergebnis</th></tr></thead>
+              <tbody>{d.jobs.slice(0, 15).map((j) => <tr key={j.id}><td>{JOB_LABEL[j.type] ?? j.type}</td><td><Badge tone={j.status === 'failed' ? 'danger' : j.status === 'done' ? 'ok' : 'info'}>{j.status === 'failed' ? 'Fehler' : j.status === 'done' ? 'ok' : 'läuft'}</Badge></td><td className="muted">{fmtDateTime(j.runAt)}</td><td className="hide-mobile small muted">{j.lastError ?? j.summary ?? '–'}</td></tr>)}</tbody>
+            </table></div>
+          </Card>
+        </div>
+      </div>
+      {restore ? <Confirm title="Sicherung wiederherstellen?" text={<>Der komplette Datenbestand (alle Mandanten, Dateien) wird durch den Stand vom <b>{fmtDateTime(restore.createdAt)}</b> ersetzt. Der aktuelle Stand wird vorher automatisch gesichert. {d.launcher ? 'Die Anwendung startet dafür neu.' : 'Die Wiederherstellung wird beim nächsten Start ausgeführt.'}</>} confirmLabel="Wiederherstellen" danger loading={doRestore.isPending} onConfirm={() => doRestore.mutate(restore.name)} onClose={() => setRestore(null)} /> : null}
+      {remove ? <Confirm title="Sicherung löschen?" text={`${remove.name} wird endgültig gelöscht.`} confirmLabel="Löschen" danger loading={doRemove.isPending} onConfirm={() => doRemove.mutate(remove.name)} onClose={() => setRemove(null)} /> : null}
+      {update ? <Confirm title="Update installieren?" text="Vorher wird eine vollständige Sicherung erstellt. Danach werden Code und Abhängigkeiten aktualisiert und die Anwendung neu gestartet. Das dauert je nach Internetverbindung einige Minuten; währenddessen ist die Anwendung nicht erreichbar." confirmLabel="Sicherung erstellen und Update starten" loading={doUpdate.isPending} onConfirm={() => doUpdate.mutate()} onClose={() => setUpdate(false)} /> : null}
+    </div>
   );
 }

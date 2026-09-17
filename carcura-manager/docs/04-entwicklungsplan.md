@@ -14,6 +14,8 @@
 | 10–11 | Lager (Bestände, Bewegungen, Mindestbestand), Finanzen (Ausgaben, wiederkehrende Kosten, Periodenübersicht, Hinweise mit Kennzeichnung) | erledigt |
 | 12–13 | Marketing-Adapter (Windsor.ai inkl. Meta-Lead-Import, Google Ads API, Meta Marketing API, GA4, Search Console), Marketing-Dashboard mit CRM-Attribution, Analyse-Hinweise | erledigt |
 | 14–16 | Berichte (Woche/Monat/Jahr, automatisch + manuell, PDF, Struktur Zahlen → Veränderung → Ursache → Empfehlung), Preisanalyse je Leistung, KI-Business-Assistent (Claude, nur Systemdaten über Werkzeuge), Wettbewerber-Monitoring (Google Places API, manuelle Einträge, wöchentlicher Scan) | erledigt |
-| 17–20 | White-Label, Betreiber-Admin, Backups, Deployment, Gesamttest, Doku | geplant |
+| 17–18 | Mandantenfähigkeit geprüft (jede Tabelle mit `company_id`, Betreiber-Ebene mit Kennzahlen je Mandant), White-Label (Produktname, Herstellerhinweis, Logo/Farben auf Anmeldeseite, PDFs, E-Mails), Aufgaben-Modul, CSV-Import/-Export, Gesamtexport (JSON) | erledigt |
+| 19 | Sicherungen (täglich 02:30, manuell, Download, Upload, Wiederherstellung mit Sicherheitskopie), Update aus der Oberfläche mit Sicherung davor, Start-/Update-/Installationsskripte (Windows, macOS, Linux), CLI für Wartung | erledigt |
+| 20 | Gesamttest: 61 Server-Tests, 8 Browser-Suiten (Desktop und Mobil, Überlaufprüfung), Dokumentation und README | erledigt |
 
 Jede Phase endet mit: Tests grün, Typecheck grün, Commit, Aktualisierung dieser Tabelle.

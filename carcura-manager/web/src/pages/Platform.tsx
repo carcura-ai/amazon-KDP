@@ -5,13 +5,13 @@ import { get, post, patch } from '../api/client';
 import type { Company } from '../api/types';
 import { useAuth } from '../app/auth';
 import { Badge, Button, Card, Field, Input, Modal, PageHead, Skeleton, useToast } from '../components/ui';
-import { fmtDate } from '../lib/format';
+import { fmtDate, fmtDateTime, fmtMoney } from '../lib/format';
 
 export function PlatformPage() {
   const { me } = useAuth();
   const qc = useQueryClient();
   const toast = useToast();
-  const q = useQuery({ queryKey: ['platform-companies'], queryFn: () => get<{ items: Array<Company & { userCount: number; createdAt: string }>; version: string }>('/api/platform/companies') });
+  const q = useQuery({ queryKey: ['platform-companies'], queryFn: () => get<{ items: Array<Company & { userCount: number; customerCount: number; leadCount: number; invoiceCount: number; invoiceTotalCents: number; filesBytes: number; lastLoginAt: string | null; createdAt: string }>; version: string }>('/api/platform/companies') });
   const [create, setCreate] = useState(false);
   const [f, setF] = useState({ name: '', city: '', primaryColor: '#E8F320', firstName: '', lastName: '', email: '', password: '' });
   const m = useMutation({
@@ -26,14 +26,19 @@ export function PlatformPage() {
       <Card tight>
         {q.isLoading ? <Skeleton /> : (
           <div className="table-wrap"><table className="table">
-            <thead><tr><th>Unternehmen</th><th>Slug</th><th className="num">Benutzer</th><th>Status</th><th>Angelegt</th><th></th></tr></thead>
+            <thead><tr><th>Unternehmen</th><th className="hide-mobile">Slug</th><th className="num">Benutzer</th><th className="num">Kunden</th><th className="num hide-mobile">Leads</th><th className="num hide-mobile">Rechnungen</th><th className="num hide-mobile">Dateien</th><th className="hide-mobile">Letzte Anmeldung</th><th>Status</th><th className="hide-mobile">Angelegt</th><th></th></tr></thead>
             <tbody>{q.data?.items.map((c) => (
               <tr key={c.id}>
                 <td><div className="row"><span style={{ width: 12, height: 12, borderRadius: 3, background: c.primaryColor }} /><span className="primary">{c.name}</span>{c.id === me?.company.id ? <span className="dim">(aktuell)</span> : null}</div></td>
-                <td className="mono muted">{c.slug}</td>
+                <td className="mono muted hide-mobile">{c.slug}</td>
                 <td className="num">{c.userCount}</td>
+                <td className="num">{c.customerCount}</td>
+                <td className="num hide-mobile">{c.leadCount}</td>
+                <td className="num hide-mobile">{c.invoiceCount}<div className="small muted">{fmtMoney(c.invoiceTotalCents)}</div></td>
+                <td className="num hide-mobile">{(c.filesBytes / 1048576).toFixed(1)} MB</td>
+                <td className="muted hide-mobile">{c.lastLoginAt ? fmtDateTime(c.lastLoginAt) : '–'}</td>
                 <td>{c.isActive ? <Badge tone="ok">aktiv</Badge> : <Badge tone="danger">deaktiviert</Badge>}</td>
-                <td className="muted">{fmtDate(c.createdAt)}</td>
+                <td className="muted hide-mobile">{fmtDate(c.createdAt)}</td>
                 <td className="num">{c.id !== me?.company.id ? <Button size="sm" variant={c.isActive ? 'danger' : undefined} onClick={() => toggle.mutate(c)}>{c.isActive ? 'Deaktivieren' : 'Aktivieren'}</Button> : null}</td>
               </tr>
             ))}</tbody>

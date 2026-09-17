@@ -5,6 +5,7 @@ export interface Company {
   bankName: string | null; iban: string | null; bic: string | null; logoFileId: string | null; primaryColor: string; secondaryColor: string;
   currency: string; locale: string; timezone: string; invoicePrefix: string; offerPrefix: string; customerPrefix: string; defaultVatBp: number;
   smallBusiness: boolean; invoiceFooter: string | null; paymentTermsDays: number; reminderDaysBefore: number; settingsJson: string; isActive: boolean;
+  productName: string; poweredBy: string | null;
 }
 export interface Me { user: User; company: Company; permissions: string[] }
 export interface Paged<T> { items: T[]; total: number; page: number; pageSize: number }
@@ -40,6 +41,7 @@ export interface Dashboard {
   finance: { revenueNetMonthCents: number; expensesNetMonthCents: number; profitNetMonthCents: number; lowStockCount: number };
   revenue: { todayCents: number; weekCents: number; monthCents: number; yearCents: number; monthCount: number; openCents: number; openCount: number; overdueCents: number; overdueCount: number };
   vehicles: { total: number };
+  tasks: { open: number; dueToday: number; overdue: number; items: Array<{ id: string; title: string; dueAt: string | null; priority: string; customerId: string | null; leadId: string | null }> };
   recentLeads: Lead[];
   hints: Array<{ level: 'info' | 'warn'; kind: 'fact' | 'calc'; text: string }>;
 }
@@ -117,3 +119,21 @@ export interface ReportContent { type: string; period: { from: string; to: strin
 export interface ReportRow { id: string; type: string; periodStart: string; periodEnd: string; title: string; summary: string | null; pdfFileId: string | null; sentTo: string | null; generatedAt: string }
 export interface Competitor { id: string; name: string; address: string | null; website: string | null; phone: string | null; source: string; isOwn: boolean; notes: string | null; firstSeenAt: string; lastSeenAt: string | null; latest: { date: string; rating: number | null; ratingCount: number | null; businessStatus: string | null } | null; ratingChange30: number | null; reviewsChange30: number | null; reviewsChange7: number | null; isNew: boolean; history: Array<{ date: string; rating: number | null; ratingCount: number | null }> }
 export interface ServicePricing { serviceId: string; name: string; category: string | null; priceCents: number; materialCostCents: number; durationMinutes: number; bookings90: number; bookingsPrev90: number; revenue90Cents: number; avgPriceCents: number | null; marginCents: number; marginPct: number | null; hourlyYieldCents: number | null; demandTrendPct: number | null; hints: string[] }
+
+export interface Task {
+  id: string; title: string; description: string | null; status: 'open' | 'done'; priority: 'low' | 'normal' | 'high'; dueAt: string | null;
+  assignedUserId: string | null; customerId: string | null; leadId: string | null; vehicleId: string | null; orderId: string | null; createdByUserId: string | null;
+  completedAt: string | null; createdAt: string; updatedAt: string;
+  assignedName: string | null; customerName: string | null; leadName: string | null; orderNumber: string | null; vehiclePlate: string | null;
+}
+export interface TaskStats { open: number; dueToday: number; overdue: number }
+export interface BackupInfo { name: string; kind: 'auto' | 'manual' | 'pre-update' | 'pre-restore'; createdAt: string; sizeBytes: number }
+export interface SystemStatus {
+  version: string; node: string; platform: string; hostname: string; uptimeSeconds: number; startedAt: string; dataDir: string;
+  usage: { dbBytes: number; filesBytes: number; backupsBytes: number }; diskFreeBytes: number | null;
+  backups: { count: number; last: BackupInfo | null; lastAuto: BackupInfo | null; totalBytes: number; keepAuto: number; keepManual: number };
+  pendingRestore: boolean; restoreLast: { restoredAt: string; safetyCopy: string } | null; launcher: boolean;
+  jobs: Array<{ id: string; type: string; status: string; runAt: string; finishedAt: string | null; lastError: string | null; summary: string | null }>;
+}
+export interface Branding { name: string; productName: string; primaryColor: string; secondaryColor: string; hasLogo: boolean; slug: string | null; poweredBy: string | null }
+export interface ImportResult { total: number; created: number; skipped: Array<{ row: number; name: string; reason: string }>; columns: Record<string, string>; dryRun: boolean }

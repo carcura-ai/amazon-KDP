@@ -5,6 +5,7 @@ import { ArrowRightLeft, Pencil, Trash2 } from 'lucide-react';
 import { get, post, patch, del } from '../api/client';
 import type { Lead, Activity, DuplicateHit, Customer } from '../api/types';
 import { useAuth } from '../app/auth';
+import { TaskPanel } from './Tasks';
 import { Badge, Button, Card, Confirm, Field, Modal, PageHead, Select, Skeleton, Textarea, useToast } from '../components/ui';
 import { fmtDateTime, fmtMoney, LEAD_SOURCE, LEAD_STATUS, personName } from '../lib/format';
 import { LeadForm } from './Leads';
@@ -88,6 +89,7 @@ export function LeadDetailPage() {
             ) : <Badge tone={LEAD_STATUS[lead.status]?.tone}>{LEAD_STATUS[lead.status]?.label}</Badge>}
             <p className="small dim" style={{ marginTop: 10 }}>Letzter Kontakt: {fmtDateTime(lead.lastContactAt)}</p>
           </Card>
+          <TaskPanel filter={{ leadId: id }} />
           <Card title="Kontakt">
             <dl className="dl">
               <dt>Typ</dt><dd>{lead.customerType === 'business' ? 'Firmenkunde' : 'Privatkunde'}</dd>

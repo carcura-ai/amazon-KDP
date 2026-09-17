@@ -4,11 +4,11 @@ import { openDatabase } from '../src/db/index.js';
 import { buildApp } from '../src/app.js';
 import { SESSION_COOKIE } from '../src/plugins/auth.js';
 
-export async function testApp(): Promise<FastifyInstance> {
+export async function testApp(extra: { exitFn?: (code: number, reason: string) => void; dbPath?: string } = {}): Promise<FastifyInstance> {
   const dataDir = `/tmp/cm-test/${process.pid}-${Math.random().toString(36).slice(2)}`;
-  const config = loadConfig({ dbPath: ':memory:', appSecret: 'test-secret-test-secret-test-secret-1234', dataDir, filesDir: `${dataDir}/files`, backupsDir: `${dataDir}/backups`, logLevel: 'silent', chromiumPath: process.env.CHROMIUM_PATH ?? '/opt/pw-browsers/chromium' });
-  const dbHandle = openDatabase(':memory:');
-  return buildApp({ config, dbHandle, logger: false });
+  const config = loadConfig({ dbPath: extra.dbPath ?? ':memory:', appSecret: 'test-secret-test-secret-test-secret-1234', dataDir, filesDir: `${dataDir}/files`, backupsDir: `${dataDir}/backups`, logLevel: 'silent', chromiumPath: process.env.CHROMIUM_PATH ?? '/opt/pw-browsers/chromium' });
+  const dbHandle = openDatabase(extra.dbPath ?? ':memory:');
+  return buildApp({ config, dbHandle, logger: false, exitFn: extra.exitFn ?? (() => undefined) });
 }
 
 export interface Session {

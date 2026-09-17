@@ -1,10 +1,11 @@
 import { useState, type FormEvent } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Link, useNavigate } from 'react-router';
-import { Plus } from 'lucide-react';
+import { Download, Plus, Upload } from 'lucide-react';
 import { get, post, patch, qs } from '../api/client';
 import type { Lead, Paged, DuplicateHit } from '../api/types';
 import { useAuth } from '../app/auth';
+import { ImportModal } from './Customers';
 import { Badge, Button, Card, Empty, Field, Input, Modal, PageHead, Pager, Select, Skeleton, Textarea, useDebounced, useToast } from '../components/ui';
 import { fmtRelative, LEAD_SOURCE, LEAD_STATUS, personName } from '../lib/format';
 
@@ -16,13 +17,14 @@ export function LeadsPage() {
   const [open, setOpen] = useState(true);
   const [page, setPage] = useState(1);
   const [create, setCreate] = useState(false);
+  const [imp, setImp] = useState(false);
   const dq = useDebounced(q);
   const navigate = useNavigate();
   const list = useQuery({ queryKey: ['leads', { dq, status, source, open, page }], queryFn: () => get<Paged<Lead>>(`/api/leads${qs({ q: dq, status, source, open: open && !status ? true : undefined, page, pageSize: 50 })}`) });
 
   return (
     <>
-      <PageHead title="Leads" sub="Anfragen aus Website, Werbung und Telefon – vom Erstkontakt bis zum Auftrag." actions={can('leads:write') ? <Button variant="primary" onClick={() => setCreate(true)}><Plus /> Lead anlegen</Button> : null} />
+      <PageHead title="Leads" sub="Anfragen aus Website, Werbung und Telefon – vom Erstkontakt bis zum Auftrag." actions={<><a className="btn" href="/api/export/leads.csv" title="Alle Leads als CSV herunterladen"><Download /> CSV</a>{can('leads:write') ? <Button onClick={() => setImp(true)}><Upload /> Import</Button> : null}{can('leads:write') ? <Button variant="primary" onClick={() => setCreate(true)}><Plus /> Lead anlegen</Button> : null}</>} />
       <Card tight>
         <div className="toolbar">
           <input type="search" placeholder="Name, E-Mail, Telefon, Fahrzeug …" value={q} onChange={(e) => { setQ(e.target.value); setPage(1); }} />
@@ -62,6 +64,7 @@ export function LeadsPage() {
         )}
       </Card>
       {create ? <LeadForm onClose={() => setCreate(false)} /> : null}
+      {imp ? <ImportModal kind="leads" onClose={() => setImp(false)} /> : null}
     </>
   );
 }
