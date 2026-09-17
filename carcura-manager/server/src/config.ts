@@ -27,8 +27,8 @@ function readInt(name: string, fallback: number): number {
 }
 
 /**
- * Liefert das Anwendungsgeheimnis. In Produktion muss APP_SECRET gesetzt sein.
- * Lokal wird beim ersten Start ein Schlüssel erzeugt und im Datenordner abgelegt,
+ * Liefert das Anwendungsgeheimnis: APP_SECRET aus der Umgebung oder ein beim ersten Start
+ * erzeugter Schlüssel im Datenordner,
  * damit Sessions und verschlüsselte Zugangsdaten Neustarts überstehen.
  */
 function resolveSecret(dataDir: string, isProduction: boolean): string {
@@ -37,12 +37,15 @@ function resolveSecret(dataDir: string, isProduction: boolean): string {
     if (fromEnv.length < 32) throw new Error('APP_SECRET muss mindestens 32 Zeichen lang sein.');
     return fromEnv;
   }
-  if (isProduction) throw new Error('APP_SECRET ist in Produktion Pflicht.');
+  // Ohne APP_SECRET wird ein zufälliger Schlüssel erzeugt und im Datenordner abgelegt (nur für den
+  // Besitzer lesbar). Das ist für den Laptop-Betrieb die richtige Lösung. Auf einem Server, der aus
+  // dem Internet erreichbar ist, sollte APP_SECRET in der .env gesetzt und separat gesichert werden.
   const keyFile = path.join(dataDir, 'app-secret.key');
   if (fs.existsSync(keyFile)) return fs.readFileSync(keyFile, 'utf8').trim();
   const secret = crypto.randomBytes(48).toString('base64url');
   fs.mkdirSync(dataDir, { recursive: true });
   fs.writeFileSync(keyFile, secret, { mode: 0o600 });
+  if (isProduction && (process.env.HOST ?? '127.0.0.1') !== '127.0.0.1') console.warn('Hinweis: Kein APP_SECRET gesetzt – Schlüssel wurde unter data/app-secret.key erzeugt. Diese Datei separat sichern.');
   return secret;
 }
 

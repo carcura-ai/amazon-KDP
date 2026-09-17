@@ -250,6 +250,7 @@ Diesen Schritt können wir gemeinsam erledigen, sobald die öffentliche Adresse 
 | Fehler mit `EPERM`, `operation not permitted` oder `Failed to remove some directories` | Dateien sind durch OneDrive oder den Virenscanner gesperrt. Ordner nach `C:\Carcura\` verschieben, Ordner `node_modules` löschen, `install.cmd` erneut starten |
 | Fehler mit `node-gyp`, `Visual Studio`, `better-sqlite3` | Veraltete Programmversion. Aktuelle ZIP verwenden – die Datenbank braucht seit Version 0.2 keine Kompilierung mehr |
 | Seite `127.0.0.1:4800` lädt nicht | Läuft `start.cmd`? Steht dort ein Fehler? Ist Port 4800 belegt? Dann in `.env` z. B. `PORT=4810` setzen |
+| `APP_SECRET ist in Produktion Pflicht` beim Start | Nur in Version 0.2.0: In `carcura-manager\.env` eine Zeile `APP_SECRET=` mit mindestens 32 beliebigen Zeichen ergänzen, oder die aktuelle Version installieren |
 | „Build fehlt“ beim Start | `install.cmd` wurde nicht bis zum Ende ausgeführt, erneut starten |
 | PDF wird nicht erzeugt | Chromium fehlt. In der Eingabeaufforderung im Ordner `carcura-manager` ausführen: `npx playwright install chromium`. Alternativ in `.env` `CHROMIUM_PATH=C:\Program Files\Google\Chrome\Application\chrome.exe` |
 | Testmail kommt nicht an | Server, Port und Verschlüsselung prüfen; bei web.de/GMX den Zugriff für E-Mail-Programme freischalten; Fehlertext steht unter E-Mail-Versand → Versandprotokoll |
