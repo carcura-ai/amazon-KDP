@@ -30,7 +30,7 @@ Das Startskript hält die Anwendung am Laufen und führt Neustart und Update aus
 | `docs/` | Bestandsanalyse, Architektur, Datenmodell, Entwicklungsplan, Betriebshandbuch |
 | `scripts/` | Installation, Start, Update (Windows `.cmd`, macOS/Linux `.sh`) |
 | `e2e/` | Browser-Tests (Playwright) gegen einen laufenden Server, Demo-Daten-Skripte |
-| `app/` | Native iPhone-App (Capacitor), Verteilung über TestFlight – siehe `app/README.md` |
+| `app/` | Optionale native iPhone-Hülle (Capacitor). Empfohlen ist die Web-App auf dem Home-Bildschirm, siehe `ANLEITUNG.md` |
 | `data/` | Datenbank, Dateien, Sicherungen, Schlüssel (nicht im Git) |
 
 ## Entwicklung

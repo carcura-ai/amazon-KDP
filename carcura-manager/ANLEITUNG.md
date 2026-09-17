@@ -166,11 +166,28 @@ Alle Punkte findest du links unter **Einstellungen**.
 | Montags | Wochenbericht unter Berichte lesen (kommt automatisch um 6 Uhr) |
 | Monatsende | Rechnungen → CSV und Finanzen → Ausgaben → CSV an den Steuerberater |
 
-**Vom Smartphone oder Tablet im selben WLAN:** In der Datei `carcura-manager\.env` die Zeile
-`HOST=127.0.0.1` in `HOST=0.0.0.0` ändern, Programm neu starten. Dann am Handy
-`http://<IP-Adresse-des-Laptops>:4800` öffnen. Die IP-Adresse zeigt `ipconfig` in der
-Eingabeaufforderung (Zeile „IPv4-Adresse“, z. B. `192.168.178.20`). Am Handy die Seite
-„Zum Startbildschirm hinzufügen“ – dann verhält sie sich wie eine App.
+### Auf dem iPhone oder iPad als App installieren (2 Minuten)
+Der Manager lässt sich auf dem Home-Bildschirm wie eine App ablegen: eigenes Icon, Vollbild ohne
+Safari-Leiste, eigener Startbildschirm. Es ist keine Installation aus dem App Store nötig.
+
+1. Auf dem Laptop in `carcura-manager\.env` die Zeile `HOST=127.0.0.1` in `HOST=0.0.0.0` ändern und
+   den Manager neu starten (Fenster von `start.cmd` schließen und erneut doppelklicken). Beim ersten
+   Start fragt die Windows-Firewall, ob Node.js im privaten Netzwerk kommunizieren darf → „Zugriff zulassen“.
+2. IP-Adresse des Laptops ermitteln: Eingabeaufforderung → `ipconfig` → Zeile „IPv4-Adresse“ des
+   WLAN-Adapters, z. B. `192.168.178.20`. Tipp: Im Router (FRITZ!Box: Heimnetz → Netzwerk → Gerät
+   bearbeiten → „Diesem Netzwerkgerät immer die gleiche IPv4-Adresse zuweisen“) die Adresse fest
+   vergeben, sonst kann sie sich irgendwann ändern.
+3. Auf dem iPhone **Safari** öffnen (nicht Chrome, nur Safari kann Apps auf den Home-Bildschirm legen)
+   und `http://192.168.178.20:4800` aufrufen (deine Adresse einsetzen). Anmelden.
+4. Unten das **Teilen-Symbol** (Quadrat mit Pfeil nach oben) antippen → nach unten blättern →
+   **„Zum Home-Bildschirm“** → Name „Manager“ bestätigen → „Hinzufügen“.
+5. Auf dem Home-Bildschirm liegt jetzt das gelbe Icon. Beim Öffnen startet der Manager im Vollbild.
+   Die Anmeldung bleibt bis zu 30 Tage gespeichert, solange die App genutzt wird.
+
+Einschränkungen: Die App funktioniert nur, solange der Laptop läuft und das iPhone im selben WLAN ist.
+Für den Zugriff von unterwegs braucht es eine öffentliche HTTPS-Adresse (siehe Teil 6). Sobald die gibt,
+die App einmal von dieser Adresse aus neu auf den Home-Bildschirm legen. Fotos für Protokolle kommen
+direkt aus der Kamera, die Unterschrift wird mit dem Finger geleistet.
 
 ### Autostart einrichten (empfohlen)
 1. Windows-Taste + R, `shell:startup` eingeben, Enter. Der Autostart-Ordner öffnet sich.

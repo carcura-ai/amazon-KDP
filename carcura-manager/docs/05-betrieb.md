@@ -204,10 +204,14 @@ gekennzeichnet (der erste Administrator der Installation ist automatisch Betreib
 
 Status und Fehler der letzten Läufe: Einstellungen → System & Sicherung → „Automatische Aufgaben“.
 
-## iPhone-App
+## iPhone und iPad
 
-Der Ordner `app/` enthält die native iOS-Hülle (Capacitor). Sie wird über GitHub Actions auf einem
-macOS-Runner gebaut und zu TestFlight hochgeladen; die Installation erfolgt über die TestFlight-App,
-ohne App-Store-Veröffentlichung. Voraussetzungen, Schritte und Secrets: `app/README.md`.
-Die App lädt die Oberfläche vom Server (Laptop im WLAN oder öffentliche HTTPS-Adresse); die Adresse
-wird beim ersten Start abgefragt und lässt sich auf der Anmeldeseite ändern.
+Empfohlener Weg: die Oberfläche als Web-App auf den Home-Bildschirm legen (Safari → Teilen →
+„Zum Home-Bildschirm“). Die App enthält dafür ein Web-App-Manifest, Icons und die iOS-Meta-Angaben
+(Vollbild, Statusleiste, Startbild). Es ist kein Apple-Konto und keine Installation nötig; Voraussetzung
+ist nur, dass der Server erreichbar ist (`HOST=0.0.0.0` im WLAN oder öffentliche HTTPS-Adresse).
+Push-Benachrichtigungen sind auf iOS ab 16.4 für Home-Bildschirm-Apps möglich und können später ergänzt werden.
+
+Optional liegt unter `app/` eine native Capacitor-Hülle mit Build-Workflows (TestFlight mit Apple
+Developer Program, oder unsignierte IPA für AltStore). Diese Variante ist vorbereitet, aber nicht der
+empfohlene Weg; Details in `app/README.md` und `app/ALTSTORE.md`.
