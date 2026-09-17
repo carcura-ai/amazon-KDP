@@ -44,3 +44,14 @@ export const LEAD_SOURCE: Record<string, string> = {
 export const ROLE_LABEL: Record<string, string> = { admin: 'Administrator', manager: 'Manager', employee: 'Mitarbeiter', accounting: 'Buchhaltung', readonly: 'Nur Lesen' };
 export const ACTIVITY_LABEL: Record<string, string> = { call: 'Telefonat', email: 'E-Mail', message: 'Nachricht', whatsapp: 'WhatsApp', note: 'Notiz', appointment: 'Termin', offer: 'Angebot', invoice: 'Rechnung', reminder: 'Erinnerung', system: 'System', status: 'Statuswechsel' };
 export const VEHICLE_TYPES = ['Kleinwagen', 'Kompaktklasse', 'Limousine', 'Kombi', 'SUV', 'Van', 'Transporter', 'Cabrio', 'Sportwagen', 'Wohnmobil', 'Motorrad', 'Sonstiges'];
+
+export const APPOINTMENT_TYPE: Record<string, string> = { service: 'Aufbereitung', pickup: 'Abholung', handover: 'Übergabe', consultation: 'Beratung', phone: 'Telefontermin', other: 'Sonstiges' };
+export const APPOINTMENT_STATUS: Record<string, { label: string; tone: string }> = { planned: { label: 'Geplant', tone: 'info' }, confirmed: { label: 'Bestätigt', tone: 'ok' }, done: { label: 'Erledigt', tone: '' }, cancelled: { label: 'Abgesagt', tone: 'danger' }, no_show: { label: 'Nicht erschienen', tone: 'warn' } };
+export const ORDER_STATUS: Record<string, { label: string; tone: string }> = { planned: { label: 'Geplant', tone: 'info' }, accepted: { label: 'Angenommen', tone: 'info' }, in_progress: { label: 'In Bearbeitung', tone: 'brand' }, quality_check: { label: 'Qualitätskontrolle', tone: 'warn' }, finished: { label: 'Fertig', tone: 'ok' }, picked_up: { label: 'Abgeholt', tone: 'ok' }, completed: { label: 'Abgeschlossen', tone: 'ok' }, cancelled: { label: 'Storniert', tone: 'danger' } };
+export const ORDER_FLOW = ['planned', 'accepted', 'in_progress', 'quality_check', 'finished', 'picked_up', 'completed'];
+export const fmtTime = (iso?: string | null) => (iso ? new Intl.DateTimeFormat('de-DE', { hour: '2-digit', minute: '2-digit' }).format(new Date(iso)) : '–');
+export const fmtWeekday = (iso: string) => new Intl.DateTimeFormat('de-DE', { weekday: 'short', day: '2-digit', month: '2-digit' }).format(new Date(iso));
+/** Lokale Datums-/Zeitwerte für <input type=datetime-local> */
+export const toLocalInput = (iso: string) => { const d = new Date(iso); const p = (n: number) => String(n).padStart(2, '0'); return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}T${p(d.getHours())}:${p(d.getMinutes())}`; };
+export const toDateInput = (d: Date) => { const p = (n: number) => String(n).padStart(2, '0'); return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}`; };
+export const fromLocalInput = (v: string) => new Date(v).toISOString();

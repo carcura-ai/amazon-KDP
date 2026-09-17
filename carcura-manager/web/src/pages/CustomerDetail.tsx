@@ -9,6 +9,7 @@ import { Badge, Button, Card, Confirm, Field, Input, Modal, PageHead, Select, Sk
 import { ACTIVITY_LABEL, fmtDate, fmtDateTime, fmtNumber, LEAD_SOURCE, LEAD_STATUS, personName } from '../lib/format';
 import { CustomerForm } from './Customers';
 import { VehicleForm } from './Vehicles';
+import { CustomerAppointmentsAndOrders } from './Orders';
 
 const ICONS: Record<string, typeof Phone> = { call: Phone, email: Mail, message: MessageSquare, whatsapp: MessageSquare, note: StickyNote, appointment: Calendar, offer: FileText, invoice: FileText, reminder: Bell, system: Cog, status: ArrowRightLeft };
 
@@ -129,6 +130,7 @@ export function CustomerDetailPage() {
                 </div>
               )}
             </Card>
+            <CustomerAppointmentsAndOrders customerId={id} />
             <Card title="Leads">
               {leads.length === 0 ? <p className="muted">Kein Lead verknüpft.</p> : leads.map((l) => <Link key={l.id} to={`/leads/${l.id}`} className="spread" style={{ padding: '6px 0' }}><span>{l.requestedService ?? 'Anfrage'} · {fmtDate(l.createdAt)}</span><Badge tone={LEAD_STATUS[l.status]?.tone}>{LEAD_STATUS[l.status]?.label}</Badge></Link>)}
             </Card>

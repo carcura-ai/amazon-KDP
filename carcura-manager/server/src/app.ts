@@ -22,6 +22,12 @@ import publicLeadRoutes from './modules/crm/public.routes.js';
 import platformRoutes from './modules/platform/routes.js';
 import dashboardRoutes from './modules/dashboard/routes.js';
 import searchRoutes from './modules/search/routes.js';
+import integrationRoutes from './modules/integrations/routes.js';
+import appointmentRoutes from './modules/appointments/routes.js';
+import orderRoutes from './modules/orders/routes.js';
+import { SecretBox } from './core/crypto.js';
+import { IntegrationStore } from './integrations/store.js';
+import { MailService } from './integrations/mail.js';
 import { createRequire } from 'node:module';
 
 declare module 'fastify' {
@@ -31,6 +37,9 @@ declare module 'fastify' {
     config: AppConfig;
     cookieOptions: CookieSerializeOptions;
     appVersion: string;
+    secrets: SecretBox;
+    integrations: IntegrationStore;
+    mail: MailService;
   }
 }
 
@@ -50,6 +59,11 @@ export async function buildApp(opts: BuildOptions): Promise<FastifyInstance> {
   app.decorate('db', opts.dbHandle.db);
   app.decorate('dbHandle', opts.dbHandle);
   app.decorate('config', opts.config);
+  const secrets = new SecretBox(opts.config.appSecret);
+  const integrationStore = new IntegrationStore(opts.dbHandle.db, secrets);
+  app.decorate('secrets', secrets);
+  app.decorate('integrations', integrationStore);
+  app.decorate('mail', new MailService(opts.dbHandle.db, integrationStore));
   app.decorate('appVersion', (createRequire(import.meta.url)('../package.json') as { version: string }).version);
   app.decorate('cookieOptions', {
     path: '/',
@@ -101,6 +115,9 @@ export async function buildApp(opts: BuildOptions): Promise<FastifyInstance> {
   await app.register(platformRoutes);
   await app.register(dashboardRoutes);
   await app.register(searchRoutes);
+  await app.register(integrationRoutes);
+  await app.register(appointmentRoutes);
+  await app.register(orderRoutes);
 
   // Web-App (Vite-Build) ausliefern, wenn vorhanden
   const webDist = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../web/dist');

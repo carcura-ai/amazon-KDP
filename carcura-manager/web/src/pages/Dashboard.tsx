@@ -4,7 +4,7 @@ import { get } from '../api/client';
 import type { Dashboard } from '../api/types';
 import { useAuth } from '../app/auth';
 import { Card, Kpi, PageHead, Skeleton, Badge, Empty } from '../components/ui';
-import { fmtRelative, LEAD_SOURCE, LEAD_STATUS, personName } from '../lib/format';
+import { fmtRelative, fmtMoney, fmtDateTime, LEAD_SOURCE, LEAD_STATUS, personName } from '../lib/format';
 
 export function DashboardPage() {
   const { me } = useAuth();
@@ -24,6 +24,12 @@ export function DashboardPage() {
             <Kpi label="Leads diese Woche" value={d.leads.thisWeek} delta={weekDelta === null ? `Vorwoche: ${d.leads.lastWeek}` : `${weekDelta > 0 ? '+' : ''}${weekDelta} % zur Vorwoche (${d.leads.lastWeek})`} tone={weekDelta === null ? undefined : weekDelta >= 0 ? 'up' : 'down'} />
             <Kpi label="Offene Leads" value={d.leads.open} delta={d.leads.conversionRateMonth === null ? 'Conversion: noch keine abgeschlossenen Leads diesen Monat' : `Conversion diesen Monat: ${d.leads.conversionRateMonth} %`} />
             <Kpi label="Kunden" value={d.customers.total} delta={`${d.customers.thisMonth} neu diesen Monat · ${d.vehicles.total} Fahrzeuge`} />
+          </div>
+          <div className="grid cols-4">
+            <Kpi label="Termine heute" value={d.appointments.today} delta={`${d.appointments.next7Days} in den nächsten 7 Tagen`} />
+            <Kpi label="Fahrzeuge in Bearbeitung" value={d.orders.inProgress} delta={d.orders.ready > 0 ? `${d.orders.ready} fertig, wartet auf Abholung` : 'kein fertiges Fahrzeug wartet'} tone={d.orders.ready > 0 ? 'up' : undefined} />
+            <Kpi label="Abgeschlossene Aufträge (Monat)" value={d.orders.completedMonth} delta={`Auftragsvolumen ${fmtMoney(d.orders.completedMonthCents)} brutto`} />
+            <Kpi label="Nächster Termin" value={d.appointments.next[0] ? fmtDateTime(d.appointments.next[0].startsAt) : '–'} delta={d.appointments.next[0] ? `${d.appointments.next[0].title}${d.appointments.next[0].customerName ? ' · ' + d.appointments.next[0].customerName : ''}` : 'kein Termin geplant'} />
           </div>
           <div className="grid main-side">
             <Card title="Zuletzt eingegangene Leads" tight actions={<Link className="btn sm" to="/leads">Alle Leads</Link>}>
@@ -49,6 +55,13 @@ export function DashboardPage() {
               )}
             </Card>
             <div className="stack" style={{ gap: 16 }}>
+              <Card title="Kommende Termine" tight actions={<Link className="btn sm" to="/kalender">Kalender</Link>}>
+                {d.appointments.next.length === 0 ? <p className="muted" style={{ padding: 18 }}>Keine Termine geplant.</p> : d.appointments.next.map((a) => (
+                  <Link key={a.id} to="/kalender" className="list-evt" style={{ gridTemplateColumns: '1fr' }}>
+                    <div><div style={{ fontWeight: 600 }}>{fmtDateTime(a.startsAt)} · {a.title}</div><div className="small muted">{[a.customerName, a.vehicleLabel].filter(Boolean).join(' · ') || 'ohne Kunde'}</div></div>
+                  </Link>
+                ))}
+              </Card>
               <Card title="Hinweise">
                 {d.hints.length === 0 ? <p className="muted">Keine Auffälligkeiten.</p> : (
                   <div className="hint-list">

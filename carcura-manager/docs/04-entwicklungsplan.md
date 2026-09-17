@@ -4,11 +4,11 @@
 |---|---|---|
 | 1 | Bestandsanalyse | erledigt (`01-bestandsanalyse.md`) |
 | 2 | Architektur, Datenmodell, Teststrategie | erledigt (`02-architektur.md`, `03-datenmodell.md`) |
-| 3 | Backend-Kern: Mandanten, Benutzer, Login, Sessions, Rollen, Audit | in Arbeit |
-| 4 | Designsystem, App-Shell, Login/Setup | in Arbeit |
-| 5 | CRM: Leads, Kunden, Historie, Duplikate, Website-Lead-Eingang | geplant |
-| 6 | Fahrzeuge | geplant |
-| 7 | Kalender, Termine, Aufträge, Erinnerungen | geplant |
+| 3 | Backend-Kern: Mandanten, Benutzer, Login, Sessions, Rollen, Audit | erledigt |
+| 4 | Designsystem, App-Shell, Login/Setup | erledigt |
+| 5 | CRM: Leads, Kunden, Historie, Duplikate, Website-Lead-Eingang | erledigt |
+| 6 | Fahrzeuge | erledigt |
+| 7 | Kalender, Termine, Aufträge, Erinnerungen (E-Mail automatisch, WhatsApp per Link) | erledigt |
 | 8 | Protokolle, Bilder, Dokumente, PDF | geplant |
 | 9 | Angebote, Rechnungen | geplant |
 | 10–11 | Lager, Finanzen, wiederkehrende Ausgaben | geplant |

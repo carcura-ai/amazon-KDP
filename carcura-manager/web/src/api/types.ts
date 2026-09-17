@@ -35,7 +35,27 @@ export interface Dashboard {
   generatedAt: string;
   leads: { today: number; thisWeek: number; lastWeek: number; thisMonth: number; open: number; new: number; conversionRateMonth: number | null; bySource: Array<{ source: string; n: number }> };
   customers: { total: number; thisMonth: number };
+  appointments: { today: number; next7Days: number; next: Array<{ id: string; title: string; startsAt: string; endsAt: string; status: string; type: string; customerName: string | null; vehicleLabel: string | null }> };
+  orders: { inProgress: number; ready: number; completedMonth: number; completedMonthCents: number };
   vehicles: { total: number };
   recentLeads: Lead[];
   hints: Array<{ level: 'info' | 'warn'; kind: 'fact' | 'calc'; text: string }>;
 }
+
+export interface Appointment {
+  id: string; customerId: string | null; vehicleId: string | null; orderId: string | null; userId: string | null; type: string; typeLabel?: string; title: string;
+  startsAt: string; endsAt: string; allDay: boolean; status: string; location: string | null; notes: string | null; priceCents: number | null;
+  reminderSentAt: string | null; reminderError: string | null; confirmationSentAt: string | null; createdAt: string; updatedAt: string;
+  customer?: { id: string; customerNumber: string; firstName: string; lastName: string; companyName: string | null; phone: string | null; email: string | null } | null;
+  vehicle?: { id: string; licensePlate: string | null; make: string | null; model: string | null } | null;
+  user?: { id: string; firstName: string; lastName: string } | null;
+}
+export interface OrderItem { id: string; orderId: string; serviceId: string | null; name: string; description: string | null; quantity: number; unitPriceCents: number; vatBp: number; totalCents: number; sortOrder: number }
+export interface Order {
+  id: string; orderNumber: string; customerId: string; vehicleId: string | null; appointmentId: string | null; userId: string | null; leadId: string | null; status: string; title: string | null;
+  notes: string | null; internalNotes: string | null; scheduledAt: string | null; startedAt: string | null; finishedAt: string | null; completedAt: string | null; mileageIn: number | null;
+  subtotalCents: number; vatCents: number; totalCents: number; createdAt: string; updatedAt: string;
+}
+export interface Totals { subtotalCents: number; vatCents: number; totalCents: number; vatBreakdown: Array<{ vatBp: number; netCents: number; vatCents: number }> }
+export interface OrderDetail { order: Order; items: OrderItem[]; customer: Customer | null; vehicle: Vehicle | null; appointment: Appointment | null; user: { id: string; firstName: string; lastName: string } | null; totals: Totals; statusLabels: Record<string, string> }
+export interface OrderRow { order: Order; customer: Pick<Customer, 'id' | 'customerNumber' | 'firstName' | 'lastName' | 'companyName'>; vehicle: Pick<Vehicle, 'id' | 'licensePlate' | 'make' | 'model'> | null }

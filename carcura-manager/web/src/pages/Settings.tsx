@@ -23,6 +23,7 @@ export function SettingsPage() {
     { to: '', label: 'Unternehmen & Branding', show: can('settings:manage') },
     { to: 'leistungen', label: 'Leistungen', show: can('settings:manage') },
     { to: 'benutzer', label: 'Benutzer & Rollen', show: can('users:manage') },
+    { to: 'email', label: 'E-Mail-Versand', show: can('integrations:manage') },
     { to: 'integrationen', label: 'Integrationen', show: can('integrations:manage') },
     { to: 'audit', label: 'Audit-Log', show: can('audit:read') },
   ].filter((t) => t.show);
@@ -34,6 +35,7 @@ export function SettingsPage() {
         <Route index element={can('settings:manage') ? <CompanySettings /> : <UsersSettings />} />
         <Route path="leistungen" element={<ServicesSettings />} />
         <Route path="benutzer" element={<UsersSettings />} />
+        <Route path="email" element={<MailSettings />} />
         <Route path="integrationen" element={<IntegrationsSettings />} />
         <Route path="audit" element={<AuditLog />} />
       </Routes>
@@ -279,5 +281,46 @@ function AuditLog() {
         </>
       )}
     </Card>
+  );
+}
+
+function MailSettings() {
+  const qc = useQueryClient();
+  const toast = useToast();
+  const q = useQuery({ queryKey: ['smtp'], queryFn: () => get<{ configured: boolean; config?: { host: string; port: number; secure: boolean; user: string; fromName: string; fromEmail: string; replyTo: string | null; hasPassword: boolean }; status?: string; lastError?: string | null; lastSyncAt?: string | null }>('/api/integrations/smtp') });
+  const log = useQuery({ queryKey: ['email-log'], queryFn: () => get<{ items: Array<{ id: string; toAddress: string; subject: string; status: string; error: string | null; createdAt: string }> }>('/api/integrations/email-log') });
+  const [f, setF] = useState({ host: '', port: '587', secure: false, user: '', pass: '', fromName: '', fromEmail: '', replyTo: '' });
+  const [loaded, setLoaded] = useState(false);
+  useEffect(() => { if (q.data?.config && !loaded) { const c = q.data.config; setF({ host: c.host, port: String(c.port), secure: c.secure, user: c.user, pass: '', fromName: c.fromName, fromEmail: c.fromEmail, replyTo: c.replyTo ?? '' }); setLoaded(true); } }, [q.data, loaded]);
+  const save = useMutation({ mutationFn: () => fetch('/api/integrations/smtp', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ host: f.host, port: Number(f.port), secure: f.secure, user: f.user, pass: f.pass || undefined, fromName: f.fromName, fromEmail: f.fromEmail, replyTo: f.replyTo || null }) }).then(async (r) => { if (!r.ok) throw new Error((await r.json()).message); }), onSuccess: () => { qc.invalidateQueries({ queryKey: ['smtp'] }); toast.ok('SMTP gespeichert'); setF({ ...f, pass: '' }); }, onError: (e) => toast.fromError(e) });
+  const test = useMutation({ mutationFn: () => post<{ to: string }>('/api/integrations/smtp/test'), onSuccess: (r) => { qc.invalidateQueries({ queryKey: ['email-log'] }); qc.invalidateQueries({ queryKey: ['smtp'] }); toast.ok('Testmail gesendet', `an ${r.to}`); }, onError: (e) => { qc.invalidateQueries({ queryKey: ['email-log'] }); toast.fromError(e, 'Testmail fehlgeschlagen'); } });
+  return (
+    <div className="stack" style={{ gap: 16 }}>
+      <Card title="SMTP-Zugangsdaten" actions={q.data?.configured ? <Badge tone={q.data.status === 'error' ? 'danger' : q.data.status === 'ok' ? 'ok' : 'info'}>{q.data.status === 'error' ? 'Fehler' : q.data.status === 'ok' ? 'funktioniert' : 'gespeichert'}</Badge> : <Badge tone="warn">nicht eingerichtet</Badge>}>
+        <p className="muted" style={{ marginBottom: 14 }}>Für Terminbestätigungen, Erinnerungen, Angebote und Rechnungen. Die Zugangsdaten werden verschlüsselt gespeichert. Für carcura.info können dieselben Daten wie in FluentSMTP verwendet werden.</p>
+        {q.data?.lastError ? <div className="dup-box" style={{ marginBottom: 14 }}>Letzter Fehler: {q.data.lastError}</div> : null}
+        <form onSubmit={(e: FormEvent) => { e.preventDefault(); save.mutate(); }}>
+          <div className="form-grid">
+            <Field label="SMTP-Host"><Input required value={f.host} onChange={(e) => setF({ ...f, host: e.target.value })} placeholder="smtp.web.de" /></Field>
+            <div className="row" style={{ gap: 12, alignItems: 'flex-end' }}>
+              <Field label="Port"><Input type="number" required value={f.port} onChange={(e) => setF({ ...f, port: e.target.value })} style={{ width: 100 }} /></Field>
+              <label className="check" style={{ paddingBottom: 10 }}><input type="checkbox" checked={f.secure} onChange={(e) => setF({ ...f, secure: e.target.checked })} /> SSL/TLS (Port 465)</label>
+            </div>
+            <Field label="Benutzername"><Input value={f.user} onChange={(e) => setF({ ...f, user: e.target.value })} /></Field>
+            <Field label="Passwort" hint={q.data?.config?.hasPassword ? 'Leer lassen, um das gespeicherte Passwort zu behalten.' : undefined}><Input type="password" value={f.pass} onChange={(e) => setF({ ...f, pass: e.target.value })} autoComplete="new-password" /></Field>
+            <Field label="Absendername"><Input required value={f.fromName} onChange={(e) => setF({ ...f, fromName: e.target.value })} /></Field>
+            <Field label="Absenderadresse"><Input type="email" required value={f.fromEmail} onChange={(e) => setF({ ...f, fromEmail: e.target.value })} /></Field>
+            <Field label="Antwort an (optional)" className="span-2"><Input type="email" value={f.replyTo} onChange={(e) => setF({ ...f, replyTo: e.target.value })} /></Field>
+          </div>
+          <div className="form-actions"><Button type="button" onClick={() => test.mutate()} loading={test.isPending} disabled={!q.data?.configured}>Testmail an mich senden</Button><Button type="submit" variant="primary" loading={save.isPending}>Speichern</Button></div>
+        </form>
+      </Card>
+      <Card title="Versandprotokoll" tight>
+        {!log.data?.items.length ? <p className="muted" style={{ padding: 18 }}>Noch keine E-Mails gesendet.</p> : (
+          <div className="table-wrap"><table className="table"><thead><tr><th>Zeitpunkt</th><th>Empfänger</th><th>Betreff</th><th>Status</th></tr></thead>
+            <tbody>{log.data.items.map((m) => <tr key={m.id}><td className="muted">{fmtDateTime(m.createdAt)}</td><td>{m.toAddress}</td><td className="muted">{m.subject}</td><td>{m.status === 'sent' ? <Badge tone="ok">gesendet</Badge> : <Badge tone="danger" >fehlgeschlagen</Badge>}{m.error ? <div className="small dim">{m.error}</div> : null}</td></tr>)}</tbody></table></div>
+        )}
+      </Card>
+    </div>
   );
 }

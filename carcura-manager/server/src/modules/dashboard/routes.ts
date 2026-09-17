@@ -1,6 +1,6 @@
 import type { FastifyInstance } from 'fastify';
 import { and, eq, gte, lt, sql } from 'drizzle-orm';
-import { leads, customers, vehicles } from '../../db/schema.js';
+import { leads, customers, vehicles, appointments, orders } from '../../db/schema.js';
 import { ctxOf } from '../../plugins/auth.js';
 
 /**
@@ -51,17 +51,36 @@ export default async function dashboardRoutes(app: FastifyInstance) {
       .groupBy(leads.source)
       .all();
 
+    const tomorrow = new Date(startOfDay(now).getTime() + 86_400_000).toISOString();
+    const in7 = new Date(startOfDay(now).getTime() + 7 * 86_400_000).toISOString();
+    const apptBase = and(eq(appointments.companyId, ctx.companyId), sql`${appointments.status} in ('planned','confirmed')`);
+    const appointmentsToday = app.db.select({ n: sql<number>`count(*)` }).from(appointments).where(and(apptBase, gte(appointments.startsAt, today), lt(appointments.startsAt, tomorrow))).get()?.n ?? 0;
+    const appointmentsWeek = app.db.select({ n: sql<number>`count(*)` }).from(appointments).where(and(apptBase, gte(appointments.startsAt, now.toISOString()), lt(appointments.startsAt, in7))).get()?.n ?? 0;
+    const nextAppointments = app.db
+      .select({ id: appointments.id, title: appointments.title, startsAt: appointments.startsAt, endsAt: appointments.endsAt, status: appointments.status, type: appointments.type, customerName: sql<string | null>`(select trim(coalesce(c.company_name || ' · ','') || c.first_name || ' ' || c.last_name) from customers c where c.id = ${appointments.customerId})`, vehicleLabel: sql<string | null>`(select trim(coalesce(v.make,'') || ' ' || coalesce(v.model,'') || ' ' || coalesce(v.license_plate,'')) from vehicles v where v.id = ${appointments.vehicleId})` })
+      .from(appointments)
+      .where(and(apptBase, gte(appointments.endsAt, now.toISOString())))
+      .orderBy(appointments.startsAt)
+      .limit(6)
+      .all();
+    const ordersInProgress = app.db.select({ n: sql<number>`count(*)` }).from(orders).where(and(eq(orders.companyId, ctx.companyId), sql`${orders.status} in ('accepted','in_progress','quality_check')`)).get()?.n ?? 0;
+    const ordersReady = app.db.select({ n: sql<number>`count(*)` }).from(orders).where(and(eq(orders.companyId, ctx.companyId), eq(orders.status, 'finished'))).get()?.n ?? 0;
+    const completedMonth = app.db.select({ n: sql<number>`count(*)`, sum: sql<number>`coalesce(sum(${orders.totalCents}),0)` }).from(orders).where(and(eq(orders.companyId, ctx.companyId), eq(orders.status, 'completed'), gte(orders.completedAt, monthStart))).get();
+
     const recentLeads = app.db.select().from(leads).where(eq(leads.companyId, ctx.companyId)).orderBy(sql`${leads.createdAt} desc`).limit(6).all();
 
     const hints: Array<{ level: 'info' | 'warn'; text: string; kind: 'fact' | 'calc' }> = [];
     if (newLeads > 0) hints.push({ level: 'warn', kind: 'fact', text: `${newLeads} neue${newLeads === 1 ? 'r' : ''} Lead${newLeads === 1 ? '' : 's'} ohne Kontaktversuch.` });
     if (leadsLastWeek > 0 && leadsThisWeek < leadsLastWeek) hints.push({ level: 'info', kind: 'calc', text: `Diese Woche bisher ${leadsThisWeek} Leads gegenüber ${leadsLastWeek} in der Vorwoche.` });
+    if (ordersReady > 0) hints.push({ level: 'info', kind: 'fact', text: `${ordersReady} fertige${ordersReady === 1 ? 'r' : ''} Auftr${ordersReady === 1 ? 'ag wartet' : 'äge warten'} auf Abholung.` });
     if (leadsLastWeek > 0 && leadsThisWeek > leadsLastWeek) hints.push({ level: 'info', kind: 'calc', text: `Leads liegen diese Woche mit ${leadsThisWeek} über der Vorwoche (${leadsLastWeek}).` });
 
     return {
       generatedAt: now.toISOString(),
       leads: { today: leadsToday, thisWeek: leadsThisWeek, lastWeek: leadsLastWeek, thisMonth: leadsThisMonth, open: openLeads, new: newLeads, conversionRateMonth: closedThisMonth > 0 ? Math.round((wonThisMonth / closedThisMonth) * 1000) / 10 : null, bySource },
       customers: { total: customersTotal, thisMonth: customersThisMonth },
+      appointments: { today: appointmentsToday, next7Days: appointmentsWeek, next: nextAppointments },
+      orders: { inProgress: ordersInProgress, ready: ordersReady, completedMonth: completedMonth?.n ?? 0, completedMonthCents: completedMonth?.sum ?? 0 },
       vehicles: { total: vehiclesTotal },
       recentLeads,
       hints,

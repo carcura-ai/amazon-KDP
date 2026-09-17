@@ -12,6 +12,8 @@ import { VehiclesPage } from '../pages/Vehicles';
 import { VehicleDetailPage } from '../pages/VehicleDetail';
 import { SettingsPage } from '../pages/Settings';
 import { PlatformPage } from '../pages/Platform';
+import { CalendarPage } from '../pages/Calendar';
+import { OrdersPage, OrderFormPage, OrderDetailPage } from '../pages/Orders';
 
 function FullscreenLoader() {
   return (
@@ -43,6 +45,11 @@ export function AppRoutes() {
         <Route path="/kunden/:id" element={<CustomerDetailPage />} />
         <Route path="/fahrzeuge" element={<VehiclesPage />} />
         <Route path="/fahrzeuge/:id" element={<VehicleDetailPage />} />
+        <Route path="/kalender" element={<CalendarPage />} />
+        <Route path="/auftraege" element={<OrdersPage />} />
+        <Route path="/auftraege/neu" element={<OrderFormPage />} />
+        <Route path="/auftraege/:id" element={<OrderDetailPage />} />
+        <Route path="/auftraege/:id/bearbeiten" element={<OrderFormPage />} />
         <Route path="/einstellungen/*" element={<SettingsPage />} />
         <Route path="/betreiber" element={<PlatformPage />} />
         <Route path="*" element={<div className="empty"><h3>Seite nicht gefunden</h3></div>} />

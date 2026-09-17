@@ -288,3 +288,116 @@ export const jobs = sqliteTable(
   },
   (t) => [index('jobs_status_idx').on(t.status, t.runAt), uniqueIndex('jobs_dedupe_unique').on(t.dedupeKey)],
 );
+
+/* ------------------------------------------------------------------ Integrationen (SMTP, Marketing-APIs …) */
+export const integrations = sqliteTable(
+  'integrations',
+  {
+    id: text('id').primaryKey(),
+    companyId: text('company_id').notNull().references(() => companies.id),
+    type: text('type').notNull(), // smtp | windsor | google_ads | meta_ads | ga4 | search_console | claude
+    name: text('name'),
+    configEncrypted: text('config_encrypted').notNull(),
+    publicJson: text('public_json').notNull().default('{}'), // unkritische Anzeige-Infos (Host, Absender, Konto-ID)
+    status: text('status').notNull().default('configured'), // configured | ok | error | action_required
+    lastSyncAt: text('last_sync_at'),
+    lastError: text('last_error'),
+    isActive: integer('is_active', { mode: 'boolean' }).notNull().default(true),
+    createdAt: ts('created_at'),
+    updatedAt: ts('updated_at'),
+  },
+  (t) => [uniqueIndex('integrations_company_type_unique').on(t.companyId, t.type)],
+);
+
+export const emailLog = sqliteTable(
+  'email_log',
+  {
+    id: text('id').primaryKey(),
+    companyId: text('company_id').notNull(),
+    toAddress: text('to_address').notNull(),
+    subject: text('subject').notNull(),
+    status: text('status').notNull(), // sent | failed
+    error: text('error'),
+    messageId: text('message_id'),
+    refType: text('ref_type'),
+    refId: text('ref_id'),
+    createdAt: ts('created_at'),
+  },
+  (t) => [index('email_log_company_idx').on(t.companyId, t.createdAt)],
+);
+
+/* ------------------------------------------------------------------ Termine */
+export const appointments = sqliteTable(
+  'appointments',
+  {
+    id: text('id').primaryKey(),
+    companyId: text('company_id').notNull().references(() => companies.id),
+    customerId: text('customer_id'),
+    vehicleId: text('vehicle_id'),
+    orderId: text('order_id'),
+    userId: text('user_id'),
+    type: text('type').notNull().default('service'), // service | pickup | handover | consultation | phone | other
+    title: text('title').notNull(),
+    startsAt: text('starts_at').notNull(),
+    endsAt: text('ends_at').notNull(),
+    allDay: integer('all_day', { mode: 'boolean' }).notNull().default(false),
+    status: text('status').notNull().default('planned'), // planned | confirmed | done | cancelled | no_show
+    location: text('location'),
+    notes: text('notes'),
+    priceCents: integer('price_cents'),
+    reminderSentAt: text('reminder_sent_at'),
+    reminderError: text('reminder_error'),
+    confirmationSentAt: text('confirmation_sent_at'),
+    createdAt: ts('created_at'),
+    updatedAt: ts('updated_at'),
+  },
+  (t) => [index('appointments_company_time_idx').on(t.companyId, t.startsAt), index('appointments_customer_idx').on(t.companyId, t.customerId)],
+);
+
+/* ------------------------------------------------------------------ Aufträge */
+export const orders = sqliteTable(
+  'orders',
+  {
+    id: text('id').primaryKey(),
+    companyId: text('company_id').notNull().references(() => companies.id),
+    orderNumber: text('order_number').notNull(),
+    customerId: text('customer_id').notNull(),
+    vehicleId: text('vehicle_id'),
+    appointmentId: text('appointment_id'),
+    userId: text('user_id'),
+    leadId: text('lead_id'),
+    status: text('status').notNull().default('planned'), // planned | accepted | in_progress | quality_check | finished | picked_up | completed | cancelled
+    title: text('title'),
+    notes: text('notes'),
+    internalNotes: text('internal_notes'),
+    scheduledAt: text('scheduled_at'),
+    startedAt: text('started_at'),
+    finishedAt: text('finished_at'),
+    completedAt: text('completed_at'),
+    mileageIn: integer('mileage_in'),
+    subtotalCents: integer('subtotal_cents').notNull().default(0),
+    vatCents: integer('vat_cents').notNull().default(0),
+    totalCents: integer('total_cents').notNull().default(0),
+    createdAt: ts('created_at'),
+    updatedAt: ts('updated_at'),
+  },
+  (t) => [uniqueIndex('orders_number_unique').on(t.companyId, t.orderNumber), index('orders_company_status_idx').on(t.companyId, t.status), index('orders_customer_idx').on(t.companyId, t.customerId)],
+);
+
+export const orderItems = sqliteTable(
+  'order_items',
+  {
+    id: text('id').primaryKey(),
+    companyId: text('company_id').notNull(),
+    orderId: text('order_id').notNull().references(() => orders.id),
+    serviceId: text('service_id'),
+    name: text('name').notNull(),
+    description: text('description'),
+    quantity: integer('quantity').notNull().default(1),
+    unitPriceCents: integer('unit_price_cents').notNull().default(0),
+    vatBp: integer('vat_bp').notNull().default(1900),
+    totalCents: integer('total_cents').notNull().default(0),
+    sortOrder: integer('sort_order').notNull().default(0),
+  },
+  (t) => [index('order_items_order_idx').on(t.orderId)],
+);

@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { NavLink, Outlet, useLocation, useNavigate } from 'react-router';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { LayoutDashboard, Users, UserPlus, Car, Settings, LogOut, Menu, Search, ShieldCheck, Building2 } from 'lucide-react';
+import { LayoutDashboard, Users, UserPlus, Car, Settings, LogOut, Menu, Search, ShieldCheck, Building2, CalendarDays, ClipboardList } from 'lucide-react';
 import { useAuth } from './auth';
 import { get, post, qs } from '../api/client';
 import type { SearchHit } from '../api/types';
@@ -13,6 +13,8 @@ const NAV = [
   { to: '/leads', label: 'Leads', icon: UserPlus, perm: 'leads:read' },
   { to: '/kunden', label: 'Kunden', icon: Users, perm: 'customers:read' },
   { to: '/fahrzeuge', label: 'Fahrzeuge', icon: Car, perm: 'vehicles:read' },
+  { to: '/kalender', label: 'Kalender', icon: CalendarDays, perm: 'appointments:read' },
+  { to: '/auftraege', label: 'Aufträge', icon: ClipboardList, perm: 'orders:read' },
 ];
 
 export function AppShell() {
