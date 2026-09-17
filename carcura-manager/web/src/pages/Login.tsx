@@ -7,6 +7,9 @@ import type { Branding } from '../api/types';
 import { useAuth, applyBranding } from '../app/auth';
 import { Button, Field, Input } from '../components/ui';
 
+/** Läuft die Oberfläche in der nativen iPhone-App (Capacitor-Hülle)? */
+const isNativeApp = typeof window !== 'undefined' && Boolean((window as unknown as { Capacitor?: { isNativePlatform?: () => boolean } }).Capacitor?.isNativePlatform?.());
+
 export function LoginPage() {
   const { refresh } = useAuth();
   const navigate = useNavigate();
@@ -51,6 +54,7 @@ export function LoginPage() {
             <Button type="submit" variant="primary" className="block" loading={busy}><LogIn /> Anmelden</Button>
           </form>
           {b?.poweredBy ? <p className="small dim" style={{ textAlign: 'center', marginTop: 14 }}>{b.poweredBy}</p> : null}
+          {isNativeApp ? <p className="small" style={{ textAlign: 'center', marginTop: 14 }}><a href="capacitor://localhost/index.html?change=1" style={{ color: 'var(--fg-muted)' }}>Server-Adresse ändern</a></p> : null}
         </div>
       </div>
     </div>

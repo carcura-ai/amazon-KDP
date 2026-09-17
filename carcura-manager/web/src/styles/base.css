@@ -28,7 +28,7 @@ img { max-width: 100%; display: block; }
 .sidebar {
   position: sticky; top: 0; height: 100dvh; overflow-y: auto;
   background: var(--bg-elev); border-right: 1px solid var(--line);
-  display: flex; flex-direction: column; padding: 16px 12px; gap: 6px;
+  display: flex; flex-direction: column; padding: calc(16px + env(safe-area-inset-top, 0px)) 12px calc(16px + env(safe-area-inset-bottom, 0px)); gap: 6px;
 }
 .brand { display: flex; align-items: center; gap: 10px; padding: 6px 8px 18px; }
 .brand-mark { width: 34px; height: 34px; border-radius: 10px; background: var(--brand); color: var(--brand-ink); display: grid; place-items: center; font-weight: 800; font-size: 15px; flex: none; overflow: hidden; }
@@ -57,6 +57,8 @@ img { max-width: 100%; display: block; }
   position: sticky; top: 0; z-index: 20; height: var(--topbar-h);
   display: flex; align-items: center; gap: 12px; padding: 0 20px;
   background: rgba(10, 10, 11, 0.85); backdrop-filter: blur(12px); border-bottom: 1px solid var(--line);
+  /* iPhone: Inhalt unter Dynamic Island / Statusleiste freihalten */
+  padding-top: env(safe-area-inset-top, 0px); height: calc(var(--topbar-h) + env(safe-area-inset-top, 0px));
 }
 .content { padding: 24px 24px 48px; max-width: 1400px; width: 100%; }
 .menu-btn { display: none; }
@@ -226,7 +228,7 @@ table.table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
 .dup-box a { color: var(--warn); font-weight: 600; }
 
 /* Auth-Seiten */
-.auth { min-height: 100dvh; display: grid; place-items: center; padding: 24px; background: radial-gradient(1200px 600px at 20% -10%, var(--brand-soft), transparent 60%), var(--bg); }
+.auth { min-height: 100dvh; display: grid; place-items: center; padding: calc(24px + env(safe-area-inset-top, 0px)) 24px calc(24px + env(safe-area-inset-bottom, 0px)); background: radial-gradient(1200px 600px at 20% -10%, var(--brand-soft), transparent 60%), var(--bg); }
 .auth-card { width: 100%; max-width: 420px; }
 .auth-card.wide { max-width: 720px; }
 .auth-logo { display: flex; align-items: center; gap: 12px; margin-bottom: 24px; }

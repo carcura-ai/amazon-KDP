@@ -1,0 +1,20 @@
+{
+  "appId": "info.carcura.manager",
+  "appName": "Carcura Manager",
+  "webDir": "www",
+  "backgroundColor": "#0B0B0C",
+  "server": {
+    "allowNavigation": ["*.carcura.info", "carcura.info", "localhost", "127.0.0.1", "192.168.*.*", "10.*.*.*", "*.trycloudflare.com"]
+  },
+  "ios": {
+    "contentInset": "never",
+    "scrollEnabled": true,
+    "backgroundColor": "#0B0B0C",
+    "preferredContentMode": "mobile",
+    "limitsNavigationsToAppBoundDomains": false
+  },
+  "plugins": {
+    "SplashScreen": { "launchShowDuration": 800, "launchAutoHide": true, "backgroundColor": "#0B0B0C", "showSpinner": false },
+    "StatusBar": { "style": "DARK", "backgroundColor": "#0B0B0C", "overlaysWebView": true }
+  }
+}

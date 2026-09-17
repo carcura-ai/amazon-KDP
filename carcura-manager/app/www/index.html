@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="dark">
+<title>Carcura Manager</title>
+<style>
+  :root { color-scheme: dark; }
+  html, body { height: 100%; margin: 0; background: #0B0B0C; color: #F2F2F0; font-family: -apple-system, 'SF Pro Text', system-ui, sans-serif; }
+  .wrap { min-height: 100%; display: flex; flex-direction: column; justify-content: center; padding: calc(env(safe-area-inset-top, 0px) + 32px) 28px calc(env(safe-area-inset-bottom, 0px) + 32px); box-sizing: border-box; }
+  .mark { width: 72px; height: 72px; border-radius: 20px; background: #E8F320; color: #0B0B0C; font-weight: 800; font-size: 28px; display: flex; align-items: center; justify-content: center; margin-bottom: 20px; letter-spacing: 0.02em; }
+  h1 { font-size: 26px; margin: 0 0 6px; font-weight: 700; }
+  p { margin: 0 0 22px; color: #9A9A94; line-height: 1.45; font-size: 15px; }
+  label { display: block; font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase; color: #9A9A94; margin-bottom: 8px; }
+  input { width: 100%; box-sizing: border-box; font-size: 17px; padding: 14px 14px; border-radius: 12px; border: 1px solid #2E2E33; background: #151518; color: #F2F2F0; outline: none; }
+  input:focus { border-color: #E8F320; }
+  button { width: 100%; margin-top: 14px; font-size: 17px; font-weight: 700; padding: 15px; border-radius: 12px; border: 0; background: #E8F320; color: #0B0B0C; }
+  button[disabled] { opacity: 0.6; }
+  .err { margin-top: 12px; color: #FF7B7B; font-size: 14px; min-height: 20px; }
+  .small { margin-top: 18px; font-size: 12px; color: #6F6F6A; }
+  .status { display: flex; align-items: center; gap: 10px; color: #9A9A94; font-size: 15px; }
+  .spin { width: 18px; height: 18px; border: 2px solid #2E2E33; border-top-color: #E8F320; border-radius: 50%; animation: r 0.8s linear infinite; }
+  @keyframes r { to { transform: rotate(360deg); } }
+</style>
+</head>
+<body>
+<div class="wrap" id="wrap">
+  <div class="mark">CA</div>
+  <h1>Carcura Manager</h1>
+  <p id="intro">Adresse deines Managers eingeben. Im WLAN der Werkstatt ist das die Adresse des Laptops, von unterwegs die öffentliche Adresse.</p>
+  <label for="url">Server-Adresse</label>
+  <input id="url" type="url" inputmode="url" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="https://manager.carcura.info">
+  <button id="go" type="button">Verbinden</button>
+  <div class="err" id="err"></div>
+  <div class="small">Die Adresse wird nur auf diesem Gerät gespeichert. Zum Ändern in der App auf der Anmeldeseite „Server-Adresse ändern“ wählen.</div>
+</div>
+<script>
+  const KEY = 'serverUrl';
+  const params = new URLSearchParams(location.search);
+  const prefs = () => window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.Preferences;
+  async function load() { try { const p = prefs(); if (p) { const r = await p.get({ key: KEY }); return r.value || ''; } return localStorage.getItem(KEY) || ''; } catch (e) { return ''; } }
+  async function save(v) { try { const p = prefs(); if (p) await p.set({ key: KEY, value: v }); else localStorage.setItem(KEY, v); } catch (e) {} }
+  function normalize(v) { v = (v || '').trim().replace(/\/+$/, ''); if (!v) return ''; if (!/^https?:\/\//i.test(v)) v = (/^(localhost|127\.|192\.168\.|10\.)/.test(v) ? 'http://' : 'https://') + v; return v; }
+  async function check(base) { const c = new AbortController(); const t = setTimeout(() => c.abort(), 8000); try { const r = await fetch(base + '/api/health', { signal: c.signal, cache: 'no-store' }); if (!r.ok) throw new Error('HTTP ' + r.status); const j = await r.json(); if (!j.ok) throw new Error('Antwort unerwartet'); return j; } finally { clearTimeout(t); } }
+  async function connect(manual) {
+    const input = document.getElementById('url'); const err = document.getElementById('err'); const btn = document.getElementById('go');
+    const base = normalize(input.value); if (!base) { err.textContent = 'Bitte eine Adresse eingeben.'; return; }
+    btn.disabled = true; err.textContent = ''; btn.textContent = 'Verbinde …';
+    try { await check(base); await save(base); location.replace(base + '/login?app=1'); }
+    catch (e) { btn.disabled = false; btn.textContent = 'Verbinden'; err.textContent = manual ? 'Keine Verbindung zu ' + base + '. Läuft der Manager? Bist du im richtigen WLAN? (' + (e && e.message ? e.message : 'Fehler') + ')' : 'Der gespeicherte Server ist nicht erreichbar. Adresse prüfen oder erneut versuchen.'; }
+  }
+  document.getElementById('go').addEventListener('click', () => connect(true));
+  document.getElementById('url').addEventListener('keydown', (e) => { if (e.key === 'Enter') connect(true); });
+  (async () => {
+    const saved = await load();
+    if (saved) document.getElementById('url').value = saved;
+    if (saved && !params.has('change')) { document.getElementById('intro').innerHTML = '<span class="status"><span class="spin"></span>Verbinde mit ' + saved + ' …</span>'; connect(false); }
+  })();
+</script>
+</body>
+</html>

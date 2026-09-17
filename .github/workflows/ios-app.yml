@@ -1,0 +1,88 @@
+name: iOS App (TestFlight)
+
+# Baut die native iPhone-App des Carcura Managers auf einem macOS-Runner und lädt sie zu TestFlight hoch.
+# Voraussetzungen (siehe carcura-manager/app/README.md): Apple Developer Program, Bundle-ID in App Store Connect,
+# API-Schlüssel und diese Secrets im Repository: APPLE_TEAM_ID, ASC_KEY_ID, ASC_ISSUER_ID, ASC_KEY_P8_BASE64.
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 4 1 * *'   # monatlich neuer Build, damit TestFlight-Builds (90 Tage gültig) nicht ablaufen
+
+concurrency:
+  group: ios-app
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: macos-15
+    timeout-minutes: 60
+    defaults:
+      run:
+        working-directory: carcura-manager/app
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Xcode-Version wählen
+        run: sudo xcode-select -s /Applications/Xcode_16.4.app || sudo xcode-select -s "$(ls -d /Applications/Xcode_16*.app | tail -1)"
+
+      - name: Abhängigkeiten installieren
+        run: npm ci || npm install
+
+      - name: Xcode-Projekt, Icons, Info.plist vorbereiten
+        env:
+          BUILD_NUMBER: ${{ github.run_number }}
+        run: bash scripts/ios-prepare.sh
+
+      - name: API-Schlüssel für App Store Connect ablegen
+        env:
+          ASC_KEY_P8_BASE64: ${{ secrets.ASC_KEY_P8_BASE64 }}
+          ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
+        run: |
+          mkdir -p "$HOME/private_keys"
+          echo "$ASC_KEY_P8_BASE64" | base64 --decode > "$HOME/private_keys/AuthKey_${ASC_KEY_ID}.p8"
+          test -s "$HOME/private_keys/AuthKey_${ASC_KEY_ID}.p8"
+
+      - name: Team-ID in das Xcode-Projekt eintragen
+        env:
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+        run: |
+          sed -i '' "s/DEVELOPMENT_TEAM = \"\";/DEVELOPMENT_TEAM = $APPLE_TEAM_ID;/g; s/DEVELOPMENT_TEAM = ;/DEVELOPMENT_TEAM = $APPLE_TEAM_ID;/g" ios/App/App.xcodeproj/project.pbxproj
+          grep -q "DEVELOPMENT_TEAM = $APPLE_TEAM_ID" ios/App/App.xcodeproj/project.pbxproj || sed -i '' "s/PRODUCT_BUNDLE_IDENTIFIER = info.carcura.manager;/PRODUCT_BUNDLE_IDENTIFIER = info.carcura.manager; DEVELOPMENT_TEAM = $APPLE_TEAM_ID;/g" ios/App/App.xcodeproj/project.pbxproj
+
+      - name: Archiv bauen (automatische Signierung über API-Schlüssel)
+        env:
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+          ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
+          ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
+        run: |
+          xcodebuild -workspace ios/App/App.xcworkspace -scheme App -configuration Release -sdk iphoneos \
+            -destination 'generic/platform=iOS' -archivePath build/App.xcarchive archive \
+            DEVELOPMENT_TEAM="$APPLE_TEAM_ID" CODE_SIGN_STYLE=Automatic \
+            -allowProvisioningUpdates -allowProvisioningDeviceRegistration \
+            -authenticationKeyPath "$HOME/private_keys/AuthKey_${ASC_KEY_ID}.p8" \
+            -authenticationKeyID "$ASC_KEY_ID" -authenticationKeyIssuerID "$ASC_ISSUER_ID"
+
+      - name: Zu TestFlight hochladen
+        env:
+          ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
+          ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
+        run: |
+          xcodebuild -exportArchive -archivePath build/App.xcarchive -exportPath build/export \
+            -exportOptionsPlist ExportOptions.plist -allowProvisioningUpdates \
+            -authenticationKeyPath "$HOME/private_keys/AuthKey_${ASC_KEY_ID}.p8" \
+            -authenticationKeyID "$ASC_KEY_ID" -authenticationKeyIssuerID "$ASC_ISSUER_ID"
+          echo "Upload abgeschlossen. Der Build erscheint in App Store Connect → TestFlight nach 5–15 Minuten Verarbeitung."
+
+      - name: Build-Protokoll sichern
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ios-build-logs
+          path: |
+            carcura-manager/app/build/export/*.plist
+            carcura-manager/app/build/export/*.log
+          if-no-files-found: ignore

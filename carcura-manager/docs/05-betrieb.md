@@ -203,3 +203,11 @@ gekennzeichnet (der erste Administrator der Installation ist automatisch Betreib
 | Sitzungsbereinigung | täglich 03:15 |
 
 Status und Fehler der letzten Läufe: Einstellungen → System & Sicherung → „Automatische Aufgaben“.
+
+## iPhone-App
+
+Der Ordner `app/` enthält die native iOS-Hülle (Capacitor). Sie wird über GitHub Actions auf einem
+macOS-Runner gebaut und zu TestFlight hochgeladen; die Installation erfolgt über die TestFlight-App,
+ohne App-Store-Veröffentlichung. Voraussetzungen, Schritte und Secrets: `app/README.md`.
+Die App lädt die Oberfläche vom Server (Laptop im WLAN oder öffentliche HTTPS-Adresse); die Adresse
+wird beim ersten Start abgefragt und lässt sich auf der Anmeldeseite ändern.

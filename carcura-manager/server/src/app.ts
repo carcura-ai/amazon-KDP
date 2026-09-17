@@ -139,7 +139,8 @@ export async function buildApp(opts: BuildOptions): Promise<FastifyInstance> {
     return reply.status(500).send({ error: 'internal', message: `Interner Fehler (ID ${errorId}).` });
   });
 
-  app.get('/api/health', async () => ({ ok: true, version: app.appVersion, time: new Date().toISOString() }));
+  // Erreichbarkeitsprüfung – auch aus der nativen App-Hülle (anderer Ursprung), deshalb CORS nur hier.
+  app.get('/api/health', async (_req, reply) => { reply.header('Access-Control-Allow-Origin', '*'); return { ok: true, version: app.appVersion, time: new Date().toISOString() }; });
 
   await app.register(setupRoutes);
   await app.register(authRoutes);
