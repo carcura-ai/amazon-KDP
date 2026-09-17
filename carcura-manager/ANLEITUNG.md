@@ -101,9 +101,46 @@ Lackpolitur, Keramikversiegelung usw.) mit Preis 0. Die Preise werden in Schritt
 
 Nach „Einrichtung abschließen“ bist du angemeldet und siehst das Dashboard.
 
+### Schritt 5b: Automatische Einrichtung mit den Carcura-Daten (5 Minuten, Abkürzung für Teil 4)
+Statt Teil 4 von Hand durchzugehen, kann das Einrichtungsskript die Carcura-Stammdaten in einem
+Rutsch eintragen. Es liest nichts aus dem Internet außer dem Logo und fragt nur die Dinge ab, die
+niemand außer dir kennt (Passwörter, API-Schlüssel).
+
+1. Manager läuft (Fenster von `start.cmd` bleibt offen).
+2. Im Ordner `scripts` die Datei **`einrichten.cmd`** doppelklicken.
+3. Mit deiner Administrator-E-Mail und dem Passwort anmelden (die Passworteingabe bleibt unsichtbar).
+4. Die Fragen beantworten. Ein Schlüssel, den du gerade nicht zur Hand hast, wird mit Enter
+   übersprungen und lässt sich später in den Einstellungen nachtragen.
+
+Das Skript erledigt:
+
+| Schritt | Was passiert | Quelle |
+|---|---|---|
+| Firmendaten | Carcura GbR, Hauptstr. 7, 57632 Walterschen, Telefon, E-Mail, Website, Farben, Zahlungsziel 14 Tage, Rechnungshinweis nach § 19 UStG | carcura.info |
+| Leistungskatalog | 9 Einzelleistungen und 17 Pflege-Abos mit den Ab-Preisen der Website, Startkatalog mit Preis 0 wird deaktiviert | carcura.info/leistungen |
+| Logo | Schriftzug von der Website als Firmenlogo (Anmeldeseite, PDF) | carcura.info |
+| Windsor.ai | API-Key (abgefragt) plus die Konto-IDs für Google Ads, Meta Ads, GA4, Instagram und Lead Ads, Verbindungstest, erster Abgleich der letzten 90 Tage | Windsor-Konto carcura@web.de |
+| E-Mail-Versand | smtp.web.de, Port 587, Postfach carcura@web.de (Passwort abgefragt), Testnachricht an dich | Vorschlag, änderbar |
+| KI-Assistent | Anthropic-Schlüssel (abgefragt), Modell claude-sonnet-5 | optional |
+| Wettbewerber | Google-Places-Schlüssel (abgefragt), Suchbegriffe rund um Walterschen, Altenkirchen, Hachenburg, erster Scan | optional |
+| Website-Anbindung | Zeigt Token und Adresse für das Formular auf carcura.info | siehe Teil 6 |
+
+Nicht automatisch gesetzt, weil nirgends öffentlich: Steuernummer, Bankverbindung (Einstellungen →
+Unternehmen). Bereits gefüllte Felder werden nicht überschrieben; `einrichten.cmd --alles` erzwingt das.
+
+**Wichtig zu Windsor.ai:** Das Windsor-Konto läuft im Tarif „Free“, der nur **ein** verbundenes
+Konto einschließt. Verbunden sind aber fünf (Google Ads, Meta Ads, GA4, Instagram, Meta Lead Ads).
+Windsor liefert in diesem Zustand keine echten Zahlen, sondern Platzhalter. Der Manager erkennt das,
+bricht den Abgleich ab und zeigt die Meldung unter Einstellungen → Integrationen. Entscheidung nötig:
+entweder bei https://onboard.windsor.ai/app/ vier Konten trennen (Empfehlung im Free-Tarif: nur
+**Meta Lead Ads** behalten, damit Anfragen aus Facebook und Instagram automatisch als Leads landen)
+oder auf einen bezahlten Windsor-Tarif wechseln, dann laufen alle fünf Quellen.
+
 ---
 
 ## Teil 4 – Grundeinstellungen (15 Minuten, in dieser Reihenfolge)
+
+Wer Schritt 5b ausgeführt hat, prüft hier nur noch und ergänzt Steuernummer, Bankverbindung, Benutzer.
 
 Alle Punkte findest du links unter **Einstellungen**.
 
@@ -148,6 +185,8 @@ Alle Punkte findest du links unter **Einstellungen**.
 - **Windsor.ai** (empfohlen für Google Ads, Meta Ads, Google Analytics, Instagram, Meta-Lead-Formulare):
   API-Key aus dem Windsor-Konto eintragen, „Verbindung testen“, dann unter Marketing
   „Jetzt synchronisieren“. Danach läuft der Abgleich alle 6 Stunden automatisch.
+  Der Free-Tarif von Windsor umfasst nur ein verbundenes Konto; bei mehr Konten liefert Windsor
+  Platzhalter statt Zahlen. Der Manager erkennt das und importiert dann nichts (siehe Schritt 5b).
 - **KI-Business-Assistent**: API-Schlüssel von https://console.anthropic.com (Kosten pro Frage im
   Cent-Bereich, Abrechnung über Anthropic). Ohne Schlüssel bleibt der Assistent aus, alles andere
   funktioniert.

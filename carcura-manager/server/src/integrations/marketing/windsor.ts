@@ -3,6 +3,19 @@ import { type FetchFn, type AdRow, type WebRow, type SocialRow, type ExternalLea
 export interface WindsorConfig { apiKey: string; googleAdsAccount?: string | null; metaAccount?: string | null; ga4Account?: string | null; instagramAccount?: string | null; leadsAccount?: string | null; retryBaseMs?: number }
 
 /**
+ * Windsor ersetzt bei pausiertem oder überzogenem Tarif die Werte durch einen Hinweistext
+ * („Uh-oh! These are not your real numbers …“). Solche Zeilen dürfen nie als Kennzahlen landen.
+ */
+export function planNotice(rows: Array<Record<string, unknown>>): string | null {
+  for (const r of rows.slice(0, 5)) {
+    for (const v of Object.values(r)) {
+      if (typeof v === 'string' && /not your real numbers|reads are paused|upgrade at https:\/\/onboard\.windsor\.ai/i.test(v)) return v.replace(/^Uh-oh!\s*/i, '').trim();
+    }
+  }
+  return null;
+}
+
+/**
  * Windsor.ai – ein API-Key für Google Ads, Meta Ads, GA4, Instagram und Meta Lead Ads.
  * Feldnamen wurden gegen die Windsor-Felddefinitionen verifiziert (Stand 2026-09).
  */
@@ -15,12 +28,21 @@ export class WindsorAdapter {
     const res = await fetchJson<{ data?: unknown[]; result?: unknown[]; error?: string }>(this.fetchFn, `${this.baseUrl}/${connector}?${p.toString()}`, {}, { baseDelayMs: this.cfg.retryBaseMs });
     const rows = (res.data ?? res.result ?? []) as Array<Record<string, unknown>>;
     if (!Array.isArray(rows)) throw new Error(`Unerwartete Antwort von Windsor (${connector}).`);
+    const notice = planNotice(rows);
+    if (notice) throw new Error(`Windsor liefert keine echten Daten (${connector}): ${notice}`);
     return rows;
   }
 
+  /**
+   * Verbindungstest: GA4 plus, falls konfiguriert, Google Ads oder Meta. Bei pausiertem Tarif
+   * liefert Windsor für GA4 eine leere Nullzeile, die Sperre steht nur in den Ads-Antworten.
+   */
   async test(): Promise<void> {
     const to = new Date().toISOString().slice(0, 10);
-    await this.query('googleanalytics4', ['date', 'sessions'], { from: to, to }, this.cfg.ga4Account);
+    const range = { from: to, to };
+    await this.query('googleanalytics4', ['date', 'sessions'], range, this.cfg.ga4Account);
+    if (this.cfg.googleAdsAccount) await this.query('google_ads', ['date', 'campaign', 'clicks'], range, this.cfg.googleAdsAccount);
+    else if (this.cfg.metaAccount) await this.query('facebook', ['date', 'campaign', 'spend'], range, this.cfg.metaAccount);
   }
 
   async fetchGoogleAds(range: DateRange): Promise<AdRow[]> {

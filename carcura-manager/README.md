@@ -18,6 +18,10 @@ Danach im Browser `http://127.0.0.1:4800` öffnen. Beim ersten Start führt ein 
 Einrichtung von Unternehmen und Administrator. Voraussetzung: Node.js 22.13 oder neuer (LTS 24) und einmalig Internet
 für die Installation.
 
+`scripts/einrichten.cmd` (bzw. `einrichten.sh`) trägt anschließend die Carcura-Stammdaten, den
+Leistungskatalog mit Preisen, das Logo und die Integrationen ein; Schlüssel und Passwörter werden
+nur abgefragt, nie gespeichert (Details: ANLEITUNG.md, Schritt 5b).
+
 Das Startskript hält die Anwendung am Laufen und führt Neustart und Update aus, die unter
 **Einstellungen → System & Sicherung** ausgelöst werden (vor jedem Update entsteht automatisch eine Sicherung).
 
