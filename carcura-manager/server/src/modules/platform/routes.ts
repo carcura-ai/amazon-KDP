@@ -12,6 +12,7 @@ import { writeAudit } from '../../core/audit.js';
 import { ctxOf } from '../../plugins/auth.js';
 import { seedDefaultServices } from '../company/defaultServices.js';
 import { publicCompany } from '../auth/routes.js';
+import { startSubscription } from '../../core/subscriptions.js';
 
 /**
  * Betreiber-Ebene: neue Mandanten anlegen, Übersicht über alle Unternehmen.
@@ -23,6 +24,7 @@ const createSchema = z.object({
   company: z.object({ name: zTrimmed(120).min(2), email: zOptionalText(200), phone: zOptionalText(60), city: zOptionalText(120), primaryColor: z.string().regex(/^#[0-9a-fA-F]{6}$/).optional() }),
   admin: z.object({ email: zEmail, password: z.string(), firstName: zTrimmed(80).min(1), lastName: zTrimmed(80).min(1) }),
   seedDefaultServices: z.boolean().default(true),
+  planCode: z.string().min(2).max(40).optional(),
 });
 
 export default async function platformRoutes(app: FastifyInstance) {
@@ -60,7 +62,8 @@ export default async function platformRoutes(app: FastifyInstance) {
       seedRolePermissions(tx, companyId);
       if (input.seedDefaultServices) seedDefaultServices(tx, companyId);
     });
-    writeAudit(app.db, ctx, { action: 'platform.company_create', entityType: 'company', entityId: companyId, after: { name: input.company.name, slug } });
+    if (app.config.deploymentMode === 'saas') startSubscription(app.db, companyId, input.planCode ?? 'BUSINESS', { trial: true }, { userId: ctx.userId, source: 'admin' });
+    writeAudit(app.db, ctx, { action: 'platform.company_create', entityType: 'company', entityId: companyId, after: { name: input.company.name, slug, planCode: input.planCode ?? null } });
     return { companyId, userId };
   });
 

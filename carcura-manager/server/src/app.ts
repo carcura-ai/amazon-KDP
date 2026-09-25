@@ -56,6 +56,12 @@ import { syncNewPermissions } from './core/session.js';
 import { createRequire } from 'node:module';
 import { randomUUID } from 'node:crypto';
 import passwordResetRoutes from './modules/auth/reset.routes.js';
+import entitlementsPlugin from './plugins/entitlements.js';
+import subscriptionRoutes from './modules/saas/subscription.routes.js';
+import saasAdminRoutes from './modules/saas/admin.routes.js';
+import paymentWebhookRoutes from './modules/saas/webhooks.routes.js';
+import { createPaymentProviders, type PaymentProvider } from './integrations/payments/provider.js';
+import { seedPlans } from './core/entitlements.js';
 
 declare module 'fastify' {
   interface FastifyInstance {
@@ -74,6 +80,7 @@ declare module 'fastify' {
     backups: BackupService;
     /** Verzeichnis aller registrierten Routen (für Isolationstests und API-Dokumentation). */
     routeIndex: Array<{ method: string; url: string }>;
+    payments: Map<string, PaymentProvider>;
     /** Beendet den Prozess mit Exit-Code (75 = Neustart, 76 = Update) – das Startskript reagiert darauf. */
     exitFn: (code: number, reason: string) => void;
   }
@@ -85,6 +92,7 @@ export interface BuildOptions {
   logger?: boolean | object;
   fetchFn?: typeof fetch;
   exitFn?: (code: number, reason: string) => void;
+  payments?: Map<string, PaymentProvider>;
 }
 
 export async function buildApp(opts: BuildOptions): Promise<FastifyInstance> {
@@ -97,10 +105,12 @@ export async function buildApp(opts: BuildOptions): Promise<FastifyInstance> {
   });
 
   const added = syncNewPermissions(opts.dbHandle.db);
+  seedPlans(opts.dbHandle.db);
   const routeIndex: Array<{ method: string; url: string }> = [];
   app.decorate('routeIndex', routeIndex);
   app.addHook('onRoute', (r) => { for (const m of [r.method].flat()) if (m !== 'HEAD') routeIndex.push({ method: m, url: r.url }); });
   app.decorate('db', opts.dbHandle.db);
+  app.decorate('payments', opts.payments ?? createPaymentProviders());
   app.decorate('dbHandle', opts.dbHandle);
   app.decorate('config', opts.config);
   const secrets = new SecretBox(opts.config.appSecret);
@@ -129,6 +139,7 @@ export async function buildApp(opts: BuildOptions): Promise<FastifyInstance> {
   await app.register(rateLimit, { global: false });
   await app.register(multipart, { limits: { fileSize: MAX_FILE_BYTES, files: 20 } });
   await app.register(authPlugin);
+  await app.register(entitlementsPlugin);
 
   // Sicherheits-Header (BSI APP.3.1 / OWASP): CSP ohne Fremdquellen, kein Framing durch Dritte, keine Browser-APIs außer Kamera
   const https = opts.config.publicUrl.startsWith('https://');
@@ -200,6 +211,9 @@ export async function buildApp(opts: BuildOptions): Promise<FastifyInstance> {
   await app.register(privacyRoutes);
   await app.register(supportRoutes);
   await app.register(passwordResetRoutes);
+  await app.register(subscriptionRoutes);
+  await app.register(saasAdminRoutes);
+  await app.register(paymentWebhookRoutes);
 
   // Web-App (Vite-Build) ausliefern, wenn vorhanden
   const webDist = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../web/dist');

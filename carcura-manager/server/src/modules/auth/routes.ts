@@ -94,6 +94,7 @@ export default async function authRoutes(app: FastifyInstance) {
       company: publicCompany(company), permissions: [...ctx.permissions], twoFactorEnabled, mustSetup2fa,
       support: support ? { id: support.id, mode: support.mode, expiresAt: support.expiresAt, reason: support.reason } : null,
       deploymentMode: app.config.deploymentMode,
+      entitlements: (() => { const e = req.entitlements(); return { features: [...e.features], plan: e.plan, status: e.status, canWrite: e.canWrite, source: e.source }; })(),
     };
   });
 

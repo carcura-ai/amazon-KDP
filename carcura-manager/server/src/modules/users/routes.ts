@@ -4,7 +4,7 @@ import { and, eq, sql } from 'drizzle-orm';
 import { users } from '../../db/schema.js';
 import { parse, zEmail, zTrimmed } from '../../core/validation.js';
 import { hashPassword, validatePasswordPolicy } from '../../core/password.js';
-import { badRequest, conflict, notFound } from '../../core/errors.js';
+import { AppError, badRequest, conflict, notFound } from '../../core/errors.js';
 import { newId, nowIso } from '../../core/ids.js';
 import { writeAudit } from '../../core/audit.js';
 import { revokeAllUserSessions } from '../../core/session.js';
@@ -26,6 +26,14 @@ const updateSchema = z.object({
   isActive: z.boolean().optional(),
 });
 
+/** Benutzerlimit des Tarifs (SaaS). Im Self-Hosted-Betrieb unbegrenzt. */
+function assertUserLimit(app: FastifyInstance, companyId: string) {
+  const { maxUsers } = app.entitlementsFor(companyId).limits;
+  if (maxUsers === null) return;
+  const active = app.db.select({ n: sql<number>`count(*)` }).from(users).where(and(eq(users.companyId, companyId), eq(users.isActive, true))).get()?.n ?? 0;
+  if (active >= maxUsers) throw new AppError(402, 'user_limit', `Ihr Tarif umfasst ${maxUsers} aktive Benutzer. Weitere Benutzer können unter Einstellungen → Vertrag & Abo hinzugebucht werden.`);
+}
+
 export default async function userRoutes(app: FastifyInstance) {
   app.get('/api/users', { preHandler: app.requireAuth() }, async (req) => {
     const ctx = ctxOf(req);
@@ -42,6 +50,7 @@ export default async function userRoutes(app: FastifyInstance) {
     const input = parse(createSchema, req.body);
     const policy = validatePasswordPolicy(input.password);
     if (policy) throw badRequest(policy, [{ path: 'password', message: policy }]);
+    assertUserLimit(app, ctx.companyId);
     const exists = app.db.select({ id: users.id }).from(users).where(eq(users.email, input.email)).get();
     if (exists) throw conflict('Diese E-Mail-Adresse wird bereits verwendet.');
     const id = newId();
@@ -66,6 +75,7 @@ export default async function userRoutes(app: FastifyInstance) {
       const admins = app.db.select({ n: sql<number>`count(*)` }).from(users).where(and(eq(users.companyId, ctx.companyId), eq(users.role, 'admin'), eq(users.isActive, true))).get()?.n ?? 0;
       if (admins <= 1) throw badRequest('Mindestens ein aktiver Administrator muss bestehen bleiben.');
     }
+    if (input.isActive === true && !before.isActive) assertUserLimit(app, ctx.companyId);
     app.db.update(users).set({ ...input, updatedAt: nowIso() }).where(eq(users.id, id)).run();
     if (input.isActive === false) revokeAllUserSessions(app.db, id);
     const after = app.db.select().from(users).where(eq(users.id, id)).get()!;

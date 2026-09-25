@@ -123,8 +123,8 @@ export class MarketingSync {
     return results;
   }
 
-  async syncAll(days = 7): Promise<string> {
-    const active = this.db.select({ id: companies.id }).from(companies).where(eq(companies.isActive, true)).all();
+  async syncAll(days = 7, allowed: (companyId: string) => boolean = () => true): Promise<string> {
+    const active = this.db.select({ id: companies.id }).from(companies).where(eq(companies.isActive, true)).all().filter((c) => allowed(c.id));
     let ok = 0; let failed = 0;
     for (const c of active) for (const r of await this.syncCompany(c.id, days)) r.ok ? ok++ : failed++;
     return `${ok} Sync(s) erfolgreich, ${failed} fehlgeschlagen`;

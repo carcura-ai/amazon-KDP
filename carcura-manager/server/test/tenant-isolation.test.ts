@@ -75,6 +75,7 @@ afterAll(async () => app.close());
 function idFor(url: string, param: string): string | null {
   if (param === 'pid') return ids.payment!;
   if (param === 'type') return 'windsor';
+  if (param === 'provider') return 'manual';
   if (param === 'role') return 'employee';
   if (param === 'kind') return 'customers';
   if (param === 'name') return 'backup-a.zip';
@@ -85,7 +86,7 @@ function idFor(url: string, param: string): string | null {
     [/^\/api\/invoices\//, 'invoice'], [/^\/api\/protocols\//, 'protocol'], [/^\/(api\/)?files\//, 'file'],
     [/^\/api\/tasks\//, 'task'], [/^\/api\/inventory\//, 'inventory'], [/^\/api\/expenses\//, 'expense'],
     [/^\/api\/recurring-expenses\//, 'recurring'], [/^\/api\/services\//, 'service'], [/^\/api\/competitors\//, 'competitor'],
-    [/^\/api\/users\//, 'user'], [/^\/api\/platform\/companies\//, 'company'], [/^\/api\/(platform\/)?support-sessions\//, 'supportSession'], [/^\/api\/reports\//, 'report'], [/^\/api\/assistant\/conversations\//, 'conversation'],
+    [/^\/api\/users\//, 'user'], [/^\/api\/platform\/companies\//, 'company'], [/^\/api\/(platform\/)?support-sessions\//, 'supportSession'], [/^\/api\/platform\/(plans|addons|discount-codes)\//, 'platformObject'], [/^\/api\/reports\//, 'report'], [/^\/api\/assistant\/conversations\//, 'conversation'],
   ];
   for (const [re, key] of map) if (re.test(url)) return ids[key] ?? '00000000-0000-4000-8000-000000000000';
   return null;

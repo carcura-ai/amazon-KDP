@@ -9,6 +9,7 @@ import { PERMISSIONS, ROLES, DEFAULT_ROLE_PERMISSIONS } from '../../core/permiss
 import { ctxOf } from '../../plugins/auth.js';
 import { publicCompany } from '../auth/routes.js';
 import { badRequest } from '../../core/errors.js';
+import { FeatureError } from '../../plugins/entitlements.js';
 import { desc, sql } from 'drizzle-orm';
 
 const hex = z.string().regex(/^#[0-9a-fA-F]{6}$/, 'Farbe als Hex-Wert, z. B. #E8F320.');
@@ -52,6 +53,8 @@ export default async function companyRoutes(app: FastifyInstance) {
     const ctx = ctxOf(req);
     const input = parse(updateSchema, req.body);
     const before = app.db.select().from(companies).where(eq(companies.id, ctx.companyId)).get()!;
+    const whiteLabelChange = (input.productName !== undefined && input.productName !== before.productName) || (input.poweredBy !== undefined && input.poweredBy !== before.poweredBy);
+    if (whiteLabelChange && !req.entitlements().features.has('WHITE_LABEL')) throw new FeatureError('WHITE_LABEL');
     const { settingsJson, ...rest } = input;
     app.db
       .update(companies)

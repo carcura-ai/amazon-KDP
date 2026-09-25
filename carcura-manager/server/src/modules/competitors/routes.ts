@@ -42,7 +42,8 @@ export async function runCompetitorScan(app: FastifyInstance, companyId: string)
 }
 
 export async function runCompetitorScanAll(app: FastifyInstance): Promise<string> {
-  const active = app.db.select({ id: companies.id }).from(companies).where(eq(companies.isActive, true)).all();
+  // Nur Mandanten mit gebuchtem Modul (im Self-Hosted-Betrieb alle)
+  const active = app.db.select({ id: companies.id }).from(companies).where(eq(companies.isActive, true)).all().filter((c) => app.hasFeature(c.id, 'COMPETITORS'));
   let n = 0;
   for (const c of active) { try { const r = await runCompetitorScan(app, c.id); if (r.found) n++; } catch (err) { app.log.warn({ err, companyId: c.id }, 'Wettbewerber-Scan fehlgeschlagen'); } }
   return `${n} Mandant(en) gescannt`;

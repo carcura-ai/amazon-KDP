@@ -926,3 +926,164 @@ export const tasks = sqliteTable(
   },
   (t) => [index('tasks_company_status_idx').on(t.companyId, t.status, t.dueAt), index('tasks_customer_idx').on(t.companyId, t.customerId), index('tasks_lead_idx').on(t.companyId, t.leadId)],
 );
+
+/* ------------------------------------------------------------------ SaaS: Tarife, Module, Abonnements */
+/** Tarife (Preise sind Platzhalter und werden vom System-Admin gepflegt, nie im Code). */
+export const plans = sqliteTable('plans', {
+  id: text('id').primaryKey(),
+  code: text('code').notNull().unique(), // START | BUSINESS | PRO | ENTERPRISE | …
+  name: text('name').notNull(),
+  description: text('description'),
+  monthlyPriceCents: integer('monthly_price_cents'), // null = auf Anfrage
+  yearlyPriceCents: integer('yearly_price_cents'),
+  setupFeeCents: integer('setup_fee_cents').notNull().default(0),
+  currency: text('currency').notNull().default('EUR'),
+  trialDays: integer('trial_days').notNull().default(14),
+  maxUsers: integer('max_users'), // null = unbegrenzt
+  maxLocations: integer('max_locations'),
+  isPublic: integer('is_public', { mode: 'boolean' }).notNull().default(true),
+  isActive: integer('is_active', { mode: 'boolean' }).notNull().default(true),
+  sortOrder: integer('sort_order').notNull().default(0),
+  createdAt: ts('created_at'),
+  updatedAt: ts('updated_at'),
+});
+
+export const planFeatures = sqliteTable(
+  'plan_features',
+  {
+    id: text('id').primaryKey(),
+    planId: text('plan_id').notNull().references(() => plans.id),
+    featureKey: text('feature_key').notNull(),
+  },
+  (t) => [uniqueIndex('plan_features_unique').on(t.planId, t.featureKey)],
+);
+
+/** Zusatzmodule (Add-ons), z. B. KI, Kundenportal, Zusatznutzer. */
+export const addons = sqliteTable('addons', {
+  id: text('id').primaryKey(),
+  code: text('code').notNull().unique(),
+  name: text('name').notNull(),
+  description: text('description'),
+  featureKeysJson: text('feature_keys_json').notNull().default('[]'),
+  monthlyPriceCents: integer('monthly_price_cents'),
+  yearlyPriceCents: integer('yearly_price_cents'),
+  extraUsers: integer('extra_users').notNull().default(0),
+  extraLocations: integer('extra_locations').notNull().default(0),
+  isActive: integer('is_active', { mode: 'boolean' }).notNull().default(true),
+  sortOrder: integer('sort_order').notNull().default(0),
+  createdAt: ts('created_at'),
+  updatedAt: ts('updated_at'),
+});
+
+export const discountCodes = sqliteTable('discount_codes', {
+  id: text('id').primaryKey(),
+  code: text('code').notNull().unique(),
+  description: text('description'),
+  percentOff: integer('percent_off'), // 0–100
+  amountOffCents: integer('amount_off_cents'),
+  durationMonths: integer('duration_months'), // null = dauerhaft
+  maxRedemptions: integer('max_redemptions'),
+  redemptions: integer('redemptions').notNull().default(0),
+  validUntil: text('valid_until'),
+  isActive: integer('is_active', { mode: 'boolean' }).notNull().default(true),
+  createdAt: ts('created_at'),
+});
+
+/**
+ * Abonnement je Mandant. Zahlungsdaten werden nie gespeichert – nur die IDs beim Zahlungsanbieter.
+ * status: trial | active | past_due | paused | cancelled | expired
+ */
+export const tenantSubscriptions = sqliteTable(
+  'tenant_subscriptions',
+  {
+    id: text('id').primaryKey(),
+    companyId: text('company_id').notNull().references(() => companies.id),
+    planId: text('plan_id').notNull().references(() => plans.id),
+    status: text('status').notNull().default('trial'),
+    billingInterval: text('billing_interval').notNull().default('monthly'), // monthly | yearly
+    startDate: text('start_date').notNull(),
+    trialStart: text('trial_start'),
+    trialEnd: text('trial_end'),
+    currentPeriodStart: text('current_period_start'),
+    nextBillingDate: text('next_billing_date'),
+    cancelAtPeriodEnd: integer('cancel_at_period_end', { mode: 'boolean' }).notNull().default(false),
+    cancellationDate: text('cancellation_date'), // wirksames Vertragsende
+    cancelledAt: text('cancelled_at'), // Zeitpunkt der Kündigungserklärung
+    cancellationReason: text('cancellation_reason'),
+    pendingPlanId: text('pending_plan_id'), // Downgrade zum nächsten Abrechnungszeitraum
+    setupFeeCents: integer('setup_fee_cents').notNull().default(0),
+    discountCodeId: text('discount_code_id'),
+    discountPercent: integer('discount_percent'),
+    discountAmountCents: integer('discount_amount_cents'),
+    discountUntil: text('discount_until'),
+    currency: text('currency').notNull().default('EUR'),
+    paymentProvider: text('payment_provider').notNull().default('manual'),
+    externalCustomerId: text('external_customer_id'),
+    externalSubscriptionId: text('external_subscription_id'),
+    createdAt: ts('created_at'),
+    updatedAt: ts('updated_at'),
+  },
+  (t) => [uniqueIndex('tenant_subscriptions_company_unique').on(t.companyId), index('tenant_subscriptions_status_idx').on(t.status)],
+);
+
+export const tenantAddons = sqliteTable(
+  'tenant_addons',
+  {
+    id: text('id').primaryKey(),
+    companyId: text('company_id').notNull().references(() => companies.id),
+    addonId: text('addon_id').notNull().references(() => addons.id),
+    quantity: integer('quantity').notNull().default(1),
+    status: text('status').notNull().default('active'), // active | cancelled
+    startedAt: text('started_at').notNull(),
+    endedAt: text('ended_at'),
+  },
+  (t) => [index('tenant_addons_company_idx').on(t.companyId, t.status)],
+);
+
+/** Manuelle Freischaltung oder Sperre einzelner Module durch den System-Admin (Enterprise, Kulanz, Test). */
+export const tenantFeatureOverrides = sqliteTable(
+  'tenant_feature_overrides',
+  {
+    id: text('id').primaryKey(),
+    companyId: text('company_id').notNull().references(() => companies.id),
+    featureKey: text('feature_key').notNull(),
+    enabled: integer('enabled', { mode: 'boolean' }).notNull(),
+    reason: text('reason'),
+    createdByUserId: text('created_by_user_id'),
+    createdAt: ts('created_at'),
+  },
+  (t) => [uniqueIndex('tenant_feature_overrides_unique').on(t.companyId, t.featureKey)],
+);
+
+export const subscriptionEvents = sqliteTable(
+  'subscription_events',
+  {
+    id: text('id').primaryKey(),
+    companyId: text('company_id').notNull(),
+    subscriptionId: text('subscription_id'),
+    type: text('type').notNull(), // created | trial_started | activated | plan_changed | cancelled | reactivated | expired | payment_failed | …
+    dataJson: text('data_json').notNull().default('{}'),
+    actorUserId: text('actor_user_id'),
+    source: text('source').notNull().default('app'), // app | admin | webhook | job
+    createdAt: ts('created_at'),
+  },
+  (t) => [index('subscription_events_company_idx').on(t.companyId, t.createdAt)],
+);
+
+/** Eingehende Zahlungs-Webhooks: Idempotenz über (provider, external_event_id). Nur Metadaten, keine Zahlungsdaten. */
+export const paymentWebhookEvents = sqliteTable(
+  'payment_webhook_events',
+  {
+    id: text('id').primaryKey(),
+    provider: text('provider').notNull(),
+    externalEventId: text('external_event_id').notNull(),
+    type: text('type').notNull(),
+    companyId: text('company_id'),
+    status: text('status').notNull().default('received'), // received | processed | ignored | failed
+    error: text('error'),
+    payloadSha256: text('payload_sha256').notNull(),
+    receivedAt: ts('received_at'),
+    processedAt: text('processed_at'),
+  },
+  (t) => [uniqueIndex('payment_webhook_events_unique').on(t.provider, t.externalEventId)],
+);
