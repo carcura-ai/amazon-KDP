@@ -117,6 +117,11 @@ export const auditLog = sqliteTable(
     afterJson: text('after_json'),
     ip: text('ip'),
     supportSessionId: text('support_session_id'),
+    requestId: text('request_id'),
+    /** Manipulationserschwerung: Hash des Inhalts und Verkettung je Mandant (prev_hash → hash). */
+    contentHash: text('content_hash'),
+    prevHash: text('prev_hash'),
+    hash: text('hash'),
     createdAt: ts('created_at'),
   },
   (t) => [index('audit_company_idx').on(t.companyId, t.createdAt), index('audit_entity_idx').on(t.entityType, t.entityId)],
@@ -1264,4 +1269,61 @@ export const aiUsageLog = sqliteTable(
     createdAt: ts('created_at'),
   },
   (t) => [index('ai_usage_company_idx').on(t.companyId, t.createdAt)],
+);
+
+/* ------------------------------------------------------------------ API-Schlüssel (versionierte API /api/v1) */
+export const apiKeys = sqliteTable(
+  'api_keys',
+  {
+    id: text('id').primaryKey(),
+    companyId: text('company_id').notNull().references(() => companies.id),
+    name: text('name').notNull(),
+    prefix: text('prefix').notNull(), // sichtbarer Teil zur Wiedererkennung
+    keyHash: text('key_hash').notNull(), // SHA-256 des vollständigen Schlüssels; der Schlüssel selbst wird nie gespeichert
+    scopesJson: text('scopes_json').notNull().default('[]'),
+    expiresAt: text('expires_at'),
+    revokedAt: text('revoked_at'),
+    lastUsedAt: text('last_used_at'),
+    lastUsedIp: text('last_used_ip'),
+    createdByUserId: text('created_by_user_id'),
+    createdAt: ts('created_at'),
+  },
+  (t) => [uniqueIndex('api_keys_hash_unique').on(t.keyHash), index('api_keys_company_idx').on(t.companyId)],
+);
+
+/* ------------------------------------------------------------------ Ausgehende Webhooks */
+export const webhookEndpoints = sqliteTable(
+  'webhook_endpoints',
+  {
+    id: text('id').primaryKey(),
+    companyId: text('company_id').notNull().references(() => companies.id),
+    url: text('url').notNull(),
+    secretEncrypted: text('secret_encrypted').notNull(),
+    eventsJson: text('events_json').notNull().default('[]'),
+    isActive: integer('is_active', { mode: 'boolean' }).notNull().default(true),
+    description: text('description'),
+    createdByUserId: text('created_by_user_id'),
+    createdAt: ts('created_at'),
+    updatedAt: ts('updated_at'),
+  },
+  (t) => [index('webhook_endpoints_company_idx').on(t.companyId)],
+);
+
+export const webhookDeliveries = sqliteTable(
+  'webhook_deliveries',
+  {
+    id: text('id').primaryKey(), // zugleich Idempotenz-Schlüssel für den Empfänger
+    companyId: text('company_id').notNull(),
+    endpointId: text('endpoint_id').notNull().references(() => webhookEndpoints.id),
+    event: text('event').notNull(),
+    payloadJson: text('payload_json').notNull(), // nur IDs und Kennzahlen, keine Kontaktdaten
+    status: text('status').notNull().default('pending'), // pending | delivered | failed
+    attempts: integer('attempts').notNull().default(0),
+    nextAttemptAt: text('next_attempt_at').notNull(),
+    lastStatusCode: integer('last_status_code'),
+    lastError: text('last_error'),
+    deliveredAt: text('delivered_at'),
+    createdAt: ts('created_at'),
+  },
+  (t) => [index('webhook_deliveries_due_idx').on(t.status, t.nextAttemptAt), index('webhook_deliveries_company_idx').on(t.companyId, t.createdAt)],
 );

@@ -17,6 +17,24 @@ export const ALLOWED_MIME: Record<string, string> = {
 export const MAX_FILE_BYTES = 25 * 1024 * 1024;
 export const FILE_CATEGORIES = ['before', 'during', 'after', 'damage', 'detail', 'offer', 'invoice', 'protocol', 'other'] as const;
 
+/**
+ * Erkennt den tatsächlichen Dateityp am Inhalt (Magic Bytes) – Dateiendung und vom Browser gemeldeter
+ * Typ werden nicht geglaubt. SVG, HTML und ausführbare Formate sind grundsätzlich nicht erlaubt.
+ */
+export function sniffMime(buf: Buffer): string | null {
+  if (buf.length >= 3 && buf[0] === 0xff && buf[1] === 0xd8 && buf[2] === 0xff) return 'image/jpeg';
+  if (buf.length >= 8 && buf.subarray(0, 8).equals(Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]))) return 'image/png';
+  if (buf.length >= 12 && buf.toString('ascii', 0, 4) === 'RIFF' && buf.toString('ascii', 8, 12) === 'WEBP') return 'image/webp';
+  if (buf.length >= 5 && buf.toString('ascii', 0, 5) === '%PDF-') return 'application/pdf';
+  return null;
+}
+
+/** PDFs mit aktiven Inhalten (JavaScript, Startaktionen, eingebettete Dateien) werden abgewiesen. */
+export function pdfHasActiveContent(buf: Buffer): boolean {
+  const text = buf.toString('latin1');
+  return /\/(JavaScript|JS|Launch|EmbeddedFile|RichMedia|XFA)\b/.test(text);
+}
+
 export interface StoreInput {
   companyId: string;
   buffer: Buffer;
@@ -48,10 +66,15 @@ export class FileStorage {
   }
 
   async store(input: StoreInput) {
-    const ext = ALLOWED_MIME[input.mimeType];
-    if (!ext) throw badRequest(`Dateityp nicht erlaubt: ${input.mimeType}. Erlaubt sind JPG, PNG, WebP und PDF.`);
     if (input.buffer.length > MAX_FILE_BYTES) throw badRequest('Datei ist größer als 25 MB.');
     if (input.buffer.length === 0) throw badRequest('Leere Datei.');
+    const sniffed = sniffMime(input.buffer);
+    if (!sniffed) throw badRequest('Dateityp nicht erlaubt. Erlaubt sind JPG, PNG, WebP und PDF.');
+    // Der erkannte Inhalt zählt; ein abweichend gemeldeter Typ (z. B. PDF als Bild getarnt) wird abgewiesen
+    if (ALLOWED_MIME[input.mimeType] && input.mimeType !== sniffed && !(input.mimeType.startsWith('image/') && sniffed.startsWith('image/'))) throw badRequest('Dateiinhalt passt nicht zum Dateityp.');
+    input = { ...input, mimeType: sniffed };
+    if (sniffed === 'application/pdf' && pdfHasActiveContent(input.buffer)) throw badRequest('PDF mit aktiven Inhalten (Skripte, eingebettete Dateien) wird aus Sicherheitsgründen nicht angenommen.');
+    const ext = ALLOWED_MIME[sniffed]!;
     const id = newId();
     const now = new Date();
     const relDir = path.join(input.companyId, String(now.getFullYear()), String(now.getMonth() + 1).padStart(2, '0'));
@@ -65,8 +88,9 @@ export class FileStorage {
     let displayPath: string | null = null;
     if (isImage) {
       // EXIF-Drehung anwenden, Metadaten entfernen, Original als bereinigte Datei speichern
-      const img = sharp(input.buffer, { failOn: 'none' }).rotate();
-      const meta = await img.metadata();
+      const img = sharp(input.buffer, { failOn: 'error' }).rotate();
+      let meta;
+      try { meta = await img.metadata(); } catch { throw badRequest('Das Bild ist beschädigt oder kein gültiges Bildformat.'); }
       width = meta.width ?? null;
       height = meta.height ?? null;
       buffer = await img.toBuffer();

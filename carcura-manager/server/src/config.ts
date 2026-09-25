@@ -26,6 +26,10 @@ export interface AppConfig {
   minDesktopVersion: string;
   /** SaaS: Tage nach Vertragsende, bis die Löschung eines Mandanten vorgemerkt wird (plus 14 Tage Vorlauf). */
   tenantDataGraceDays: number;
+  /** Globales API-Limit je Sitzung/IP und Minute. */
+  rateLimitPerMinute: number;
+  /** Optional: Passphrase zur Verschlüsselung der Sicherungen (AES-256-GCM). */
+  backupPassphrase: string | null;
 }
 
 function readInt(name: string, fallback: number): number {
@@ -87,5 +91,7 @@ export function loadConfig(overrides: Partial<AppConfig> = {}): AppConfig {
     } : null,
     minDesktopVersion: overrides.minDesktopVersion ?? process.env.MIN_DESKTOP_VERSION ?? '1.0.0',
     tenantDataGraceDays: overrides.tenantDataGraceDays ?? readInt('TENANT_DATA_GRACE_DAYS', 30),
+    rateLimitPerMinute: overrides.rateLimitPerMinute ?? readInt('RATE_LIMIT_PER_MINUTE', 1200),
+    backupPassphrase: overrides.backupPassphrase !== undefined ? overrides.backupPassphrase : (process.env.BACKUP_PASSPHRASE && process.env.BACKUP_PASSPHRASE.length >= 16 ? process.env.BACKUP_PASSPHRASE : null),
   };
 }

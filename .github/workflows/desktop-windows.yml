@@ -9,6 +9,9 @@ on:
     branches: [main, master, 'claude/**']
     paths: ['carcura-manager/desktop/**', '.github/workflows/desktop-windows.yml']
 
+permissions:
+  contents: write
+
 concurrency:
   group: desktop-windows-${{ github.ref }}
   cancel-in-progress: true
@@ -51,3 +54,26 @@ jobs:
             carcura-manager/desktop/dist/latest.yml
           if-no-files-found: error
           retention-days: 30
+
+      - name: Version lesen
+        id: ver
+        shell: pwsh
+        run: echo "version=$((Get-Content package.json | ConvertFrom-Json).version)" >> $env:GITHUB_OUTPUT
+
+      # Fester Download-Link: Release „Carcura Management <Version>“ mit dem Installer
+      - name: Als Release veröffentlichen
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: desktop-v${{ steps.ver.outputs.version }}
+          name: Carcura Management ${{ steps.ver.outputs.version }} (Windows)
+          target_commitish: ${{ github.sha }}
+          prerelease: true
+          overwrite_files: true
+          body: |
+            Windows-Installer der Desktop-App „Carcura Management“.
+            Herunterladen: Carcura-Management-Setup-${{ steps.ver.outputs.version }}.exe (unten unter „Assets“).
+            Ohne Code-Signatur zeigt Windows beim ersten Start „Der Computer wurde durch Windows geschützt“ → „Weitere Informationen“ → „Trotzdem ausführen“.
+            Anleitung: carcura-manager/docs/deployment/zentraler-server-und-desktop-app.md
+          files: |
+            carcura-manager/desktop/dist/*.exe
+            carcura-manager/desktop/dist/latest.yml

@@ -3,6 +3,16 @@
 Reihenfolge: erst den Server im Internet einrichten, dann die Windows-App auf jedem PC installieren.
 Die Daten liegen danach auf dem Server; jeder PC mit der App und Internet greift auf denselben Stand zu.
 
+## Die zwei Dateien
+
+| Datei | Wofür | Wo |
+|---|---|---|
+| `Carcura-Management-Setup-1.0.0.exe` | Windows-App, auf jedem PC installieren | GitHub → Repository `carcura-ai/amazon-KDP` → rechts „Releases“ → „Carcura Management 1.0.0 (Windows)“ → Assets |
+| `carcura-manager.zip` | Server-Paket (Programm + Anleitung) für den zentralen Server | wird mitgeliefert; alternativ direkt per `git clone` auf dem Server |
+
+Falls unter „Releases“ noch nichts steht: GitHub → Reiter „Actions“ → „Windows-Desktop-App (Installer)“ →
+oberster grüner Lauf → ganz unten „Artifacts“ → „Carcura-Management-Windows“ herunterladen und entpacken.
+
 ## Teil A – Zentraler Server (einmalig, ca. 45 Minuten)
 
 ### A1. Server mieten (EU)

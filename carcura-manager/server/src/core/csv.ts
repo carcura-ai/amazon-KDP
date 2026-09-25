@@ -6,7 +6,9 @@ export interface CsvColumn<T> { key: string; label: string; get: (row: T) => unk
 
 function cell(v: unknown): string {
   if (v === null || v === undefined) return '';
-  const s = typeof v === 'number' ? String(v).replace('.', ',') : typeof v === 'boolean' ? (v ? 'ja' : 'nein') : Array.isArray(v) ? v.join(', ') : String(v);
+  let s = typeof v === 'number' ? String(v).replace('.', ',') : typeof v === 'boolean' ? (v ? 'ja' : 'nein') : Array.isArray(v) ? v.join(', ') : String(v);
+  // Schutz vor Formel-Injektion in Tabellenkalkulationen (=, +, -, @, Tab, CR am Zellanfang)
+  if (typeof v === 'string' && /^[=+\-@\t\r]/.test(s)) s = `'${s}`;
   return /[";\r\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
 }
 
