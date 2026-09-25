@@ -1,0 +1,24 @@
+{
+  "name": "carcura-manager-app",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Native iOS-Hülle (Capacitor) für den Carcura Manager – Verteilung über TestFlight, nicht über den App Store.",
+  "scripts": {
+    "assets": "capacitor-assets generate --ios --iconBackgroundColor '#E8F320' --iconBackgroundColorDark '#E8F320' --splashBackgroundColor '#0B0B0C' --splashBackgroundColorDark '#0B0B0C'",
+    "ios:add": "cap add ios",
+    "ios:sync": "cap sync ios",
+    "ios:open": "cap open ios"
+  },
+  "dependencies": {
+    "@capacitor/app": "^8.1.1",
+    "@capacitor/core": "^8.5.2",
+    "@capacitor/ios": "^8.5.2",
+    "@capacitor/preferences": "^8.0.1",
+    "@capacitor/splash-screen": "^8.0.2",
+    "@capacitor/status-bar": "^8.0.3"
+  },
+  "devDependencies": {
+    "@capacitor/assets": "^3.0.5",
+    "@capacitor/cli": "^8.5.2"
+  }
+}

@@ -1,0 +1,65 @@
+{
+  "name": "carcura-management",
+  "productName": "Carcura Management",
+  "version": "1.0.0",
+  "description": "Carcura Management – Windows-Anwendung für Fahrzeugaufbereiter (Client des zentralen Carcura-Servers)",
+  "author": "Carcura GbR",
+  "license": "UNLICENSED",
+  "private": true,
+  "main": "src/main.cjs",
+  "scripts": {
+    "start": "electron .",
+    "test": "node --test test/lib.test.cjs",
+    "check": "node --check src/main.cjs && node --check src/preload.cjs && node --check src/lib.cjs && node --check src/ui/connect.js && node --test test/lib.test.cjs",
+    "dist": "electron-builder --win nsis --x64 --publish never",
+    "dist:dir": "electron-builder --win dir --x64 --publish never"
+  },
+  "dependencies": {
+    "electron-updater": "^6.8.9"
+  },
+  "devDependencies": {
+    "electron": "^44.4.5",
+    "electron-builder": "^26.15.3"
+  },
+  "build": {
+    "appId": "de.carcura.management",
+    "productName": "Carcura Management",
+    "copyright": "© Carcura GbR",
+    "executableName": "Carcura Management",
+    "directories": { "output": "dist", "buildResources": "build" },
+    "files": ["src/**/*", "app-config.json", "build/icon.png", "package.json"],
+    "asar": true,
+    "electronLanguages": ["de", "en-US"],
+    "electronFuses": {
+      "runAsNode": false,
+      "enableCookieEncryption": true,
+      "enableNodeOptionsEnvironmentVariable": false,
+      "enableNodeCliInspectArguments": false,
+      "enableEmbeddedAsarIntegrityValidation": true,
+      "onlyLoadAppFromAsar": true,
+      "grantFileProtocolExtraPrivileges": false
+    },
+    "win": {
+      "target": [{ "target": "nsis", "arch": ["x64"] }],
+      "icon": "build/icon.png",
+      "artifactName": "Carcura-Management-Setup-${version}.exe",
+      "requestedExecutionLevel": "asInvoker"
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowElevation": true,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": "always",
+      "createStartMenuShortcut": true,
+      "shortcutName": "Carcura Management",
+      "uninstallDisplayName": "Carcura Management",
+      "menuCategory": false,
+      "runAfterFinish": true,
+      "deleteAppDataOnUninstall": false,
+      "installerLanguages": ["de_DE"],
+      "language": "1031"
+    },
+    "publish": [{ "provider": "generic", "url": "https://updates.example.invalid/carcura-management" }]
+  }
+}

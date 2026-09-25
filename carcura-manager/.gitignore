@@ -7,3 +7,9 @@ data/
 coverage/
 test-results/
 playwright-report/
+
+# Die Root-.gitignore (KDP-Projekt) schließt package.json, Lockfiles und .env.* aus.
+# Für den Manager gehören sie ins Repository (reproduzierbare Builds, Vorlagen ohne Geheimnisse).
+!package.json
+!package-lock.json
+!.env.example
