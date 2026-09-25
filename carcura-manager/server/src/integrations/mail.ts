@@ -30,7 +30,27 @@ export class MailService {
   /** Für Tests: ersetzt den echten SMTP-Transport. */
   transportOverride: Transporter | null = null;
 
-  constructor(private readonly db: Db, private readonly store: IntegrationStore) {}
+  constructor(private readonly db: Db, private readonly store: IntegrationStore, private readonly systemSmtp: SmtpConfig | null = null) {}
+
+  /** Konto-E-Mails (Passwort-Reset, Bestätigung) gehen über das Betreiber-SMTP, sonst über das des Mandanten. */
+  canSendAccountMail(companyId: string): boolean {
+    return Boolean(this.systemSmtp) || this.isConfigured(companyId);
+  }
+
+  async sendAccountMail(companyId: string, msg: MailMessage): Promise<{ ok: true; messageId: string | null } | { ok: false; error: string }> {
+    if (!this.systemSmtp || this.transportOverride) return this.send(companyId, msg);
+    const cfg = this.systemSmtp;
+    try {
+      const info = await this.transport(cfg).sendMail({ from: { name: cfg.fromName, address: cfg.fromEmail }, to: msg.to, subject: msg.subject, text: msg.text, html: msg.html ?? textToHtml(msg.text) });
+      const messageId = (info as { messageId?: string }).messageId ?? null;
+      this.db.insert(emailLog).values({ id: newId(), companyId, toAddress: msg.to, subject: msg.subject, status: 'sent', messageId, refType: msg.refType ?? 'account', refId: msg.refId ?? null }).run();
+      return { ok: true, messageId };
+    } catch (err) {
+      const error = err instanceof Error ? err.message : String(err);
+      this.db.insert(emailLog).values({ id: newId(), companyId, toAddress: msg.to, subject: msg.subject, status: 'failed', error, refType: msg.refType ?? 'account', refId: msg.refId ?? null }).run();
+      return { ok: false, error };
+    }
+  }
 
   isConfigured(companyId: string): boolean {
     return Boolean(this.transportOverride) || this.store.get<SmtpConfig>(companyId, 'smtp') !== null;

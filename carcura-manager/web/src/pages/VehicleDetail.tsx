@@ -6,7 +6,7 @@ import { get, del } from '../api/client';
 import type { Vehicle, Customer, Activity } from '../api/types';
 import { useAuth } from '../app/auth';
 import { Button, Card, Confirm, PageHead, Skeleton, useToast } from '../components/ui';
-import { fmtDate, fmtNumber, personName } from '../lib/format';
+import { fmtDate, personName } from '../lib/format';
 import { VehicleForm } from './Vehicles';
 import { Timeline } from './CustomerDetail';
 import { DocumentsPanel } from '../components/documents';
@@ -40,13 +40,8 @@ export function VehicleDetailPage() {
             <dt>Halter</dt><dd><Link to={`/kunden/${c.id}`}>{personName(c)}</Link> <span className="dim mono">{c.customerNumber}</span></dd>
             <dt>Kennzeichen</dt><dd className="mono">{v.licensePlate ?? '–'}</dd>
             <dt>Marke / Modell</dt><dd>{title}</dd>
-            <dt>Typ</dt><dd>{v.vehicleType ?? '–'}</dd>
-            <dt>Baujahr</dt><dd>{v.year ?? '–'}</dd>
-            <dt>Kilometerstand</dt><dd>{v.mileage ? `${fmtNumber(v.mileage)} km` : '–'}</dd>
-            <dt>Farbe</dt><dd>{v.color ?? '–'}</dd>
-            <dt>VIN</dt><dd className="mono">{v.vin ?? '–'}</dd>
             <dt>Angelegt</dt><dd>{fmtDate(v.createdAt)}</dd>
-            <dt>Notizen</dt><dd style={{ whiteSpace: 'pre-wrap' }}>{v.notes ?? '–'}</dd>
+            <dt>Besondere Merkmale</dt><dd style={{ whiteSpace: 'pre-wrap' }}>{v.notes ?? '–'}</dd>
           </dl>
         </Card>
         <div className="stack" style={{ gap: 16 }}>

@@ -103,7 +103,6 @@ export default async function protocolRoutes(app: FastifyInstance) {
     const protocolNumber = nextNumber(app.db, ctx.companyId, 'protocol', 'PR', true);
     app.db.insert(protocols).values({ id, companyId: ctx.companyId, protocolNumber, ...input, checklistJson: JSON.stringify(checklist), createdByUserId: ctx.userId }).run();
     writeDamages(ctx.companyId, id, damages);
-    if (input.mileage !== null) app.db.update(vehicles).set({ mileage: input.mileage, updatedAt: nowIso() }).where(eq(vehicles.id, input.vehicleId)).run();
     logActivity(app.db, ctx.companyId, { customerId: input.customerId, vehicleId: input.vehicleId, userId: ctx.userId, type: 'system', subject: `${input.type === 'intake' ? 'Annahmeprotokoll' : 'Übergabeprotokoll'} ${protocolNumber} angelegt`, refType: 'protocol', refId: id });
     writeAudit(app.db, ctx, { action: 'protocol.create', entityType: 'protocol', entityId: id, after: { protocolNumber, damages: damages.length } });
     return detail(ctx.companyId, id);
@@ -120,7 +119,6 @@ export default async function protocolRoutes(app: FastifyInstance) {
     delete patch.customerId; delete patch.vehicleId; // Kunde/Fahrzeug sind nach Anlage fest
     app.db.update(protocols).set(patch).where(eq(protocols.id, id)).run();
     if (damages) writeDamages(ctx.companyId, id, damages);
-    if (input.mileage !== undefined && input.mileage !== null) app.db.update(vehicles).set({ mileage: input.mileage, updatedAt: nowIso() }).where(eq(vehicles.id, before.vehicleId)).run();
     writeAudit(app.db, ctx, { action: 'protocol.update', entityType: 'protocol', entityId: id });
     return detail(ctx.companyId, id);
   });

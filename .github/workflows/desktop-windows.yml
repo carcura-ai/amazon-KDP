@@ -1,0 +1,53 @@
+name: Windows-Desktop-App (Installer)
+
+# Baut „Carcura-Management-Setup-<Version>.exe“ auf einem Windows-Runner und stellt ihn als
+# Artefakt bereit (Actions → Lauf → Artifacts). Manuell startbar oder bei Änderungen an desktop/.
+# Optional signiert, wenn die Secrets WIN_CSC_LINK (Base64 eines .pfx) und WIN_CSC_KEY_PASSWORD gesetzt sind.
+on:
+  workflow_dispatch:
+  push:
+    branches: [main, master, 'claude/**']
+    paths: ['carcura-manager/desktop/**', '.github/workflows/desktop-windows.yml']
+
+concurrency:
+  group: desktop-windows-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: windows-latest
+    timeout-minutes: 30
+    defaults:
+      run:
+        working-directory: carcura-manager/desktop
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: carcura-manager/desktop/package-lock.json
+
+      - name: Abhängigkeiten
+        run: npm ci --no-audit --no-fund
+
+      - name: Prüfen und testen
+        run: npm run check
+
+      - name: Installer bauen
+        env:
+          CSC_LINK: ${{ secrets.WIN_CSC_LINK }}
+          CSC_KEY_PASSWORD: ${{ secrets.WIN_CSC_KEY_PASSWORD }}
+          CSC_IDENTITY_AUTO_DISCOVERY: 'false'
+        run: npm run dist
+
+      - name: Installer hochladen
+        uses: actions/upload-artifact@v4
+        with:
+          name: Carcura-Management-Windows
+          path: |
+            carcura-manager/desktop/dist/*.exe
+            carcura-manager/desktop/dist/latest.yml
+          if-no-files-found: error
+          retention-days: 30

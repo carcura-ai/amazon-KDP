@@ -2,6 +2,7 @@ import { Navigate, Route, Routes, useLocation } from 'react-router';
 import { useAuth } from './auth';
 import { AppShell } from './shell';
 import { LoginPage } from '../pages/Login';
+import { PasswordForgotPage, PasswordResetPage } from '../pages/PasswordReset';
 import { SetupPage } from '../pages/Setup';
 import { DashboardPage } from '../pages/Dashboard';
 import { LeadsPage } from '../pages/Leads';
@@ -39,6 +40,8 @@ export function AppRoutes() {
     return (
       <Routes>
         <Route path="/login" element={<LoginPage />} />
+        <Route path="/passwort-vergessen" element={<PasswordForgotPage />} />
+        <Route path="/passwort-zuruecksetzen" element={<PasswordResetPage />} />
         <Route path="*" element={<Navigate to="/login" replace state={{ from: loc.pathname }} />} />
       </Routes>
     );

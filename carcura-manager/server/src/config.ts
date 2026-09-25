@@ -18,6 +18,12 @@ export interface AppConfig {
   chromiumPath: string | null;
   /** selfhosted: alle Module ohne Abo (Standard). saas: Tarife, Entitlements, strengere Admin-Regeln. */
   deploymentMode: 'selfhosted' | 'saas';
+  /** Anzahl vertrauenswürdiger Proxys vor dem Server (z. B. 1 bei Caddy/Nginx). 0 = direkt erreichbar. */
+  trustProxy: number;
+  /** Betreiber-SMTP für Konto-E-Mails (Passwort-Reset, Bestätigung). Ohne Angabe wird das SMTP des Mandanten genutzt. */
+  systemSmtp: { host: string; port: number; secure: boolean; user: string; pass: string; fromName: string; fromEmail: string } | null;
+  /** Mindestversion der Desktop-App, die dieser Server akzeptiert (Hinweis zur Aktualisierung). */
+  minDesktopVersion: string;
 }
 
 function readInt(name: string, fallback: number): number {
@@ -71,5 +77,12 @@ export function loadConfig(overrides: Partial<AppConfig> = {}): AppConfig {
     publicUrl: overrides.publicUrl ?? process.env.PUBLIC_URL ?? `http://${host === '0.0.0.0' ? 'localhost' : host}:${port}`,
     chromiumPath: overrides.chromiumPath ?? process.env.CHROMIUM_PATH ?? null,
     deploymentMode: overrides.deploymentMode ?? (process.env.DEPLOYMENT_MODE === 'saas' ? 'saas' : 'selfhosted'),
+    trustProxy: overrides.trustProxy ?? (Number.parseInt(process.env.TRUST_PROXY ?? '0', 10) || 0),
+    systemSmtp: overrides.systemSmtp !== undefined ? overrides.systemSmtp : process.env.SYSTEM_SMTP_HOST ? {
+      host: process.env.SYSTEM_SMTP_HOST, port: Number(process.env.SYSTEM_SMTP_PORT ?? 587), secure: process.env.SYSTEM_SMTP_SECURE === 'true',
+      user: process.env.SYSTEM_SMTP_USER ?? '', pass: process.env.SYSTEM_SMTP_PASS ?? '',
+      fromName: process.env.SYSTEM_SMTP_FROM_NAME ?? 'Carcura Management', fromEmail: process.env.SYSTEM_SMTP_FROM ?? process.env.SYSTEM_SMTP_USER ?? '',
+    } : null,
+    minDesktopVersion: overrides.minDesktopVersion ?? process.env.MIN_DESKTOP_VERSION ?? '1.0.0',
   };
 }

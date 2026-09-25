@@ -76,7 +76,9 @@ describe('Fahrzeugprotokoll', () => {
     protocolId = res.json().protocol.id;
     expect(res.json().protocol.protocolNumber).toMatch(/^PR-\d{4}-0001$/);
     expect(res.json().damages).toHaveLength(2);
-    expect((await app.inject(as(admin, { url: `/api/vehicles/${vehicleId}` }))).json().vehicle.mileage).toBe(91500);
+    // Kilometerstand gehört nur ins Protokoll, nicht in die Fahrzeug-Stammdaten (Datensparsamkeit)
+    expect(res.json().protocol.mileage).toBe(91500);
+    expect((await app.inject(as(admin, { url: `/api/vehicles/${vehicleId}` }))).json().vehicle.mileage).toBeNull();
     const other = (await app.inject(as(admin, { method: 'POST', url: '/api/customers', payload: { firstName: 'Anderer', lastName: 'Kunde' } }))).json().customer;
     const wrong = await app.inject(as(admin, { method: 'POST', url: '/api/protocols', payload: { customerId: other.id, vehicleId } }));
     expect(wrong.statusCode).toBe(400); // Fahrzeug gehört einem anderen Kunden

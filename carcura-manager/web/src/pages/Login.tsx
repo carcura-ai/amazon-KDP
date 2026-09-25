@@ -1,11 +1,12 @@
 import { useEffect, useState, type FormEvent } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { useNavigate, useLocation } from 'react-router';
+import { Link, useNavigate, useLocation } from 'react-router';
 import { LogIn } from 'lucide-react';
 import { get, post } from '../api/client';
 import type { Branding } from '../api/types';
 import { useAuth, applyBranding } from '../app/auth';
 import { Button, Field, Input } from '../components/ui';
+import { desktop } from '../lib/desktop';
 
 /** Läuft die Oberfläche in der nativen iPhone-App (Capacitor-Hülle)? */
 const isNativeApp = typeof window !== 'undefined' && Boolean((window as unknown as { Capacitor?: { isNativePlatform?: () => boolean } }).Capacitor?.isNativePlatform?.());
@@ -68,10 +69,12 @@ export function LoginPage() {
                 <Field label="E-Mail-Adresse"><Input type="email" autoComplete="username" required value={email} onChange={(e) => setEmail(e.target.value)} autoFocus /></Field>
                 <Field label="Passwort" error={error ?? undefined}><Input type="password" autoComplete="current-password" required value={password} onChange={(e) => setPassword(e.target.value)} /></Field>
                 <Button type="submit" variant="primary" className="block" loading={busy}><LogIn /> Anmelden</Button>
+                <p className="small" style={{ textAlign: 'center', margin: 0 }}><Link to="/passwort-vergessen" style={{ color: 'var(--fg-muted)' }}>Passwort vergessen?</Link></p>
               </>
             )}
           </form>
           {b?.poweredBy ? <p className="small dim" style={{ textAlign: 'center', marginTop: 14 }}>{b.poweredBy}</p> : null}
+          {desktop ? <p className="small dim" style={{ textAlign: 'center', marginTop: 14 }}>Verbunden mit {desktop.serverUrl.replace(/^https?:\/\//, '')} · <button type="button" className="link-button" onClick={() => desktop?.changeServer()} style={{ color: 'var(--fg-muted)', background: 'none', border: 0, padding: 0, cursor: 'pointer', textDecoration: 'underline', font: 'inherit' }}>Server ändern</button></p> : null}
           {isNativeApp ? <p className="small" style={{ textAlign: 'center', marginTop: 14 }}><a href="capacitor://localhost/index.html?change=1" style={{ color: 'var(--fg-muted)' }}>Server-Adresse ändern</a></p> : null}
         </div>
       </div>

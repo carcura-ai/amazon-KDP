@@ -42,7 +42,7 @@ export default async function searchRoutes(app: FastifyInstance) {
       const rows = app.db
         .select()
         .from(vehicles)
-        .where(and(eq(vehicles.companyId, ctx.companyId), eq(vehicles.isActive, true), or(like(vehicles.licensePlate, term), like(vehicles.make, term), like(vehicles.model, term), like(vehicles.vin, term))))
+        .where(and(eq(vehicles.companyId, ctx.companyId), eq(vehicles.isActive, true), or(like(vehicles.licensePlate, term), like(vehicles.make, term), like(vehicles.model, term))))
         .limit(8)
         .all();
       for (const v of rows) hits.push({ kind: 'vehicle', id: v.id, title: [v.make, v.model].filter(Boolean).join(' ') || 'Fahrzeug', subtitle: `${v.licensePlate ?? 'ohne Kennzeichen'}${v.year ? ' · ' + v.year : ''}`, href: `/fahrzeuge/${v.id}` });

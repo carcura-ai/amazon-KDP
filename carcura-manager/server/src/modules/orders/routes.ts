@@ -26,10 +26,9 @@ const fields = {
   notes: zOptionalText(5000),
   internalNotes: zOptionalText(5000),
   scheduledAt: z.string().datetime({ offset: true }).nullable(),
-  mileageIn: z.number().int().min(0).nullable(),
   items: z.array(itemSchema).max(100),
 };
-const createSchema = z.object({ ...fields, vehicleId: fields.vehicleId.default(null), appointmentId: fields.appointmentId.default(null), userId: fields.userId.default(null), leadId: fields.leadId.default(null), status: fields.status.default('planned'), scheduledAt: fields.scheduledAt.default(null), mileageIn: fields.mileageIn.default(null), items: fields.items.default([]) });
+const createSchema = z.object({ ...fields, vehicleId: fields.vehicleId.default(null), appointmentId: fields.appointmentId.default(null), userId: fields.userId.default(null), leadId: fields.leadId.default(null), status: fields.status.default('planned'), scheduledAt: fields.scheduledAt.default(null), items: fields.items.default([]) });
 const updateSchema = z.object(fields).partial();
 
 export default async function orderRoutes(app: FastifyInstance) {

@@ -87,9 +87,8 @@ export default async function importExportRoutes(app: FastifyInstance) {
     const ctx = ctxOf(req);
     const rows = app.db.select({ v: vehicles, customerNumber: customers.customerNumber, firstName: customers.firstName, lastName: customers.lastName, companyName: customers.companyName }).from(vehicles).leftJoin(customers, eq(customers.id, vehicles.customerId)).where(eq(vehicles.companyId, ctx.companyId)).orderBy(asc(vehicles.licensePlate)).all();
     return send(reply, 'fahrzeuge', toCsv(rows, [
-      { key: 'plate', label: 'Kennzeichen', get: (r) => r.v.licensePlate }, { key: 'make', label: 'Marke', get: (r) => r.v.make }, { key: 'model', label: 'Modell', get: (r) => r.v.model }, { key: 'year', label: 'Baujahr', get: (r) => r.v.year },
-      { key: 'type', label: 'Fahrzeugtyp', get: (r) => r.v.vehicleType }, { key: 'color', label: 'Farbe', get: (r) => r.v.color }, { key: 'mileage', label: 'Kilometerstand', get: (r) => r.v.mileage }, { key: 'vin', label: 'FIN', get: (r) => r.v.vin },
-      { key: 'customerNumber', label: 'Kundennummer', get: (r) => r.customerNumber }, { key: 'customer', label: 'Kunde', get: (r) => r.companyName || `${r.firstName ?? ''} ${r.lastName ?? ''}`.trim() }, { key: 'notes', label: 'Notizen', get: (r) => r.v.notes },
+      { key: 'plate', label: 'Kennzeichen', get: (r) => r.v.licensePlate }, { key: 'make', label: 'Marke', get: (r) => r.v.make }, { key: 'model', label: 'Modell', get: (r) => r.v.model },
+      { key: 'customerNumber', label: 'Kundennummer', get: (r) => r.customerNumber }, { key: 'customer', label: 'Kunde', get: (r) => r.companyName || `${r.firstName ?? ''} ${r.lastName ?? ''}`.trim() }, { key: 'notes', label: 'Besondere Merkmale', get: (r) => r.v.notes },
     ]));
   });
 

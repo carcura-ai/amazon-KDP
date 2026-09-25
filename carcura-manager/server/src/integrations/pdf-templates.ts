@@ -123,7 +123,7 @@ export function protocolBody(p: Protocol, customer: Customer, vehicle: Vehicle, 
   return `
 <div class="grid2">
   <div class="box"><h2 style="margin-top:0">Kunde</h2><div class="pre">${esc(personName(customer))}</div><div class="small muted">${esc([customer.street, [customer.zip, customer.city].filter(Boolean).join(' ')].filter(Boolean).join(', '))}<br>${esc([customer.phone, customer.email].filter(Boolean).join(' · '))}</div></div>
-  <div class="box"><h2 style="margin-top:0">Fahrzeug</h2><div class="kv"><div>Fahrzeug</div><div>${esc(vehicleLabel(vehicle))}</div><div>Kennzeichen</div><div>${esc(vehicle.licensePlate ?? '–')}</div><div>Farbe</div><div>${esc(vehicle.color ?? '–')}</div><div>VIN</div><div>${esc(vehicle.vin ?? '–')}</div><div>Kilometerstand</div><div>${p.mileage !== null ? new Intl.NumberFormat('de-DE').format(p.mileage) + ' km' : '–'}</div><div>Tankfüllung</div><div>${p.fuelLevel !== null ? p.fuelLevel + ' %' : '–'}</div></div></div>
+  <div class="box"><h2 style="margin-top:0">Fahrzeug</h2><div class="kv"><div>Fahrzeug</div><div>${esc(vehicleLabel(vehicle))}</div><div>Kennzeichen</div><div>${esc(vehicle.licensePlate ?? '–')}</div><div>Kilometerstand</div><div>${p.mileage !== null ? new Intl.NumberFormat('de-DE').format(p.mileage) + ' km' : '–'}</div><div>Tankfüllung</div><div>${p.fuelLevel !== null ? p.fuelLevel + ' %' : '–'}</div></div></div>
 </div>
 <h2>Zustand bei ${p.type === 'intake' ? 'Annahme' : 'Übergabe'}</h2>
 <div class="kv"><div>Außen</div><div>${esc(p.exteriorCondition ?? '–')}</div><div>Innen</div><div>${esc(p.interiorCondition ?? '–')}</div><div>Zubehör im Fahrzeug</div><div>${Object.entries(CHECK).filter(([k]) => checklist[k]).map(([, v]) => v).join(', ') || '–'}</div></div>
@@ -146,7 +146,7 @@ export function customerProfileBody(customer: Customer, vehicleRows: Vehicle[], 
   return `
 <div class="grid2">
   <div class="box"><h2 style="margin-top:0">Stammdaten</h2><div class="kv"><div>Kundennummer</div><div>${esc(customer.customerNumber)}</div><div>Name</div><div class="pre">${esc(personName(customer))}</div><div>Adresse</div><div>${esc([[customer.street, customer.houseNumber].filter(Boolean).join(' '), [customer.zip, customer.city].filter(Boolean).join(' ')].filter(Boolean).join(', ') || '–')}</div><div>Telefon</div><div>${esc([customer.phone, customer.phone2].filter(Boolean).join(' · ') || '–')}</div><div>E-Mail</div><div>${esc(customer.email ?? '–')}</div><div>Kunde seit</div><div>${dateDe(customer.createdAt)}</div></div></div>
-  <div class="box"><h2 style="margin-top:0">Fahrzeuge</h2>${vehicleRows.length ? vehicleRows.map((v) => `<div style="margin-bottom:6px"><b>${esc(vehicleLabel(v))}</b> <span class="muted">${esc(v.licensePlate ?? '')}${v.year ? ' · ' + v.year : ''}${v.mileage ? ' · ' + new Intl.NumberFormat('de-DE').format(v.mileage) + ' km' : ''}</span></div>`).join('') : '<span class="muted">Keine Fahrzeuge</span>'}</div>
+  <div class="box"><h2 style="margin-top:0">Fahrzeuge</h2>${vehicleRows.length ? vehicleRows.map((v) => `<div style="margin-bottom:6px"><b>${esc(vehicleLabel(v))}</b> <span class="muted">${esc(v.licensePlate ?? '')}</span></div>`).join('') : '<span class="muted">Keine Fahrzeuge</span>'}</div>
 </div>
 ${customer.notes ? `<h2>Notizen</h2><div class="pre">${esc(customer.notes)}</div>` : ''}
 <h2>Aufträge</h2>
@@ -159,7 +159,7 @@ export function orderBody(o: typeof orders.$inferSelect, items: Array<typeof ord
   return `
 <div class="grid2">
   <div class="box"><h2 style="margin-top:0">Kunde</h2><div class="pre">${esc(personName(customer))}</div><div class="small muted">${esc([customer.street, [customer.zip, customer.city].filter(Boolean).join(' ')].filter(Boolean).join(', '))}</div></div>
-  <div class="box"><h2 style="margin-top:0">Fahrzeug</h2>${vehicle ? `<b>${esc(vehicleLabel(vehicle))}</b><div class="small muted">${esc(vehicle.licensePlate ?? '')}${o.mileageIn ? ' · ' + new Intl.NumberFormat('de-DE').format(o.mileageIn) + ' km bei Annahme' : ''}</div>` : '<span class="muted">–</span>'}</div>
+  <div class="box"><h2 style="margin-top:0">Fahrzeug</h2>${vehicle ? `<b>${esc(vehicleLabel(vehicle))}</b><div class="small muted">${esc(vehicle.licensePlate ?? '')}</div>` : '<span class="muted">–</span>'}</div>
 </div>
 ${o.title ? `<h1 style="margin-top:16px">${esc(o.title)}</h1>` : ''}
 <table style="margin-top:10px"><thead><tr><th>Pos.</th><th>Leistung</th><th class="num">Menge</th><th class="num">Einzelpreis</th><th class="num">Gesamt</th></tr></thead><tbody>

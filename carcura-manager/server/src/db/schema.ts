@@ -63,6 +63,8 @@ export const users = sqliteTable(
     backupCodesJson: text('backup_codes_json'),
     failedLoginCount: integer('failed_login_count').notNull().default(0),
     lockedUntil: text('locked_until'),
+    emailVerifiedAt: text('email_verified_at'),
+    passwordChangedAt: text('password_changed_at'),
     createdAt: ts('created_at'),
     updatedAt: ts('updated_at'),
   },
@@ -114,6 +116,22 @@ export const auditLog = sqliteTable(
     createdAt: ts('created_at'),
   },
   (t) => [index('audit_company_idx').on(t.companyId, t.createdAt), index('audit_entity_idx').on(t.entityType, t.entityId)],
+);
+
+/* ------------------------------------------------------------------ Einmal-Tokens (Passwort-Reset, E-Mail-Bestätigung, Einladung) */
+export const userTokens = sqliteTable(
+  'user_tokens',
+  {
+    id: text('id').primaryKey(),
+    userId: text('user_id').notNull().references(() => users.id),
+    purpose: text('purpose').notNull(), // password_reset | email_verify | invite
+    tokenHash: text('token_hash').notNull(), // SHA-256 des Tokens; das Token selbst wird nie gespeichert
+    expiresAt: text('expires_at').notNull(),
+    usedAt: text('used_at'),
+    ip: text('ip'),
+    createdAt: ts('created_at'),
+  },
+  (t) => [uniqueIndex('user_tokens_hash_unique').on(t.tokenHash), index('user_tokens_user_idx').on(t.userId, t.purpose)],
 );
 
 /* ------------------------------------------------------------------ Systemweite Einstellungen (Schlüssel/Wert) */

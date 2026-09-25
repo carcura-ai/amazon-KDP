@@ -1,0 +1,23 @@
+{$DOMAIN} {
+	encode zstd gzip
+	request_body {
+		max_size 30MB
+	}
+	reverse_proxy app:4800
+	header -Server
+	log {
+		output stdout
+		format json
+		# Keine Query-Strings und Cookies in Proxy-Logs (Datensparsamkeit)
+		format filter {
+			wrap json
+			fields {
+				request>uri query {
+					delete *
+				}
+				request>headers>Cookie delete
+				request>headers>Authorization delete
+			}
+		}
+	}
+}

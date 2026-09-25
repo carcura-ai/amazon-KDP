@@ -54,6 +54,8 @@ import privacyRoutes from './modules/privacy/routes.js';
 import supportRoutes from './modules/platform/support.routes.js';
 import { syncNewPermissions } from './core/session.js';
 import { createRequire } from 'node:module';
+import { randomUUID } from 'node:crypto';
+import passwordResetRoutes from './modules/auth/reset.routes.js';
 
 declare module 'fastify' {
   interface FastifyInstance {
@@ -88,7 +90,9 @@ export interface BuildOptions {
 export async function buildApp(opts: BuildOptions): Promise<FastifyInstance> {
   const app = Fastify({
     logger: opts.logger ?? { level: opts.config.logLevel, transport: opts.config.isProduction ? undefined : { target: 'pino-pretty', options: { translateTime: 'HH:MM:ss', ignore: 'pid,hostname' } } },
-    trustProxy: false,
+    // Hinter Caddy/Nginx: nur die konfigurierte Anzahl Proxys wird für IP/Protokoll berücksichtigt
+    trustProxy: opts.config.trustProxy > 0 ? (_addr: string, hop: number) => hop < opts.config.trustProxy : false,
+    genReqId: () => randomUUID(),
     bodyLimit: 25 * 1024 * 1024,
   });
 
@@ -103,7 +107,7 @@ export async function buildApp(opts: BuildOptions): Promise<FastifyInstance> {
   const integrationStore = new IntegrationStore(opts.dbHandle.db, secrets);
   app.decorate('secrets', secrets);
   app.decorate('integrations', integrationStore);
-  app.decorate('mail', new MailService(opts.dbHandle.db, integrationStore));
+  app.decorate('mail', new MailService(opts.dbHandle.db, integrationStore, opts.config.systemSmtp));
   app.decorate('storage', new FileStorage(opts.dbHandle.db, opts.config.filesDir));
   const pdf = new PdfService(opts.config.chromiumPath, app.log);
   app.decorate('pdf', pdf);
@@ -129,7 +133,9 @@ export async function buildApp(opts: BuildOptions): Promise<FastifyInstance> {
   // Sicherheits-Header (BSI APP.3.1 / OWASP): CSP ohne Fremdquellen, kein Framing durch Dritte, keine Browser-APIs außer Kamera
   const https = opts.config.publicUrl.startsWith('https://');
   const CSP = "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self'; frame-src 'self' blob:; media-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'self'";
-  app.addHook('onSend', async (_req, reply) => {
+  app.addHook('onSend', async (req, reply) => {
+    // API-Antworten enthalten personenbezogene Daten: nie auf dem Client (Browser/Desktop-App) zwischenspeichern
+    if (req.url.startsWith('/api/') && !reply.hasHeader('Cache-Control')) reply.header('Cache-Control', 'no-store');
     reply.header('X-Content-Type-Options', 'nosniff');
     reply.header('X-Frame-Options', 'SAMEORIGIN');
     reply.header('Referrer-Policy', 'same-origin');
@@ -157,7 +163,7 @@ export async function buildApp(opts: BuildOptions): Promise<FastifyInstance> {
   });
 
   // Erreichbarkeitsprüfung – auch aus der nativen App-Hülle (anderer Ursprung), deshalb CORS nur hier.
-  app.get('/api/health', async (_req, reply) => { reply.header('Access-Control-Allow-Origin', '*'); return { ok: true, version: app.appVersion, time: new Date().toISOString() }; });
+  app.get('/api/health', async (_req, reply) => { reply.header('Access-Control-Allow-Origin', '*'); reply.header('Cache-Control', 'no-store'); return { ok: true, version: app.appVersion, time: new Date().toISOString(), minDesktopVersion: app.config.minDesktopVersion, deploymentMode: app.config.deploymentMode }; });
 
   await app.register(setupRoutes);
   await app.register(authRoutes);
@@ -193,6 +199,7 @@ export async function buildApp(opts: BuildOptions): Promise<FastifyInstance> {
   await app.register(twoFactorRoutes);
   await app.register(privacyRoutes);
   await app.register(supportRoutes);
+  await app.register(passwordResetRoutes);
 
   // Web-App (Vite-Build) ausliefern, wenn vorhanden
   const webDist = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../web/dist');

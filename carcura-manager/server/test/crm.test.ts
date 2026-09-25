@@ -89,9 +89,11 @@ describe('Leads, Kunden, Fahrzeuge', () => {
   });
 
   it('legt Fahrzeug an, erkennt Kennzeichen-Duplikate, sucht Kunden und Fahrzeuge', async () => {
-    const v = await app.inject(as(admin, { method: 'POST', url: '/api/vehicles', payload: { customerId, licensePlate: 'K-AB 1234', make: 'BMW', model: '320d Touring', year: 2019, mileage: 85000, vehicleType: 'Kombi' } }));
+    const v = await app.inject(as(admin, { method: 'POST', url: '/api/vehicles', payload: { customerId, licensePlate: 'K-AB 1234', make: 'BMW', model: '320d Touring', year: 2019, mileage: 85000, vehicleType: 'Kombi', vin: 'WBA123', color: 'blau' } }));
     expect(v.statusCode).toBe(200);
     expect(v.json().vehicle.normalizedPlate).toBe('KAB1234');
+    // Datensparsamkeit: Baujahr, Kilometerstand, Typ, FIN und Farbe werden nicht gespeichert
+    for (const k of ['year', 'mileage', 'vehicleType', 'vin', 'color']) expect(v.json().vehicle[k], k).toBeNull();
     const dup = (await app.inject(as(admin, { url: '/api/crm/duplicates?plate=k-ab1234' }))).json();
     expect(dup.hits[0].kind).toBe('vehicle');
     const wrongOwner = await app.inject(as(admin, { method: 'POST', url: '/api/vehicles', payload: { customerId: '00000000-0000-0000-0000-000000000000', licensePlate: 'X-Y 1' } }));

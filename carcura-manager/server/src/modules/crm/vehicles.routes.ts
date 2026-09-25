@@ -11,18 +11,17 @@ import { ctxOf } from '../../plugins/auth.js';
 import { findDuplicates } from './duplicates.js';
 import { logActivity, listActivities } from './activities.js';
 
-export const VEHICLE_TYPES = ['Kleinwagen', 'Kompaktklasse', 'Limousine', 'Kombi', 'SUV', 'Van', 'Transporter', 'Cabrio', 'Sportwagen', 'Wohnmobil', 'Motorrad', 'Sonstiges'] as const;
-
+/**
+ * Fahrzeug-Stammdaten nach dem Grundsatz der Datensparsamkeit: Hersteller, Modell, Kennzeichen und
+ * besondere Merkmale (Notizen). Baujahr, Kilometerstand, Farbe, Fahrzeugtyp und FIN werden nicht
+ * erfasst; ältere Werte bleiben unverändert gespeichert (Auskunft nach Art. 15), werden aber weder
+ * angezeigt noch geändert. Der Kilometerstand wird nur im Annahmeprotokoll festgehalten.
+ */
 const vehicleSchema = z.object({
   customerId: z.string().uuid(),
   licensePlate: zOptionalText(20),
   make: zOptionalText(60),
   model: zOptionalText(80),
-  year: z.number().int().min(1950).max(2100).nullable().optional(),
-  mileage: z.number().int().min(0).max(5_000_000).nullable().optional(),
-  color: zOptionalText(40),
-  vehicleType: z.enum(VEHICLE_TYPES).nullable().optional(),
-  vin: zOptionalText(20),
   notes: zOptionalText(5000),
   isActive: z.boolean().optional(),
 });
@@ -41,7 +40,7 @@ export default async function vehicleRoutes(app: FastifyInstance) {
     if (q.customerId) conds.push(eq(vehicles.customerId, q.customerId));
     if (q.q) {
       const term = `%${q.q}%`;
-      conds.push(or(like(vehicles.licensePlate, term), like(vehicles.make, term), like(vehicles.model, term), like(vehicles.vin, term))!);
+      conds.push(or(like(vehicles.licensePlate, term), like(vehicles.make, term), like(vehicles.model, term))!);
     }
     const where = and(...conds);
     const items = app.db
@@ -63,7 +62,7 @@ export default async function vehicleRoutes(app: FastifyInstance) {
     const vehicle = getVehicle(ctx.companyId, id);
     const customer = app.db.select().from(customers).where(and(eq(customers.id, vehicle.customerId), eq(customers.companyId, vehicle.companyId))).get();
     const activities = listActivities(app.db, ctx.companyId, { customerId: vehicle.customerId }).filter((a) => a.vehicleId === id);
-    return { vehicle, customer, activities, types: VEHICLE_TYPES };
+    return { vehicle, customer, activities };
   });
 
   app.post('/api/vehicles', { preHandler: app.requireAuth('vehicles:write') }, async (req) => {

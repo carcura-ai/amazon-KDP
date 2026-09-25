@@ -7,7 +7,7 @@ import type { Customer, OrderDetail, OrderRow, Paged, Appointment } from '../api
 import { useAuth } from '../app/auth';
 import { Badge, Button, Card, Confirm, Empty, Field, Input, PageHead, Pager, Select, Skeleton, Textarea, useDebounced, useToast } from '../components/ui';
 import { CustomerPicker, VehicleSelect, UserSelect } from '../components/pickers';
-import { fmtDate, fmtDateTime, fmtMoney, fmtNumber, personName, ORDER_STATUS, ORDER_FLOW, toLocalInput, fromLocalInput } from '../lib/format';
+import { fmtDate, fmtDateTime, fmtMoney, personName, ORDER_STATUS, ORDER_FLOW, toLocalInput, fromLocalInput } from '../lib/format';
 import { AppointmentModal } from './Calendar';
 import { DocumentsPanel } from '../components/documents';
 import { ProtocolList } from './Protocol';
@@ -65,14 +65,14 @@ export function OrderFormPage() {
   const existing = useQuery({ queryKey: ['order', id], queryFn: () => get<OrderDetail>(`/api/orders/${id}`), enabled: editing });
   const presetCustomer = useQuery({ queryKey: ['customer', sp.get('customerId')], queryFn: () => get<{ customer: Customer }>(`/api/customers/${sp.get('customerId')}`), enabled: Boolean(sp.get('customerId')) && !editing });
   const [customer, setCustomer] = useState<Customer | null>(null);
-  const [f, setF] = useState({ vehicleId: sp.get('vehicleId') || null as string | null, userId: null as string | null, title: sp.get('title') ?? '', notes: '', internalNotes: '', scheduledAt: '', mileageIn: '', appointmentId: sp.get('appointmentId') || null as string | null });
+  const [f, setF] = useState({ vehicleId: sp.get('vehicleId') || null as string | null, userId: null as string | null, title: sp.get('title') ?? '', notes: '', internalNotes: '', scheduledAt: '', appointmentId: sp.get('appointmentId') || null as string | null });
   const [items, setItems] = useState<ItemDraft[]>([emptyItem()]);
   const [loaded, setLoaded] = useState(false);
   useEffect(() => {
     if (editing && existing.data && !loaded) {
       const { order: o, items: its } = existing.data;
       setCustomer(existing.data.customer);
-      setF({ vehicleId: o.vehicleId, userId: o.userId, title: o.title ?? '', notes: o.notes ?? '', internalNotes: o.internalNotes ?? '', scheduledAt: o.scheduledAt ? toLocalInput(o.scheduledAt) : '', mileageIn: o.mileageIn ? String(o.mileageIn) : '', appointmentId: o.appointmentId });
+      setF({ vehicleId: o.vehicleId, userId: o.userId, title: o.title ?? '', notes: o.notes ?? '', internalNotes: o.internalNotes ?? '', scheduledAt: o.scheduledAt ? toLocalInput(o.scheduledAt) : '', appointmentId: o.appointmentId });
       setItems(draftsFrom(its));
       setLoaded(true);
     }
@@ -82,7 +82,7 @@ export function OrderFormPage() {
 
   const save = useMutation({
     mutationFn: () => {
-      const payload = { customerId: customer!.id, vehicleId: f.vehicleId, userId: f.userId, appointmentId: f.appointmentId, title: f.title || null, notes: f.notes || null, internalNotes: f.internalNotes || null, scheduledAt: f.scheduledAt ? fromLocalInput(f.scheduledAt) : null, mileageIn: f.mileageIn ? Number(f.mileageIn) : null, items: payloadFrom(items) };
+      const payload = { customerId: customer!.id, vehicleId: f.vehicleId, userId: f.userId, appointmentId: f.appointmentId, title: f.title || null, notes: f.notes || null, internalNotes: f.internalNotes || null, scheduledAt: f.scheduledAt ? fromLocalInput(f.scheduledAt) : null, items: payloadFrom(items) };
       return editing ? patch<OrderDetail>(`/api/orders/${id}`, payload) : post<OrderDetail>('/api/orders', payload);
     },
     onSuccess: (r) => { qc.invalidateQueries({ queryKey: ['orders'] }); qc.invalidateQueries({ queryKey: ['order', r.order.id] }); qc.invalidateQueries({ queryKey: ['appointments'] }); qc.invalidateQueries({ queryKey: ['dashboard'] }); toast.ok(editing ? 'Auftrag gespeichert' : `Auftrag ${r.order.orderNumber} angelegt`); navigate(`/auftraege/${r.order.id}`); },
@@ -102,7 +102,7 @@ export function OrderFormPage() {
               <Field label="Mitarbeiter"><UserSelect value={f.userId} onChange={(u) => setF({ ...f, userId: u })} /></Field>
               <Field label="Bezeichnung" className="span-2"><Input value={f.title} onChange={(e) => setF({ ...f, title: e.target.value })} placeholder="z. B. Komplettaufbereitung + Keramik" /></Field>
               <Field label="Geplanter Termin"><Input type="datetime-local" value={f.scheduledAt} onChange={(e) => setF({ ...f, scheduledAt: e.target.value })} /></Field>
-              <Field label="Kilometerstand bei Annahme"><Input type="number" min={0} value={f.mileageIn} onChange={(e) => setF({ ...f, mileageIn: e.target.value })} /></Field>
+              
               <Field label="Hinweise für den Kunden (auf Dokumenten)" className="span-2"><Textarea value={f.notes} onChange={(e) => setF({ ...f, notes: e.target.value })} /></Field>
               <Field label="Interne Notizen" className="span-2"><Textarea value={f.internalNotes} onChange={(e) => setF({ ...f, internalNotes: e.target.value })} /></Field>
             </div>
@@ -171,7 +171,6 @@ export function OrderDetailPage() {
             <dl className="dl">
               <dt>Kunde</dt><dd>{customer ? <Link to={`/kunden/${customer.id}`}>{personName(customer)}</Link> : '–'}<div className="small dim">{customer?.phone}</div></dd>
               <dt>Fahrzeug</dt><dd>{vehicle ? <Link to={`/fahrzeuge/${vehicle.id}`}>{[vehicle.make, vehicle.model].filter(Boolean).join(' ')} <span className="mono dim">{vehicle.licensePlate}</span></Link> : '–'}</dd>
-              <dt>km bei Annahme</dt><dd>{o.mileageIn ? `${fmtNumber(o.mileageIn)} km` : '–'}</dd>
               <dt>Mitarbeiter</dt><dd>{user ? `${user.firstName} ${user.lastName}` : '–'}</dd>
             </dl>
           </Card>

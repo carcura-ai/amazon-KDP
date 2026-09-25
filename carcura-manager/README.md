@@ -25,6 +25,14 @@ nur abgefragt, nie gespeichert (Details: ANLEITUNG.md, Schritt 5b).
 Das Startskript hält die Anwendung am Laufen und führt Neustart und Update aus, die unter
 **Einstellungen → System & Sicherung** ausgelöst werden (vor jedem Update entsteht automatisch eine Sicherung).
 
+## Betrieb als Windows-Anwendung mit zentralem Server (empfohlen)
+
+- **Zentraler Server** (`deploy/`): Docker + Caddy mit automatischem HTTPS, Hosting in der EU. Alle PCs und
+  Benutzer eines Betriebs arbeiten auf denselben Daten.
+- **Windows-App „Carcura Management“** (`desktop/`): installierbare `.exe` mit Desktop- und Startmenü-Verknüpfung,
+  eigenes Programmfenster, kein Browser nötig, Internetverbindung erforderlich.
+- Anleitung: `docs/deployment/zentraler-server-und-desktop-app.md`, Architektur: `docs/architecture/desktop-architecture.md`.
+
 ## Aufbau
 
 | Ordner | Inhalt |

@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self'">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Carcura Management</title>
+<link rel="stylesheet" href="connect.css">
+</head>
+<body>
+<main class="wrap">
+  <section class="card" aria-live="polite">
+    <div class="brand">
+      <div class="mark" aria-hidden="true">CM</div>
+      <div>
+        <h1 id="product">Carcura Management</h1>
+        <p class="muted" id="subtitle">Verbindung zum Server</p>
+      </div>
+    </div>
+
+    <div id="view-connecting" class="view" hidden>
+      <p class="status"><span class="spin" aria-hidden="true"></span><span>Verbinde mit <strong id="server-connecting"></strong> …</span></p>
+    </div>
+
+    <form id="view-setup" class="view" hidden novalidate>
+      <p id="setup-intro">Geben Sie die Adresse Ihres Carcura-Servers ein. Sie erhalten sie von Ihrem Administrator oder mit Ihrem Zugang.</p>
+      <label for="url">Server-Adresse</label>
+      <input id="url" type="text" inputmode="url" autocomplete="url" spellcheck="false" placeholder="https://app.ihr-betrieb.de" required>
+      <p class="error" id="setup-error" role="alert"></p>
+      <button id="btn-connect" type="submit">Verbinden</button>
+      <button id="btn-cancel" type="button" class="ghost" hidden>Abbrechen</button>
+      <p class="hint">Die Daten liegen auf dem Server, nicht auf diesem PC. Für die Arbeit ist eine Internetverbindung nötig.</p>
+    </form>
+
+    <div id="view-offline" class="view" hidden>
+      <h2>Keine Verbindung</h2>
+      <p>Der Server <strong id="server-offline"></strong> ist gerade nicht erreichbar.</p>
+      <p class="error" id="offline-reason"></p>
+      <button id="btn-retry" type="button">Erneut versuchen</button>
+      <button id="btn-change" type="button" class="ghost">Server-Adresse ändern</button>
+      <p class="hint">Carcura Management arbeitet online. Prüfen Sie Ihre Internetverbindung. Bei längeren Störungen wenden Sie sich an den Support.</p>
+      <button id="btn-support" type="button" class="link">Support-Website öffnen</button>
+    </div>
+
+    <div id="view-update" class="view" hidden>
+      <h2>Aktualisierung erforderlich</h2>
+      <p>Der Server <strong id="server-update"></strong> benötigt mindestens Version <strong id="min-version"></strong>. Installiert ist <strong id="app-version"></strong>.</p>
+      <p>Bitte installieren Sie die aktuelle Version von Carcura Management.</p>
+      <button id="btn-support2" type="button">Download-Seite öffnen</button>
+      <button id="btn-retry2" type="button" class="ghost">Erneut prüfen</button>
+    </div>
+  </section>
+  <footer class="muted small" id="footer"></footer>
+</main>
+<script src="connect.js"></script>
+</body>
+</html>
