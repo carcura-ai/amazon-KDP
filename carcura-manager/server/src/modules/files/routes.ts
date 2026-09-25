@@ -9,6 +9,7 @@ import { writeAudit } from '../../core/audit.js';
 import { nowIso } from '../../core/ids.js';
 import { ctxOf } from '../../plugins/auth.js';
 import { FILE_CATEGORIES } from '../../integrations/storage.js';
+import { assertRefs } from '../../core/tenant.js';
 
 const metaSchema = z.object({
   customerId: z.string().uuid().nullable().optional(),
@@ -37,6 +38,7 @@ export default async function fileRoutes(app: FastifyInstance) {
     }
     if (stored.length === 0) throw badRequest('Keine Datei übermittelt.');
     const meta = parse(metaSchema, { ...fields, customerId: fields.customerId || null, vehicleId: fields.vehicleId || null, orderId: fields.orderId || null, protocolId: fields.protocolId || null, caption: fields.caption || null });
+    assertRefs(app.db, ctx.companyId, { customerId: meta.customerId, vehicleId: meta.vehicleId, orderId: meta.orderId, protocolId: meta.protocolId });
     const results = [];
     for (const s of stored) {
       const row = await app.storage.store({ companyId: ctx.companyId, buffer: s.buffer, originalName: s.filename, mimeType: s.mimetype, ...meta, uploadedByUserId: ctx.userId });

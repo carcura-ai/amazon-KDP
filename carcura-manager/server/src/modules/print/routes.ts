@@ -34,9 +34,9 @@ export default async function printRoutes(app: FastifyInstance) {
     const { id } = req.params as { id: string };
     const o = app.db.select().from(orders).where(and(eq(orders.id, id), eq(orders.companyId, ctx.companyId))).get();
     if (!o) throw notFound('Auftrag');
-    const c = app.db.select().from(customers).where(eq(customers.id, o.customerId)).get();
+    const c = app.db.select().from(customers).where(and(eq(customers.id, o.customerId), eq(customers.companyId, o.companyId))).get();
     if (!c) throw notFound('Kunde');
-    const v = o.vehicleId ? app.db.select().from(vehicles).where(eq(vehicles.id, o.vehicleId)).get() ?? null : null;
+    const v = o.vehicleId ? app.db.select().from(vehicles).where(and(eq(vehicles.id, o.vehicleId), eq(vehicles.companyId, o.companyId))).get() ?? null : null;
     const items = app.db.select().from(orderItems).where(eq(orderItems.orderId, id)).orderBy(asc(orderItems.sortOrder)).all();
     const { company, logoDataUrl } = shellFor(ctx.companyId);
     const html = documentShell({ company, logoDataUrl, title: 'Auftrag', docNumber: o.orderNumber, docDate: dateDe(o.createdAt), body: orderBody(o, items, c, v, computeTotals(items, company.smallBusiness), company.smallBusiness), footerExtra: `Auftrag ${o.orderNumber}` });

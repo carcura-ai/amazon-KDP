@@ -52,9 +52,9 @@ export default async function protocolRoutes(app: FastifyInstance) {
     return {
       protocol: p,
       damages: damagesOf(id),
-      customer: app.db.select().from(customers).where(eq(customers.id, p.customerId)).get() ?? null,
-      vehicle: app.db.select().from(vehicles).where(eq(vehicles.id, p.vehicleId)).get() ?? null,
-      order: p.orderId ? app.db.select().from(orders).where(eq(orders.id, p.orderId)).get() ?? null : null,
+      customer: app.db.select().from(customers).where(and(eq(customers.id, p.customerId), eq(customers.companyId, p.companyId))).get() ?? null,
+      vehicle: app.db.select().from(vehicles).where(and(eq(vehicles.id, p.vehicleId), eq(vehicles.companyId, p.companyId))).get() ?? null,
+      order: p.orderId ? app.db.select().from(orders).where(and(eq(orders.id, p.orderId), eq(orders.companyId, p.companyId))).get() ?? null : null,
       files: app.db.select().from(files).where(and(eq(files.protocolId, id), eq(files.kind, 'image'))).orderBy(asc(files.sortOrder), asc(files.createdAt)).all(),
       labels: PROTOCOL_LABELS,
     };
@@ -152,7 +152,7 @@ export default async function protocolRoutes(app: FastifyInstance) {
     const logo = company.logoFileId ? app.storage.get(companyId, company.logoFileId) : null;
     const photos = d.files.map((f) => ({ file: f, dataUrl: app.storage.dataUrl(f, 'display') }));
     const sigOf = (fid: string | null) => { const f = fid ? app.storage.get(companyId, fid) : null; return f ? app.storage.dataUrl(f, 'original') : null; };
-    const employee = d.protocol.createdByUserId ? app.db.select({ firstName: users.firstName, lastName: users.lastName }).from(users).where(eq(users.id, d.protocol.createdByUserId)).get() : null;
+    const employee = d.protocol.createdByUserId ? app.db.select({ firstName: users.firstName, lastName: users.lastName }).from(users).where(and(eq(users.id, d.protocol.createdByUserId), eq(users.companyId, d.protocol.companyId))).get() : null;
     const html = documentShell({
       company,
       logoDataUrl: logo ? app.storage.dataUrl(logo, 'original') : null,

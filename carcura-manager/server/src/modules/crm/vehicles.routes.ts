@@ -61,7 +61,7 @@ export default async function vehicleRoutes(app: FastifyInstance) {
     const ctx = ctxOf(req);
     const { id } = req.params as { id: string };
     const vehicle = getVehicle(ctx.companyId, id);
-    const customer = app.db.select().from(customers).where(eq(customers.id, vehicle.customerId)).get();
+    const customer = app.db.select().from(customers).where(and(eq(customers.id, vehicle.customerId), eq(customers.companyId, vehicle.companyId))).get();
     const activities = listActivities(app.db, ctx.companyId, { customerId: vehicle.customerId }).filter((a) => a.vehicleId === id);
     return { vehicle, customer, activities, types: VEHICLE_TYPES };
   });

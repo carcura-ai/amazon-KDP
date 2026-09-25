@@ -68,6 +68,8 @@ declare module 'fastify' {
     marketing: MarketingSync;
     fetchFn: typeof fetch;
     backups: BackupService;
+    /** Verzeichnis aller registrierten Routen (für Isolationstests und API-Dokumentation). */
+    routeIndex: Array<{ method: string; url: string }>;
     /** Beendet den Prozess mit Exit-Code (75 = Neustart, 76 = Update) – das Startskript reagiert darauf. */
     exitFn: (code: number, reason: string) => void;
   }
@@ -88,6 +90,9 @@ export async function buildApp(opts: BuildOptions): Promise<FastifyInstance> {
     bodyLimit: 25 * 1024 * 1024,
   });
 
+  const routeIndex: Array<{ method: string; url: string }> = [];
+  app.decorate('routeIndex', routeIndex);
+  app.addHook('onRoute', (r) => { for (const m of [r.method].flat()) if (m !== 'HEAD') routeIndex.push({ method: m, url: r.url }); });
   app.decorate('db', opts.dbHandle.db);
   app.decorate('dbHandle', opts.dbHandle);
   app.decorate('config', opts.config);

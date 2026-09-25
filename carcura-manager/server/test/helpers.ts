@@ -46,3 +46,13 @@ export function as(session: Session | string, opts: InjectOptions): InjectOption
   const cookie = typeof session === 'string' ? session : session.cookie;
   return { ...opts, headers: { ...(opts.headers ?? {}), cookie } };
 }
+
+/** Multipart-Anfrage für Upload-Tests (Felder plus optionale Datei). */
+export function multipart(fields: Record<string, string>, file?: { name: string; type: string; data: Buffer }) {
+  const boundary = '----cmtest' + Math.random().toString(36).slice(2);
+  const parts: Buffer[] = [];
+  for (const [k, v] of Object.entries(fields)) parts.push(Buffer.from(`--${boundary}\r\nContent-Disposition: form-data; name="${k}"\r\n\r\n${v}\r\n`));
+  if (file) parts.push(Buffer.concat([Buffer.from(`--${boundary}\r\nContent-Disposition: form-data; name="file"; filename="${file.name}"\r\nContent-Type: ${file.type}\r\n\r\n`), file.data, Buffer.from('\r\n')]));
+  parts.push(Buffer.from(`--${boundary}--\r\n`));
+  return { payload: Buffer.concat(parts), headers: { 'content-type': `multipart/form-data; boundary=${boundary}` } };
+}

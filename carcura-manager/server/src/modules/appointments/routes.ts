@@ -60,9 +60,10 @@ export default async function appointmentRoutes(app: FastifyInstance) {
   const withRefs = (rows: Array<typeof appointments.$inferSelect>) => {
     const custIds = [...new Set(rows.map((r) => r.customerId).filter(Boolean))] as string[];
     const vehIds = [...new Set(rows.map((r) => r.vehicleId).filter(Boolean))] as string[];
-    const custMap = new Map(custIds.length ? app.db.select().from(customers).where(sql`${customers.id} in ${custIds}`).all().map((c) => [c.id, c]) : []);
-    const vehMap = new Map(vehIds.length ? app.db.select().from(vehicles).where(sql`${vehicles.id} in ${vehIds}`).all().map((v) => [v.id, v]) : []);
-    const userMap = new Map(app.db.select({ id: users.id, firstName: users.firstName, lastName: users.lastName }).from(users).all().map((u) => [u.id, u]));
+    const companyId = rows[0]?.companyId ?? '';
+    const custMap = new Map(custIds.length ? app.db.select().from(customers).where(and(eq(customers.companyId, companyId), sql`${customers.id} in ${custIds}`)).all().map((c) => [c.id, c]) : []);
+    const vehMap = new Map(vehIds.length ? app.db.select().from(vehicles).where(and(eq(vehicles.companyId, companyId), sql`${vehicles.id} in ${vehIds}`)).all().map((v) => [v.id, v]) : []);
+    const userMap = new Map(app.db.select({ id: users.id, firstName: users.firstName, lastName: users.lastName }).from(users).where(eq(users.companyId, companyId)).all().map((u) => [u.id, u]));
     return rows.map((r) => {
       const c = r.customerId ? custMap.get(r.customerId) : undefined;
       const v = r.vehicleId ? vehMap.get(r.vehicleId) : undefined;
@@ -95,7 +96,7 @@ export default async function appointmentRoutes(app: FastifyInstance) {
     const { id } = req.params as { id: string };
     const a = withRefs([getOne(ctx.companyId, id)])[0]!;
     const company = app.db.select().from(companies).where(eq(companies.id, ctx.companyId)).get()!;
-    const customer = a.customerId ? app.db.select().from(customers).where(eq(customers.id, a.customerId)).get() : undefined;
+    const customer = a.customerId ? app.db.select().from(customers).where(and(eq(customers.id, a.customerId), eq(customers.companyId, ctx.companyId))).get() : undefined;
     const raw = getOne(ctx.companyId, id);
     return {
       appointment: a,
@@ -184,7 +185,7 @@ export default async function appointmentRoutes(app: FastifyInstance) {
   async function sendConfirmationMail(companyId: string, id: string, userId: string): Promise<{ ok: boolean; error?: string }> {
     const a = getOne(companyId, id);
     const company = app.db.select().from(companies).where(eq(companies.id, companyId)).get()!;
-    const customer = a.customerId ? app.db.select().from(customers).where(eq(customers.id, a.customerId)).get() : undefined;
+    const customer = a.customerId ? app.db.select().from(customers).where(and(eq(customers.id, a.customerId), eq(customers.companyId, companyId))).get() : undefined;
     if (!customer?.email) return { ok: false, error: 'Kunde hat keine E-Mail-Adresse.' };
     if (!app.mail.isConfigured(companyId)) return { ok: false, error: 'Kein E-Mail-Versand (SMTP) konfiguriert.' };
     const tpl = confirmationMail(company, customer, a);

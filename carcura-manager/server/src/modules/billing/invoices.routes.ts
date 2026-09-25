@@ -44,12 +44,12 @@ export default async function invoiceRoutes(app: FastifyInstance) {
       invoice: inv,
       items: its,
       payments: app.db.select().from(payments).where(eq(payments.invoiceId, id)).orderBy(desc(payments.paidAt)).all(),
-      customer: app.db.select().from(customers).where(eq(customers.id, inv.customerId)).get() ?? null,
-      vehicle: inv.vehicleId ? app.db.select().from(vehicles).where(eq(vehicles.id, inv.vehicleId)).get() ?? null : null,
-      order: inv.orderId ? app.db.select({ id: orders.id, orderNumber: orders.orderNumber, status: orders.status }).from(orders).where(eq(orders.id, inv.orderId)).get() ?? null : null,
+      customer: app.db.select().from(customers).where(and(eq(customers.id, inv.customerId), eq(customers.companyId, inv.companyId))).get() ?? null,
+      vehicle: inv.vehicleId ? app.db.select().from(vehicles).where(and(eq(vehicles.id, inv.vehicleId), eq(vehicles.companyId, inv.companyId))).get() ?? null : null,
+      order: inv.orderId ? app.db.select({ id: orders.id, orderNumber: orders.orderNumber, status: orders.status }).from(orders).where(and(eq(orders.id, inv.orderId), eq(orders.companyId, inv.companyId))).get() ?? null : null,
       totals: totalsFor(app, companyId, its),
-      cancels: inv.cancelsInvoiceId ? app.db.select({ id: invoices.id, invoiceNumber: invoices.invoiceNumber }).from(invoices).where(eq(invoices.id, inv.cancelsInvoiceId)).get() ?? null : null,
-      cancelledBy: inv.cancelledByInvoiceId ? app.db.select({ id: invoices.id, invoiceNumber: invoices.invoiceNumber }).from(invoices).where(eq(invoices.id, inv.cancelledByInvoiceId)).get() ?? null : null,
+      cancels: inv.cancelsInvoiceId ? app.db.select({ id: invoices.id, invoiceNumber: invoices.invoiceNumber }).from(invoices).where(and(eq(invoices.id, inv.cancelsInvoiceId), eq(invoices.companyId, inv.companyId))).get() ?? null : null,
+      cancelledBy: inv.cancelledByInvoiceId ? app.db.select({ id: invoices.id, invoiceNumber: invoices.invoiceNumber }).from(invoices).where(and(eq(invoices.id, inv.cancelledByInvoiceId), eq(invoices.companyId, inv.companyId))).get() ?? null : null,
     };
   };
   const writeItems = (companyId: string, id: string, list: z.infer<typeof lineItemSchema>[]) => {

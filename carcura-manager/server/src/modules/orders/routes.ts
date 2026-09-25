@@ -41,10 +41,10 @@ export default async function orderRoutes(app: FastifyInstance) {
   const items = (orderId: string) => app.db.select().from(orderItems).where(eq(orderItems.orderId, orderId)).orderBy(asc(orderItems.sortOrder)).all();
   const detail = (companyId: string, id: string) => {
     const o = getOne(companyId, id);
-    const customer = app.db.select().from(customers).where(eq(customers.id, o.customerId)).get() ?? null;
-    const vehicle = o.vehicleId ? app.db.select().from(vehicles).where(eq(vehicles.id, o.vehicleId)).get() ?? null : null;
-    const appointment = o.appointmentId ? app.db.select().from(appointments).where(eq(appointments.id, o.appointmentId)).get() ?? null : null;
-    const user = o.userId ? app.db.select({ id: users.id, firstName: users.firstName, lastName: users.lastName }).from(users).where(eq(users.id, o.userId)).get() ?? null : null;
+    const customer = app.db.select().from(customers).where(and(eq(customers.id, o.customerId), eq(customers.companyId, companyId))).get() ?? null;
+    const vehicle = o.vehicleId ? app.db.select().from(vehicles).where(and(eq(vehicles.id, o.vehicleId), eq(vehicles.companyId, companyId))).get() ?? null : null;
+    const appointment = o.appointmentId ? app.db.select().from(appointments).where(and(eq(appointments.id, o.appointmentId), eq(appointments.companyId, companyId))).get() ?? null : null;
+    const user = o.userId ? app.db.select({ id: users.id, firstName: users.firstName, lastName: users.lastName }).from(users).where(and(eq(users.id, o.userId), eq(users.companyId, companyId))).get() ?? null : null;
     const company = app.db.select({ smallBusiness: companies.smallBusiness }).from(companies).where(eq(companies.id, companyId)).get()!;
     const its = items(id);
     return { order: o, items: its, customer, vehicle, appointment, user, totals: computeTotals(its, company.smallBusiness), statusLabels: ORDER_STATUS_LABEL };

@@ -8,6 +8,7 @@ import { notFound } from '../../core/errors.js';
 import { writeAudit } from '../../core/audit.js';
 import { ctxOf } from '../../plugins/auth.js';
 import type { Db } from '../../db/index.js';
+import { assertRefs } from '../../core/tenant.js';
 
 export const TASK_PRIORITIES = ['low', 'normal', 'high'] as const;
 const fields = {
@@ -42,7 +43,7 @@ export default async function taskRoutes(app: FastifyInstance) {
     id: tasks.id, title: tasks.title, description: tasks.description, status: tasks.status, priority: tasks.priority, dueAt: tasks.dueAt,
     assignedUserId: tasks.assignedUserId, customerId: tasks.customerId, leadId: tasks.leadId, vehicleId: tasks.vehicleId, orderId: tasks.orderId,
     createdByUserId: tasks.createdByUserId, completedAt: tasks.completedAt, createdAt: tasks.createdAt, updatedAt: tasks.updatedAt,
-    assignedName: sql<string | null>`(select first_name || ' ' || last_name from ${users} u where u.id = ${tasks.assignedUserId})`,
+    assignedName: sql<string | null>`(select first_name || ' ' || last_name from ${users} u where u.id = ${tasks.assignedUserId} and u.company_id = ${companyId})`,
     customerName: sql<string | null>`(select coalesce(nullif(company_name,''), first_name || ' ' || last_name) from ${customers} c where c.id = ${tasks.customerId} and c.company_id = ${companyId})`,
     leadName: sql<string | null>`(select first_name || ' ' || last_name from ${leads} l where l.id = ${tasks.leadId} and l.company_id = ${companyId})`,
     orderNumber: sql<string | null>`(select order_number from ${orders} o where o.id = ${tasks.orderId} and o.company_id = ${companyId})`,
@@ -90,6 +91,7 @@ export default async function taskRoutes(app: FastifyInstance) {
   app.post('/api/tasks', { preHandler: app.requireAuth('tasks:write') }, async (req, reply) => {
     const ctx = ctxOf(req);
     const input = parse(createSchema, req.body);
+    assertRefs(app.db, ctx.companyId, { customerId: input.customerId, leadId: input.leadId, vehicleId: input.vehicleId, orderId: input.orderId, assignedUserId: input.assignedUserId });
     const id = newId();
     app.db.insert(tasks).values({ id, companyId: ctx.companyId, ...input, createdByUserId: ctx.userId, assignedUserId: input.assignedUserId === undefined ? ctx.userId : input.assignedUserId }).run();
     writeAudit(app.db, ctx, { action: 'task.create', entityType: 'task', entityId: id, after: { title: input.title } });
@@ -101,6 +103,7 @@ export default async function taskRoutes(app: FastifyInstance) {
     const { id } = req.params as { id: string };
     const before = getOne(ctx.companyId, id);
     const input = parse(updateSchema, req.body);
+    assertRefs(app.db, ctx.companyId, { customerId: input.customerId, leadId: input.leadId, vehicleId: input.vehicleId, orderId: input.orderId, assignedUserId: input.assignedUserId });
     const patch: Partial<typeof tasks.$inferInsert> = { ...input, updatedAt: nowIso() };
     if (input.status && input.status !== before.status) patch.completedAt = input.status === 'done' ? nowIso() : null;
     app.db.update(tasks).set(patch).where(eq(tasks.id, id)).run();

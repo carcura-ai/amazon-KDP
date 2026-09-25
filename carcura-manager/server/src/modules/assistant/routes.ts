@@ -4,7 +4,7 @@ import { and, asc, desc, eq } from 'drizzle-orm';
 import { assistantMessages, companies } from '../../db/schema.js';
 import { parse, zTrimmed } from '../../core/validation.js';
 import { privacySettings } from '../privacy/settings.js';
-import { badRequest } from '../../core/errors.js';
+import { badRequest, notFound } from '../../core/errors.js';
 import { writeAudit } from '../../core/audit.js';
 import { newId } from '../../core/ids.js';
 import { ctxOf } from '../../plugins/auth.js';
@@ -57,7 +57,9 @@ export default async function assistantRoutes(app: FastifyInstance) {
   app.get('/api/assistant/conversations/:id', { preHandler: app.requireAuth('assistant:use') }, async (req) => {
     const ctx = ctxOf(req);
     const { id } = req.params as { id: string };
-    return { items: app.db.select().from(assistantMessages).where(and(eq(assistantMessages.companyId, ctx.companyId), eq(assistantMessages.conversationId, id), eq(assistantMessages.userId, ctx.userId))).orderBy(asc(assistantMessages.createdAt)).all() };
+    const items = app.db.select().from(assistantMessages).where(and(eq(assistantMessages.companyId, ctx.companyId), eq(assistantMessages.conversationId, id), eq(assistantMessages.userId, ctx.userId))).orderBy(asc(assistantMessages.createdAt)).all();
+    if (items.length === 0) throw notFound('Gespräch');
+    return { items };
   });
 
   app.get('/api/assistant/conversations', { preHandler: app.requireAuth('assistant:use') }, async (req) => {

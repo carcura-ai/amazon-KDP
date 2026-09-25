@@ -34,7 +34,7 @@ export async function runReminders(db: Db, mail: MailService): Promise<string> {
 }
 
 export async function sendReminder(db: Db, mail: MailService, company: typeof companies.$inferSelect, a: typeof appointments.$inferSelect, userId?: string): Promise<{ ok: boolean; error?: string }> {
-  const customer = a.customerId ? db.select().from(customers).where(eq(customers.id, a.customerId)).get() : undefined;
+  const customer = a.customerId ? db.select().from(customers).where(and(eq(customers.id, a.customerId), eq(customers.companyId, a.companyId))).get() : undefined;
   const fail = (error: string) => {
     db.update(appointments).set({ reminderError: error, updatedAt: nowIso() }).where(eq(appointments.id, a.id)).run();
     return { ok: false, error };

@@ -168,7 +168,7 @@ export default async function leadRoutes(app: FastifyInstance) {
     app.db.run(sql`update activities set customer_id = ${customerId} where company_id = ${ctx.companyId} and lead_id = ${id} and customer_id is null`);
     logActivity(app.db, ctx.companyId, { customerId, leadId: id, userId: ctx.userId, type: 'system', subject: existingCustomerId ? 'Lead bestehendem Kunden zugeordnet' : 'Kunde aus Lead erstellt' });
     writeAudit(app.db, ctx, { action: 'lead.convert', entityType: 'lead', entityId: id, after: { customerId } });
-    const customer = app.db.select().from(customers).where(eq(customers.id, customerId)).get();
+    const customer = app.db.select().from(customers).where(and(eq(customers.id, customerId), eq(customers.companyId, ctx.companyId))).get();
     return { customer, lead: getLead(ctx.companyId, id) };
   });
 
