@@ -43,7 +43,7 @@ export async function sendReminder(db: Db, mail: MailService, company: typeof co
   if (!customer.email) return fail('Kunde hat keine E-Mail-Adresse.');
   if (!mail.isConfigured(company.id)) return fail('Kein E-Mail-Versand (SMTP) konfiguriert.');
   const tpl = reminderMail(company, customer, a);
-  const res = await mail.send(company.id, { to: customer.email, subject: tpl.subject, text: tpl.text, refType: 'appointment', refId: a.id });
+  const res = await mail.send(company.id, { customerId: customer.id, to: customer.email, subject: tpl.subject, text: tpl.text, refType: 'appointment', refId: a.id });
   if (!res.ok) return fail(res.error);
   db.update(appointments).set({ reminderSentAt: nowIso(), reminderError: null, updatedAt: nowIso() }).where(eq(appointments.id, a.id)).run();
   logActivity(db, company.id, { customerId: customer.id, vehicleId: a.vehicleId, userId: userId ?? null, type: 'reminder', direction: 'out', subject: `Terminerinnerung per E-Mail: ${a.title}`, content: `An ${customer.email}`, refType: 'appointment', refId: a.id });

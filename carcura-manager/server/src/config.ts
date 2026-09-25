@@ -24,6 +24,8 @@ export interface AppConfig {
   systemSmtp: { host: string; port: number; secure: boolean; user: string; pass: string; fromName: string; fromEmail: string } | null;
   /** Mindestversion der Desktop-App, die dieser Server akzeptiert (Hinweis zur Aktualisierung). */
   minDesktopVersion: string;
+  /** SaaS: Tage nach Vertragsende, bis die Löschung eines Mandanten vorgemerkt wird (plus 14 Tage Vorlauf). */
+  tenantDataGraceDays: number;
 }
 
 function readInt(name: string, fallback: number): number {
@@ -84,5 +86,6 @@ export function loadConfig(overrides: Partial<AppConfig> = {}): AppConfig {
       fromName: process.env.SYSTEM_SMTP_FROM_NAME ?? 'Carcura Management', fromEmail: process.env.SYSTEM_SMTP_FROM ?? process.env.SYSTEM_SMTP_USER ?? '',
     } : null,
     minDesktopVersion: overrides.minDesktopVersion ?? process.env.MIN_DESKTOP_VERSION ?? '1.0.0',
+    tenantDataGraceDays: overrides.tenantDataGraceDays ?? readInt('TENANT_DATA_GRACE_DAYS', 30),
   };
 }

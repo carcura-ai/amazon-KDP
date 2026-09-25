@@ -189,7 +189,7 @@ export default async function appointmentRoutes(app: FastifyInstance) {
     if (!customer?.email) return { ok: false, error: 'Kunde hat keine E-Mail-Adresse.' };
     if (!app.mail.isConfigured(companyId)) return { ok: false, error: 'Kein E-Mail-Versand (SMTP) konfiguriert.' };
     const tpl = confirmationMail(company, customer, a);
-    const res = await app.mail.send(companyId, { to: customer.email, subject: tpl.subject, text: tpl.text, refType: 'appointment', refId: id });
+    const res = await app.mail.send(companyId, { customerId: customer.id, to: customer.email, subject: tpl.subject, text: tpl.text, refType: 'appointment', refId: id });
     if (!res.ok) return { ok: false, error: res.error };
     app.db.update(appointments).set({ confirmationSentAt: nowIso(), updatedAt: nowIso() }).where(eq(appointments.id, id)).run();
     logActivity(app.db, companyId, { customerId: customer.id, vehicleId: a.vehicleId, userId, type: 'email', direction: 'out', subject: `Terminbestätigung: ${a.title}`, content: `An ${customer.email}`, refType: 'appointment', refId: id });

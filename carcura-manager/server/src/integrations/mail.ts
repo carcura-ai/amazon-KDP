@@ -1,7 +1,7 @@
 import nodemailer, { type Transporter } from 'nodemailer';
-import { eq } from 'drizzle-orm';
+import { and, eq } from 'drizzle-orm';
 import type { Db } from '../db/index.js';
-import { companies, emailLog } from '../db/schema.js';
+import { companies, customers, emailLog } from '../db/schema.js';
 import { newId } from '../core/ids.js';
 import type { IntegrationStore } from './store.js';
 
@@ -24,6 +24,8 @@ export interface MailMessage {
   refType?: string;
   refId?: string;
   attachments?: Array<{ filename: string; content: Buffer; contentType?: string }>;
+  /** Kundenbezug: bei eingeschränkter Verarbeitung (Art. 18 DSGVO) wird nicht versendet. */
+  customerId?: string | null;
 }
 
 export class MailService {
@@ -69,6 +71,11 @@ export class MailService {
     const found = this.store.get<SmtpConfig>(companyId, 'smtp');
     const cfg: SmtpConfig | null = found?.config ?? (this.transportOverride ? { host: 'test', port: 25, secure: false, user: '', pass: '', fromName: 'Test', fromEmail: 'test@example.test' } : null);
     if (!cfg) return { ok: false, error: 'Kein E-Mail-Versand (SMTP) konfiguriert.' };
+    if (msg.customerId) {
+      const c = this.db.select({ restrictedAt: customers.restrictedAt, anonymizedAt: customers.anonymizedAt }).from(customers).where(and(eq(customers.id, msg.customerId), eq(customers.companyId, companyId))).get();
+      if (c?.restrictedAt) return { ok: false, error: 'Die Verarbeitung der Daten dieses Kunden ist eingeschränkt (Art. 18 DSGVO). Kein Versand.' };
+      if (c?.anonymizedAt) return { ok: false, error: 'Der Kunde wurde anonymisiert. Kein Versand.' };
+    }
     const company = this.db.select({ name: companies.name }).from(companies).where(eq(companies.id, companyId)).get();
     try {
       const info = await this.transport(cfg).sendMail({

@@ -10,6 +10,8 @@ import { publicCompany } from '../auth/routes.js';
 import { privacySchema, privacySettings } from './settings.js';
 import { anonymizeCustomer, deleteCustomerCompletely, hasRetentionDocuments } from './anonymize.js';
 import { runRetention } from './retention.js';
+import { logDeletion, retentionEnd } from './lifecycle.js';
+import { appendLedger } from '../platform/tenant-lifecycle.js';
 
 /** Auskunft nach Art. 15 DSGVO: alle zu einer Person gespeicherten Daten in einer Datei. */
 export function customerDossier(app: FastifyInstance, companyId: string, customerId: string) {
@@ -41,6 +43,28 @@ export function customerDossier(app: FastifyInstance, companyId: string, custome
   };
 }
 
+/**
+ * Löschen nach dem Löschkonzept: mit aufbewahrungspflichtigen Belegen anonymisieren und bis zum Fristende
+ * sperren (Grund und Datum werden gespeichert), sonst vollständig löschen. Immer mit Löschprotokoll.
+ */
+export function eraseCustomer(app: FastifyInstance, companyId: string, customerId: string, by: { userId: string | null; source: 'user' | 'job' | 'admin'; reason: string }) {
+  const c = app.db.select().from(customers).where(and(eq(customers.id, customerId), eq(customers.companyId, companyId))).get();
+  if (!c) throw notFound('Kunde');
+  const years = privacySettings(app.db.select().from(companies).where(eq(companies.id, companyId)).get()!).documentRetentionYears;
+  if (hasRetentionDocuments(app.db, companyId, customerId)) {
+    const ret = retentionEnd(app.db, companyId, customerId, years);
+    const result = anonymizeCustomer(app.db, app.storage, companyId, customerId);
+    app.db.update(customers).set({ retentionUntil: ret?.until ?? null, retentionReason: ret?.reason ?? null, restrictedAt: null, restrictionReason: null }).where(eq(customers.id, customerId)).run();
+    appendLedger(app, { kind: 'customer', companyId, customerId, at: nowIso() });
+    logDeletion(app.db, { companyId, subjectType: 'customer', subjectRef: c.customerNumber, action: 'anonymized', reason: `${by.reason}. Nicht sofort vollständig gelöscht: ${ret?.reason ?? 'aufbewahrungspflichtige Belege'}`, retentionUntil: ret?.until, details: result, userId: by.userId, source: by.source });
+    return { mode: 'anonymized' as const, retentionUntil: ret?.until ?? null, retentionReason: ret?.reason ?? null, ...result };
+  }
+  const result = deleteCustomerCompletely(app.db, app.storage, companyId, customerId);
+  appendLedger(app, { kind: 'customer', companyId, customerId, at: nowIso() });
+  logDeletion(app.db, { companyId, subjectType: 'customer', subjectRef: c.customerNumber, action: 'deleted', reason: by.reason, details: result, userId: by.userId, source: by.source });
+  return { mode: 'deleted' as const, retentionUntil: null, retentionReason: null, ...result };
+}
+
 export default async function privacyRoutes(app: FastifyInstance) {
   app.get('/api/privacy/settings', { preHandler: app.requireAuth('settings:manage') }, async (req) => {
     const ctx = ctxOf(req);
@@ -63,7 +87,7 @@ export default async function privacyRoutes(app: FastifyInstance) {
   /** Aufbewahrungslauf manuell starten (sonst täglich automatisch). */
   app.post('/api/privacy/retention/run', { preHandler: app.requireAuth('privacy:manage') }, async (req) => {
     const ctx = ctxOf(req);
-    const summary = runRetention(app.db, app.storage);
+    const summary = runRetention(app);
     writeAudit(app.db, ctx, { action: 'privacy.retention_run', entityType: 'company', entityId: ctx.companyId, after: { summary } });
     return { summary };
   });
@@ -75,10 +99,9 @@ export default async function privacyRoutes(app: FastifyInstance) {
     const c = app.db.select().from(customers).where(and(eq(customers.id, id), eq(customers.companyId, ctx.companyId))).get();
     if (!c) throw notFound('Kunde');
     if (c.anonymizedAt) throw badRequest('Dieser Kunde wurde bereits anonymisiert.');
-    const retention = hasRetentionDocuments(app.db, ctx.companyId, id);
-    const result = retention ? anonymizeCustomer(app.db, app.storage, ctx.companyId, id) : deleteCustomerCompletely(app.db, app.storage, ctx.companyId, id);
-    writeAudit(app.db, ctx, { action: retention ? 'customer.anonymize' : 'customer.delete_hard', entityType: 'customer', entityId: id, before: { customerNumber: c.customerNumber }, after: { ...result, mode: retention ? 'anonymized' : 'deleted' } });
-    return { ok: true, mode: retention ? 'anonymized' : 'deleted', ...result };
+    const r = eraseCustomer(app, ctx.companyId, id, { userId: ctx.userId, source: 'user', reason: 'Löschung auf Anfrage (Art. 17 DSGVO)' });
+    writeAudit(app.db, ctx, { action: r.mode === 'anonymized' ? 'customer.anonymize' : 'customer.delete_hard', entityType: 'customer', entityId: id, before: { customerNumber: c.customerNumber }, after: r });
+    return { ok: true, ...r };
   });
 
   /** Auskunft als JSON-Datei. */

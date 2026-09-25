@@ -4,14 +4,14 @@ import { and, asc, desc, eq, like, or, sql } from 'drizzle-orm';
 import { customers, companies, vehicles, leads } from '../../db/schema.js';
 import { parse, zOptionalText, zTrimmed, zPagination, zOptionalEmail } from '../../core/validation.js';
 import { newId, nowIso } from '../../core/ids.js';
-import { badRequest, notFound } from '../../core/errors.js';
+import { badRequest, notFound, AppError } from '../../core/errors.js';
 import { writeAudit } from '../../core/audit.js';
 import { normalizeEmail, normalizePhone } from '../../core/normalize.js';
 import { nextNumber } from '../../core/numbering.js';
 import { ctxOf } from '../../plugins/auth.js';
 import { findDuplicates } from './duplicates.js';
 import { logActivity, listActivities, ACTIVITY_TYPES } from './activities.js';
-import { anonymizeCustomer, deleteCustomerCompletely, hasRetentionDocuments } from '../privacy/anonymize.js';
+import { eraseCustomer } from '../privacy/routes.js';
 import { customerDossier } from '../privacy/routes.js';
 
 const customerFields = {
@@ -106,6 +106,9 @@ export default async function customerRoutes(app: FastifyInstance) {
   app.patch('/api/customers/:id', { preHandler: app.requireAuth('customers:write') }, async (req) => {
     const ctx = ctxOf(req);
     const { id } = req.params as { id: string };
+    const current = getCustomer(ctx.companyId, id);
+    if (current.restrictedAt) throw new AppError(423, 'restricted', 'Die Verarbeitung dieses Kunden ist eingeschränkt (Art. 18 DSGVO). Änderungen erst nach Aufhebung unter Datenschutz möglich.');
+    if (current.anonymizedAt) throw new AppError(423, 'anonymized', 'Dieser Kunde wurde anonymisiert und kann nicht mehr geändert werden.');
     const { tags, ...input } = parse(customerUpdateSchema, req.body);
     const before = getCustomer(ctx.companyId, id);
     const patch: Record<string, unknown> = { ...input, updatedAt: nowIso() };
@@ -126,9 +129,9 @@ export default async function customerRoutes(app: FastifyInstance) {
     const before = getCustomer(ctx.companyId, id);
     if (hard) {
       // Löschkonzept: mit aufbewahrungspflichtigen Belegen wird anonymisiert, sonst vollständig gelöscht
-      const retention = hasRetentionDocuments(app.db, ctx.companyId, id);
-      const result = retention ? anonymizeCustomer(app.db, app.storage, ctx.companyId, id) : deleteCustomerCompletely(app.db, app.storage, ctx.companyId, id);
-      writeAudit(app.db, ctx, { action: retention ? 'customer.anonymize' : 'customer.delete_hard', entityType: 'customer', entityId: id, before: { customerNumber: before.customerNumber }, after: { ...result, mode: retention ? 'anonymized' : 'deleted' } });
+      const result = eraseCustomer(app, ctx.companyId, id, { userId: ctx.userId, source: 'user', reason: 'Löschung durch Benutzer' });
+      const retention = result.mode === 'anonymized';
+      writeAudit(app.db, ctx, { action: retention ? 'customer.anonymize' : 'customer.delete_hard', entityType: 'customer', entityId: id, before: { customerNumber: before.customerNumber }, after: result });
       return { ok: true, deleted: !retention, anonymized: retention, ...result };
     }
     app.db.update(customers).set({ isActive: false, updatedAt: nowIso() }).where(eq(customers.id, id)).run();

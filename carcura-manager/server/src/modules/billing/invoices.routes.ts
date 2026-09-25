@@ -185,7 +185,7 @@ export default async function invoiceRoutes(app: FastifyInstance) {
     if (!app.mail.isConfigured(ctx.companyId)) throw badRequest('Kein E-Mail-Versand (SMTP) konfiguriert.');
     const tpl = invoiceMailText(company, customer, inv.invoiceNumber!, inv.totalCents, inv.dueDate);
     const pdf = await renderPdf(ctx.companyId, id);
-    const res = await app.mail.send(ctx.companyId, { to, subject: input.subject ?? tpl.subject, text: input.message ?? tpl.text, attachments: [{ filename: `${inv.invoiceNumber}.pdf`, content: pdf, contentType: 'application/pdf' }], refType: 'invoice', refId: id });
+    const res = await app.mail.send(ctx.companyId, { customerId: customer.id, to, subject: input.subject ?? tpl.subject, text: input.message ?? tpl.text, attachments: [{ filename: `${inv.invoiceNumber}.pdf`, content: pdf, contentType: 'application/pdf' }], refType: 'invoice', refId: id });
     if (!res.ok) throw badRequest(`Versand fehlgeschlagen: ${res.error}`);
     app.db.update(invoices).set({ status: inv.status === 'open' ? 'sent' : inv.status, sentAt: nowIso(), updatedAt: nowIso() }).where(eq(invoices.id, id)).run();
     logActivity(app.db, ctx.companyId, { customerId: inv.customerId, userId: ctx.userId, type: 'email', direction: 'out', subject: `Rechnung ${inv.invoiceNumber} per E-Mail gesendet`, content: `An ${to}`, refType: 'invoice', refId: id });

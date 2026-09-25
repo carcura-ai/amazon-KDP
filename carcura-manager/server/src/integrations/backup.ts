@@ -119,7 +119,9 @@ export async function applyPendingRestore(cfg: BackupConfig, log: Pick<FastifyBa
     if (fs.existsSync(path.join(work, 'files'))) fs.cpSync(path.join(work, 'files'), cfg.filesDir, { recursive: true });
     else fs.mkdirSync(cfg.filesDir, { recursive: true });
     fs.rmSync(pending, { force: true });
-    fs.writeFileSync(path.join(cfg.dataDir, 'restore-last.json'), JSON.stringify({ restoredAt: new Date().toISOString(), safetyCopy: safety }, null, 2));
+    let backupCreatedAt: string | null = null;
+    try { backupCreatedAt = (JSON.parse(fs.readFileSync(path.join(work, 'manifest.json'), 'utf8')) as { createdAt?: string }).createdAt ?? null; } catch { /* ältere Sicherung ohne Manifest */ }
+    fs.writeFileSync(path.join(cfg.dataDir, 'restore-last.json'), JSON.stringify({ restoredAt: new Date().toISOString(), safetyCopy: safety, backupCreatedAt }, null, 2));
     log.info({ safety }, 'Wiederherstellung angewendet');
     return true;
   } catch (err) {

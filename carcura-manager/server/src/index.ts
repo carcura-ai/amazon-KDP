@@ -11,6 +11,9 @@ import { runCompetitorScanAll } from './modules/competitors/routes.js';
 import { applyPendingRestore } from './integrations/backup.js';
 import { runRetention } from './modules/privacy/retention.js';
 import { runSubscriptionLifecycle } from './core/subscriptions.js';
+import { reapplyDeletionLedger, runTenantLifecycle } from './modules/platform/tenant-lifecycle.js';
+import fs from 'node:fs';
+import path from 'node:path';
 import { expireSupportSessions } from './modules/platform/support.routes.js';
 
 async function main() {
@@ -33,8 +36,9 @@ async function main() {
     const info = await app.backups.create('auto');
     return `${info.name} (${Math.round(info.sizeBytes / 1024)} KB)`;
   } });
-  scheduler.register({ type: 'privacy.retention', cron: '45 3 * * *', runOnStart: true, handler: async () => runRetention(dbHandle.db, app.storage) });
+  scheduler.register({ type: 'privacy.retention', cron: '45 3 * * *', runOnStart: true, handler: async () => runRetention(app) });
   scheduler.register({ type: 'subscriptions.lifecycle', cron: '20 1 * * *', runOnStart: true, handler: async () => runSubscriptionLifecycle(dbHandle.db) });
+  scheduler.register({ type: 'tenants.lifecycle', cron: '40 1 * * *', handler: () => runTenantLifecycle(app, config.tenantDataGraceDays) });
   scheduler.register({ type: 'support.expire', cron: '*/15 * * * *', handler: async () => `${expireSupportSessions(dbHandle.db)} Supportzugriffe abgelaufen` });
   scheduler.register({ type: 'sessions.cleanup', cron: '15 3 * * *', handler: async () => `${purgeExpiredSessions(dbHandle.db)} Sessions entfernt` });
   app.addHook('onClose', async () => scheduler.stop());
@@ -47,7 +51,15 @@ async function main() {
   process.on('SIGTERM', () => void shutdown('SIGTERM'));
   await app.listen({ port: config.port, host: config.host });
   app.log.info(`Oberfläche: ${config.publicUrl}`);
-  if (restored) app.log.warn('Eine Sicherung wurde beim Start wiederhergestellt (Details: data/restore-last.json).');
+  if (restored) {
+    app.log.warn('Eine Sicherung wurde beim Start wiederhergestellt (Details: data/restore-last.json).');
+    // Löschungen, die nach dem Sicherungsstand erfolgt sind, erneut anwenden (Löschregister außerhalb der DB)
+    try {
+      const info = JSON.parse(fs.readFileSync(path.join(config.dataDir, 'restore-last.json'), 'utf8')) as { backupCreatedAt?: string | null };
+      const n = await reapplyDeletionLedger(app, info.backupCreatedAt ?? '1970-01-01T00:00:00.000Z');
+      if (n) app.log.warn({ n }, 'Löschungen nach Wiederherstellung erneut angewendet');
+    } catch (err) { app.log.error({ err }, 'Löschregister konnte nicht angewendet werden'); }
+  }
 }
 
 main().catch((err) => {

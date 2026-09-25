@@ -40,6 +40,10 @@ export const companies = sqliteTable('companies', {
   poweredBy: text('powered_by'),
   websiteLeadToken: text('website_lead_token'),
   isActive: integer('is_active', { mode: 'boolean' }).notNull().default(true),
+  /** Mandanten-Lebenszyklus (SaaS): Löschung nach Vertragsende und Frist. */
+  deletionScheduledAt: text('deletion_scheduled_at'),
+  deletionReason: text('deletion_reason'),
+  deletedAt: text('deleted_at'),
   createdAt: ts('created_at'),
   updatedAt: ts('updated_at'),
 });
@@ -214,6 +218,12 @@ export const customers = sqliteTable(
     normalizedPhone: text('normalized_phone'),
     isActive: integer('is_active', { mode: 'boolean' }).notNull().default(true),
     anonymizedAt: text('anonymized_at'),
+    /** Einschränkung der Verarbeitung (Art. 18 DSGVO): gespeichert, aber keine Nutzung/Änderung/Kontaktaufnahme. */
+    restrictedAt: text('restricted_at'),
+    restrictionReason: text('restriction_reason'),
+    /** Aufbewahrungssperre: Rest-Daten (Belege) bleiben bis zu diesem Datum, danach endgültige Löschung. */
+    retentionUntil: text('retention_until'),
+    retentionReason: text('retention_reason'),
     createdAt: ts('created_at'),
     updatedAt: ts('updated_at'),
   },
@@ -1086,4 +1096,172 @@ export const paymentWebhookEvents = sqliteTable(
     processedAt: text('processed_at'),
   },
   (t) => [uniqueIndex('payment_webhook_events_unique').on(t.provider, t.externalEventId)],
+);
+
+/* ------------------------------------------------------------------ Datenschutz: Anfragen, Exporte, Löschprotokoll */
+/** Register der Betroffenenanfragen (Art. 15–21 DSGVO) mit Frist (grundsätzlich ein Monat, Art. 12 Abs. 3). */
+export const privacyRequests = sqliteTable(
+  'privacy_requests',
+  {
+    id: text('id').primaryKey(),
+    companyId: text('company_id').notNull().references(() => companies.id),
+    type: text('type').notNull(), // access | rectification | erasure | restriction | portability | objection
+    subjectName: text('subject_name').notNull(),
+    subjectContact: text('subject_contact'),
+    customerId: text('customer_id'),
+    receivedAt: text('received_at').notNull(),
+    dueAt: text('due_at').notNull(),
+    status: text('status').notNull().default('open'), // open | in_progress | completed | rejected
+    notes: text('notes'),
+    result: text('result'),
+    completedAt: text('completed_at'),
+    handledByUserId: text('handled_by_user_id'),
+    createdAt: ts('created_at'),
+    updatedAt: ts('updated_at'),
+  },
+  (t) => [index('privacy_requests_company_idx').on(t.companyId, t.status, t.dueAt)],
+);
+
+/** Nachweis jeder Löschung/Anonymisierung – ohne personenbezogene Inhalte (nur Kundennummer, Zählwerte, Grund). */
+export const deletionLog = sqliteTable(
+  'deletion_log',
+  {
+    id: text('id').primaryKey(),
+    companyId: text('company_id').notNull(),
+    subjectType: text('subject_type').notNull(), // customer | lead | tenant | data_class
+    subjectRef: text('subject_ref'), // z. B. Kundennummer, nie Name/E-Mail
+    action: text('action').notNull(), // anonymized | deleted | purged | restricted | unrestricted | tenant_deleted
+    reason: text('reason').notNull(),
+    retentionUntil: text('retention_until'),
+    detailsJson: text('details_json').notNull().default('{}'),
+    performedByUserId: text('performed_by_user_id'),
+    source: text('source').notNull().default('user'), // user | job | admin
+    createdAt: ts('created_at'),
+  },
+  (t) => [index('deletion_log_company_idx').on(t.companyId, t.createdAt)],
+);
+
+/** Datenexporte (Kunde nach Art. 20, gesamter Mandant bei Vertragsende). Dateien werden nach Ablauf gelöscht. */
+export const dataExports = sqliteTable(
+  'data_exports',
+  {
+    id: text('id').primaryKey(),
+    companyId: text('company_id').notNull().references(() => companies.id),
+    scope: text('scope').notNull(), // tenant | customer
+    subjectRef: text('subject_ref'),
+    formatVersion: integer('format_version').notNull().default(1),
+    status: text('status').notNull().default('running'), // running | ready | failed | expired
+    storagePath: text('storage_path'),
+    sizeBytes: integer('size_bytes'),
+    sha256: text('sha256'),
+    contentsJson: text('contents_json').notNull().default('{}'),
+    error: text('error'),
+    requestedByUserId: text('requested_by_user_id'),
+    createdAt: ts('created_at'),
+    completedAt: text('completed_at'),
+    expiresAt: text('expires_at'),
+    downloadedAt: text('downloaded_at'),
+  },
+  (t) => [index('data_exports_company_idx').on(t.companyId, t.createdAt)],
+);
+
+/** Subprozessoren / externe Dienste (vom Betreiber gepflegt). Status der Verträge nie vorbelegen – nur tatsächlich Geprüftes eintragen. */
+export const subprocessors = sqliteTable('subprocessors', {
+  id: text('id').primaryKey(),
+  key: text('key').notNull().unique(), // hosting | smtp | windsor | google | meta | anthropic | payment | monitoring …
+  name: text('name').notNull(),
+  purpose: text('purpose').notNull(),
+  dataCategories: text('data_categories').notNull(),
+  location: text('location'),
+  thirdCountry: integer('third_country', { mode: 'boolean' }).notNull().default(false),
+  transferMechanism: text('transfer_mechanism'), // z. B. Angemessenheitsbeschluss (EU-US DPF), Standardvertragsklauseln
+  dpaStatus: text('dpa_status').notNull().default('to_review'), // to_review | signed | not_required | missing
+  dpaReference: text('dpa_reference'),
+  activation: text('activation').notNull().default('optional'), // always | optional (nur wenn Integration aktiv)
+  integrationType: text('integration_type'), // Zuordnung zu integrations.type
+  notes: text('notes'),
+  isActive: integer('is_active', { mode: 'boolean' }).notNull().default(true),
+  version: integer('version').notNull().default(1),
+  updatedAt: ts('updated_at'),
+});
+
+/** Versionierte Rechtsdokumente (AGB, AVV, Datenschutz, TOM …). Inhalte werden vom Betreiber eingestellt, nicht im Code. */
+export const legalDocuments = sqliteTable(
+  'legal_documents',
+  {
+    id: text('id').primaryKey(),
+    type: text('type').notNull(), // agb | avv | privacy | tom | subprocessors | prices | imprint | withdrawal | sla
+    version: text('version').notNull(),
+    title: text('title').notNull(),
+    contentMarkdown: text('content_markdown'),
+    url: text('url'),
+    contentSha256: text('content_sha256').notNull(),
+    requiresAcceptance: integer('requires_acceptance', { mode: 'boolean' }).notNull().default(false),
+    isCurrent: integer('is_current', { mode: 'boolean' }).notNull().default(false),
+    publishedAt: text('published_at').notNull(),
+    createdByUserId: text('created_by_user_id'),
+    createdAt: ts('created_at'),
+  },
+  (t) => [uniqueIndex('legal_documents_type_version_unique').on(t.type, t.version)],
+);
+
+/** Nachweis der Zustimmung (Vertragsabschluss): Dokumentversion, Zeitpunkt, Mandant, Benutzer, technische Nachweise. */
+export const legalAcceptances = sqliteTable(
+  'legal_acceptances',
+  {
+    id: text('id').primaryKey(),
+    companyId: text('company_id').notNull().references(() => companies.id),
+    userId: text('user_id').notNull(),
+    documentId: text('document_id').notNull().references(() => legalDocuments.id),
+    documentType: text('document_type').notNull(),
+    documentVersion: text('document_version').notNull(),
+    contentSha256: text('content_sha256').notNull(),
+    acceptedAt: text('accepted_at').notNull(),
+    ip: text('ip'),
+    userAgent: text('user_agent'),
+  },
+  (t) => [index('legal_acceptances_company_idx').on(t.companyId, t.documentType)],
+);
+
+/** Sicherheits- und Datenschutzvorfälle (Art. 33/34 DSGVO: Meldung an Behörde grundsätzlich binnen 72 Stunden prüfen). */
+export const incidents = sqliteTable(
+  'incidents',
+  {
+    id: text('id').primaryKey(),
+    companyId: text('company_id'), // null = betreiberweit
+    title: text('title').notNull(),
+    type: text('type').notNull(), // data_breach | account_compromise | credential_loss | outage | malware | backup_failure | cross_tenant_bug | other
+    severity: text('severity').notNull().default('medium'), // low | medium | high | critical
+    status: text('status').notNull().default('open'), // open | contained | resolved | closed
+    occurredAt: text('occurred_at'),
+    detectedAt: text('detected_at').notNull(),
+    affectedTenantsJson: text('affected_tenants_json').notNull().default('[]'),
+    personalDataAffected: integer('personal_data_affected', { mode: 'boolean' }).notNull().default(false),
+    description: text('description'),
+    measures: text('measures'),
+    authorityNotifiedAt: text('authority_notified_at'),
+    subjectsNotifiedAt: text('subjects_notified_at'),
+    tenantsNotifiedAt: text('tenants_notified_at'),
+    createdByUserId: text('created_by_user_id'),
+    createdAt: ts('created_at'),
+    updatedAt: ts('updated_at'),
+  },
+  (t) => [index('incidents_company_idx').on(t.companyId, t.status)],
+);
+
+/** Protokoll der KI-Nutzung ohne Inhalte: wer, wann, welche Werkzeuge, ob Personendaten übermittelt wurden. */
+export const aiUsageLog = sqliteTable(
+  'ai_usage_log',
+  {
+    id: text('id').primaryKey(),
+    companyId: text('company_id').notNull(),
+    userId: text('user_id').notNull(),
+    model: text('model').notNull(),
+    toolsJson: text('tools_json').notNull().default('[]'),
+    personalData: integer('personal_data', { mode: 'boolean' }).notNull().default(false),
+    inputTokens: integer('input_tokens'),
+    outputTokens: integer('output_tokens'),
+    createdAt: ts('created_at'),
+  },
+  (t) => [index('ai_usage_company_idx').on(t.companyId, t.createdAt)],
 );

@@ -62,6 +62,10 @@ import saasAdminRoutes from './modules/saas/admin.routes.js';
 import paymentWebhookRoutes from './modules/saas/webhooks.routes.js';
 import { createPaymentProviders, type PaymentProvider } from './integrations/payments/provider.js';
 import { seedPlans } from './core/entitlements.js';
+import privacyCenterRoutes from './modules/privacy/center.routes.js';
+import complianceRoutes from './modules/platform/compliance.routes.js';
+import legalSignupRoutes from './modules/saas/legal-signup.routes.js';
+import { seedSubprocessors } from './modules/platform/tenant-lifecycle.js';
 
 declare module 'fastify' {
   interface FastifyInstance {
@@ -214,6 +218,10 @@ export async function buildApp(opts: BuildOptions): Promise<FastifyInstance> {
   await app.register(subscriptionRoutes);
   await app.register(saasAdminRoutes);
   await app.register(paymentWebhookRoutes);
+  await app.register(privacyCenterRoutes);
+  await app.register(complianceRoutes);
+  await app.register(legalSignupRoutes);
+  seedSubprocessors(app);
 
   // Web-App (Vite-Build) ausliefern, wenn vorhanden
   const webDist = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../web/dist');

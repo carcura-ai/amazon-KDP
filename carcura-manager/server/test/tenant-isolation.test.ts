@@ -62,6 +62,9 @@ beforeAll(async () => {
   ids.competitor = (await post('/api/competitors', { name: `${MARK} Wettbewerber` })).id;
   await post(`/api/customers/${ids.customer}/activities`, { type: 'note', content: MARK });
   ids.supportSession = (await post('/api/support-sessions/grant', { reason: `${MARK} Support`, durationMinutes: 30 })).id;
+  ids.privacyRequest = (await post('/api/privacy/requests', { type: 'access', subjectName: `${MARK} Person` })).id;
+  ids.incident = (await post('/api/privacy/incidents', { title: `${MARK} Vorfall`, type: 'other' })).id;
+  ids.export = (await post('/api/tenant-export', {})).id;
   // Mandant B
   const created = await app.inject(as(A, { method: 'POST', url: '/api/platform/companies', payload: { company: { name: 'Mandant B' }, admin: { email: 'chef@b.test', password: 'MandantB-Pass1', firstName: 'Bernd', lastName: 'B' } } }));
   expect(created.statusCode).toBe(200);
@@ -86,7 +89,7 @@ function idFor(url: string, param: string): string | null {
     [/^\/api\/invoices\//, 'invoice'], [/^\/api\/protocols\//, 'protocol'], [/^\/(api\/)?files\//, 'file'],
     [/^\/api\/tasks\//, 'task'], [/^\/api\/inventory\//, 'inventory'], [/^\/api\/expenses\//, 'expense'],
     [/^\/api\/recurring-expenses\//, 'recurring'], [/^\/api\/services\//, 'service'], [/^\/api\/competitors\//, 'competitor'],
-    [/^\/api\/users\//, 'user'], [/^\/api\/platform\/companies\//, 'company'], [/^\/api\/(platform\/)?support-sessions\//, 'supportSession'], [/^\/api\/platform\/(plans|addons|discount-codes)\//, 'platformObject'], [/^\/api\/reports\//, 'report'], [/^\/api\/assistant\/conversations\//, 'conversation'],
+    [/^\/api\/users\//, 'user'], [/^\/api\/platform\/companies\//, 'company'], [/^\/api\/(platform\/)?support-sessions\//, 'supportSession'], [/^\/api\/platform\/(plans|addons|discount-codes|subprocessors|incidents)\//, 'platformObject'], [/^\/api\/privacy\/leads\//, 'lead'], [/^\/api\/privacy\/requests\//, 'privacyRequest'], [/^\/api\/privacy\/incidents\//, 'incident'], [/^\/api\/tenant-export\//, 'export'], [/^\/api\/legal\/documents\//, 'legalDocument'], [/^\/api\/reports\//, 'report'], [/^\/api\/assistant\/conversations\//, 'conversation'],
   ];
   for (const [re, key] of map) if (re.test(url)) return ids[key] ?? '00000000-0000-4000-8000-000000000000';
   return null;
@@ -158,7 +161,7 @@ describe('Mandantentrennung über alle Routen', () => {
     const routes = app.routeIndex.filter((r) => ['POST', 'PUT', 'PATCH'].includes(r.method) && r.url.startsWith('/api/') && !r.url.includes(':') && !SKIP.has(r.url));
     const accepted: string[] = [];
     // Diese Routen haben keine Fremdreferenz im Body und dürfen mit B-eigenen Daten erfolgreich sein.
-    const noRefs = new Set(['/api/users', '/api/competitors', '/api/expenses', '/api/recurring-expenses', '/api/inventory', '/api/services', '/api/leads', '/api/customers', '/api/marketing/sync', '/api/reports/generate', '/api/competitors/scan', '/api/privacy/retention/run', '/api/system/backups', '/api/system/restore/cancel', '/api/company/website-lead-token/rotate', '/api/auth/2fa/setup', '/api/auth/2fa/enable', '/api/assistant/chat', '/api/company', '/api/privacy/settings', '/api/platform/companies', '/api/public/leads/website', '/api/integrations/smtp', '/api/integrations/smtp/test', '/api/integrations/claude', '/api/integrations/google_places', '/api/company/logo', '/api/system/restore/upload', '/api/tasks']);
+    const noRefs = new Set(['/api/users', '/api/competitors', '/api/expenses', '/api/recurring-expenses', '/api/inventory', '/api/services', '/api/leads', '/api/customers', '/api/marketing/sync', '/api/reports/generate', '/api/competitors/scan', '/api/privacy/retention/run', '/api/system/backups', '/api/system/restore/cancel', '/api/company/website-lead-token/rotate', '/api/auth/2fa/setup', '/api/auth/2fa/enable', '/api/assistant/chat', '/api/company', '/api/privacy/settings', '/api/platform/companies', '/api/public/leads/website', '/api/integrations/smtp', '/api/integrations/smtp/test', '/api/integrations/claude', '/api/integrations/google_places', '/api/company/logo', '/api/system/restore/upload', '/api/tasks', '/api/tenant-export', '/api/auth/verify-email/resend', '/api/privacy/requests', '/api/privacy/incidents']);
     for (const r of routes) {
       if (noRefs.has(r.url)) continue;
       const res = await app.inject(as(B, { method: r.method as 'POST', url: r.url, payload: foreignBody() }));
@@ -179,6 +182,26 @@ describe('Mandantentrennung über alle Routen', () => {
     }
     expect(accepted).toEqual([]);
   }, 120_000);
+
+  it('Mandantenexport von B enthält keine Daten von A', async () => {
+    const e = (await app.inject(as(B, { method: 'POST', url: '/api/tenant-export', payload: {} }))).json();
+    const zip = await app.inject(as(B, { url: `/api/tenant-export/${e.id}/download` }));
+    expect(zip.statusCode).toBe(200);
+    const fs = await import('node:fs');
+    const os = await import('node:os');
+    const path = await import('node:path');
+    const extract = (await import('extract-zip')).default;
+    const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'cm-export-'));
+    fs.writeFileSync(path.join(dir, 'e.zip'), zip.rawPayload);
+    await extract(path.join(dir, 'e.zip'), { dir: path.join(dir, 'x') });
+    const walk = (d: string): string[] => fs.readdirSync(d, { withFileTypes: true }).flatMap((f) => (f.isDirectory() ? walk(path.join(d, f.name)) : [path.join(d, f.name)]));
+    const allFiles = walk(path.join(dir, 'x'));
+    expect(allFiles.some((f) => f.endsWith('manifest.json'))).toBe(true);
+    for (const f of allFiles) expect(fs.readFileSync(f).toString('latin1').includes(MARK), f).toBe(false);
+    // Exporte von A sind für B nicht abrufbar
+    expect((await app.inject(as(B, { url: `/api/tenant-export/${ids.export}/download` }))).statusCode).toBe(404);
+    fs.rmSync(dir, { recursive: true, force: true });
+  });
 
   it('Daten von A sind nach allen Versuchen unverändert', async () => {
     const c = await app.inject(as(A, { url: `/api/customers/${ids.customer}` }));

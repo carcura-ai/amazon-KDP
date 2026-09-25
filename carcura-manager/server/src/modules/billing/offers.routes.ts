@@ -142,7 +142,7 @@ export default async function offerRoutes(app: FastifyInstance) {
     if (!to) throw badRequest('Der Kunde hat keine E-Mail-Adresse.');
     if (!app.mail.isConfigured(ctx.companyId)) throw badRequest('Kein E-Mail-Versand (SMTP) konfiguriert.');
     const pdf = await renderPdf(ctx.companyId, id);
-    const res = await app.mail.send(ctx.companyId, { to, subject: input.subject ?? tpl.subject, text: input.message ?? tpl.text, attachments: [{ filename: `${o.offerNumber}.pdf`, content: pdf, contentType: 'application/pdf' }], refType: 'offer', refId: id });
+    const res = await app.mail.send(ctx.companyId, { customerId: customer.id, to, subject: input.subject ?? tpl.subject, text: input.message ?? tpl.text, attachments: [{ filename: `${o.offerNumber}.pdf`, content: pdf, contentType: 'application/pdf' }], refType: 'offer', refId: id });
     if (!res.ok) throw badRequest(`Versand fehlgeschlagen: ${res.error}`);
     if (o.pdfFileId) app.storage.remove(ctx.companyId, o.pdfFileId);
     const file = await app.storage.store({ companyId: ctx.companyId, buffer: pdf, originalName: `${o.offerNumber}.pdf`, mimeType: 'application/pdf', kind: 'pdf', category: 'offer', customerId: o.customerId, vehicleId: o.vehicleId, uploadedByUserId: ctx.userId });

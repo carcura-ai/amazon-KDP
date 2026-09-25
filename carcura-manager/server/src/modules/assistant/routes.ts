@@ -1,7 +1,7 @@
 import type { FastifyInstance } from 'fastify';
 import { z } from 'zod';
 import { and, asc, desc, eq } from 'drizzle-orm';
-import { assistantMessages, companies } from '../../db/schema.js';
+import { assistantMessages, companies, aiUsageLog } from '../../db/schema.js';
 import { parse, zTrimmed } from '../../core/validation.js';
 import { privacySettings } from '../privacy/settings.js';
 import { badRequest, notFound } from '../../core/errors.js';
@@ -88,6 +88,7 @@ export default async function assistantRoutes(app: FastifyInstance) {
       throw badRequest(`KI-Anfrage fehlgeschlagen: ${message}`);
     }
     app.db.insert(assistantMessages).values({ id: newId(), companyId: ctx.companyId, userId: ctx.userId, conversationId: convId, role: 'user', content: question }).run();
+    app.db.insert(aiUsageLog).values({ id: newId(), companyId: ctx.companyId, userId: ctx.userId, model: f.config.model ?? DEFAULT_MODEL, toolsJson: JSON.stringify(result.toolsUsed), personalData: privacySettings(company).assistantPersonalData, inputTokens: result.inputTokens, outputTokens: result.outputTokens }).run();
     app.db.insert(assistantMessages).values({ id: newId(), companyId: ctx.companyId, userId: ctx.userId, conversationId: convId, role: 'assistant', content: result.answer, toolsUsedJson: JSON.stringify(result.toolsUsed), inputTokens: result.inputTokens, outputTokens: result.outputTokens }).run();
     return { conversationId: convId, answer: result.answer, toolsUsed: result.toolsUsed, usage: { inputTokens: result.inputTokens, outputTokens: result.outputTokens } };
   });

@@ -156,7 +156,7 @@ describe('Löschkonzept und Auskunft', () => {
     const old = new Date(Date.now() - 400 * 86_400_000).toISOString();
     app.db.update(leads).set({ updatedAt: old }).run();
     app.db.update(auditLog).set({ createdAt: new Date(Date.now() - 800 * 86_400_000).toISOString() }).run();
-    const summary = runRetention(app.db, app.storage);
+    const summary = runRetention(app);
     expect(summary).toContain('1 Leads');
     expect((await app.inject(as(admin, { method: 'GET', url: `/api/leads/${leadId}` }))).statusCode).toBe(404);
     expect(summary).toMatch(/\d+ Audit-Einträge/);
