@@ -61,6 +61,7 @@ beforeAll(async () => {
   ids.recurring = (await post('/api/recurring-expenses', { name: `${MARK} Miete`, category: 'Miete', netCents: 1000, vatBp: 1900, interval: 'monthly', startDate: '2026-01-01' })).id;
   ids.competitor = (await post('/api/competitors', { name: `${MARK} Wettbewerber` })).id;
   await post(`/api/customers/${ids.customer}/activities`, { type: 'note', content: MARK });
+  ids.supportSession = (await post('/api/support-sessions/grant', { reason: `${MARK} Support`, durationMinutes: 30 })).id;
   // Mandant B
   const created = await app.inject(as(A, { method: 'POST', url: '/api/platform/companies', payload: { company: { name: 'Mandant B' }, admin: { email: 'chef@b.test', password: 'MandantB-Pass1', firstName: 'Bernd', lastName: 'B' } } }));
   expect(created.statusCode).toBe(200);
@@ -84,7 +85,7 @@ function idFor(url: string, param: string): string | null {
     [/^\/api\/invoices\//, 'invoice'], [/^\/api\/protocols\//, 'protocol'], [/^\/(api\/)?files\//, 'file'],
     [/^\/api\/tasks\//, 'task'], [/^\/api\/inventory\//, 'inventory'], [/^\/api\/expenses\//, 'expense'],
     [/^\/api\/recurring-expenses\//, 'recurring'], [/^\/api\/services\//, 'service'], [/^\/api\/competitors\//, 'competitor'],
-    [/^\/api\/users\//, 'user'], [/^\/api\/platform\/companies\//, 'company'], [/^\/api\/reports\//, 'report'], [/^\/api\/assistant\/conversations\//, 'conversation'],
+    [/^\/api\/users\//, 'user'], [/^\/api\/platform\/companies\//, 'company'], [/^\/api\/(platform\/)?support-sessions\//, 'supportSession'], [/^\/api\/reports\//, 'report'], [/^\/api\/assistant\/conversations\//, 'conversation'],
   ];
   for (const [re, key] of map) if (re.test(url)) return ids[key] ?? '00000000-0000-4000-8000-000000000000';
   return null;

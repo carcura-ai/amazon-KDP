@@ -93,7 +93,7 @@ export default async function importExportRoutes(app: FastifyInstance) {
     ]));
   });
 
-  app.get('/api/export/invoices.csv', { preHandler: app.requireAuth('invoices:read') }, async (req, reply) => {
+  app.get('/api/export/invoices.csv', { preHandler: app.requireAuth('invoices:read', 'invoices:export') }, async (req, reply) => {
     const ctx = ctxOf(req);
     const q = parse(z.object({ from: z.string().optional(), to: z.string().optional() }), req.query);
     const rows = app.db.select({ i: invoices, customerNumber: customers.customerNumber, firstName: customers.firstName, lastName: customers.lastName, companyName: customers.companyName }).from(invoices).leftJoin(customers, eq(customers.id, invoices.customerId)).where(eq(invoices.companyId, ctx.companyId)).orderBy(asc(invoices.invoiceNumber)).all()
@@ -120,7 +120,7 @@ export default async function importExportRoutes(app: FastifyInstance) {
   });
 
   /** Vollständiger Datenexport des Mandanten (JSON) – Datenportabilität, Mandantenwechsel, Archiv. */
-  app.get('/api/export/company.json', { preHandler: app.requireAuth('settings:manage') }, async (req, reply) => {
+  app.get('/api/export/company.json', { preHandler: app.requireAuth('settings:manage', 'export:manage') }, async (req, reply) => {
     const ctx = ctxOf(req);
     const by = (table: SQLiteTable & { companyId: AnySQLiteColumn }) => app.db.select().from(table).where(eq(table.companyId, ctx.companyId)).all();
     const company = app.db.select().from(companies).where(eq(companies.id, ctx.companyId)).get()!;

@@ -5,13 +5,13 @@ import { get, post, patch } from '../api/client';
 import type { Company } from '../api/types';
 import { useAuth } from '../app/auth';
 import { Badge, Button, Card, Field, Input, Modal, PageHead, Skeleton, useToast } from '../components/ui';
-import { fmtDate, fmtDateTime, fmtMoney } from '../lib/format';
+import { fmtDate, fmtDateTime } from '../lib/format';
 
 export function PlatformPage() {
   const { me } = useAuth();
   const qc = useQueryClient();
   const toast = useToast();
-  const q = useQuery({ queryKey: ['platform-companies'], queryFn: () => get<{ items: Array<Company & { userCount: number; customerCount: number; leadCount: number; invoiceCount: number; invoiceTotalCents: number; filesBytes: number; lastLoginAt: string | null; createdAt: string }>; version: string }>('/api/platform/companies') });
+  const q = useQuery({ queryKey: ['platform-companies'], queryFn: () => get<{ items: Array<Company & { userCount: number; customerCount: number; leadCount: number; invoiceCount: number; filesBytes: number; lastLoginAt: string | null; createdAt: string }>; version: string }>('/api/platform/companies') });
   const [create, setCreate] = useState(false);
   const [f, setF] = useState({ name: '', city: '', primaryColor: '#E8F320', firstName: '', lastName: '', email: '', password: '' });
   const m = useMutation({
@@ -34,7 +34,7 @@ export function PlatformPage() {
                 <td className="num">{c.userCount}</td>
                 <td className="num">{c.customerCount}</td>
                 <td className="num hide-mobile">{c.leadCount}</td>
-                <td className="num hide-mobile">{c.invoiceCount}<div className="small muted">{fmtMoney(c.invoiceTotalCents)}</div></td>
+                <td className="num hide-mobile">{c.invoiceCount}</td>
                 <td className="num hide-mobile">{(c.filesBytes / 1048576).toFixed(1)} MB</td>
                 <td className="muted hide-mobile">{c.lastLoginAt ? fmtDateTime(c.lastLoginAt) : '–'}</td>
                 <td>{c.isActive ? <Badge tone="ok">aktiv</Badge> : <Badge tone="danger">deaktiviert</Badge>}</td>

@@ -16,6 +16,8 @@ export interface AppConfig {
   isProduction: boolean;
   publicUrl: string;
   chromiumPath: string | null;
+  /** selfhosted: alle Module ohne Abo (Standard). saas: Tarife, Entitlements, strengere Admin-Regeln. */
+  deploymentMode: 'selfhosted' | 'saas';
 }
 
 function readInt(name: string, fallback: number): number {
@@ -68,5 +70,6 @@ export function loadConfig(overrides: Partial<AppConfig> = {}): AppConfig {
     isProduction,
     publicUrl: overrides.publicUrl ?? process.env.PUBLIC_URL ?? `http://${host === '0.0.0.0' ? 'localhost' : host}:${port}`,
     chromiumPath: overrides.chromiumPath ?? process.env.CHROMIUM_PATH ?? null,
+    deploymentMode: overrides.deploymentMode ?? (process.env.DEPLOYMENT_MODE === 'saas' ? 'saas' : 'selfhosted'),
   };
 }

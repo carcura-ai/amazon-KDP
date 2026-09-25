@@ -4,6 +4,9 @@ import type { Ctx } from '../core/context.js';
 import type { Permission } from '../core/permissions.js';
 import { forbidden, unauthorized } from '../core/errors.js';
 import { resolveSession } from '../core/session.js';
+import { writeAudit } from '../core/audit.js';
+import { users } from '../db/schema.js';
+import { eq } from 'drizzle-orm';
 
 export const SESSION_COOKIE = 'cm_sid';
 
@@ -29,8 +32,15 @@ export default fp(async (app) => {
     if (!unsigned.valid || !unsigned.value) return;
     const info = resolveSession(app.db, app.config, unsigned.value, req.ip);
     if (!info) return;
-    req.auth = info.ctx;
+    req.auth = { ...info.ctx, requestId: req.id };
     req.sessionId = info.sessionId;
+  });
+
+  // Supportzugriff: jede Anfrage wird im Audit-Log des Mandanten protokolliert (ohne Query-String und Body).
+  app.addHook('onResponse', async (req, reply) => {
+    const ctx = req.auth;
+    if (!ctx?.supportSessionId) return;
+    writeAudit(app.db, ctx, { action: 'support.request', entityType: 'http', entityId: null, after: { method: req.method, path: req.url.split('?')[0], status: reply.statusCode, requestId: req.id } });
   });
 
   app.decorate('requireAuth', (...permissions: Permission[]) => {
@@ -45,7 +55,12 @@ export default fp(async (app) => {
   app.decorate('requirePlatformAdmin', () => {
     return async (req: FastifyRequest) => {
       if (!req.auth) throw unauthorized();
-      if (!req.auth.isPlatformAdmin) throw forbidden('Nur für den Softwarebetreiber.');
+      if (req.auth.supportSessionId || !req.auth.isPlatformAdmin) throw forbidden('Nur für den Softwarebetreiber.');
+      // Im SaaS-Betrieb ist Zwei-Faktor-Anmeldung für System-Admins Pflicht.
+      if (app.config.deploymentMode === 'saas') {
+        const u = app.db.select({ totp: users.totpEnabledAt }).from(users).where(eq(users.id, req.auth.userId)).get();
+        if (!u?.totp) throw forbidden('System-Admins müssen die Zwei-Faktor-Anmeldung aktivieren (Einstellungen → Konto).');
+      }
     };
   });
 });

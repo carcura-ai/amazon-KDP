@@ -1,7 +1,7 @@
 import type { FastifyInstance } from 'fastify';
 import { z } from 'zod';
 import { eq } from 'drizzle-orm';
-import { users, companies } from '../../db/schema.js';
+import { users, companies, supportSessions } from '../../db/schema.js';
 import { parse, zEmail } from '../../core/validation.js';
 import { hashPassword, verifyPassword, validatePasswordPolicy } from '../../core/password.js';
 import { AppError, badRequest, unauthorized } from '../../core/errors.js';
@@ -87,7 +87,14 @@ export default async function authRoutes(app: FastifyInstance) {
     const company = app.db.select().from(companies).where(eq(companies.id, ctx.companyId)).get()!;
     const privacy = privacySettings(company);
     const twoFactorEnabled = Boolean(user.totpEnabledAt);
-    return { user: publicUser(user), company: publicCompany(company), permissions: [...ctx.permissions], twoFactorEnabled, mustSetup2fa: privacy.require2faForAdmins && user.role === 'admin' && !twoFactorEnabled };
+    const support = ctx.supportSessionId ? app.db.select().from(supportSessions).where(eq(supportSessions.id, ctx.supportSessionId)).get() : null;
+    const mustSetup2fa = !support && !twoFactorEnabled && ((privacy.require2faForAdmins && user.role === 'admin') || (app.config.deploymentMode === 'saas' && user.isPlatformAdmin));
+    return {
+      user: support ? { ...publicUser(user), role: 'support', isPlatformAdmin: false } : publicUser(user),
+      company: publicCompany(company), permissions: [...ctx.permissions], twoFactorEnabled, mustSetup2fa,
+      support: support ? { id: support.id, mode: support.mode, expiresAt: support.expiresAt, reason: support.reason } : null,
+      deploymentMode: app.config.deploymentMode,
+    };
   });
 
   app.post('/api/auth/change-password', { preHandler: app.requireAuth() }, async (req) => {

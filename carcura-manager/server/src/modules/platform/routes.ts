@@ -15,7 +15,9 @@ import { publicCompany } from '../auth/routes.js';
 
 /**
  * Betreiber-Ebene: neue Mandanten anlegen, Übersicht über alle Unternehmen.
- * Nur für Benutzer mit is_platform_admin.
+ * Nur für Benutzer mit is_platform_admin. Die Übersicht enthält ausschließlich Metadaten
+ * (Anzahlen, Speicherbedarf, letzte Anmeldung) – keine Umsätze, keine Kunden- oder Rechnungsinhalte.
+ * Zugriff auf Mandantendaten nur über einen freigegebenen Supportzugriff (support.routes.ts).
  */
 const createSchema = z.object({
   company: z.object({ name: zTrimmed(120).min(2), email: zOptionalText(200), phone: zOptionalText(60), city: zOptionalText(120), primaryColor: z.string().regex(/^#[0-9a-fA-F]{6}$/).optional() }),
@@ -32,7 +34,6 @@ export default async function platformRoutes(app: FastifyInstance) {
         customerCount: sql<number>`(select count(*) from customers c where c.company_id = companies.id)`,
         leadCount: sql<number>`(select count(*) from leads l where l.company_id = companies.id)`,
         invoiceCount: sql<number>`(select count(*) from invoices i where i.company_id = companies.id and i.status != 'draft')`,
-        invoiceTotalCents: sql<number>`(select coalesce(sum(total_cents),0) from invoices i where i.company_id = companies.id and i.status in ('open','sent','overdue','paid'))`,
         filesBytes: sql<number>`(select coalesce(sum(size_bytes),0) from files f where f.company_id = companies.id)`,
         lastLoginAt: sql<string | null>`(select max(last_login_at) from users u where u.company_id = companies.id)`,
       })

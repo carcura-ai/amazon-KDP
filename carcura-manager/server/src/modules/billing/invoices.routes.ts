@@ -225,7 +225,7 @@ export default async function invoiceRoutes(app: FastifyInstance) {
   });
 
   /** Storno: Entwurf wird gelöscht, ausgestellte Rechnung erhält eine Stornorechnung (negative Positionen). */
-  app.post('/api/invoices/:id/cancel', { preHandler: app.requireAuth('invoices:write') }, async (req) => {
+  app.post('/api/invoices/:id/cancel', { preHandler: app.requireAuth('invoices:write', 'invoices:cancel') }, async (req) => {
     const ctx = ctxOf(req);
     const { id } = req.params as { id: string };
     const inv = getOne(ctx.companyId, id);

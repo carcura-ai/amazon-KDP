@@ -48,7 +48,7 @@ export default async function privacyRoutes(app: FastifyInstance) {
     return { settings: privacySettings(company), https: app.config.publicUrl.startsWith('https://'), publicUrl: app.config.publicUrl };
   });
 
-  app.put('/api/privacy/settings', { preHandler: app.requireAuth('settings:manage') }, async (req) => {
+  app.put('/api/privacy/settings', { preHandler: app.requireAuth('privacy:manage') }, async (req) => {
     const ctx = ctxOf(req);
     const input = parse(privacySchema, req.body);
     const company = app.db.select().from(companies).where(eq(companies.id, ctx.companyId)).get()!;
@@ -61,7 +61,7 @@ export default async function privacyRoutes(app: FastifyInstance) {
   });
 
   /** Aufbewahrungslauf manuell starten (sonst täglich automatisch). */
-  app.post('/api/privacy/retention/run', { preHandler: app.requireAuth('settings:manage') }, async (req) => {
+  app.post('/api/privacy/retention/run', { preHandler: app.requireAuth('privacy:manage') }, async (req) => {
     const ctx = ctxOf(req);
     const summary = runRetention(app.db, app.storage);
     writeAudit(app.db, ctx, { action: 'privacy.retention_run', entityType: 'company', entityId: ctx.companyId, after: { summary } });

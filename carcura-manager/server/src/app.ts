@@ -51,6 +51,8 @@ import systemRoutes from './modules/system/routes.js';
 import brandingRoutes from './modules/company/branding.routes.js';
 import twoFactorRoutes from './modules/auth/twofa.routes.js';
 import privacyRoutes from './modules/privacy/routes.js';
+import supportRoutes from './modules/platform/support.routes.js';
+import { syncNewPermissions } from './core/session.js';
 import { createRequire } from 'node:module';
 
 declare module 'fastify' {
@@ -90,6 +92,7 @@ export async function buildApp(opts: BuildOptions): Promise<FastifyInstance> {
     bodyLimit: 25 * 1024 * 1024,
   });
 
+  const added = syncNewPermissions(opts.dbHandle.db);
   const routeIndex: Array<{ method: string; url: string }> = [];
   app.decorate('routeIndex', routeIndex);
   app.addHook('onRoute', (r) => { for (const m of [r.method].flat()) if (m !== 'HEAD') routeIndex.push({ method: m, url: r.url }); });
@@ -189,6 +192,7 @@ export async function buildApp(opts: BuildOptions): Promise<FastifyInstance> {
   await app.register(brandingRoutes);
   await app.register(twoFactorRoutes);
   await app.register(privacyRoutes);
+  await app.register(supportRoutes);
 
   // Web-App (Vite-Build) ausliefern, wenn vorhanden
   const webDist = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../web/dist');
@@ -205,6 +209,7 @@ export async function buildApp(opts: BuildOptions): Promise<FastifyInstance> {
     app.setNotFoundHandler((_req, reply) => reply.status(404).send({ error: 'not_found', message: 'Route nicht gefunden.' }));
   }
 
+  if (added > 0) app.log.info({ added }, 'Neue Standardrechte für bestehende Mandanten ergänzt');
   app.addHook('onClose', async () => {
     await pdf.close();
     opts.dbHandle.close();

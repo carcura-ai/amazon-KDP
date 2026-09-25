@@ -11,7 +11,7 @@ export interface AuditEntry {
   after?: unknown;
 }
 
-export function writeAudit(db: Db, ctx: Pick<Ctx, 'companyId' | 'userId' | 'ip'> | { companyId: string; userId?: null; ip?: string }, entry: AuditEntry): void {
+export function writeAudit(db: Db, ctx: Pick<Ctx, 'companyId' | 'userId' | 'ip'> & { supportSessionId?: string | null } | { companyId: string; userId?: null; ip?: string; supportSessionId?: string | null }, entry: AuditEntry): void {
   db.insert(auditLog)
     .values({
       id: newId(),
@@ -23,6 +23,7 @@ export function writeAudit(db: Db, ctx: Pick<Ctx, 'companyId' | 'userId' | 'ip'>
       beforeJson: entry.before === undefined ? null : JSON.stringify(entry.before),
       afterJson: entry.after === undefined ? null : JSON.stringify(entry.after),
       ip: ctx.ip ?? null,
+      supportSessionId: ctx.supportSessionId ?? null,
     })
     .run();
 }

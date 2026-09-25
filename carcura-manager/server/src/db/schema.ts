@@ -81,6 +81,8 @@ export const sessions = sqliteTable(
     ip: text('ip'),
     userAgent: text('user_agent'),
     revokedAt: text('revoked_at'),
+    /** Gesetzt, wenn ein System-Admin über einen freigegebenen Supportzugriff im Mandanten arbeitet. */
+    supportSessionId: text('support_session_id'),
   },
   (t) => [index('sessions_user_idx').on(t.userId)],
 );
@@ -108,9 +110,41 @@ export const auditLog = sqliteTable(
     beforeJson: text('before_json'),
     afterJson: text('after_json'),
     ip: text('ip'),
+    supportSessionId: text('support_session_id'),
     createdAt: ts('created_at'),
   },
   (t) => [index('audit_company_idx').on(t.companyId, t.createdAt), index('audit_entity_idx').on(t.entityType, t.entityId)],
+);
+
+/* ------------------------------------------------------------------ Systemweite Einstellungen (Schlüssel/Wert) */
+export const systemSettings = sqliteTable('system_settings', {
+  key: text('key').primaryKey(),
+  value: text('value').notNull(),
+  updatedAt: ts('updated_at'),
+});
+
+/* ------------------------------------------------------------------ Supportzugriff (kontrolliert, befristet, auditiert) */
+export const supportSessions = sqliteTable(
+  'support_sessions',
+  {
+    id: text('id').primaryKey(),
+    companyId: text('company_id').notNull().references(() => companies.id), // Ziel-Mandant
+    requestedByUserId: text('requested_by_user_id'), // System-Admin (null = vom Mandanten freigegeben, ohne Anfrage)
+    reason: text('reason').notNull(),
+    mode: text('mode').notNull().default('read'), // read | write
+    status: text('status').notNull().default('requested'), // requested | approved | rejected | revoked | ended | expired
+    breakGlass: integer('break_glass', { mode: 'boolean' }).notNull().default(false),
+    durationMinutes: integer('duration_minutes').notNull().default(60),
+    approvedByUserId: text('approved_by_user_id'),
+    approvedAt: text('approved_at'),
+    expiresAt: text('expires_at'),
+    firstUsedAt: text('first_used_at'),
+    endedAt: text('ended_at'),
+    endedReason: text('ended_reason'),
+    createdAt: ts('created_at'),
+    updatedAt: ts('updated_at'),
+  },
+  (t) => [index('support_sessions_company_idx').on(t.companyId, t.status)],
 );
 
 /* ------------------------------------------------------------------ Leistungskatalog */
