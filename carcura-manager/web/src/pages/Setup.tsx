@@ -1,6 +1,7 @@
 import { useState, type FormEvent } from 'react';
 import { useNavigate } from 'react-router';
-import { post, ApiError } from '../api/client';
+import { useQuery } from '@tanstack/react-query';
+import { get, post, ApiError } from '../api/client';
 import { useAuth } from '../app/auth';
 import { Button, Field, Input } from '../components/ui';
 
@@ -10,6 +11,9 @@ export function SetupPage() {
   const [c, setC] = useState({ name: '', email: '', phone: '', website: '', street: '', zip: '', city: '', primaryColor: '#E8F320' });
   const [a, setA] = useState({ firstName: '', lastName: '', email: '', password: '', password2: '' });
   const [seed, setSeed] = useState(true);
+  const [setupToken, setSetupToken] = useState('');
+  const status = useQuery({ queryKey: ['setup-status'], queryFn: () => get<{ needsSetup: boolean; setupCodeRequired?: boolean }>('/api/setup/status'), staleTime: 60_000 });
+  const codeRequired = status.data?.setupCodeRequired === true;
   const [err, setErr] = useState<ApiError | Error | null>(null);
   const [busy, setBusy] = useState(false);
   const fe = (p: string) => (err instanceof ApiError ? err.fieldError(p) : undefined);
@@ -20,7 +24,7 @@ export function SetupPage() {
     setBusy(true);
     setErr(null);
     try {
-      await post('/api/setup', { company: { ...c, email: c.email || null, phone: c.phone || null, website: c.website || null, street: c.street || null, zip: c.zip || null, city: c.city || null }, admin: { firstName: a.firstName, lastName: a.lastName, email: a.email, password: a.password }, seedDefaultServices: seed });
+      await post('/api/setup', { company: { ...c, email: c.email || null, phone: c.phone || null, website: c.website || null, street: c.street || null, zip: c.zip || null, city: c.city || null }, admin: { firstName: a.firstName, lastName: a.lastName, email: a.email, password: a.password }, seedDefaultServices: seed, ...(codeRequired ? { setupToken } : {}) });
       await refresh();
       navigate('/', { replace: true });
     } catch (e2) {
@@ -42,6 +46,13 @@ export function SetupPage() {
             </div>
           </div>
           <form onSubmit={submit}>
+            {codeRequired ? (
+              <div className="form-grid" style={{ marginBottom: 18 }}>
+                <Field label="Einrichtungscode *" hint="Schutz vor fremder Einrichtung: Der Code steht im Server-Protokoll (docker compose logs app | grep Einrichtungscode)." error={fe('setupToken')} className="span-2">
+                  <Input required autoComplete="off" spellCheck={false} value={setupToken} onChange={(e) => setSetupToken(e.target.value)} placeholder="XXXX-XXXX-XXXX" />
+                </Field>
+              </div>
+            ) : null}
             <h2 style={{ marginBottom: 12 }}>Unternehmen</h2>
             <div className="form-grid">
               <Field label="Firmenname *" error={fe('company.name')} className="span-2"><Input required value={c.name} onChange={(e) => setC({ ...c, name: e.target.value })} placeholder="z. B. Carcura" /></Field>

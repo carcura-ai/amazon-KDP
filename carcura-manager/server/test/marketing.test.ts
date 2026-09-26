@@ -11,6 +11,7 @@ const today = new Date().toISOString().slice(0, 10);
 const yesterday = new Date(Date.now() - 86_400_000).toISOString().slice(0, 10);
 let failNext429 = false;
 let planPaused = false;
+let ga4Down = false;
 const PAUSED = 'Uh-oh! These are not your real numbers: reads are paused because you have 5 accounts connected and your Free plan includes 1 account. To resume, disconnect 4 accounts at https://onboard.windsor.ai/app/ or upgrade at https://onboard.windsor.ai/app/pricing';
 const fakeFetch: typeof fetch = async (input, init) => {
   const url = typeof input === 'string' ? input : input instanceof URL ? input.toString() : input.url;
@@ -18,8 +19,11 @@ const fakeFetch: typeof fetch = async (input, init) => {
   const json = (body: unknown, status = 200, headers: Record<string, string> = {}) => new Response(JSON.stringify(body), { status, headers: { 'content-type': 'application/json', ...headers } });
   if (failNext429) { failNext429 = false; return json({ error: 'rate limited' }, 429, { 'retry-after': '0' }); }
   if (planPaused && url.includes('connectors.windsor.ai/google_ads')) return json({ data: [{ date: today, campaign: PAUSED, campaign_id: null, clicks: 0, impressions: 0, spend: 0, conversions: 0, conversions_value: 0, currency: null }] });
+  if (planPaused && url.includes('connectors.windsor.ai/facebook?')) return json({ data: [{ date: today, campaign: PAUSED, campaign_id: null, impressions: 0, clicks: 0, spend: 0, reach: 0, actions_lead: 0, currency: null }] });
   if (planPaused && url.includes('connectors.windsor.ai/googleanalytics4')) return json({ data: [{ date: today, sessions: 0, totalusers: 0, conversions: 0 }] });
   if (url.includes('connectors.windsor.ai/google_ads')) return json({ data: [{ date: yesterday, campaign: 'Suche Köln', campaign_id: '111', clicks: 40, impressions: 1000, spend: 25.5, conversions: 2, conversions_value: 0, currency: 'EUR' }] });
+  if (ga4Down && url.includes('connectors.windsor.ai/googleanalytics4')) return json({ error: 'GA4 nicht verbunden' }, 400);
+  if (ga4Down && url.includes('connectors.windsor.ai/facebook_leads')) return json({ data: [{ id: '9002', created_time: `${yesterday}T11:00:00+0000`, campaign: 'Leasingrückgabe', form_name: 'Carcura privat', full_name: 'Tom Test', email: 'tom@example.de' }] });
   if (url.includes('connectors.windsor.ai/facebook_leads')) return json({ data: [{ id: '9001', created_time: `${yesterday}T10:00:00+0000`, campaign: 'Leasingrückgabe', campaign_id: '222', form_name: 'Carcura privat', ad_name: 'Beitrag', full_name: 'Lena Lead', email: 'lena@example.de', phone_number: '+491701234567', welche_leistung_interessiert_dich: 'Innenreinigung' }] });
   if (url.includes('connectors.windsor.ai/facebook')) return json({ data: [{ date: yesterday, campaign: 'Leasingrückgabe', campaign_id: '222', impressions: 500, clicks: 60, spend: 4.92, reach: 400, actions_lead: 1, currency: 'EUR' }, { date: today, campaign: 'Leasingrückgabe', campaign_id: '222', impressions: 100, clicks: 10, spend: 1, reach: 90, actions_lead: null, currency: 'EUR' }] });
   if (url.includes('connectors.windsor.ai/googleanalytics4')) {
@@ -134,6 +138,18 @@ describe('Marketing-Integrationen', () => {
       const status = (await app.inject(as(admin, { url: '/api/integrations/marketing/windsor' }))).json();
       expect(status.status).toBe('error');
     } finally { planPaused = false; }
+  });
+
+  it('Meta-Leads werden auch übernommen, wenn eine andere Windsor-Quelle (GA4) ausfällt', async () => {
+    ga4Down = true;
+    try {
+      const s = await app.inject(as(admin, { method: 'POST', url: '/api/marketing/sync', payload: { days: 3 } }));
+      const win = s.json().results.find((r: { type: string }) => r.type === 'windsor');
+      expect(win.ok).toBe(false);
+      expect(win.error).toContain('GA4');
+      const leads = (await app.inject(as(admin, { url: '/api/leads?source=meta_ads' }))).json();
+      expect(leads.items.some((l: { firstName: string }) => l.firstName === 'Tom')).toBe(true);
+    } finally { ga4Down = false; }
   });
 
   it('Mandant ohne Berechtigung sieht keine Konfiguration', async () => {

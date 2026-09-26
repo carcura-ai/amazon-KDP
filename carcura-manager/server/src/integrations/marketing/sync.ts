@@ -103,12 +103,23 @@ export class MarketingSync {
     if (windsor?.row.isActive) {
       const a = new WindsorAdapter(windsor.config, this.fetchFn);
       await run('windsor', async () => {
+        // Jede Quelle einzeln: Ein nicht verbundenes Konto (z. B. GA4) darf den Lead-Import nicht verhindern.
         let rows = 0; let leadsImported = 0;
-        rows += this.upsertAds(companyId, await a.fetchGoogleAds(range));
-        rows += this.upsertAds(companyId, await a.fetchMetaAds(range));
-        rows += this.upsertWeb(companyId, await a.fetchGa4(range));
-        rows += this.upsertSocial(companyId, await a.fetchInstagram(range));
-        leadsImported = this.importLeads(companyId, await a.fetchMetaLeads(rangeDays(Math.max(days, 30))));
+        const errors: string[] = [];
+        const part = async (label: string, fn: () => Promise<void>) => {
+          try { await fn(); } catch (err) { errors.push(`${label}: ${err instanceof Error ? err.message : String(err)}`); }
+        };
+        await part('Google Ads', async () => { rows += this.upsertAds(companyId, await a.fetchGoogleAds(range)); });
+        await part('Meta Ads', async () => { rows += this.upsertAds(companyId, await a.fetchMetaAds(range)); });
+        // Pausierter Windsor-Tarif zeigt sich nur in den Ads-Antworten; GA4/Instagram liefern dann Nullzeilen,
+        // die echte Werte überschreiben würden – in diesem Fall nicht abrufen. Leads prüfen den Hinweis selbst.
+        const paused = errors.some((e) => e.includes('keine echten Daten'));
+        await part('Meta Lead Ads', async () => { leadsImported = this.importLeads(companyId, await a.fetchMetaLeads(rangeDays(Math.max(days, 30)))); });
+        if (!paused) {
+          await part('GA4', async () => { rows += this.upsertWeb(companyId, await a.fetchGa4(range)); });
+          await part('Instagram', async () => { rows += this.upsertSocial(companyId, await a.fetchInstagram(range)); });
+        }
+        if (errors.length) throw new Error(`${errors.join(' | ')} (übernommen: ${leadsImported} Leads, ${rows} Zeilen)`);
         return { rows, leadsImported };
       });
     }

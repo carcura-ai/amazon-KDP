@@ -1,6 +1,6 @@
 import type { FastifyInstance } from 'fastify';
 import { z } from 'zod';
-import { and, eq, gt } from 'drizzle-orm';
+import { and, eq } from 'drizzle-orm';
 import { companies, leads } from '../../db/schema.js';
 import { newId } from '../../core/ids.js';
 import { normalizeEmail, normalizePhone } from '../../core/normalize.js';
@@ -52,10 +52,15 @@ export default async function publicLeadRoutes(app: FastifyInstance) {
     const email = normalizeEmail(p.email);
     const phone = normalizePhone(p.phone);
     // Duplikatschutz: identische Anfrage (Kontakt + Nachricht) innerhalb von 24 h wird nicht doppelt angelegt
-    const externalId = p.external_id || `web:${sha256(`${company.id}|${email ?? ''}|${phone ?? ''}|${p.service}|${p.message}`).slice(0, 32)}`;
-    const since = new Date(Date.now() - 86_400_000).toISOString();
-    const existing = app.db.select({ id: leads.id }).from(leads).where(and(eq(leads.companyId, company.id), eq(leads.externalId, externalId), gt(leads.createdAt, since))).get();
-    if (existing) return { ok: true, duplicate: true, id: existing.id };
+    // Eine vom Absender vergebene external_id gilt dauerhaft als Idempotenzschlüssel. Der Inhalts-Hash nur 24 h:
+    // Dieselbe Anfrage später ist eine neue Anfrage und erhält einen eigenen Schlüssel (eindeutiger Index).
+    let externalId = p.external_id || `web:${sha256(`${company.id}|${email ?? ''}|${phone ?? ''}|${p.service}|${p.message}`).slice(0, 32)}`;
+    const existing = app.db.select({ id: leads.id, createdAt: leads.createdAt }).from(leads).where(and(eq(leads.companyId, company.id), eq(leads.externalId, externalId))).get();
+    if (existing) {
+      const since = new Date(Date.now() - 86_400_000).toISOString();
+      if (p.external_id || existing.createdAt > since) return { ok: true, duplicate: true, id: existing.id };
+      externalId = `${externalId}:${Date.now().toString(36)}`;
+    }
 
     const { firstName, lastName } = splitName(p.name);
     const source = p.gclid ? 'google_ads' : p.fbclid ? 'meta_ads' : 'website';

@@ -41,4 +41,21 @@ export function openDatabase(dbPath: string): DbHandle {
   return { db, sqlite, close: () => sqlite.close() };
 }
 
+/**
+ * Anzahl noch nicht angewendeter Migrationen einer bestehenden Datenbank (0 bei neuer Datenbank).
+ * Wird vor dem Start genutzt, um vor Schemaänderungen automatisch eine Sicherung anzulegen.
+ */
+export function pendingMigrationCount(dbPath: string): number {
+  if (dbPath === ':memory:' || !fs.existsSync(dbPath)) return 0;
+  const journal = JSON.parse(fs.readFileSync(path.join(migrationsFolder, 'meta', '_journal.json'), 'utf8')) as { entries: Array<{ when: number }> };
+  const sqlite = new CompatDatabase(dbPath);
+  try {
+    const hasTable = sqlite.prepare("select 1 from sqlite_master where type = 'table' and name = '__drizzle_migrations'").get();
+    if (!hasTable) return 0;
+    // Gleiche Regel wie der Drizzle-Migrator: ausstehend ist, was jünger als die zuletzt angewendete Migration ist
+    const last = Number((sqlite.prepare('select max(created_at) as t from __drizzle_migrations').get() as { t: number | null }).t ?? 0);
+    return journal.entries.filter((e) => e.when > last).length;
+  } finally { sqlite.close(); }
+}
+
 export { schema };

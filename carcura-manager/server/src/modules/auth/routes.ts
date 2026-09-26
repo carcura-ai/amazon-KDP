@@ -11,8 +11,8 @@ import { writeAudit } from '../../core/audit.js';
 import { SESSION_COOKIE, ctxOf } from '../../plugins/auth.js';
 
 const loginSchema = z.object({ email: zEmail, password: z.string().min(1) });
-const MAX_FAILED = 5;
-const LOCK_MINUTES = 15;
+export const MAX_FAILED = 5;
+export const LOCK_MINUTES = 15;
 
 export function publicUser(u: typeof users.$inferSelect) {
   return {
@@ -64,8 +64,8 @@ export default async function authRoutes(app: FastifyInstance) {
       throw generic;
     }
     if (user.totpEnabledAt && user.totpSecretEnc) {
-      // Zweiter Faktor erforderlich: noch keine Sitzung, nur eine kurzlebige Challenge
-      app.db.update(users).set({ failedLoginCount: 0, lockedUntil: null }).where(eq(users.id, user.id)).run();
+      // Zweiter Faktor erforderlich: noch keine Sitzung, nur eine kurzlebige Challenge. Der Fehlversuchszähler wird
+      // erst nach bestandenem zweiten Faktor zurückgesetzt (sonst ließe sich der Code unbegrenzt durchprobieren).
       return { ok: false, requires2fa: true, challenge: issueChallenge(app, user.id) };
     }
     app.db.update(users).set({ failedLoginCount: 0, lockedUntil: null, lastLoginAt: nowIso() }).where(eq(users.id, user.id)).run();

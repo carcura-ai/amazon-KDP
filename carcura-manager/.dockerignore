@@ -1,0 +1,17 @@
+# Nie ins Image: Abhängigkeiten/Builds (werden im Container erzeugt), Daten, Geheimnisse
+**/node_modules
+**/dist
+**/data
+**/.env
+**/.env.*
+!**/.env.example
+**/*.db
+**/*.db-wal
+**/*.db-shm
+**/*.key
+**/backups
+desktop
+e2e
+docs
+app
+.git

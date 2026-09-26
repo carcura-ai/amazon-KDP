@@ -10,12 +10,12 @@ afterAll(async () => app.close());
 
 describe('Ersteinrichtung und Anmeldung', () => {
   it('meldet Setup-Bedarf, führt Setup aus und verweigert ein zweites Setup', async () => {
-    expect((await app.inject({ url: '/api/setup/status' })).json()).toEqual({ needsSetup: true });
+    expect((await app.inject({ url: '/api/setup/status' })).json()).toMatchObject({ needsSetup: true });
     const weak = await app.inject({ method: 'POST', url: '/api/setup', payload: { company: { name: 'X Y' }, admin: { ...ADMIN, password: 'kurz' } } });
     expect(weak.statusCode).toBe(400);
     const session = await setupCompany(app);
     expect(session.companyId).toBeTruthy();
-    expect((await app.inject({ url: '/api/setup/status' })).json()).toEqual({ needsSetup: false });
+    expect((await app.inject({ url: '/api/setup/status' })).json()).toMatchObject({ needsSetup: false });
     const again = await app.inject({ method: 'POST', url: '/api/setup', payload: { company: { name: 'Zweite' }, admin: ADMIN } });
     expect(again.statusCode).toBe(409);
   });

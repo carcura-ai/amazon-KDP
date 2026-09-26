@@ -1,5 +1,8 @@
 import { loadConfig } from './config.js';
-import { openDatabase } from './db/index.js';
+import { openDatabase, pendingMigrationCount } from './db/index.js';
+import { CompatDatabase } from './db/sqlite.js';
+import { BackupService } from './integrations/backup.js';
+import { createRequire } from 'node:module';
 import { buildApp } from './app.js';
 import { Scheduler } from './jobs/scheduler.js';
 import { runReminders } from './jobs/reminders.js';
@@ -19,6 +22,7 @@ import { expireSupportSessions } from './modules/platform/support.routes.js';
 async function main() {
   const config = loadConfig();
   const restored = await applyPendingRestore(config, console);
+  await backupBeforeMigrations(config);
   const dbHandle = openDatabase(config.dbPath);
   const app = await buildApp({ config, dbHandle });
   const scheduler = new Scheduler(dbHandle.db, app.log);
@@ -60,6 +64,19 @@ async function main() {
       if (n) app.log.warn({ n }, 'Löschungen nach Wiederherstellung erneut angewendet');
     } catch (err) { app.log.error({ err }, 'Löschregister konnte nicht angewendet werden'); }
   }
+}
+
+/** Sicherung vor Schemaänderungen (Update mit neuen Migrationen). Schlägt sie fehl, startet der Server nicht. */
+async function backupBeforeMigrations(config: ReturnType<typeof loadConfig>): Promise<void> {
+  const pending = pendingMigrationCount(config.dbPath);
+  if (pending === 0) return;
+  const version = (createRequire(import.meta.url)('../package.json') as { version: string }).version;
+  const sqlite = new CompatDatabase(config.dbPath);
+  try {
+    const log = { info: (o: unknown, m?: string) => console.log(m ?? '', JSON.stringify(o)), warn: console.warn, error: console.error };
+    const info = await new BackupService(config, sqlite, log, version).create('pre-update');
+    console.log(`${pending} Datenbank-Änderung(en) ausstehend – Sicherung vorab erstellt: ${info.name}`);
+  } finally { sqlite.close(); }
 }
 
 main().catch((err) => {

@@ -11,7 +11,9 @@ import { createSession } from '../../core/session.js';
 import { SESSION_COOKIE, ctxOf } from '../../plugins/auth.js';
 import { writeAudit } from '../../core/audit.js';
 import { nowIso } from '../../core/ids.js';
-import { publicUser } from './routes.js';
+import { publicUser, MAX_FAILED, LOCK_MINUTES } from './routes.js';
+import { assertMayManageUser } from '../users/routes.js';
+import { AppError } from '../../core/errors.js';
 
 const CHALLENGE_MINUTES = 5;
 
@@ -35,6 +37,9 @@ export default async function twoFactorRoutes(app: FastifyInstance) {
     if (payload.exp < Date.now()) throw unauthorized('Anmeldung abgelaufen. Bitte erneut anmelden.');
     const user = getUser(payload.uid);
     if (!user || !user.isActive || !user.totpSecretEnc || !user.totpEnabledAt) throw unauthorized('Anmeldung nicht möglich.');
+    if (user.lockedUntil && new Date(user.lockedUntil).getTime() > Date.now()) {
+      throw new AppError(423, 'locked', `Konto vorübergehend gesperrt. Bitte in ${LOCK_MINUTES} Minuten erneut anmelden.`);
+    }
     const secret = app.secrets.decrypt(user.totpSecretEnc);
     let ok = verifyTotp(secret, code);
     let usedBackup = false;
@@ -45,6 +50,9 @@ export default async function twoFactorRoutes(app: FastifyInstance) {
       if (idx >= 0) { hashes.splice(idx, 1); app.db.update(users).set({ backupCodesJson: JSON.stringify(hashes) }).where(eq(users.id, user.id)).run(); ok = true; usedBackup = true; }
     }
     if (!ok) {
+      // Fehlversuche zählen wie falsche Passwörter: nach MAX_FAILED Versuchen wird das Konto vorübergehend gesperrt
+      const failed = user.failedLoginCount + 1;
+      app.db.update(users).set({ failedLoginCount: failed, lockedUntil: failed >= MAX_FAILED ? new Date(Date.now() + LOCK_MINUTES * 60_000).toISOString() : null }).where(eq(users.id, user.id)).run();
       writeAudit(app.db, { companyId: user.companyId, userId: user.id, ip: req.ip }, { action: 'auth.2fa_failed', entityType: 'user', entityId: user.id });
       throw unauthorized('Der Code ist ungültig oder abgelaufen.');
     }
@@ -102,6 +110,7 @@ export default async function twoFactorRoutes(app: FastifyInstance) {
     const { id } = req.params as { id: string };
     const user = getUser(id);
     if (!user || user.companyId !== ctx.companyId) throw notFound('Benutzer');
+    assertMayManageUser(ctx, user);
     app.db.update(users).set({ totpSecretEnc: null, totpEnabledAt: null, backupCodesJson: null }).where(eq(users.id, id)).run();
     writeAudit(app.db, ctx, { action: 'auth.2fa_reset_by_admin', entityType: 'user', entityId: id });
     return { ok: true };

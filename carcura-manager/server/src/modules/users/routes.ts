@@ -4,13 +4,23 @@ import { and, eq, sql } from 'drizzle-orm';
 import { users } from '../../db/schema.js';
 import { parse, zEmail, zTrimmed } from '../../core/validation.js';
 import { hashPassword, validatePasswordPolicy } from '../../core/password.js';
-import { AppError, badRequest, conflict, notFound } from '../../core/errors.js';
+import { AppError, badRequest, conflict, forbidden, notFound } from '../../core/errors.js';
+import type { Ctx } from '../../core/context.js';
 import { newId, nowIso } from '../../core/ids.js';
 import { writeAudit } from '../../core/audit.js';
 import { revokeAllUserSessions } from '../../core/session.js';
 import { ROLES } from '../../core/permissions.js';
 import { ctxOf } from '../../plugins/auth.js';
 import { publicUser } from '../auth/routes.js';
+
+/**
+ * Schutz der Administratorkonten: Wer nur das Recht „Benutzer verwalten“ hat (z. B. ein Betriebsleiter mit
+ * erweiterten Rechten), darf Administratoren und den Softwarebetreiber weder ändern, zurücksetzen noch anlegen.
+ */
+export function assertMayManageUser(ctx: Ctx, target: { id: string; role: string; isPlatformAdmin: boolean }, newRole?: string): void {
+  if (target.isPlatformAdmin && !ctx.isPlatformAdmin && target.id !== ctx.userId) throw forbidden('Das Konto des Softwarebetreibers kann nur von ihm selbst geändert werden.');
+  if ((target.role === 'admin' || newRole === 'admin') && ctx.role !== 'admin') throw forbidden('Administratorkonten können nur von Administratoren verwaltet werden.');
+}
 
 const createSchema = z.object({
   email: zEmail,
@@ -50,6 +60,7 @@ export default async function userRoutes(app: FastifyInstance) {
     const input = parse(createSchema, req.body);
     const policy = validatePasswordPolicy(input.password);
     if (policy) throw badRequest(policy, [{ path: 'password', message: policy }]);
+    if (input.role === 'admin' && ctx.role !== 'admin') throw forbidden('Administratorkonten können nur von Administratoren angelegt werden.');
     assertUserLimit(app, ctx.companyId);
     const exists = app.db.select({ id: users.id }).from(users).where(eq(users.email, input.email)).get();
     if (exists) throw conflict('Diese E-Mail-Adresse wird bereits verwendet.');
@@ -68,6 +79,7 @@ export default async function userRoutes(app: FastifyInstance) {
     const input = parse(updateSchema, req.body);
     const before = app.db.select().from(users).where(and(eq(users.id, id), eq(users.companyId, ctx.companyId))).get();
     if (!before) throw notFound('Benutzer');
+    assertMayManageUser(ctx, before, input.role);
     if (id === ctx.userId && (input.role !== undefined && input.role !== 'admin' || input.isActive === false)) {
       throw badRequest('Der eigene Admin-Zugang kann nicht herabgestuft oder deaktiviert werden.');
     }
@@ -91,6 +103,7 @@ export default async function userRoutes(app: FastifyInstance) {
     if (policy) throw badRequest(policy);
     const target = app.db.select().from(users).where(and(eq(users.id, id), eq(users.companyId, ctx.companyId))).get();
     if (!target) throw notFound('Benutzer');
+    assertMayManageUser(ctx, target);
     app.db.update(users).set({ passwordHash: await hashPassword(password), failedLoginCount: 0, lockedUntil: null, updatedAt: nowIso() }).where(eq(users.id, id)).run();
     revokeAllUserSessions(app.db, id);
     writeAudit(app.db, ctx, { action: 'user.password_reset', entityType: 'user', entityId: id });

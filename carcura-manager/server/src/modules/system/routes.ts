@@ -22,6 +22,9 @@ export default async function systemRoutes(app: FastifyInstance) {
   };
   const pre = [app.requireAuth('backups:manage'), guard];
   const launcher = Boolean(process.env.CM_LAUNCHER);
+  // Neustart möglich, wenn ein Startskript oder Docker (restart: unless-stopped) den Prozess wieder startet.
+  // Update per Oberfläche nur mit Startskript; im Container erfolgt das Update über „docker compose up -d --build“.
+  const supervised = launcher || app.config.supervised;
 
   app.get('/api/system/status', { preHandler: pre }, async () => {
     const backups = app.backups.list();
@@ -33,7 +36,7 @@ export default async function systemRoutes(app: FastifyInstance) {
       dataDir: app.config.dataDir, usage: app.backups.usage(), diskFreeBytes: (() => { try { const s = fs.statfsSync(app.config.dataDir); return s.bavail * s.bsize; } catch { return null; } })(),
       backups: { count: backups.length, last: backups[0] ?? null, lastAuto: backups.find((b) => b.kind === 'auto') ?? null, totalBytes: backups.reduce((s, b) => s + b.sizeBytes, 0), keepAuto: 14, keepManual: 20 },
       pendingRestore: app.backups.hasPendingRestore(), restoreLast: fs.existsSync(restoreLastFile) ? JSON.parse(fs.readFileSync(restoreLastFile, 'utf8')) : null,
-      launcher, jobs: lastRuns.map((j) => ({ id: j.id, type: j.type, status: j.status, runAt: j.runAt, finishedAt: j.finishedAt, lastError: j.lastError, summary: (JSON.parse(j.payloadJson || '{}') as { summary?: string }).summary ?? null })),
+      launcher, canRestart: supervised, container: app.config.supervised && !launcher, jobs: lastRuns.map((j) => ({ id: j.id, type: j.type, status: j.status, runAt: j.runAt, finishedAt: j.finishedAt, lastError: j.lastError, summary: (JSON.parse(j.payloadJson || '{}') as { summary?: string }).summary ?? null })),
     };
   });
 
@@ -74,8 +77,8 @@ export default async function systemRoutes(app: FastifyInstance) {
     if (!fs.existsSync(file)) throw notFound('Sicherung');
     const { manifest } = await app.backups.stageRestore(file);
     writeAudit(app.db, ctxOf(req), { action: 'system.restore_staged', entityType: 'backup', entityId: name, after: manifest });
-    if (launcher) scheduleRestart(req, `restore:${name}`, 75);
-    return { staged: true, manifest, restarting: launcher };
+    if (supervised) scheduleRestart(req, `restore:${name}`, 75);
+    return { staged: true, manifest, restarting: supervised };
   });
 
   app.post('/api/system/restore/upload', { preHandler: pre }, async (req) => {
@@ -88,8 +91,8 @@ export default async function systemRoutes(app: FastifyInstance) {
       if (part.file.truncated) throw badRequest('Datei zu groß für den Upload.');
       const { manifest } = await app.backups.stageRestore(tmp);
       writeAudit(app.db, ctxOf(req), { action: 'system.restore_staged', entityType: 'backup', entityId: part.filename, after: manifest });
-      if (launcher) scheduleRestart(req, `restore-upload:${part.filename}`, 75);
-      return { staged: true, manifest, restarting: launcher };
+      if (supervised) scheduleRestart(req, `restore-upload:${part.filename}`, 75);
+      return { staged: true, manifest, restarting: supervised };
     } finally { fs.rmSync(tmp, { force: true }); }
   });
 
@@ -100,7 +103,7 @@ export default async function systemRoutes(app: FastifyInstance) {
   });
 
   app.post('/api/system/restart', { preHandler: pre }, async (req) => {
-    if (!launcher) throw badRequest('Neustart nur möglich, wenn die Anwendung über das Startskript läuft (start.cmd / start.sh).');
+    if (!supervised) throw badRequest('Neustart nur möglich, wenn die Anwendung über das Startskript (start.cmd / start.sh) oder Docker läuft.');
     scheduleRestart(req, 'manual', 75);
     return { restarting: true };
   });

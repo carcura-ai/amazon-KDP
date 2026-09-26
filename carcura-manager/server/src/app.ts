@@ -149,10 +149,12 @@ export async function buildApp(opts: BuildOptions): Promise<FastifyInstance> {
   } satisfies CookieSerializeOptions);
 
   await app.register(cookie, { secret: opts.config.appSecret });
-  // Globales Limit je Sitzung/API-Schlüssel bzw. IP; strengere Limits an Login, Reset, Registrierung, Webhooks
+  // Globales Limit je Client-IP (hinter Caddy aus X-Forwarded-For, siehe trustProxy); strengere Limits an Login,
+  // 2FA, Reset, Einrichtung, Registrierung, Webhooks. Bewusst nicht nach Cookie/Header: diese Werte sind vor der
+  // Anmeldung ungeprüft und könnten pro Anfrage gewechselt werden, um die Limits zu umgehen.
   await app.register(rateLimit, {
     global: true, max: opts.config.rateLimitPerMinute, timeWindow: '1 minute',
-    keyGenerator: (req) => (req.headers.authorization ? `k:${String(req.headers.authorization).slice(-16)}` : req.cookies?.cm_sid ? `s:${String(req.cookies.cm_sid).slice(0, 24)}` : `ip:${req.ip}`),
+    keyGenerator: (req) => `ip:${req.ip}`,
     allowList: (req) => !req.url.startsWith('/api/') && !req.url.startsWith('/files/'),
   });
   await app.register(multipart, { limits: { fileSize: MAX_FILE_BYTES, files: 20 } });
@@ -210,8 +212,8 @@ export async function buildApp(opts: BuildOptions): Promise<FastifyInstance> {
   });
 
   // Liveness/Readiness für Betrieb hinter Proxy/Orchestrierung (ohne Details nach außen)
-  app.get('/api/health/live', { config: { rateLimit: false } }, async (_req, reply) => { reply.header('Cache-Control', 'no-store'); return { ok: true }; });
-  app.get('/api/health/ready', { config: { rateLimit: false } }, async (_req, reply) => {
+  app.get('/api/health/live', { logLevel: 'warn', config: { rateLimit: false } }, async (_req, reply) => { reply.header('Cache-Control', 'no-store'); return { ok: true }; });
+  app.get('/api/health/ready', { logLevel: 'warn', config: { rateLimit: false } }, async (_req, reply) => {
     reply.header('Cache-Control', 'no-store');
     const checks: Record<string, boolean> = {};
     try { checks.database = Boolean(opts.dbHandle.sqlite.prepare('select 1 as ok').get()); } catch { checks.database = false; }
@@ -221,7 +223,7 @@ export async function buildApp(opts: BuildOptions): Promise<FastifyInstance> {
   });
 
   // Erreichbarkeitsprüfung – auch aus der nativen App-Hülle (anderer Ursprung), deshalb CORS nur hier.
-  app.get('/api/health', async (_req, reply) => { reply.header('Access-Control-Allow-Origin', '*'); reply.header('Cache-Control', 'no-store'); return { ok: true, version: app.appVersion, time: new Date().toISOString(), minDesktopVersion: app.config.minDesktopVersion, deploymentMode: app.config.deploymentMode }; });
+  app.get('/api/health', { logLevel: 'warn' }, async (_req, reply) => { reply.header('Access-Control-Allow-Origin', '*'); reply.header('Cache-Control', 'no-store'); return { ok: true, version: app.appVersion, time: new Date().toISOString(), minDesktopVersion: app.config.minDesktopVersion, deploymentMode: app.config.deploymentMode }; });
 
   await app.register(setupRoutes);
   await app.register(authRoutes);

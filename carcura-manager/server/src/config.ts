@@ -30,6 +30,15 @@ export interface AppConfig {
   rateLimitPerMinute: number;
   /** Optional: Passphrase zur Verschlüsselung der Sicherungen (AES-256-GCM). */
   backupPassphrase: string | null;
+  /**
+   * Einrichtungscode für die Ersteinrichtung. Ist der Server aus dem Netz erreichbar (Produktion, nicht nur
+   * localhost), darf nur einrichten, wer den Code kennt – sonst könnte ein Fremder auf einem frisch
+   * gestarteten Server das erste Administratorkonto anlegen. Ohne SETUP_TOKEN wird ein Code erzeugt und
+   * beim Start ins Log geschrieben.
+   */
+  setupToken: string | null;
+  /** Neustart durch einen Supervisor (Docker: restart unless-stopped) möglich – für Wiederherstellung per Oberfläche. */
+  supervised: boolean;
 }
 
 function readInt(name: string, fallback: number): number {
@@ -92,6 +101,8 @@ export function loadConfig(overrides: Partial<AppConfig> = {}): AppConfig {
     minDesktopVersion: overrides.minDesktopVersion ?? process.env.MIN_DESKTOP_VERSION ?? '1.0.0',
     tenantDataGraceDays: overrides.tenantDataGraceDays ?? readInt('TENANT_DATA_GRACE_DAYS', 30),
     rateLimitPerMinute: overrides.rateLimitPerMinute ?? readInt('RATE_LIMIT_PER_MINUTE', 1200),
+    setupToken: overrides.setupToken !== undefined ? overrides.setupToken : (process.env.SETUP_TOKEN?.trim() || null),
+    supervised: overrides.supervised ?? (Boolean(process.env.CM_LAUNCHER) || process.env.CM_SUPERVISOR === 'docker'),
     backupPassphrase: overrides.backupPassphrase !== undefined ? overrides.backupPassphrase : (process.env.BACKUP_PASSPHRASE && process.env.BACKUP_PASSPHRASE.length >= 16 ? process.env.BACKUP_PASSPHRASE : null),
   };
 }

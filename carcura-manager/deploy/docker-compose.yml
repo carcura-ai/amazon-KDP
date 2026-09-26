@@ -1,5 +1,12 @@
 # Zentrales Backend mit automatischem HTTPS (Let's Encrypt über Caddy).
 # Start auf dem Server (Ordner carcura-manager/deploy):  docker compose up -d --build
+x-logging: &logging
+  # Protokolle begrenzen (sonst wächst die Log-Datei unbegrenzt und füllt die Festplatte)
+  driver: json-file
+  options:
+    max-size: "10m"
+    max-file: "5"
+
 services:
   app:
     build:
@@ -8,9 +15,13 @@ services:
     env_file: .env
     environment:
       PUBLIC_URL: https://${DOMAIN}
+      # Neustart nach Wiederherstellung übernimmt Docker (restart: unless-stopped)
+      CM_SUPERVISOR: docker
     volumes:
       - carcura-data:/data
     restart: unless-stopped
+    stop_grace_period: 30s
+    logging: *logging
     expose:
       - "4800"
 
@@ -22,11 +33,13 @@ services:
     ports:
       - "80:80"
       - "443:443"
+      - "443:443/udp"
     volumes:
       - ./Caddyfile:/etc/caddy/Caddyfile:ro
       - caddy-data:/data
       - caddy-config:/config
     restart: unless-stopped
+    logging: *logging
 
 volumes:
   carcura-data:

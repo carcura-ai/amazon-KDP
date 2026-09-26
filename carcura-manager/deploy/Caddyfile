@@ -7,16 +7,16 @@
 	header -Server
 	log {
 		output stdout
-		format json
-		# Keine Query-Strings und Cookies in Proxy-Logs (Datensparsamkeit)
+		# Datensparsamkeit: keine Query-Strings (z. B. Einmal-Links zum Passwort-Reset), keine Cookies,
+		# keine Zugangsdaten in Proxy-Logs
 		format filter {
 			wrap json
 			fields {
-				request>uri query {
-					delete *
-				}
+				request>uri regexp [?].* ?[entfernt]
 				request>headers>Cookie delete
 				request>headers>Authorization delete
+				request>headers>X-Lead-Token delete
+				resp_headers>Set-Cookie delete
 			}
 		}
 	}

@@ -132,7 +132,7 @@ export interface SystemStatus {
   version: string; node: string; platform: string; hostname: string; uptimeSeconds: number; startedAt: string; dataDir: string;
   usage: { dbBytes: number; filesBytes: number; backupsBytes: number }; diskFreeBytes: number | null;
   backups: { count: number; last: BackupInfo | null; lastAuto: BackupInfo | null; totalBytes: number; keepAuto: number; keepManual: number };
-  pendingRestore: boolean; restoreLast: { restoredAt: string; safetyCopy: string } | null; launcher: boolean;
+  pendingRestore: boolean; restoreLast: { restoredAt: string; safetyCopy: string } | null; launcher: boolean; canRestart?: boolean; container?: boolean;
   jobs: Array<{ id: string; type: string; status: string; runAt: string; finishedAt: string | null; lastError: string | null; summary: string | null }>;
 }
 export interface Branding { name: string; productName: string; primaryColor: string; secondaryColor: string; hasLogo: boolean; slug: string | null; poweredBy: string | null }
