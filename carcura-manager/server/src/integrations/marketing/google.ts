@@ -21,6 +21,13 @@ async function serviceAccountToken(fetchFn: FetchFn, clientEmail: string, privat
   return res.access_token;
 }
 
+/**
+ * Google-Ads-API-Version. Google schaltet Versionen etwa ein Jahr nach Erscheinen ab (v22 z. B. am 07.10.2026).
+ * Stand 09/2026 aktuell: v25 (Juli 2026, Abschaltung ca. August 2027). Ohne Code-Änderung anpassbar über
+ * GOOGLE_ADS_API_VERSION in der .env.
+ */
+export const GOOGLE_ADS_API_VERSION = process.env.GOOGLE_ADS_API_VERSION?.trim() || 'v25';
+
 export interface GoogleAdsConfig { developerToken: string; clientId: string; clientSecret: string; refreshToken: string; customerId: string; loginCustomerId?: string | null }
 
 export class GoogleAdsAdapter {
@@ -34,8 +41,9 @@ export class GoogleAdsAdapter {
     if (this.cfg.loginCustomerId) headers['login-customer-id'] = this.cfg.loginCustomerId.replace(/-/g, '');
     const out: AdRow[] = [];
     let pageToken: string | undefined;
+    // Seitengröße ist fest (10.000 Zeilen); das Feld page_size darf seit v17 nicht mehr gesendet werden
     do {
-      const res = await fetchJson<{ results?: Array<{ segments: { date: string }; campaign: { id: string; name: string }; metrics: { impressions?: string; clicks?: string; costMicros?: string; conversions?: number; conversionsValue?: number }; customer?: { currencyCode?: string } }>; nextPageToken?: string }>(this.fetchFn, `https://googleads.googleapis.com/v18/customers/${this.cid()}/googleAds:search`, { method: 'POST', headers, body: JSON.stringify({ query, pageSize: 1000, pageToken }) });
+      const res = await fetchJson<{ results?: Array<{ segments: { date: string }; campaign: { id: string; name: string }; metrics: { impressions?: string; clicks?: string; costMicros?: string; conversions?: number; conversionsValue?: number }; customer?: { currencyCode?: string } }>; nextPageToken?: string }>(this.fetchFn, `https://googleads.googleapis.com/${GOOGLE_ADS_API_VERSION}/customers/${this.cid()}/googleAds:search`, { method: 'POST', headers, body: JSON.stringify({ query, pageToken }) });
       for (const r of res.results ?? []) out.push({ source: 'google_ads', date: r.segments.date, campaignId: String(r.campaign.id), campaignName: r.campaign.name, impressions: num(r.metrics.impressions), clicks: num(r.metrics.clicks), costCents: Math.round(num(r.metrics.costMicros) / 10_000), conversions: num(r.metrics.conversions), conversionValueCents: Math.round(num(r.metrics.conversionsValue) * 100), reach: null, leads: null, currency: r.customer?.currencyCode ?? 'EUR' });
       pageToken = res.nextPageToken;
     } while (pageToken);

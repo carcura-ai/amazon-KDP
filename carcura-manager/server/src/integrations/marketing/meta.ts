@@ -2,10 +2,16 @@ import { type FetchFn, type AdRow, type DateRange, fetchJson, num, cents } from 
 
 export interface MetaConfig { accessToken: string; adAccountId: string; apiVersion?: string }
 
+/**
+ * Graph-/Marketing-API-Version. Meta akzeptiert seit 09.06.2026 für die Marketing API nur noch v24.0 und neuer;
+ * Stand 09/2026 aktuell: v25.0 (Februar 2026). Anpassbar über META_GRAPH_API_VERSION in der .env.
+ */
+export const META_GRAPH_API_VERSION = process.env.META_GRAPH_API_VERSION?.trim() || 'v25.0';
+
 /** Meta Marketing API – Kampagnen-Insights je Tag. */
 export class MetaAdsAdapter {
   constructor(private readonly cfg: MetaConfig, private readonly fetchFn: FetchFn = fetch) {}
-  private base() { return `https://graph.facebook.com/${this.cfg.apiVersion ?? 'v21.0'}`; }
+  private base() { return `https://graph.facebook.com/${this.cfg.apiVersion ?? META_GRAPH_API_VERSION}`; }
   private act() { return this.cfg.adAccountId.startsWith('act_') ? this.cfg.adAccountId : `act_${this.cfg.adAccountId}`; }
   async test(): Promise<void> {
     await fetchJson(this.fetchFn, `${this.base()}/${this.act()}?fields=name,currency&access_token=${encodeURIComponent(this.cfg.accessToken)}`);

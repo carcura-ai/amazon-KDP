@@ -149,11 +149,11 @@ veröffentlicht, Vorfallprozess, Code-Signatur, die offenen Sicherheitspunkte au
 
 | Integration | Funktioniert im Code | Nur vorbereitet / fehlt |
 |---|---|---|
-| **Google Ads (Kosten, Klicks, Conversions)** | über Windsor.ai (Abruf alle 6 h, getestet mit simulierten Antworten); Direktanbindung Google-Ads-API mit Refresh-Token | Direktanbindung nutzt API-Version **v18**, die nach Googles üblichem Zyklus inzwischen abgeschaltet sein dürfte → vor Nutzung Version aktualisieren. Kein OAuth-Anmeldedialog (Refresh-Token manuell). Kein Test mit echtem Konto nachweisbar. |
+| **Google Ads (Kosten, Klicks, Conversions)** | über Windsor.ai (Abruf alle 6 h, getestet mit simulierten Antworten); Direktanbindung Google-Ads-API mit Refresh-Token | **Nachtrag 26.09.2026:** auf **v25** aktualisiert (v18 abgeschaltet; v22 wird am 07.10.2026 abgeschaltet), unzulässiges `pageSize` entfernt, Version per `GOOGLE_ADS_API_VERSION` anpassbar. Kein OAuth-Anmeldedialog (Refresh-Token manuell). Kein Test mit echtem Konto nachweisbar. |
 | **Google Leads (Lead-Formulare)** | – | **nicht umgesetzt** (kein Webhook, kein Abruf). Nur Zuordnung von Website-Anfragen mit `gclid` zu „Google Ads“. |
-| **Meta Ads (Kosten, Reichweite)** | über Windsor.ai; Direktanbindung Graph API v21.0 | v21.0 nähert sich dem Ende der Unterstützung; kein Token-Ablauf-Handling (System-User-Token empfohlen). |
+| **Meta Ads (Kosten, Reichweite)** | über Windsor.ai; Direktanbindung Marketing API | **Nachtrag 26.09.2026:** von v21.0 (abgelaufen; seit 09.06.2026 nur noch ≥ v24.0) auf **v25.0** aktualisiert, per `META_GRAPH_API_VERSION` anpassbar; kein Token-Ablauf-Handling (System-User-Token empfohlen). |
 | **Meta Leads (Lead Ads)** | über Windsor.ai (Abruf alle 6 h, idempotent, Feldnamen passend zu Carcuras Formular); nach F12 unabhängig von anderen Quellen | kein Echtzeit-Webhook (Verzögerung bis 6 h oder manueller Sync); **Windsor-Free-Plan liefert laut Anleitung derzeit Platzhalterwerte** → aktuell keine echten Daten. |
-| **Website-Leads** | Endpunkt `POST /api/public/leads/website` mit Token, Rate-Limit, Honeypot, Duplikatschutz, Quellerkennung (gclid/fbclid); getestet | **Die Weiterleitung von der Website (WordPress-Formular → Endpunkt) existiert nicht** – muss im WordPress-Plugin/Formular ergänzt werden (serverseitig, Token nie im Browser). Keine E-Mail-Benachrichtigung bei neuem Lead, keine Einwilligungsfelder, E-Mail-Format nicht geprüft. |
+| **Website-Leads** | Endpunkt `POST /api/public/leads/website` mit Token, Rate-Limit, Honeypot, Duplikatschutz, Quellerkennung (gclid/fbclid); getestet | **Nachtrag 26.09.2026:** WordPress-Weiterleitung als MU-Plugin `integrations/wordpress/carcura-manager-lead-bridge.php` bereitgestellt (serverseitig, Token nur in `wp-config.php`, bestehendes Plugin bleibt Rückfallebene); gegen den Produktions-Build getestet. Keine E-Mail-Benachrichtigung bei neuem Lead, keine Einwilligungsfelder, E-Mail-Format nicht geprüft. |
 
 ## 11. Kosten für den ersten produktiven Betrieb (Richtwerte, aktuelle Preise beim Anbieter prüfen)
 
@@ -196,7 +196,6 @@ Uptime-Check (z. B. Hetzner-Monitoring oder UptimeRobot-Free) auf `https://app.c
 - Server-Tests in CI
 - Rechtliches: AGB, AVV (Carcura als Auftragsverarbeiter), TOM, Subprozessorliste, Datenschutzerklärung, juristische Prüfung
 - Oberflächen für Abo/Vertrag, Datenschutz-Center, Supportzugriff
-- Integrationen: Google-Ads-API-Version aktualisieren, Meta-Graph-Version prüfen
 
 ### C – Kann später ergänzt werden
 - Automatische Desktop-Updates (Update-Server), PostgreSQL-Adapter

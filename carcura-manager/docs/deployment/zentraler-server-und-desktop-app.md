@@ -77,6 +77,18 @@ cd carcura-manager/deploy && docker compose up -d --build
 Vor Datenbank-Änderungen legt der Server automatisch eine Sicherung (`…-pre-update.zip`) an.
 Alte Images gelegentlich entfernen: `docker image prune -f`.
 
+### A7. Website-Anfragen (WordPress) anbinden
+1. In Carcura Management: Einstellungen → Integrationen → Website-Lead-Eingang → Token kopieren.
+2. Datei `integrations/wordpress/carcura-manager-lead-bridge.php` nach `wp-content/mu-plugins/` hochladen
+   (Ordner ggf. anlegen, z. B. per SFTP oder Dateimanager des Hosters).
+3. In `wp-config.php` oberhalb von „That's all, stop editing!“ eintragen:
+   ```php
+   define( 'CARCURA_MANAGER_URL', 'https://app.carcura.info' );
+   define( 'CARCURA_MANAGER_LEAD_TOKEN', '<Token>' );
+   ```
+4. Testanfrage über das Formular auf `/anfragen/` senden → erscheint unter Leads mit Quelle „Website“
+   (mit Google-Klick-ID als „Google Ads“). Das bestehende Revenue-Plugin speichert weiterhin parallel.
+
 ## Teil B – Windows-App (je PC, ca. 3 Minuten)
 
 1. `Carcura-Management-Setup-<Version>.exe` ausführen.
