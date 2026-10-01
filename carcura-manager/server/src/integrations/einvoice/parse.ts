@@ -7,7 +7,8 @@ export type EInvoiceSyntax = 'cii' | 'ubl';
 export function parseEInvoice(xml: string): { syntax: EInvoiceSyntax; invoice: NormalizedInvoice } | null {
   let doc: XmlNode;
   try { doc = parseXml(xml); } catch { return null; }
-  if (doc.name === 'CrossIndustryInvoice') return { syntax: 'cii', invoice: parseCii(doc) };
+  // CrossIndustryDocument = ZUGFeRD 1.0 (2014–2019), gleicher Aufbau mit älteren Elementnamen
+  if (doc.name === 'CrossIndustryInvoice' || doc.name === 'CrossIndustryDocument') return { syntax: 'cii', invoice: parseCii(doc) };
   if (doc.name === 'Invoice' || doc.name === 'CreditNote') return { syntax: 'ubl', invoice: parseUbl(doc) };
   return null;
 }
@@ -39,22 +40,26 @@ function ciiParty(p: XmlNode | undefined): InvoiceParty {
   return party;
 }
 
+/** Erstes vorhandenes Kind-Element aus mehreren möglichen Namen (ZUGFeRD 2.x bzw. 1.0). */
+const alt = (n: XmlNode | undefined, ...names: string[]) => { for (const nm of names) { const c = child(n, nm); if (c) return c; } return undefined; };
+const rateOf = (n: XmlNode | undefined) => toBp(text(n, 'RateApplicablePercent') ?? text(n, 'ApplicablePercent'));
+
 function parseCii(doc: XmlNode): NormalizedInvoice {
-  const hdr = child(doc, 'ExchangedDocument');
-  const tx = child(doc, 'SupplyChainTradeTransaction');
-  const agreement = child(tx, 'ApplicableHeaderTradeAgreement');
-  const delivery = child(tx, 'ApplicableHeaderTradeDelivery');
-  const settlement = child(tx, 'ApplicableHeaderTradeSettlement');
-  const sum = child(settlement, 'SpecifiedTradeSettlementHeaderMonetarySummation');
+  const hdr = alt(doc, 'ExchangedDocument', 'HeaderExchangedDocument');
+  const tx = alt(doc, 'SupplyChainTradeTransaction', 'SpecifiedSupplyChainTradeTransaction');
+  const agreement = alt(tx, 'ApplicableHeaderTradeAgreement', 'ApplicableSupplyChainTradeAgreement');
+  const delivery = alt(tx, 'ApplicableHeaderTradeDelivery', 'ApplicableSupplyChainTradeDelivery');
+  const settlement = alt(tx, 'ApplicableHeaderTradeSettlement', 'ApplicableSupplyChainTradeSettlement');
+  const sum = alt(settlement, 'SpecifiedTradeSettlementHeaderMonetarySummation', 'SpecifiedTradeSettlementMonetarySummation');
   const lines: InvoiceLine[] = children(tx, 'IncludedSupplyChainTradeLineItem').map((li) => {
     const product = child(li, 'SpecifiedTradeProduct');
-    const qtyNode = child(li, 'SpecifiedLineTradeDelivery', 'BilledQuantity');
+    const qtyNode = child(alt(li, 'SpecifiedLineTradeDelivery', 'SpecifiedSupplyChainTradeDelivery'), 'BilledQuantity');
     const quantity = toNumber(qtyNode?.text.trim()) ?? 1;
-    const price = child(li, 'SpecifiedLineTradeAgreement', 'NetPriceProductTradePrice');
+    const price = child(alt(li, 'SpecifiedLineTradeAgreement', 'SpecifiedSupplyChainTradeAgreement'), 'NetPriceProductTradePrice');
     const basis = toNumber(text(price, 'BasisQuantity')) ?? 1;
     const unitPrice = toCents(text(price, 'ChargeAmount'));
-    const lineSettle = child(li, 'SpecifiedLineTradeSettlement');
-    const net = toCents(text(lineSettle, 'SpecifiedTradeSettlementLineMonetarySummation', 'LineTotalAmount'));
+    const lineSettle = alt(li, 'SpecifiedLineTradeSettlement', 'SpecifiedSupplyChainTradeSettlement');
+    const net = toCents(text(alt(lineSettle, 'SpecifiedTradeSettlementLineMonetarySummation', 'SpecifiedTradeSettlementMonetarySummation'), 'LineTotalAmount'));
     return {
       name: text(product, 'Name') ?? 'Position',
       description: text(product, 'Description'),
@@ -62,10 +67,10 @@ function parseCii(doc: XmlNode): NormalizedInvoice {
       unit: qtyNode?.attrs.unitCode ?? null,
       unitNetCents: unitPrice === null ? null : Math.round(unitPrice / (basis || 1)),
       netCents: net ?? (unitPrice !== null ? Math.round((unitPrice / (basis || 1)) * quantity) : 0),
-      vatBp: toBp(text(lineSettle, 'ApplicableTradeTax', 'RateApplicablePercent')),
+      vatBp: rateOf(child(lineSettle, 'ApplicableTradeTax')),
     };
   });
-  const vat: VatLine[] = children(settlement, 'ApplicableTradeTax').map((t) => ({ vatBp: toBp(text(t, 'RateApplicablePercent')) ?? 0, netCents: toCents(text(t, 'BasisAmount')) ?? 0, vatCents: toCents(text(t, 'CalculatedAmount')) ?? 0 }));
+  const vat: VatLine[] = children(settlement, 'ApplicableTradeTax').map((t) => ({ vatBp: rateOf(t) ?? 0, netCents: toCents(text(t, 'BasisAmount')) ?? 0, vatCents: toCents(text(t, 'CalculatedAmount')) ?? 0 }));
   // TaxTotalAmount kann mehrfach vorkommen (je Währung); die Rechnungswährung zählt
   const currency = text(settlement, 'InvoiceCurrencyCode') ?? 'EUR';
   const taxTotals = children(sum, 'TaxTotalAmount');
