@@ -1,4 +1,5 @@
 import type { FastifyInstance } from 'fastify';
+import fs from 'node:fs';
 import { z } from 'zod';
 import { and, asc, desc, eq, gte, like, or, sql } from 'drizzle-orm';
 import { invoices, invoiceItems, payments, customers, vehicles, orders, orderItems } from '../../db/schema.js';
@@ -30,6 +31,12 @@ const fields = {
 const createSchema = z.object({ ...fields, vehicleId: fields.vehicleId.default(null), orderId: fields.orderId.default(null), offerId: fields.offerId.default(null), serviceDate: fields.serviceDate.default(null), items: fields.items.default([]) });
 const updateSchema = z.object(fields).partial();
 
+function importedVatBreakdown(items: Array<{ vatBp: number; totalCents: number }>) {
+  const byVat = new Map<number, number>();
+  for (const it of items) byVat.set(it.vatBp, (byVat.get(it.vatBp) ?? 0) + it.totalCents);
+  return [...byVat.entries()].map(([vatBp, netCents]) => ({ vatBp, netCents, vatCents: Math.round((netCents * vatBp) / 10000) })).sort((a, b) => b.vatBp - a.vatBp);
+}
+
 export default async function invoiceRoutes(app: FastifyInstance) {
   const getOne = (companyId: string, id: string) => {
     const row = app.db.select().from(invoices).where(and(eq(invoices.id, id), eq(invoices.companyId, companyId))).get();
@@ -47,7 +54,9 @@ export default async function invoiceRoutes(app: FastifyInstance) {
       customer: app.db.select().from(customers).where(and(eq(customers.id, inv.customerId), eq(customers.companyId, inv.companyId))).get() ?? null,
       vehicle: inv.vehicleId ? app.db.select().from(vehicles).where(and(eq(vehicles.id, inv.vehicleId), eq(vehicles.companyId, inv.companyId))).get() ?? null : null,
       order: inv.orderId ? app.db.select({ id: orders.id, orderNumber: orders.orderNumber, status: orders.status }).from(orders).where(and(eq(orders.id, inv.orderId), eq(orders.companyId, inv.companyId))).get() ?? null : null,
-      totals: totalsFor(app, companyId, its),
+      // Importierte Rechnungen: Summen exakt wie auf dem Originalbeleg (Rundung des Fremdprogramms)
+      totals: inv.source === 'import' ? { subtotalCents: inv.subtotalCents, vatCents: inv.vatCents, totalCents: inv.totalCents, vatBreakdown: importedVatBreakdown(its) } : totalsFor(app, companyId, its),
+      imported: inv.source === 'import',
       cancels: inv.cancelsInvoiceId ? app.db.select({ id: invoices.id, invoiceNumber: invoices.invoiceNumber }).from(invoices).where(and(eq(invoices.id, inv.cancelsInvoiceId), eq(invoices.companyId, inv.companyId))).get() ?? null : null,
       cancelledBy: inv.cancelledByInvoiceId ? app.db.select({ id: invoices.id, invoiceNumber: invoices.invoiceNumber }).from(invoices).where(and(eq(invoices.id, inv.cancelledByInvoiceId), eq(invoices.companyId, inv.companyId))).get() ?? null : null,
     };
@@ -60,6 +69,12 @@ export default async function invoiceRoutes(app: FastifyInstance) {
     app.db.update(invoices).set({ subtotalCents: t.subtotalCents, vatCents: t.vatCents, totalCents: t.totalCents, updatedAt: nowIso() }).where(eq(invoices.id, id)).run();
   };
   const assertDraft = (inv: typeof invoices.$inferSelect) => { if (inv.status !== 'draft') throw conflict('Ausgestellte Rechnungen sind unveränderlich. Bei Fehlern bitte stornieren und neu ausstellen.'); };
+  /** Original einer importierten Rechnung (PDF oder Foto) – wird nie neu erzeugt. */
+  const originalFile = (companyId: string, inv: typeof invoices.$inferSelect) => {
+    const file = inv.pdfFileId ? app.storage.get(companyId, inv.pdfFileId) : null;
+    if (!file) throw notFound('Originalbeleg');
+    return { file, buffer: fs.readFileSync(app.storage.absolute(file.storagePath)) };
+  };
   const renderPdf = async (companyId: string, id: string) => {
     const d = detail(companyId, id);
     if (!d.customer) throw notFound('Kunde');
@@ -166,6 +181,13 @@ export default async function invoiceRoutes(app: FastifyInstance) {
     const ctx = ctxOf(req);
     const { id } = req.params as { id: string };
     const inv = getOne(ctx.companyId, id);
+    if (inv.source === 'import') {
+      const { file, buffer } = originalFile(ctx.companyId, inv);
+      reply.header('Content-Type', file.mimeType);
+      if (file.mimeType !== 'application/pdf') reply.header('Content-Security-Policy', "sandbox; default-src 'none'; img-src 'self' data:; style-src 'unsafe-inline'");
+      reply.header('Content-Disposition', `${file.mimeType === 'application/xml' ? 'attachment' : 'inline'}; filename="${encodeURIComponent(file.originalName)}"`);
+      return reply.send(buffer);
+    }
     reply.header('Content-Type', 'application/pdf');
     reply.header('Content-Disposition', `inline; filename="${inv.invoiceNumber ?? 'rechnungsentwurf'}.pdf"`);
     return reply.send(await renderPdf(ctx.companyId, id));
@@ -184,8 +206,10 @@ export default async function invoiceRoutes(app: FastifyInstance) {
     if (!to) throw badRequest('Der Kunde hat keine E-Mail-Adresse.');
     if (!app.mail.isConfigured(ctx.companyId)) throw badRequest('Kein E-Mail-Versand (SMTP) konfiguriert.');
     const tpl = invoiceMailText(company, customer, inv.invoiceNumber!, inv.totalCents, inv.dueDate);
-    const pdf = await renderPdf(ctx.companyId, id);
-    const res = await app.mail.send(ctx.companyId, { customerId: customer.id, to, subject: input.subject ?? tpl.subject, text: input.message ?? tpl.text, attachments: [{ filename: `${inv.invoiceNumber}.pdf`, content: pdf, contentType: 'application/pdf' }], refType: 'invoice', refId: id });
+    const attachment = inv.source === 'import'
+      ? (() => { const o = originalFile(ctx.companyId, inv); return { filename: o.file.originalName, content: o.buffer, contentType: o.file.mimeType }; })()
+      : { filename: `${inv.invoiceNumber}.pdf`, content: await renderPdf(ctx.companyId, id), contentType: 'application/pdf' };
+    const res = await app.mail.send(ctx.companyId, { customerId: customer.id, to, subject: input.subject ?? tpl.subject, text: input.message ?? tpl.text, attachments: [attachment], refType: 'invoice', refId: id });
     if (!res.ok) throw badRequest(`Versand fehlgeschlagen: ${res.error}`);
     app.db.update(invoices).set({ status: inv.status === 'open' ? 'sent' : inv.status, sentAt: nowIso(), updatedAt: nowIso() }).where(eq(invoices.id, id)).run();
     logActivity(app.db, ctx.companyId, { customerId: inv.customerId, userId: ctx.userId, type: 'email', direction: 'out', subject: `Rechnung ${inv.invoiceNumber} per E-Mail gesendet`, content: `An ${to}`, refType: 'invoice', refId: id });
@@ -235,6 +259,14 @@ export default async function invoiceRoutes(app: FastifyInstance) {
       app.db.delete(invoiceItems).where(eq(invoiceItems.invoiceId, id)).run();
       app.db.delete(invoices).where(eq(invoices.id, id)).run();
       return { ok: true, deleted: true };
+    }
+    if (inv.source === 'import') {
+      // Importierte Rechnung: Storno erfolgt im Ursprungsprogramm (eigene Stornonummer dort). Hier nur kennzeichnen;
+      // die Stornorechnung aus dem Ursprungsprogramm kann anschließend importiert werden.
+      app.db.update(invoices).set({ status: 'cancelled', updatedAt: nowIso() }).where(eq(invoices.id, id)).run();
+      logActivity(app.db, ctx.companyId, { customerId: inv.customerId, userId: ctx.userId, type: 'invoice', subject: `Importierte Rechnung ${inv.invoiceNumber} als storniert gekennzeichnet`, refType: 'invoice', refId: id });
+      writeAudit(app.db, ctx, { action: 'invoice.cancel_imported', entityType: 'invoice', entityId: id });
+      return detail(ctx.companyId, id);
     }
     const company = companyOf(app, ctx.companyId);
     const its = items(id);

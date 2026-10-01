@@ -629,6 +629,9 @@ export const invoices = sqliteTable(
     pdfFileId: text('pdf_file_id'),
     cancelsInvoiceId: text('cancels_invoice_id'), // Stornorechnung zu …
     cancelledByInvoiceId: text('cancelled_by_invoice_id'),
+    /** internal = in dieser Software erstellt; import = aus einem anderen Programm (z. B. Lexware Office) übernommen */
+    source: text('source').notNull().default('internal'),
+    importId: text('import_id'),
     createdByUserId: text('created_by_user_id'),
     createdAt: ts('created_at'),
     updatedAt: ts('updated_at'),
@@ -734,11 +737,14 @@ export const expenses = sqliteTable(
     recurringExpenseId: text('recurring_expense_id'),
     receiptFileId: text('receipt_file_id'),
     notes: text('notes'),
+    /** Rechnungs-/Belegnummer des Lieferanten (Dublettenprüfung beim Belegimport) */
+    documentNumber: text('document_number'),
+    importId: text('import_id'),
     createdByUserId: text('created_by_user_id'),
     createdAt: ts('created_at'),
     updatedAt: ts('updated_at'),
   },
-  (t) => [index('expenses_company_date_idx').on(t.companyId, t.date), index('expenses_category_idx').on(t.companyId, t.category), uniqueIndex('expenses_recurring_period_unique').on(t.recurringExpenseId, t.date)],
+  (t) => [index('expenses_document_idx').on(t.companyId, t.documentNumber), index('expenses_company_date_idx').on(t.companyId, t.date), index('expenses_category_idx').on(t.companyId, t.category), uniqueIndex('expenses_recurring_period_unique').on(t.recurringExpenseId, t.date)],
 );
 
 export const recurringExpenses = sqliteTable(
@@ -1252,6 +1258,39 @@ export const incidents = sqliteTable(
     updatedAt: ts('updated_at'),
   },
   (t) => [index('incidents_company_idx').on(t.companyId, t.status)],
+);
+
+/* ------------------------------------------------------------------ Belegimport (Rechnungen hochladen und automatisch erfassen) */
+export const documentImports = sqliteTable(
+  'document_imports',
+  {
+    id: text('id').primaryKey(),
+    companyId: text('company_id').notNull().references(() => companies.id),
+    /** outgoing = eigene Ausgangsrechnung (z. B. aus Lexware Office), incoming = Rechnung eines Lieferanten */
+    direction: text('direction').notNull(),
+    /** queued | processing | needs_review | completed | failed | duplicate | discarded | undone */
+    status: text('status').notNull().default('queued'),
+    fileId: text('file_id'),
+    fileName: text('file_name').notNull(),
+    sha256: text('sha256').notNull(),
+    /** einvoice_cii | einvoice_ubl | ai | manual */
+    method: text('method'),
+    dataJson: text('data_json'),
+    warningsJson: text('warnings_json').notNull().default('[]'),
+    error: text('error'),
+    invoiceId: text('invoice_id'),
+    customerId: text('customer_id'),
+    customerCreated: integer('customer_created', { mode: 'boolean' }).notNull().default(false),
+    expenseIdsJson: text('expense_ids_json').notNull().default('[]'),
+    optionsJson: text('options_json').notNull().default('{}'),
+    aiModel: text('ai_model'),
+    createdByUserId: text('created_by_user_id').notNull(),
+    createdAt: ts('created_at'),
+    updatedAt: ts('updated_at'),
+    processedAt: text('processed_at'),
+    appliedAt: text('applied_at'),
+  },
+  (t) => [index('document_imports_company_idx').on(t.companyId, t.createdAt), index('document_imports_sha_idx').on(t.companyId, t.sha256), index('document_imports_status_idx').on(t.companyId, t.status)],
 );
 
 /** Protokoll der KI-Nutzung ohne Inhalte: wer, wann, welche Werkzeuge, ob Personendaten übermittelt wurden. */

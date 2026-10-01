@@ -55,6 +55,8 @@ async function main() {
   process.on('SIGTERM', () => void shutdown('SIGTERM'));
   await app.listen({ port: config.port, host: config.host });
   app.log.info(`Oberfläche: ${config.publicUrl}`);
+  const resumed = app.importQueue.resume();
+  if (resumed) app.log.info({ resumed }, 'Belegimport: unterbrochene Verarbeitungen fortgesetzt');
   if (restored) {
     app.log.warn('Eine Sicherung wurde beim Start wiederhergestellt (Details: data/restore-last.json).');
     // Löschungen, die nach dem Sicherungsstand erfolgt sind, erneut anwenden (Löschregister außerhalb der DB)

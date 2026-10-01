@@ -1,6 +1,6 @@
 import { and, eq, isNotNull, lt, sql } from 'drizzle-orm';
 import type { Db } from '../../db/index.js';
-import { customers, vehicles, leads, appointments, orders, orderItems, offers, offerItems, invoices, invoiceItems, payments, protocols, protocolDamages, files, tasks, activities, deletionLog, companies } from '../../db/schema.js';
+import { customers, vehicles, leads, appointments, orders, orderItems, offers, offerItems, invoices, invoiceItems, payments, protocols, protocolDamages, files, tasks, activities, deletionLog, companies, documentImports } from '../../db/schema.js';
 import type { FileStorage } from '../../integrations/storage.js';
 import { newId, nowIso } from '../../core/ids.js';
 import { privacySettings } from './settings.js';
@@ -70,6 +70,7 @@ export function purgeCustomer(db: Db, storage: FileStorage, companyId: string, c
       activities: tx.delete(activities).where(and(eq(activities.companyId, companyId), eq(activities.customerId, customerId))).run().changes,
       leads: tx.delete(leads).where(and(eq(leads.companyId, companyId), eq(leads.customerId, customerId))).run().changes,
       vehicles: tx.delete(vehicles).where(and(eq(vehicles.companyId, companyId), eq(vehicles.customerId, customerId))).run().changes,
+      documentImports: tx.delete(documentImports).where(and(eq(documentImports.companyId, companyId), eq(documentImports.customerId, customerId))).run().changes,
     };
     tx.delete(customers).where(eq(customers.id, customerId)).run();
     return n;

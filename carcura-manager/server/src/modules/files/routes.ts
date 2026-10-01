@@ -97,7 +97,8 @@ export default async function fileRoutes(app: FastifyInstance) {
     // Inhalte geprüft und behalten die Anwendungs-CSP, damit der eingebaute PDF-Betrachter funktioniert.
     if (!row.mimeType.includes('pdf')) reply.header('Content-Security-Policy', "sandbox; default-src 'none'; img-src 'self' data:; style-src 'unsafe-inline'");
     reply.header('X-Content-Type-Options', 'nosniff');
-    if (download) reply.header('Content-Disposition', `attachment; filename="${encodeURIComponent(row.originalName)}"`);
+    // XML (E-Rechnungen) nie im Browser darstellen, sondern immer als Download
+    if (download || row.mimeType === 'application/xml') reply.header('Content-Disposition', `attachment; filename="${encodeURIComponent(row.originalName)}"`);
     return reply.send(fs.createReadStream(abs));
   });
 

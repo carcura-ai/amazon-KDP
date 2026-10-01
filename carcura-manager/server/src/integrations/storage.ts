@@ -7,12 +7,14 @@ import type { Db } from '../db/index.js';
 import { files } from '../db/schema.js';
 import { newId } from '../core/ids.js';
 import { badRequest } from '../core/errors.js';
+import { extractEmbeddedFiles } from './einvoice/pdf.js';
 
 export const ALLOWED_MIME: Record<string, string> = {
   'image/jpeg': 'jpg',
   'image/png': 'png',
   'image/webp': 'webp',
   'application/pdf': 'pdf',
+  'application/xml': 'xml',
 };
 export const MAX_FILE_BYTES = 25 * 1024 * 1024;
 export const FILE_CATEGORIES = ['before', 'during', 'after', 'damage', 'detail', 'offer', 'invoice', 'protocol', 'other'] as const;
@@ -29,10 +31,24 @@ export function sniffMime(buf: Buffer): string | null {
   return null;
 }
 
-/** PDFs mit aktiven Inhalten (JavaScript, Startaktionen, eingebettete Dateien) werden abgewiesen. */
-export function pdfHasActiveContent(buf: Buffer): boolean {
+/**
+ * PDFs mit aktiven Inhalten (JavaScript, Startaktionen, eingebettete Dateien) werden abgewiesen.
+ * Ausnahme für den Belegimport: E-Rechnungen (ZUGFeRD/Factur-X) enthalten ihre Rechnungsdaten als
+ * eingebettete XML-Datei – erlaubt, wenn ausschließlich XML eingebettet ist und sonst nichts Aktives.
+ */
+export function pdfHasActiveContent(buf: Buffer, opts: { allowEmbeddedXml?: boolean } = {}): boolean {
   const text = buf.toString('latin1');
-  return /\/(JavaScript|JS|Launch|EmbeddedFile|RichMedia|XFA)\b/.test(text);
+  if (/\/(JavaScript|JS|Launch|RichMedia|XFA)\b/.test(text)) return true;
+  if (!/\/EmbeddedFile\b/.test(text)) return false;
+  if (!opts.allowEmbeddedXml) return true;
+  const embedded = extractEmbeddedFiles(buf, 50);
+  return embedded.length === 0 || embedded.some((f) => !f.isXml);
+}
+
+/** XML-Datei (z. B. XRechnung): Inhalt beginnt mit einer XML-Deklaration oder einem Element. */
+export function looksLikeXml(buf: Buffer): boolean {
+  const head = buf.subarray(0, 200).toString('utf8').replace(/^\uFEFF/, '').trimStart();
+  return head.startsWith('<?xml') || /^<[A-Za-z_][\w:.-]*[\s>]/.test(head);
 }
 
 export interface StoreInput {
@@ -48,6 +64,8 @@ export interface StoreInput {
   protocolId?: string | null;
   caption?: string | null;
   uploadedByUserId?: string | null;
+  /** Belegimport: E-Rechnungs-PDF mit eingebetteter XML und reine XML-Rechnungen zulassen */
+  allowEInvoice?: boolean;
 }
 
 /**
@@ -68,19 +86,19 @@ export class FileStorage {
   async store(input: StoreInput) {
     if (input.buffer.length > MAX_FILE_BYTES) throw badRequest('Datei ist größer als 25 MB.');
     if (input.buffer.length === 0) throw badRequest('Leere Datei.');
-    const sniffed = sniffMime(input.buffer);
-    if (!sniffed) throw badRequest('Dateityp nicht erlaubt. Erlaubt sind JPG, PNG, WebP und PDF.');
+    const sniffed = sniffMime(input.buffer) ?? (input.allowEInvoice && looksLikeXml(input.buffer) ? 'application/xml' : null);
+    if (!sniffed) throw badRequest(input.allowEInvoice ? 'Dateityp nicht erlaubt. Erlaubt sind PDF, JPG, PNG, WebP und XML (E-Rechnung).' : 'Dateityp nicht erlaubt. Erlaubt sind JPG, PNG, WebP und PDF.');
     // Der erkannte Inhalt zählt; ein abweichend gemeldeter Typ (z. B. PDF als Bild getarnt) wird abgewiesen
     if (ALLOWED_MIME[input.mimeType] && input.mimeType !== sniffed && !(input.mimeType.startsWith('image/') && sniffed.startsWith('image/'))) throw badRequest('Dateiinhalt passt nicht zum Dateityp.');
     input = { ...input, mimeType: sniffed };
-    if (sniffed === 'application/pdf' && pdfHasActiveContent(input.buffer)) throw badRequest('PDF mit aktiven Inhalten (Skripte, eingebettete Dateien) wird aus Sicherheitsgründen nicht angenommen.');
+    if (sniffed === 'application/pdf' && pdfHasActiveContent(input.buffer, { allowEmbeddedXml: input.allowEInvoice })) throw badRequest('PDF mit aktiven Inhalten (Skripte, eingebettete Dateien) wird aus Sicherheitsgründen nicht angenommen.');
     const ext = ALLOWED_MIME[sniffed]!;
     const id = newId();
     const now = new Date();
     const relDir = path.join(input.companyId, String(now.getFullYear()), String(now.getMonth() + 1).padStart(2, '0'));
     fs.mkdirSync(path.join(this.rootDir, relDir), { recursive: true });
     const isImage = input.mimeType.startsWith('image/');
-    const kind = input.kind ?? (isImage ? 'image' : 'pdf');
+    const kind = input.kind ?? (isImage ? 'image' : sniffed === 'application/xml' ? 'document' : 'pdf');
     let buffer = input.buffer;
     let width: number | null = null;
     let height: number | null = null;

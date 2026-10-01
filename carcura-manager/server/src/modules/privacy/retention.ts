@@ -1,7 +1,7 @@
 import { and, eq, lt, sql } from 'drizzle-orm';
 import type { FastifyInstance } from 'fastify';
 import fs from 'node:fs';
-import { companies, leads, emailLog, auditLog, jobs, customers, marketingDaily, webAnalyticsDaily, socialDaily, seoDaily, assistantMessages, aiUsageLog, dataExports, userTokens, supportSessions } from '../../db/schema.js';
+import { companies, leads, emailLog, auditLog, jobs, customers, marketingDaily, webAnalyticsDaily, socialDaily, seoDaily, assistantMessages, aiUsageLog, dataExports, userTokens, supportSessions, documentImports } from '../../db/schema.js';
 import { privacySettings } from './settings.js';
 import { eraseCustomer } from './routes.js';
 import { logDeletion, purgeExpiredRetention } from './lifecycle.js';
@@ -35,6 +35,10 @@ export function runRetention(app: FastifyInstance): string {
       + db.delete(seoDaily).where(and(eq(seoDaily.companyId, cid), lt(seoDaily.date, mCut))).run().changes;
     counts.assistant = db.delete(assistantMessages).where(and(eq(assistantMessages.companyId, cid), lt(assistantMessages.createdAt, daysAgo(p.assistantRetentionDays)))).run().changes
       + db.delete(aiUsageLog).where(and(eq(aiUsageLog.companyId, cid), lt(aiUsageLog.createdAt, daysAgo(Math.max(p.assistantRetentionDays, 365))))).run().changes;
+    // Belegimport: ausgelesene Rohdaten abgeschlossener Importe nach 180 Tagen entfernen (die Buchung und der Beleg bleiben);
+    // verworfene/zurückgenommene Importe nach 180 Tagen ganz löschen
+    counts.documentImports = db.update(documentImports).set({ dataJson: null }).where(and(eq(documentImports.companyId, cid), sql`${documentImports.status} in ('completed','duplicate')`, sql`${documentImports.dataJson} is not null`, lt(documentImports.updatedAt, daysAgo(180)))).run().changes
+      + db.delete(documentImports).where(and(eq(documentImports.companyId, cid), sql`${documentImports.status} in ('discarded','undone')`, sql`${documentImports.fileId} is null`, lt(documentImports.updatedAt, daysAgo(180)))).run().changes;
     // Export-Dateien nach Ablauf entfernen
     for (const e of db.select().from(dataExports).where(and(eq(dataExports.companyId, cid), eq(dataExports.status, 'ready'), lt(dataExports.expiresAt, nowIso()))).all()) {
       if (e.storagePath) fs.rmSync(e.storagePath, { force: true });
@@ -49,7 +53,7 @@ export function runRetention(app: FastifyInstance): string {
     }
     const total = Object.values(counts).reduce((s, n) => s + n, 0);
     if (total) logDeletion(db, { companyId: cid, subjectType: 'data_class', subjectRef: null, action: 'deleted', reason: 'Automatische Löschung nach Aufbewahrungsfristen des Mandanten', details: counts, source: 'job' });
-    const LABEL: Record<string, string> = { leads: 'Leads', emailLog: 'Mailprotokolle', auditLog: 'Audit-Einträge', marketing: 'Marketing-Kennzahlen', assistant: 'KI-Verläufe', exports: 'Exporte' };
+    const LABEL: Record<string, string> = { leads: 'Leads', emailLog: 'Mailprotokolle', auditLog: 'Audit-Einträge', marketing: 'Marketing-Kennzahlen', assistant: 'KI-Verläufe', exports: 'Exporte', documentImports: 'Belegimport-Rohdaten' };
     if (total || anonymized) parts.push(`${company.name}: ${Object.entries(counts).filter(([, n]) => n).map(([k, n]) => `${n} ${LABEL[k] ?? k}`).join(', ')}${anonymized ? `, ${anonymized} Kunden anonymisiert` : ''}`);
   }
   const purged = purgeExpiredRetention(db, app.storage);

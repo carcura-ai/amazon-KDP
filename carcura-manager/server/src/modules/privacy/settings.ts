@@ -19,6 +19,8 @@ export const privacySchema = z.object({
   assistantRetentionDays: z.number().int().min(1).max(3650).default(180),  // Verlauf des KI-Assistenten
   exportRetentionDays: z.number().int().min(1).max(30).default(7),         // bereitgestellte Export-Dateien
   assistantPersonalData: z.boolean().default(false),                       // Namen/Kontaktdaten an den KI-Assistenten übermitteln
+  /** Belegimport: Fotos/PDFs ohne E-Rechnungsdaten von der KI (Anthropic) auslesen lassen. Der Beleg enthält Personendaten. */
+  aiDocumentRecognition: z.boolean().default(false),
   require2faForAdmins: z.boolean().default(false),
 });
 export type PrivacySettings = z.infer<typeof privacySchema>;

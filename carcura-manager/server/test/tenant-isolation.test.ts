@@ -65,6 +65,11 @@ beforeAll(async () => {
   ids.privacyRequest = (await post('/api/privacy/requests', { type: 'access', subjectName: `${MARK} Person` })).id;
   ids.incident = (await post('/api/privacy/incidents', { title: `${MARK} Vorfall`, type: 'other' })).id;
   ids.export = (await post('/api/tenant-export', {})).id;
+  // Belegimport (Foto ohne E-Rechnung → Prüfung)
+  const bon = multipart({ direction: 'incoming' }, { name: `${MARK}-bon.jpg`, type: 'image/jpeg', data: img });
+  const imp = await app.inject(as(A, { method: 'POST', url: '/api/document-imports', payload: bon.payload, headers: bon.headers }));
+  ids.documentImport = imp.json().items[0].id;
+  await app.importQueue.idle();
   // Mandant B
   const created = await app.inject(as(A, { method: 'POST', url: '/api/platform/companies', payload: { company: { name: 'Mandant B' }, admin: { email: 'chef@b.test', password: 'MandantB-Pass1', firstName: 'Bernd', lastName: 'B' } } }));
   expect(created.statusCode).toBe(200);
@@ -89,7 +94,7 @@ function idFor(url: string, param: string): string | null {
     [/^\/api\/invoices\//, 'invoice'], [/^\/api\/protocols\//, 'protocol'], [/^\/(api\/)?files\//, 'file'],
     [/^\/api\/tasks\//, 'task'], [/^\/api\/inventory\//, 'inventory'], [/^\/api\/expenses\//, 'expense'],
     [/^\/api\/recurring-expenses\//, 'recurring'], [/^\/api\/services\//, 'service'], [/^\/api\/competitors\//, 'competitor'],
-    [/^\/api\/users\//, 'user'], [/^\/api\/platform\/companies\//, 'company'], [/^\/api\/(platform\/)?support-sessions\//, 'supportSession'], [/^\/api\/platform\/(plans|addons|discount-codes|subprocessors|incidents)\//, 'platformObject'], [/^\/api\/privacy\/leads\//, 'lead'], [/^\/api\/privacy\/requests\//, 'privacyRequest'], [/^\/api\/privacy\/incidents\//, 'incident'], [/^\/api\/tenant-export\//, 'export'], [/^\/api\/legal\/documents\//, 'legalDocument'], [/^\/api\/reports\//, 'report'], [/^\/api\/assistant\/conversations\//, 'conversation'],
+    [/^\/api\/users\//, 'user'], [/^\/api\/platform\/companies\//, 'company'], [/^\/api\/(platform\/)?support-sessions\//, 'supportSession'], [/^\/api\/platform\/(plans|addons|discount-codes|subprocessors|incidents)\//, 'platformObject'], [/^\/api\/privacy\/leads\//, 'lead'], [/^\/api\/privacy\/requests\//, 'privacyRequest'], [/^\/api\/privacy\/incidents\//, 'incident'], [/^\/api\/tenant-export\//, 'export'], [/^\/api\/legal\/documents\//, 'legalDocument'], [/^\/api\/reports\//, 'report'], [/^\/api\/assistant\/conversations\//, 'conversation'], [/^\/api\/document-imports\//, 'documentImport'],
   ];
   for (const [re, key] of map) if (re.test(url)) return ids[key] ?? '00000000-0000-4000-8000-000000000000';
   return null;

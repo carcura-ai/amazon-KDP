@@ -66,6 +66,8 @@ import privacyCenterRoutes from './modules/privacy/center.routes.js';
 import complianceRoutes from './modules/platform/compliance.routes.js';
 import legalSignupRoutes from './modules/saas/legal-signup.routes.js';
 import { seedSubprocessors } from './modules/platform/tenant-lifecycle.js';
+import importRoutes from './modules/imports/routes.js';
+import { ImportQueue } from './modules/imports/service.js';
 
 declare module 'fastify' {
   interface FastifyInstance {
@@ -147,6 +149,10 @@ export async function buildApp(opts: BuildOptions): Promise<FastifyInstance> {
     signed: true,
     maxAge: opts.config.sessionMaxDays * 86_400,
   } satisfies CookieSerializeOptions);
+
+  // Belegimport: Warteschlange auf Anwendungsebene (Verarbeitung im Hintergrund, nacheinander)
+  const importQueue = new ImportQueue(app);
+  app.decorate('importQueue', importQueue);
 
   await app.register(cookie, { secret: opts.config.appSecret });
   // Globales Limit je Client-IP (hinter Caddy aus X-Forwarded-For, siehe trustProxy); strengere Limits an Login,
@@ -266,6 +272,7 @@ export async function buildApp(opts: BuildOptions): Promise<FastifyInstance> {
   await app.register(privacyCenterRoutes);
   await app.register(complianceRoutes);
   await app.register(legalSignupRoutes);
+  await app.register(importRoutes);
   seedSubprocessors(app);
 
   // Web-App (Vite-Build) ausliefern, wenn vorhanden
@@ -285,6 +292,7 @@ export async function buildApp(opts: BuildOptions): Promise<FastifyInstance> {
 
   if (added > 0) app.log.info({ added }, 'Neue Standardrechte für bestehende Mandanten ergänzt');
   app.addHook('onClose', async () => {
+    await importQueue.idle();
     await pdf.close();
     opts.dbHandle.close();
   });

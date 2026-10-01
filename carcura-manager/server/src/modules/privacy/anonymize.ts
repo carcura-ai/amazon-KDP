@@ -1,6 +1,6 @@
 import { and, eq, inArray, sql } from 'drizzle-orm';
 import type { Db } from '../../db/index.js';
-import { customers, vehicles, activities, leads, tasks, appointments, orders, protocols, files, emailLog, auditLog } from '../../db/schema.js';
+import { customers, vehicles, activities, leads, tasks, appointments, orders, protocols, files, emailLog, auditLog, documentImports } from '../../db/schema.js';
 import type { FileStorage } from '../../integrations/storage.js';
 import { nowIso } from '../../core/ids.js';
 
@@ -22,7 +22,8 @@ export function anonymizeCustomer(db: Db, storage: FileStorage, companyId: strin
   // Dateien: alles mit Kundenbezug außer Rechnungs-/Angebots-PDFs (Aufbewahrungspflicht)
   const fileRows = db.select({ id: files.id, category: files.category, kind: files.kind }).from(files).where(and(eq(files.companyId, companyId), sql`(${files.customerId} = ${customerId}${vehicleIds.length ? sql` or ${files.vehicleId} in ${vehicleIds}` : sql``}${protocolIds.length ? sql` or ${files.protocolId} in ${protocolIds}` : sql``})`)).all();
   let filesDeleted = 0;
-  for (const f of fileRows) { if (f.kind === 'pdf' && (f.category === 'invoice' || f.category === 'offer')) continue; if (storage.remove(companyId, f.id)) filesDeleted++; }
+  // Rechnungsbelege bleiben – auch importierte Rechnungen als Foto (Aufbewahrungspflicht)
+  for (const f of fileRows) { if (f.category === 'invoice' || (f.kind === 'pdf' && f.category === 'offer')) continue; if (storage.remove(companyId, f.id)) filesDeleted++; }
 
   const invoicesKept = db.select({ n: sql<number>`count(*)` }).from(sql`invoices`).where(sql`customer_id = ${customerId}`).get()?.n ?? 0;
   const result = db.transaction((tx) => {
@@ -35,6 +36,8 @@ export function anonymizeCustomer(db: Db, storage: FileStorage, companyId: strin
     if (protocolIds.length) protocolsCleared = tx.update(protocols).set({ notes: null, signedByName: null, customerSignatureFileId: null, employeeSignatureFileId: null, pdfFileId: null, updatedAt: nowIso() }).where(inArray(protocols.id, protocolIds)).run().changes;
     if (vehicleIds.length) tx.update(vehicles).set({ licensePlate: null, normalizedPlate: null, vin: null, notes: null, isActive: false, updatedAt: nowIso() }).where(inArray(vehicles.id, vehicleIds)).run();
     tx.update(customers).set({ salutation: null, firstName: 'Gelöschter', lastName: `Kunde ${c.customerNumber}`, companyName: null, street: null, houseNumber: null, zip: null, city: null, email: null, phone: null, phone2: null, notes: null, tagsJson: '[]', source: null, leadId: null, normalizedEmail: null, normalizedPhone: null, isActive: false, anonymizedAt: nowIso(), updatedAt: nowIso() }).where(eq(customers.id, customerId)).run();
+    // Belegimport: ausgelesene Rohdaten (Name, Anschrift) entfernen; Beleg und Buchung bleiben
+    tx.update(documentImports).set({ dataJson: null, fileName: 'Beleg (anonymisiert)', updatedAt: nowIso() }).where(and(eq(documentImports.companyId, companyId), eq(documentImports.customerId, customerId))).run();
     if (c.email) tx.update(emailLog).set({ toAddress: 'anonymisiert' }).where(and(eq(emailLog.companyId, companyId), eq(emailLog.toAddress, c.email))).run();
     // Audit-Log: Einträge bleiben (Nachweis), aber ohne Vorher/Nachher-Inhalte mit Personenbezug
     tx.update(auditLog).set({ beforeJson: null, afterJson: null }).where(and(eq(auditLog.companyId, companyId), eq(auditLog.entityType, 'customer'), eq(auditLog.entityId, customerId))).run();
