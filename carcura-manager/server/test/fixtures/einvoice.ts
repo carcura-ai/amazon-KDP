@@ -4,7 +4,7 @@ export interface CiiOpts {
   number?: string; date?: string; due?: string; typeCode?: string;
   sellerName?: string; buyerName?: string; buyerContact?: string | null; buyerStreet?: string; buyerZip?: string; buyerCity?: string; buyerEmail?: string | null; buyerPhone?: string | null; buyerId?: string;
   lines?: Array<{ name: string; qty: number; unit?: string; price: string; total: string; rate?: string }>;
-  net?: string; tax?: string; gross?: string; due_amount?: string; taxRate?: string; taxCategory?: string;
+  net?: string; tax?: string; gross?: string; due_amount?: string; taxRate?: string; taxCategory?: string; referenced?: string;
 }
 
 /** ZUGFeRD 2.x / Factur-X (EN 16931) im Aufbau, wie Lexware Office sie erzeugt (Kleinunternehmer: Kategorie E, 0 %). */
@@ -52,6 +52,7 @@ ${lines.map((l, i) => `    <ram:IncludedSupplyChainTradeLineItem>
     <ram:ApplicableHeaderTradeDelivery><ram:ActualDeliverySupplyChainEvent><ram:OccurrenceDateTime><udt:DateTimeString format="102">${o.date ?? '20260915'}</udt:DateTimeString></ram:OccurrenceDateTime></ram:ActualDeliverySupplyChainEvent></ram:ApplicableHeaderTradeDelivery>
     <ram:ApplicableHeaderTradeSettlement>
       <ram:InvoiceCurrencyCode>EUR</ram:InvoiceCurrencyCode>
+      ${o.referenced ? `<ram:InvoiceReferencedDocument><ram:IssuerAssignedID>${o.referenced}</ram:IssuerAssignedID></ram:InvoiceReferencedDocument>` : ''}
       <ram:ApplicableTradeTax><ram:CalculatedAmount>${o.tax ?? '0.00'}</ram:CalculatedAmount><ram:TypeCode>VAT</ram:TypeCode><ram:BasisAmount>${o.net ?? '249.00'}</ram:BasisAmount><ram:CategoryCode>${cat}</ram:CategoryCode><ram:RateApplicablePercent>${rate}</ram:RateApplicablePercent></ram:ApplicableTradeTax>
       <ram:SpecifiedTradePaymentTerms><ram:Description>Zahlbar innerhalb von 14 Tagen ohne Abzug.</ram:Description><ram:DueDateDateTime><udt:DateTimeString format="102">${o.due ?? '20260929'}</udt:DateTimeString></ram:DueDateDateTime></ram:SpecifiedTradePaymentTerms>
       <ram:SpecifiedTradeSettlementHeaderMonetarySummation>

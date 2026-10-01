@@ -58,6 +58,8 @@ export interface NormalizedInvoice {
   notes: string | null;
   /** Nur KI: vorgeschlagene Ausgabenkategorie */
   suggestedCategory: string | null;
+  /** Bei Gutschrift/Storno: Nummer der Rechnung, auf die sich der Beleg bezieht */
+  referencedNumber?: string | null;
 }
 
 export const emptyParty = (): InvoiceParty => ({ name: null, companyName: null, personName: null, street: null, zip: null, city: null, country: null, email: null, phone: null, vatId: null, taxNumber: null, partyNumber: null });

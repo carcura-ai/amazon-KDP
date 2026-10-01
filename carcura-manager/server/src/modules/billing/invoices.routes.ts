@@ -68,6 +68,14 @@ export default async function invoiceRoutes(app: FastifyInstance) {
     const t = totalsFor(app, companyId, list);
     app.db.update(invoices).set({ subtotalCents: t.subtotalCents, vatCents: t.vatCents, totalCents: t.totalCents, updatedAt: nowIso() }).where(eq(invoices.id, id)).run();
   };
+  /** Nächste freie Rechnungsnummer – überspringt Nummern, die bereits eine importierte Rechnung trägt. */
+  const freeInvoiceNumber = (companyId: string, prefix: string) => {
+    for (let i = 0; i < 1000; i++) {
+      const n = nextNumber(app.db, companyId, 'invoice', prefix, true);
+      if (!app.db.select({ id: invoices.id }).from(invoices).where(and(eq(invoices.companyId, companyId), eq(invoices.invoiceNumber, n))).get()) return n;
+    }
+    throw conflict('Keine freie Rechnungsnummer gefunden.');
+  };
   const assertDraft = (inv: typeof invoices.$inferSelect) => { if (inv.status !== 'draft') throw conflict('Ausgestellte Rechnungen sind unveränderlich. Bei Fehlern bitte stornieren und neu ausstellen.'); };
   /** Original einer importierten Rechnung (PDF oder Foto) – wird nie neu erzeugt. */
   const originalFile = (companyId: string, inv: typeof invoices.$inferSelect) => {
@@ -109,8 +117,8 @@ export default async function invoiceRoutes(app: FastifyInstance) {
     const sum = (cond: ReturnType<typeof sql>) => app.db.select({ n: sql<number>`count(*)`, s: sql<number>`coalesce(sum(${invoices.totalCents} - ${invoices.paidCents}),0)`, t: sql<number>`coalesce(sum(${invoices.totalCents}),0)` }).from(invoices).where(and(eq(invoices.companyId, ctx.companyId), cond)).get()!;
     const open = sum(sql`${invoices.status} in ('open','sent','overdue')`);
     const overdue = sum(sql`${invoices.status} = 'overdue'`);
-    const month = sum(sql`${invoices.status} in ('open','sent','overdue','paid') and ${invoices.issueDate} >= ${monthStart}`);
-    const year = sum(sql`${invoices.status} in ('open','sent','overdue','paid') and ${invoices.issueDate} >= ${yearStart}`);
+    const month = sum(sql`${invoices.status} in ('open','sent','overdue','paid') and ${invoices.cancelsInvoiceId} is null and ${invoices.issueDate} >= ${monthStart}`);
+    const year = sum(sql`${invoices.status} in ('open','sent','overdue','paid') and ${invoices.cancelsInvoiceId} is null and ${invoices.issueDate} >= ${yearStart}`);
     const paidMonth = app.db.select({ s: sql<number>`coalesce(sum(${payments.amountCents}),0)` }).from(payments).where(and(eq(payments.companyId, ctx.companyId), gte(payments.paidAt, monthStart))).get()!;
     return { openCents: open.s, openCount: open.n, overdueCents: overdue.s, overdueCount: overdue.n, invoicedMonthCents: month.t, invoicedMonthCount: month.n, invoicedYearCents: year.t, paidMonthCents: paidMonth.s };
   });
@@ -168,7 +176,7 @@ export default async function invoiceRoutes(app: FastifyInstance) {
     if (items(id).length === 0) throw badRequest('Eine Rechnung braucht mindestens eine Position.');
     const company = companyOf(app, ctx.companyId);
     const date = issueDate ?? today();
-    const invoiceNumber = nextNumber(app.db, ctx.companyId, 'invoice', company.invoicePrefix, true);
+    const invoiceNumber = freeInvoiceNumber(ctx.companyId, company.invoicePrefix);
     app.db.update(invoices).set({ invoiceNumber, status: 'open', issueDate: date, dueDate: addDays(date, company.paymentTermsDays), serviceDate: inv.serviceDate ?? date, issuedAt: nowIso(), updatedAt: nowIso() }).where(eq(invoices.id, id)).run();
     const pdf = await renderPdf(ctx.companyId, id);
     await storePdf(ctx.companyId, ctx.userId, getOne(ctx.companyId, id), pdf);
@@ -271,7 +279,7 @@ export default async function invoiceRoutes(app: FastifyInstance) {
     const company = companyOf(app, ctx.companyId);
     const its = items(id);
     const stornoId = newId();
-    const invoiceNumber = nextNumber(app.db, ctx.companyId, 'invoice', company.invoicePrefix, true);
+    const invoiceNumber = freeInvoiceNumber(ctx.companyId, company.invoicePrefix);
     const date = today();
     app.db.insert(invoices).values({ id: stornoId, companyId: ctx.companyId, invoiceNumber, customerId: inv.customerId, vehicleId: inv.vehicleId, orderId: inv.orderId, offerId: inv.offerId, status: 'paid', title: `Storno zu Rechnung ${inv.invoiceNumber}`, issueDate: date, serviceDate: inv.serviceDate, dueDate: date, issuedAt: nowIso(), cancelsInvoiceId: id, subtotalCents: -inv.subtotalCents, vatCents: -inv.vatCents, totalCents: -inv.totalCents, paidCents: -inv.totalCents, paidAt: nowIso(), createdByUserId: ctx.userId }).run();
     its.forEach((it, i) => app.db.insert(invoiceItems).values({ id: newId(), companyId: ctx.companyId, invoiceId: stornoId, serviceId: it.serviceId, name: it.name, description: it.description, quantity: it.quantity, unitPriceCents: -it.unitPriceCents, vatBp: it.vatBp, totalCents: -it.totalCents, sortOrder: i }).run());

@@ -97,6 +97,7 @@ function parseCii(doc: XmlNode): NormalizedInvoice {
     paid: null,
     notes,
     suggestedCategory: null,
+    referencedNumber: text(settlement, 'InvoiceReferencedDocument', 'IssuerAssignedID'),
   };
 }
 
@@ -167,5 +168,6 @@ function parseUbl(doc: XmlNode): NormalizedInvoice {
     paid: null,
     notes,
     suggestedCategory: null,
+    referencedNumber: text(doc, 'BillingReference', 'InvoiceDocumentReference', 'ID'),
   };
 }

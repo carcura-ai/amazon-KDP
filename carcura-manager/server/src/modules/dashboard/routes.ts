@@ -73,11 +73,11 @@ export default async function dashboardRoutes(app: FastifyInstance) {
     const weekStr = weekStart.toISOString().slice(0, 10);
     const monthStr = monthStart.slice(0, 10);
     const yearStr = `${now.getFullYear()}-01-01`;
-    const revenue = (from: string) => app.db.select({ s: sql<number>`coalesce(sum(${invoices.totalCents}),0)`, n: sql<number>`count(*)` }).from(invoices).where(and(eq(invoices.companyId, ctx.companyId), sql`${invoices.status} in ('open','sent','overdue','paid')`, gte(invoices.issueDate, from))).get()!;
+    const revenue = (from: string) => app.db.select({ s: sql<number>`coalesce(sum(${invoices.totalCents}),0)`, n: sql<number>`count(*)` }).from(invoices).where(and(eq(invoices.companyId, ctx.companyId), sql`${invoices.status} in ('open','sent','overdue','paid') and ${invoices.cancelsInvoiceId} is null`, gte(invoices.issueDate, from))).get()!;
     const openInv = app.db.select({ s: sql<number>`coalesce(sum(${invoices.totalCents} - ${invoices.paidCents}),0)`, n: sql<number>`count(*)` }).from(invoices).where(and(eq(invoices.companyId, ctx.companyId), sql`${invoices.status} in ('open','sent','overdue')`)).get()!;
     const overdueInv = app.db.select({ s: sql<number>`coalesce(sum(${invoices.totalCents} - ${invoices.paidCents}),0)`, n: sql<number>`count(*)` }).from(invoices).where(and(eq(invoices.companyId, ctx.companyId), eq(invoices.status, 'overdue'))).get()!;
 
-    const revNetMonth = app.db.select({ s: sql<number>`coalesce(sum(${invoices.subtotalCents}),0)` }).from(invoices).where(and(eq(invoices.companyId, ctx.companyId), sql`${invoices.status} in ('open','sent','overdue','paid')`, gte(invoices.issueDate, monthStr))).get()!.s;
+    const revNetMonth = app.db.select({ s: sql<number>`coalesce(sum(${invoices.subtotalCents}),0)` }).from(invoices).where(and(eq(invoices.companyId, ctx.companyId), sql`${invoices.status} in ('open','sent','overdue','paid') and ${invoices.cancelsInvoiceId} is null`, gte(invoices.issueDate, monthStr))).get()!.s;
     const expNetMonth = app.db.select({ s: sql<number>`coalesce(sum(${expenses.netCents}),0)` }).from(expenses).where(and(eq(expenses.companyId, ctx.companyId), gte(expenses.date, monthStr))).get()!.s;
     const lowStock = app.db.select({ n: sql<number>`count(*)` }).from(inventoryItems).where(and(eq(inventoryItems.companyId, ctx.companyId), eq(inventoryItems.isActive, true), sql`${inventoryItems.minQuantity} > 0 and ${inventoryItems.quantity} <= ${inventoryItems.minQuantity}`)).get()?.n ?? 0;
 

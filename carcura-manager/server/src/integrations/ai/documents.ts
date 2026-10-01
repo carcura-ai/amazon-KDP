@@ -27,6 +27,7 @@ const party = z.object({
 export const EXTRACTION_SCHEMA = z.object({
   document_type: z.enum(['invoice', 'credit_note', 'correction', 'receipt', 'not_an_invoice']).describe('Art des Belegs; receipt = Kassenbon/Quittung'),
   invoice_number: z.string().nullable(),
+  referenced_invoice_number: z.string().nullable().describe('Bei Gutschrift/Storno/Korrektur: Nummer der ursprünglichen Rechnung, falls genannt'),
   issue_date: z.string().nullable().describe('Rechnungsdatum als YYYY-MM-DD'),
   due_date: z.string().nullable().describe('Fälligkeitsdatum als YYYY-MM-DD, nur wenn genannt oder eindeutig aus „zahlbar innerhalb von X Tagen“ berechenbar'),
   service_date: z.string().nullable().describe('Leistungs-/Lieferdatum als YYYY-MM-DD'),
@@ -146,5 +147,6 @@ export function normalizeExtraction(e: Extraction): NormalizedInvoice {
     paid: e.paid,
     notes: null,
     suggestedCategory: e.suggested_category,
+    referencedNumber: e.referenced_invoice_number?.trim() || null,
   };
 }

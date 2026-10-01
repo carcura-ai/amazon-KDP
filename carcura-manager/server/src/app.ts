@@ -292,7 +292,7 @@ export async function buildApp(opts: BuildOptions): Promise<FastifyInstance> {
 
   if (added > 0) app.log.info({ added }, 'Neue Standardrechte für bestehende Mandanten ergänzt');
   app.addHook('onClose', async () => {
-    await importQueue.idle();
+    await importQueue.idle(15_000); // laufende Belege dürfen das Herunterfahren nicht blockieren
     await pdf.close();
     opts.dbHandle.close();
   });

@@ -7,7 +7,7 @@ import type { Db } from '../db/index.js';
 import { files } from '../db/schema.js';
 import { newId } from '../core/ids.js';
 import { badRequest } from '../core/errors.js';
-import { extractEmbeddedFiles } from './einvoice/pdf.js';
+import { pdfSecurityScan } from './einvoice/pdf.js';
 
 export const ALLOWED_MIME: Record<string, string> = {
   'image/jpeg': 'jpg',
@@ -37,12 +37,14 @@ export function sniffMime(buf: Buffer): string | null {
  * eingebettete XML-Datei – erlaubt, wenn ausschließlich XML eingebettet ist und sonst nichts Aktives.
  */
 export function pdfHasActiveContent(buf: Buffer, opts: { allowEmbeddedXml?: boolean } = {}): boolean {
-  const text = buf.toString('latin1');
-  if (/\/(JavaScript|JS|Launch|RichMedia|XFA)\b/.test(text)) return true;
-  if (!/\/EmbeddedFile\b/.test(text)) return false;
+  const scan = pdfSecurityScan(buf);
+  if (scan.active) return true;
+  const hasAttachments = scan.attachmentRefs > 0 || scan.embedded.length > 0 || /\/EmbeddedFiles?\b/.test(buf.toString('latin1'));
+  if (!hasAttachments) return false;
   if (!opts.allowEmbeddedXml) return true;
-  const embedded = extractEmbeddedFiles(buf, 50);
-  return embedded.length === 0 || embedded.some((f) => !f.isXml);
+  // Nur XML-Anhänge erlaubt – und jeder Anhang-Verweis muss zu einem erkannten XML-Anhang gehören
+  const xml = scan.embedded.filter((f) => f.isXml).length;
+  return xml === 0 || scan.embedded.some((f) => !f.isXml) || scan.attachmentRefs > xml;
 }
 
 /** XML-Datei (z. B. XRechnung): Inhalt beginnt mit einer XML-Deklaration oder einem Element. */

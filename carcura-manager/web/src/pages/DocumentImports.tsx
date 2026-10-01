@@ -16,7 +16,7 @@ interface Line { name: string; description: string | null; quantity: number; uni
 interface InvoiceData { kind: 'invoice' | 'credit_note' | 'correction' | 'receipt'; number: string | null; issueDate: string | null; dueDate: string | null; serviceDate: string | null; currency: string; seller: Party; buyer: Party; lines: Line[]; vat: Array<{ vatBp: number; netCents: number; vatCents: number }>; netCents: number | null; vatCents: number | null; grossCents: number | null; prepaidCents: number | null; dueCents: number | null; paymentTerms: string | null; paid: boolean | null; notes: string | null; suggestedCategory: string | null }
 interface ImportSummary { id: string; direction: Direction; status: Status; fileName: string; fileId: string | null; method: string | null; number: string | null; issueDate: string | null; grossCents: number | null; kind: string | null; partyName: string | null; error: string | null; warnings: string[]; invoiceId: string | null; customerId: string | null; customerCreated: boolean; expenseIds: string[]; createdAt: string; processedAt: string | null; appliedAt: string | null }
 interface Candidate { id: string; customerNumber: string; label: string; score: number; reasons: string[] }
-interface ImportDetail { import: ImportSummary; data: InvoiceData | null; file: { id: string; mimeType: string; originalName: string; sizeBytes: number } | null; candidates: Candidate[]; suggestedCustomerId: string | null; suggestedCategory: string | null; customer: { id: string; customerNumber: string; firstName: string; lastName: string; companyName: string | null } | null; invoice: { id: string; invoiceNumber: string; status: string; totalCents: number } | null; expenses: Array<{ id: string; date: string; category: string; grossCents: number; vatBp: number; isPaid: boolean }>; options: { markPaid?: boolean } }
+interface ImportDetail { import: ImportSummary; data: InvoiceData | null; file: { id: string; mimeType: string; originalName: string; sizeBytes: number } | null; candidates: Candidate[]; suggestedCustomerId: string | null; matchDecision: 'matched' | 'uncertain' | 'ambiguous' | 'new' | null; undoBlockedReason: string | null; suggestedCategory: string | null; customer: { id: string; customerNumber: string; firstName: string; lastName: string; companyName: string | null } | null; invoice: { id: string; invoiceNumber: string; status: string; totalCents: number } | null; expenses: Array<{ id: string; date: string; category: string; grossCents: number; vatBp: number; isPaid: boolean }>; options: { markPaid?: boolean } }
 interface ImportStatusInfo { directions: Direction[]; canWrite: Direction[]; aiEnabled: boolean; aiConfigured: boolean; canManageAi: boolean; counts: Array<{ direction: Direction; status: Status; n: number }>; categories: string[] }
 interface UploadResult { fileName: string; status: 'queued' | 'duplicate' | 'rejected'; id?: string; existingId?: string; message?: string }
 
@@ -29,15 +29,21 @@ const METHOD: Record<string, string> = { einvoice_cii: 'E-Rechnung (ZUGFeRD)', e
 const KIND: Record<string, string> = { invoice: 'Rechnung', credit_note: 'Gutschrift', correction: 'Rechnungskorrektur', receipt: 'Kassenbon/Quittung' };
 const ACCEPT = 'application/pdf,image/jpeg,image/png,image/webp,.xml,application/xml,text/xml';
 
-/** Betrag „1.234,56“ / „1234.56“ → Cent; leer → null. */
+/** Betrag „1.234,56“ / „1.500“ / „1234.56“ → Cent (ohne Gleitkommafehler); leer oder ungültig → null. */
 function parseMoney(v: string): number | null {
   let s = v.trim().replace(/\s|€/g, '');
   if (!s) return null;
   const neg = s.startsWith('-');
   s = s.replace(/^[-+]/, '');
-  if (s.lastIndexOf(',') > s.lastIndexOf('.')) s = s.replace(/\./g, '').replace(',', '.'); else s = s.replace(/,/g, '');
-  if (!/^\d+(\.\d{0,4})?$/.test(s)) return null;
-  const c = Math.round(Number(s) * 100);
+  const comma = s.lastIndexOf(','); const dot = s.lastIndexOf('.');
+  if (comma > dot) s = s.replace(/\./g, '').replace(',', '.');
+  else if (dot >= 0 && comma < 0 && /^\d{1,3}(\.\d{3})+$/.test(s)) s = s.replace(/\./g, ''); // „1.500“ = Tausenderpunkt
+  else s = s.replace(/,/g, '');
+  if (!/^\d+(\.\d+)?$/.test(s)) return null;
+  const [int, frac = ''] = s.split('.');
+  const f = (frac + '000').slice(0, 3);
+  let c = Number(int) * 100 + Number(f.slice(0, 2));
+  if (Number(f[2]) >= 5) c += 1;
   return neg ? -c : c;
 }
 const money = (c: number | null | undefined) => (c === null || c === undefined ? '' : (c / 100).toFixed(2).replace('.', ','));
@@ -212,33 +218,43 @@ function ReviewModal({ id, direction, categories, canWrite, onClose }: { id: str
   const [category, setCategory] = useState<string>('');
   const [markPaid, setMarkPaid] = useState(false);
   const [confirm, setConfirm] = useState<'discard' | 'undo' | null>(null);
+  const [allowDuplicate, setAllowDuplicate] = useState(false);
+  const [rateChoice, setRateChoice] = useState<string | null>(null);
+  // Formular aus dem Serverstand befüllen – erneut, sobald der Beleg neu ausgelesen wurde
+  const [initKey, setInitKey] = useState('');
   useEffect(() => {
-    if (!d || data) return;
-    if (d.data) setData(structuredClone(d.data));
-    setCandidateId(d.suggestedCustomerId ?? d.candidates[0]?.id ?? null);
-    setCustomerMode(d.candidates.length ? 'candidate' : 'new');
+    if (!d || ['queued', 'processing'].includes(d.import.status)) return;
+    const key = `${d.import.status}|${d.import.processedAt ?? ''}|${d.import.method ?? ''}`;
+    if (key === initKey) return;
+    setInitKey(key);
+    setData(d.data ? structuredClone(d.data) : null);
+    setRateChoice(null);
+    setCandidateId(d.suggestedCustomerId);
+    // Nur ein eindeutiger bzw. wahrscheinlicher Treffer wird vorgewählt; bei mehreren Treffern muss gewählt werden
+    setCustomerMode(d.suggestedCustomerId ? 'candidate' : d.matchDecision === 'ambiguous' ? 'candidate' : 'new');
     setCategory(d.suggestedCategory ?? '');
-    setMarkPaid(Boolean(d.options.markPaid || d.data?.paid));
-  }, [d, data]);
+    setMarkPaid(Boolean(d.options.markPaid || (d.import.direction === 'incoming' && d.data?.paid)));
+    setAllowDuplicate(false);
+  }, [d, initKey]);
   const refresh = () => { for (const k of [['document-imports'], ['document-import', id], ['customers'], ['invoices'], ['expenses'], ['finance'], ['files']]) void qc.invalidateQueries({ queryKey: k }); };
   const apply = useMutation({
-    mutationFn: () => post(`/api/document-imports/${id}/apply`, { data, markPaid, category: direction === 'incoming' ? category || null : null, customerId: direction === 'outgoing' ? (customerMode === 'candidate' ? candidateId : customerMode === 'other' ? other?.id ?? null : null) : null, createCustomer: direction === 'outgoing' && customerMode === 'new' }),
+    mutationFn: () => post(`/api/document-imports/${id}/apply`, { data, markPaid, allowDuplicate, category: direction === 'incoming' ? category || null : null, customerId: direction === 'outgoing' ? (customerMode === 'candidate' ? candidateId : customerMode === 'other' ? other?.id ?? null : null) : null, createCustomer: direction === 'outgoing' && customerMode === 'new' }),
     onSuccess: () => { toast.ok('Beleg übernommen'); refresh(); onClose(); },
     onError: (e) => toast.fromError(e, 'Übernahme nicht möglich'),
   });
-  const retry = useMutation({ mutationFn: () => post(`/api/document-imports/${id}/retry`), onSuccess: () => { setData(null); refresh(); toast.info('Wird erneut ausgelesen'); }, onError: (e) => toast.fromError(e) });
+  const retry = useMutation({ mutationFn: () => post(`/api/document-imports/${id}/retry`), onSuccess: () => { setInitKey(''); refresh(); toast.info('Wird erneut ausgelesen'); }, onError: (e) => toast.fromError(e) });
   const discard = useMutation({ mutationFn: () => post(`/api/document-imports/${id}/discard`), onSuccess: () => { toast.ok('Beleg verworfen'); refresh(); onClose(); }, onError: (e) => toast.fromError(e) });
   const undo = useMutation({ mutationFn: () => post<{ invoiceRemoved: boolean; customerRemoved: boolean; expensesRemoved: number }>(`/api/document-imports/${id}/undo`), onSuccess: (r) => { toast.ok('Übernahme zurückgenommen', [r.invoiceRemoved ? 'Rechnung entfernt' : null, r.customerRemoved ? 'neu angelegter Kunde entfernt' : null, r.expensesRemoved ? `${r.expensesRemoved} Ausgabe(n) entfernt` : null].filter(Boolean).join(' · ')); refresh(); onClose(); }, onError: (e) => toast.fromError(e) });
 
   const imp = d?.import;
-  const editable = canWrite && imp && ['needs_review', 'failed'].includes(imp.status) && data;
+  const isDuplicateNoNumber = imp?.status === 'duplicate' && direction === 'incoming' && !data?.number;
+  const editable = canWrite && imp && (['needs_review', 'failed'].includes(imp.status) || isDuplicateNoNumber) && data;
   const party = data ? (direction === 'outgoing' ? data.buyer : data.seller) : null;
   const setParty = (patch: Partial<Party>) => setData((s) => (s ? (direction === 'outgoing' ? { ...s, buyer: { ...s.buyer, ...patch } } : { ...s, seller: { ...s.seller, ...patch } }) : s));
   const setField = <K extends keyof InvoiceData>(k: K, v: InvoiceData[K]) => setData((s) => (s ? { ...s, [k]: v } : s));
   const sumLines = data?.lines.reduce((s, l) => s + l.netCents, 0) ?? 0;
   const arithmeticOk = data && data.netCents !== null && data.vatCents !== null && data.grossCents !== null ? Math.abs(data.netCents + data.vatCents - data.grossCents) <= 2 : true;
   const docRate = data?.vat.length === 1 ? String(data.vat[0]!.vatBp / 100) : data?.vat.length ? 'mixed' : '';
-  const [rateChoice, setRateChoice] = useState<string | null>(null);
   const vatRate = rateChoice ?? docRate;
   /** Aus Brutto (bevorzugt) oder Netto und dem gewählten Steuersatz die übrigen Beträge berechnen. */
   const recalc = (rate: string, next: InvoiceData, from: 'gross' | 'net') => {
@@ -278,7 +294,7 @@ function ReviewModal({ id, direction, categories, canWrite, onClose }: { id: str
                 {d.customer ? <div>Kunde: <Link to={`/kunden/${d.customer.id}`} onClick={onClose}><strong>{d.customer.companyName ?? `${d.customer.firstName} ${d.customer.lastName}`}</strong></Link> <span className="dim mono small">{d.customer.customerNumber}</span>{imp.customerCreated ? <Badge tone="info">neu angelegt</Badge> : null}</div> : null}
                 {d.invoice ? <div>Rechnung: <Link to={`/rechnungen/${d.invoice.id}`} onClick={onClose}><strong>{d.invoice.invoiceNumber}</strong></Link> · {fmtMoney(d.invoice.totalCents)}</div> : null}
                 {d.expenses.length ? <div className="stack" style={{ gap: 4 }}>{d.expenses.map((e) => <div key={e.id}>Ausgabe {fmtDate(e.date)} · {e.category} · {fmtMoney(e.grossCents)} ({e.vatBp / 100} %) {e.isPaid ? <Badge tone="ok">bezahlt</Badge> : <Badge tone="warn">offen</Badge>}</div>)}<Link to="/finanzen" onClick={onClose} className="small">Zu den Ausgaben</Link></div> : null}
-                {canWrite ? <div className="form-actions" style={{ justifyContent: 'flex-start' }}><Button onClick={() => setConfirm('undo')}><RotateCcw /> Übernahme rückgängig machen</Button></div> : null}
+                {canWrite ? (d.undoBlockedReason ? <p className="small muted">Rückgängig nicht mehr möglich: {d.undoBlockedReason}</p> : <div className="form-actions" style={{ justifyContent: 'flex-start' }}><Button onClick={() => setConfirm('undo')}><RotateCcw /> Übernahme rückgängig machen</Button></div>) : null}
               </div>
             ) : null}
 
@@ -313,6 +329,7 @@ function ReviewModal({ id, direction, categories, canWrite, onClose }: { id: str
                   <Field label="Brutto (€) *" error={arithmeticOk ? undefined : 'Netto + MwSt. ergibt nicht Brutto'}><Input inputMode="decimal" defaultValue={money(data!.grossCents)} key={`g${data!.grossCents}`} onBlur={(e) => setAmount('grossCents', parseMoney(e.target.value))} /></Field>
                   {direction === 'incoming' ? <Field label="Kategorie"><Select value={category} onChange={(e) => setCategory(e.target.value)}><option value="">automatisch</option>{categories.map((c) => <option key={c}>{c}</option>)}</Select></Field> : null}
                   <label className="check span-2"><input type="checkbox" checked={markPaid} onChange={(e) => setMarkPaid(e.target.checked)} /> Bereits bezahlt</label>
+                  {isDuplicateNoNumber ? <label className="check span-2"><input type="checkbox" checked={allowDuplicate} onChange={(e) => setAllowDuplicate(e.target.checked)} /> Kein Duplikat – es ist ein weiterer, gleicher Beleg (trotzdem erfassen)</label> : null}
                 </div>
                 <Card title={`Positionen (${data!.lines.length})`} tight actions={<Button size="sm" variant="ghost" onClick={() => setField('lines', [...data!.lines, { name: '', description: null, quantity: 1, unit: null, unitNetCents: null, netCents: 0, vatBp: data!.vat[0]?.vatBp ?? null }])}><Plus /> Position</Button>}>
                   {data!.lines.length === 0 ? <p className="small muted" style={{ padding: '4px 14px 12px' }}>Ohne Positionen wird eine Sammelposition über den Nettobetrag angelegt.</p> : (
@@ -320,7 +337,7 @@ function ReviewModal({ id, direction, categories, canWrite, onClose }: { id: str
                       {data!.lines.map((l, i) => (
                         <div key={i} className="import-line">
                           <Input value={l.name} placeholder="Bezeichnung" onChange={(e) => setField('lines', data!.lines.map((x, j) => (j === i ? { ...x, name: e.target.value } : x)))} />
-                          <Input inputMode="decimal" defaultValue={money(l.netCents)} key={`l${i}-${l.netCents}`} placeholder="Netto" onBlur={(e) => setField('lines', data!.lines.map((x, j) => (j === i ? { ...x, netCents: parseMoney(e.target.value) ?? 0, unitNetCents: null, quantity: 1 } : x)))} />
+                          <Input inputMode="decimal" defaultValue={money(l.netCents)} key={`l${i}-${l.netCents}`} placeholder="Netto" onBlur={(e) => { const v = parseMoney(e.target.value) ?? 0; if (v !== l.netCents) setField('lines', data!.lines.map((x, j) => (j === i ? { ...x, netCents: v, unitNetCents: null, quantity: 1 } : x))); }} />
                           <button className="btn ghost icon" type="button" aria-label="Position entfernen" onClick={() => setField('lines', data!.lines.filter((_, j) => j !== i))}><X size={14} /></button>
                         </div>
                       ))}
@@ -331,16 +348,16 @@ function ReviewModal({ id, direction, categories, canWrite, onClose }: { id: str
                 <div className="form-actions" style={{ flexWrap: 'wrap' }}>
                   <Button variant="ghost" onClick={() => setConfirm('discard')}><Trash2 /> Verwerfen</Button>
                   {imp.method !== 'einvoice_cii' && imp.method !== 'einvoice_ubl' ? <Button onClick={() => retry.mutate()} loading={retry.isPending}><RefreshCw /> Erneut auslesen</Button> : null}
-                  <Button variant="primary" onClick={() => apply.mutate()} loading={apply.isPending} disabled={direction === 'outgoing' && customerMode === 'other' && !other}><CheckCircle2 /> Prüfen und übernehmen</Button>
+                  <Button variant="primary" onClick={() => apply.mutate()} loading={apply.isPending} disabled={(direction === 'outgoing' && ((customerMode === 'other' && !other) || (customerMode === 'candidate' && !candidateId))) || (isDuplicateNoNumber && !allowDuplicate)}><CheckCircle2 /> Prüfen und übernehmen</Button>
                 </div>
               </>
             ) : null}
-            {canWrite && imp.status === 'duplicate' ? <div className="form-actions" style={{ justifyContent: 'flex-start' }}><Button variant="ghost" onClick={() => setConfirm('discard')}><Trash2 /> Verwerfen</Button></div> : null}
+            {canWrite && ((imp.status === 'duplicate' && !isDuplicateNoNumber) || (imp.status === 'failed' && !data)) ? <div className="form-actions" style={{ justifyContent: 'flex-start' }}><Button variant="ghost" onClick={() => setConfirm('discard')}><Trash2 /> Verwerfen</Button>{imp.status === 'failed' ? <Button onClick={() => retry.mutate()} loading={retry.isPending}><RefreshCw /> Erneut auslesen</Button> : null}</div> : null}
           </div>
         </div>
       )}
       {confirm === 'discard' ? <Confirm title="Beleg verwerfen?" text="Der Beleg wird nicht übernommen und die hochgeladene Datei gelöscht." confirmLabel="Verwerfen" danger loading={discard.isPending} onConfirm={() => discard.mutate()} onClose={() => setConfirm(null)} /> : null}
-      {confirm === 'undo' ? <Confirm title="Übernahme rückgängig machen?" text={direction === 'outgoing' ? 'Die importierte Rechnung wird entfernt. Ein nur dafür neu angelegter Kunde ohne weitere Daten wird ebenfalls entfernt. Der Beleg bleibt erhalten und kann erneut übernommen werden.' : 'Die erfassten Ausgaben werden entfernt. Der Beleg bleibt erhalten.'} confirmLabel="Rückgängig machen" danger loading={undo.isPending} onConfirm={() => undo.mutate()} onClose={() => setConfirm(null)} /> : null}
+      {confirm === 'undo' ? <Confirm title="Übernahme rückgängig machen?" text={direction === 'outgoing' ? 'Die importierte Rechnung wird entfernt. Ein nur dafür neu angelegter Kunde ohne weitere Daten wird ebenfalls entfernt. Der Beleg bleibt erhalten und steht wieder unter „Prüfen“ – dort korrigieren und erneut übernehmen oder verwerfen.' : 'Die erfassten Ausgaben werden entfernt. Der Beleg bleibt erhalten und steht wieder unter „Prüfen“.'} confirmLabel="Rückgängig machen" danger loading={undo.isPending} onConfirm={() => undo.mutate()} onClose={() => setConfirm(null)} /> : null}
     </Modal>
   );
 }

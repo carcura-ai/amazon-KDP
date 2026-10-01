@@ -12,6 +12,35 @@ export interface XmlNode {
 }
 
 const MAX_XML_BYTES = 5 * 1024 * 1024;
+const MAX_TAG_CHARS = 64 * 1024;
+const MAX_NODES = 200_000;
+
+/** Element-Name und Attribute in einem linearen Durchlauf (kein Regex-Backtracking). */
+function parseTag(body: string): { name: string; attrs: Record<string, string> } {
+  let i = 0;
+  const n = body.length;
+  const isWs = (c: string | undefined) => c === ' ' || c === '\t' || c === '\n' || c === '\r';
+  while (i < n && !isWs(body[i])) i++;
+  const name = body.slice(0, i);
+  const attrs: Record<string, string> = {};
+  while (i < n) {
+    while (i < n && isWs(body[i])) i++;
+    const ks = i;
+    while (i < n && body[i] !== '=' && !isWs(body[i])) i++;
+    const key = body.slice(ks, i);
+    while (i < n && isWs(body[i])) i++;
+    if (body[i] !== '=') { if (!key) break; continue; }
+    i++;
+    while (i < n && isWs(body[i])) i++;
+    const q = body[i];
+    if (q !== '"' && q !== "'") break;
+    const end = body.indexOf(q, i + 1);
+    if (end < 0) throw new Error('XML-Attribut nicht geschlossen.');
+    if (key) attrs[local(key)] = decodeEntities(body.slice(i + 1, end));
+    i = end + 1;
+  }
+  return { name, attrs };
+}
 
 function decodeEntities(s: string): string {
   return s.replace(/&(#x[0-9a-fA-F]+|#\d+|amp|lt|gt|quot|apos);/g, (_m, e: string) => {
@@ -34,6 +63,7 @@ export function parseXml(input: string): XmlNode {
   const root: XmlNode = { name: '#root', attrs: {}, children: [], text: '' };
   const stack: XmlNode[] = [root];
   let i = 0;
+  let count = 0;
   while (i < src.length) {
     const lt = src.indexOf('<', i);
     if (lt < 0) break;
@@ -51,13 +81,13 @@ export function parseXml(input: string): XmlNode {
       i = gt + 1;
       continue;
     }
+    if (raw.length > MAX_TAG_CHARS) throw new Error('XML-Element zu groß.');
     const selfClosing = raw.endsWith('/');
-    const body = selfClosing ? raw.slice(0, -1) : raw;
-    const m = /^([^\s]+)([\s\S]*)$/.exec(body.trim());
-    if (!m) throw new Error('XML-Element ohne Namen.');
-    const attrs: Record<string, string> = {};
-    for (const a of m[2]!.matchAll(/([^\s=]+)\s*=\s*("([^"]*)"|'([^']*)')/g)) attrs[local(a[1]!)] = decodeEntities(a[3] ?? a[4] ?? '');
-    const node: XmlNode = { name: local(m[1]!), attrs, children: [], text: '' };
+    const body = (selfClosing ? raw.slice(0, -1) : raw).trim();
+    const { name, attrs } = parseTag(body);
+    if (!name) throw new Error('XML-Element ohne Namen.');
+    const node: XmlNode = { name: local(name), attrs, children: [], text: '' };
+    if (++count > MAX_NODES) throw new Error('XML enthält zu viele Elemente.');
     stack[stack.length - 1]!.children.push(node);
     if (!selfClosing) stack.push(node);
     if (stack.length > 200) throw new Error('XML zu tief verschachtelt.');

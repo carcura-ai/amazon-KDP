@@ -40,15 +40,20 @@ export const normalizedInvoiceSchema = z.object({
   vat: z.array(z.object({ vatBp: z.number().int().min(0).max(10000), netCents: cents, vatCents: cents })).max(20),
   netCents: cents.nullable(), vatCents: cents.nullable(), grossCents: cents.nullable(), prepaidCents: cents.nullable(), dueCents: cents.nullable(),
   paymentTerms: z.string().trim().max(1000).nullable(), paid: z.boolean().nullable(), notes: z.string().trim().max(5000).nullable(), suggestedCategory: z.string().trim().max(80).nullable(),
+  referencedNumber: z.string().trim().max(80).nullable().optional(),
 });
 
 /* ------------------------------------------------------------------ Hilfen: Namen, Anschrift, eigene Firma */
-const LEGAL_FORM = /\b(gmbh|mbh|ug|ag|kg|ohg|gbr|e\.?\s?k\.?|e\.?\s?v\.?|ltd|inc|se|kgaa|partg|gmbh\s*&\s*co|& co|autohaus|werkstatt|kfz|service|handel|logistik|holding|gruppe|stiftung|verein|stadt|gemeinde|versicherung)\b/i;
+/** Rechtsformen – werden für den Firmenvergleich entfernt (alle Vorkommen). */
+const LEGAL_FORMS = /(^|\s)(gmbh\s*&\s*co\.?\s*kg|gmbh|mbh|ug(\s*\(haftungsbeschränkt\))?|ag|kg|ohg|gbr|e\.\s?k\.?|e\.\s?v\.?|ltd\.?|inc\.?|se|kgaa|partg)(?=\s|$|[.,])/gi;
+/** Hinweise auf ein Unternehmen (nur zur Erkennung, nicht zum Entfernen). */
+const COMPANY_HINT = /\b(gmbh|mbh|ug|ag|kg|ohg|gbr|e\.\s?k|e\.\s?v|ltd|inc|kgaa|partg|autohaus|autohandel|werkstatt|kfz|service|handel|logistik|holding|gruppe|stiftung|verein|stadt|gemeinde|versicherung|leasing)\b/i;
+const companyKey = (name: string | null | undefined) => normalizeName((name ?? '').replace(LEGAL_FORMS, ' '));
 
 export function isCompanyParty(p: InvoiceParty): boolean {
   if (p.companyName) return true;
   if (!p.name) return false;
-  if (LEGAL_FORM.test(p.name)) return true;
+  if (COMPANY_HINT.test(p.name)) return true;
   // Firma mit zusätzlichem Ansprechpartner
   return Boolean(p.personName && normalizeName(p.personName) !== normalizeName(p.name));
 }
@@ -77,7 +82,33 @@ function isOwnCompany(p: InvoiceParty, company: Company): boolean {
   const n = normalizeName(p.name);
   const own = normalizeName(company.legalName ?? company.name);
   const short = normalizeName(company.name);
-  return Boolean(n && ((own && n.includes(own)) || (short.length >= 4 && n.includes(short))));
+  return Boolean(n && ((own.length >= 4 && n.includes(own)) || (short.length >= 4 && n.includes(short))));
+}
+
+/* ------------------------------------------------------------------ Steueraufteilung */
+const STANDARD_RATES = [1900, 700, 0];
+/** Steuersatz aus Netto/MwSt. – nur wenn er einem üblichen deutschen Satz entspricht (sonst null). */
+export function standardRate(net: number | null, vat: number | null): number | null {
+  if (net === null || vat === null) return null;
+  if (net === 0) return vat === 0 ? 0 : null;
+  for (const bp of STANDARD_RATES) if (Math.abs(Math.round((Math.abs(net) * bp) / 10000) - Math.abs(vat)) <= 2) return bp;
+  return null;
+}
+export interface VatGroup { vatBp: number; net: number; vat: number }
+/** Aufteilung je Steuersatz, abgeglichen mit den Gesamtbeträgen. problem ≠ null → nicht automatisch buchen. */
+export function vatGroups(inv: NormalizedInvoice): { groups: VatGroup[]; problem: string | null } {
+  const net = inv.netCents ?? (inv.grossCents !== null ? inv.grossCents - (inv.vatCents ?? 0) : null);
+  const vat = inv.vatCents ?? (inv.vat.length ? inv.vat.reduce((s, v) => s + v.vatCents, 0) : net !== null && inv.grossCents !== null ? inv.grossCents - net : 0);
+  if (inv.vat.length) {
+    const tol = 2 * inv.vat.length;
+    const sNet = inv.vat.reduce((s, v) => s + v.netCents, 0);
+    const sVat = inv.vat.reduce((s, v) => s + v.vatCents, 0);
+    if ((net === null || Math.abs(sNet - net) <= tol) && Math.abs(sVat - vat) <= tol) return { groups: inv.vat.filter((v) => v.netCents !== 0 || v.vatCents !== 0).map((v) => ({ vatBp: v.vatBp, net: v.netCents, vat: v.vatCents })), problem: null };
+    if (inv.vat.length > 1) return { groups: [], problem: 'Die Aufteilung nach Steuersätzen passt nicht zu den Gesamtbeträgen – bitte prüfen.' };
+  }
+  const bp = standardRate(net, vat);
+  if (net === null || bp === null) return { groups: [], problem: 'Steuersatz nicht eindeutig (kein üblicher Satz von 19 %, 7 % oder 0 %) – bitte Beträge prüfen.' };
+  return { groups: [{ vatBp: bp, net, vat }], problem: null };
 }
 
 /* ------------------------------------------------------------------ Plausibilitätsprüfung */
@@ -104,8 +135,11 @@ export function checkInvoice(inv: NormalizedInvoice, direction: ImportDirection,
     // Rabatte/Zuschläge auf Belegebene können die Positionssumme vom Netto abweichen lassen
     if (inv.netCents !== null && Math.abs(sumLines - inv.netCents) > tolerance) warnings.push(`Summe der Positionen (${eur(sumLines)}) weicht vom Nettobetrag (${eur(inv.netCents)}) ab – Rabatte/Zuschläge? Übernommen wird der Rechnungsbetrag.`);
   } else warnings.push('Keine Einzelpositionen erkannt – es wird eine Sammelposition angelegt.');
-  if (inv.vat.length > 1 && direction === 'incoming') warnings.push('Mehrere Steuersätze – die Ausgabe wird je Steuersatz aufgeteilt.');
+  const vg = vatGroups(inv);
+  if (vg.problem && inv.grossCents !== null) blocking.push(vg.problem);
+  if (vg.groups.length > 1 && direction === 'incoming') warnings.push('Mehrere Steuersätze – die Ausgabe wird je Steuersatz aufgeteilt.');
   if (inv.kind === 'credit_note') warnings.push('Gutschrift erkannt – Beträge werden negativ gebucht.');
+  if (inv.kind === 'correction') blocking.push('Rechnungskorrektur erkannt – ersetzt sie eine frühere Rechnung, diese bitte zuerst stornieren bzw. als storniert kennzeichnen. Danach übernehmen.');
   if (inv.issueDate && inv.issueDate > new Date(Date.now() + 86_400_000).toISOString().slice(0, 10)) blocking.push('Rechnungsdatum liegt in der Zukunft – bitte prüfen.');
   return { blocking, warnings };
 }
@@ -114,14 +148,20 @@ const eur = (c: number) => `${(c / 100).toFixed(2).replace('.', ',')} €`;
 
 /* ------------------------------------------------------------------ Kundenabgleich */
 export interface CustomerCandidate { id: string; customerNumber: string; label: string; score: number; reasons: string[] }
-export interface CustomerMatch { decision: 'matched' | 'new' | 'ambiguous'; customerId: string | null; candidates: CustomerCandidate[] }
+/**
+ * matched = eindeutig und durch ein starkes Merkmal gestützt (E-Mail, Telefon oder Name/Firma plus Anschrift);
+ * uncertain = wahrscheinlich, aber nur über den Namen → Vorschlag, Prüfung durch den Nutzer;
+ * ambiguous = mehrere gleich gute Treffer; new = kein passender Kunde.
+ */
+export interface CustomerMatch { decision: 'matched' | 'uncertain' | 'ambiguous' | 'new'; customerId: string | null; suggestedId: string | null; candidates: CustomerCandidate[] }
 
 export function matchCustomer(app: FastifyInstance, companyId: string, buyer: InvoiceParty): CustomerMatch {
   const email = normalizeEmail(buyer.email);
   const phone = normalizePhone(buyer.phone);
   const business = isCompanyParty(buyer);
-  const person = splitPersonName(business ? buyer.personName : buyer.personName ?? buyer.name);
-  const companyKey = business ? normalizeName((buyer.companyName ?? buyer.name ?? '').replace(LEGAL_FORM, '')) : '';
+  // Bei Firmen zählt die Firma – der Ansprechpartner allein ordnet nie einem (Privat-)Kunden zu
+  const person = splitPersonName(business ? null : buyer.personName ?? buyer.name);
+  const cKey = business ? companyKey(buyer.companyName ?? buyer.name) : '';
   const first = normalizeName(person.firstName);
   const last = normalizeName(person.lastName);
   const zip = buyer.zip?.trim() || null;
@@ -129,34 +169,40 @@ export function matchCustomer(app: FastifyInstance, companyId: string, buyer: In
   const conds = [];
   if (email) conds.push(eq(customers.normalizedEmail, email));
   if (phone) conds.push(eq(customers.normalizedPhone, phone));
-  if (last) conds.push(sql`lower(${customers.lastName}) = ${person.lastName.toLowerCase()}`);
-  if (companyKey) conds.push(sql`${customers.companyName} is not null`);
-  if (conds.length === 0) return { decision: 'new', customerId: null, candidates: [] };
+  if (last.length >= 2) conds.push(sql`lower(${customers.lastName}) = ${person.lastName.toLowerCase()}`);
+  if (cKey.length >= 3) conds.push(sql`${customers.companyName} is not null`);
+  const none: CustomerMatch = { decision: 'new', customerId: null, suggestedId: null, candidates: [] };
+  if (conds.length === 0) return none;
   const rows = app.db.select().from(customers).where(and(eq(customers.companyId, companyId), sql`${customers.anonymizedAt} is null`, sql`(${sql.join(conds, sql` or `)})`)).limit(500).all();
-  const scored: CustomerCandidate[] = [];
+  const scored: Array<CustomerCandidate & { strong: boolean }> = [];
   for (const c of rows) {
     let score = 0;
     const reasons: string[] = [];
-    if (email && c.normalizedEmail === email) { score += 100; reasons.push('E-Mail'); }
-    if (phone && c.normalizedPhone === phone) { score += 60; reasons.push('Telefon'); }
-    if (companyKey && c.companyName && normalizeName(c.companyName.replace(LEGAL_FORM, '')) === companyKey) { score += 50; reasons.push('Firmenname'); }
-    if (last && normalizeName(c.lastName) === last && (!first || !c.firstName || normalizeName(c.firstName) === first)) { score += first && c.firstName ? 40 : 25; reasons.push('Name'); }
+    let strong = false;
+    if (email && c.normalizedEmail === email) { score += 100; reasons.push('E-Mail'); strong = true; }
+    if (phone && c.normalizedPhone === phone) { score += 60; reasons.push('Telefon'); strong = true; }
+    const nameHit = business
+      ? Boolean(cKey.length >= 3 && c.companyName && companyKey(c.companyName) === cKey)
+      : Boolean(last && first && normalizeName(c.lastName) === last && normalizeName(c.firstName) === first && !c.companyName);
+    if (nameHit) { score += business ? 50 : 40; reasons.push(business ? 'Firmenname' : 'Name'); }
     if (score === 0) continue;
-    if (zip && c.zip) { if (c.zip.trim() === zip) { score += 20; reasons.push('PLZ'); } else score -= 45; }
-    if (street && c.street && normalizeName(c.street) === street) { score += 15; reasons.push('Straße'); }
-    scored.push({ id: c.id, customerNumber: c.customerNumber, label: `${c.customerNumber} · ${c.companyName ? `${c.companyName} · ` : ''}${`${c.firstName} ${c.lastName}`.trim()}${c.city ? ` · ${c.zip ?? ''} ${c.city}` : ''}`.trim(), score, reasons });
+    if (zip && c.zip) { if (c.zip.trim() === zip) { score += 20; reasons.push('PLZ'); if (nameHit) strong = true; } else score -= 45; }
+    if (street && c.street && normalizeName(c.street) === street) { score += 15; reasons.push('Straße'); if (nameHit) strong = true; }
+    scored.push({ id: c.id, customerNumber: c.customerNumber, label: `${c.customerNumber} · ${c.companyName ? `${c.companyName} · ` : ''}${`${c.firstName} ${c.lastName}`.trim()}${c.city ? ` · ${c.zip ?? ''} ${c.city}` : ''}`.trim(), score, reasons, strong });
   }
   scored.sort((a, b) => b.score - a.score);
-  const candidates = scored.filter((c) => c.score > 0).slice(0, 5);
-  const best = candidates[0];
-  if (!best || best.score < 40) return { decision: 'new', customerId: null, candidates };
-  const second = candidates[1];
-  if (second && second.score >= best.score - 20) return { decision: 'ambiguous', customerId: null, candidates };
-  return { decision: 'matched', customerId: best.id, candidates };
+  const top = scored.filter((c) => c.score >= 25).slice(0, 5);
+  const candidates = top.map(({ strong: _s, ...c }) => c);
+  const best = top[0];
+  if (!best || best.score < 40) return { ...none, candidates };
+  const second = top[1];
+  if (second && second.score >= best.score - 20) return { decision: 'ambiguous', customerId: null, suggestedId: null, candidates };
+  if (!best.strong) return { decision: 'uncertain', customerId: null, suggestedId: best.id, candidates };
+  return { decision: 'matched', customerId: best.id, suggestedId: best.id, candidates };
 }
 
 /* ------------------------------------------------------------------ Anwenden: Ausgangsrechnung → Kunde + Rechnung */
-export interface ApplyChoice { customerId?: string | null; createCustomer?: boolean; category?: string | null; markPaid?: boolean }
+export interface ApplyChoice { customerId?: string | null; createCustomer?: boolean; category?: string | null; markPaid?: boolean; allowDuplicate?: boolean }
 export interface ApplyResult { status: 'completed' | 'duplicate' | 'needs_review'; message?: string; invoiceId?: string; customerId?: string; customerCreated?: boolean; expenseIds?: string[]; warnings?: string[] }
 
 const sign = (inv: NormalizedInvoice) => (inv.kind === 'credit_note' ? -1 : 1);
@@ -164,7 +210,8 @@ const sign = (inv: NormalizedInvoice) => (inv.kind === 'credit_note' ? -1 : 1);
 const signed = (inv: NormalizedInvoice, v: number) => (sign(inv) < 0 && v > 0 ? -v : v);
 
 function itemRowsFrom(inv: NormalizedInvoice, companyId: string, invoiceId: string) {
-  const lines = inv.lines.length ? inv.lines : [{ name: inv.kind === 'credit_note' ? 'Gutschrift' : 'Rechnungsbetrag', description: null, quantity: 1, unit: null, unitNetCents: inv.netCents, netCents: inv.netCents ?? (inv.grossCents ?? 0) - (inv.vatCents ?? 0), vatBp: inv.vat[0]?.vatBp ?? null }];
+  const fallbackBp = vatGroups(inv).groups[0]?.vatBp ?? null;
+  const lines = inv.lines.length ? inv.lines : [{ name: inv.kind === 'credit_note' ? 'Gutschrift' : 'Rechnungsbetrag', description: null, quantity: 1, unit: null, unitNetCents: inv.netCents, netCents: inv.netCents ?? (inv.grossCents ?? 0) - (inv.vatCents ?? 0), vatBp: fallbackBp }];
   return lines.map((l, i) => {
     const net = signed(inv, l.netCents);
     // Mengen sind in der Software ganzzahlig; Bruchmengen (z. B. 1,5 Std.) werden als 1 × Zeilensumme mit Angabe übernommen
@@ -173,7 +220,7 @@ function itemRowsFrom(inv: NormalizedInvoice, companyId: string, invoiceId: stri
     return {
       id: newId(), companyId, invoiceId, serviceId: null, name: l.name.slice(0, 200),
       description: [l.description, qtyNote].filter(Boolean).join('\n').slice(0, 1000) || null,
-      quantity: intQty ? l.quantity : 1, unitPriceCents: intQty ? signed(inv, l.unitNetCents!) : net, vatBp: l.vatBp ?? inv.vat[0]?.vatBp ?? 0, totalCents: net, sortOrder: i,
+      quantity: intQty ? l.quantity : 1, unitPriceCents: intQty ? signed(inv, l.unitNetCents!) : net, vatBp: l.vatBp ?? fallbackBp ?? 0, totalCents: net, sortOrder: i,
     };
   });
 }
@@ -192,7 +239,6 @@ function fillCustomerGaps(app: FastifyInstance, companyId: string, customerId: s
     Object.assign(patch, { street: s.street, houseNumber: s.houseNumber, zip: buyer.zip, city: buyer.city });
     filled.push('Anschrift');
   }
-  if (!c.companyName && isCompanyParty(buyer) && (buyer.companyName ?? buyer.name)) { patch.companyName = (buyer.companyName ?? buyer.name)!.slice(0, 160); patch.type = 'business'; filled.push('Firmenname'); }
   if (filled.length) app.db.update(customers).set({ ...patch, updatedAt: nowIso() }).where(eq(customers.id, customerId)).run();
   return filled;
 }
@@ -233,8 +279,8 @@ function applyOutgoing(app: FastifyInstance, row: ImportRow, inv: NormalizedInvo
   } else if (!choice.createCustomer) {
     const match = matchCustomer(app, companyId, inv.buyer);
     if (match.decision === 'ambiguous') return { status: 'needs_review', message: 'Mehrere passende Kunden gefunden – bitte den richtigen Kunden auswählen.' };
+    if (match.decision === 'uncertain') return { status: 'needs_review', message: `Wahrscheinlich bestehender Kunde (${match.candidates[0]?.label ?? ''}), aber nur über den Namen erkannt – bitte bestätigen oder neuen Kunden anlegen.` };
     customerId = match.customerId;
-    if (customerId) { const c = match.candidates[0]!; if (!c.reasons.some((r) => r === 'E-Mail' || r === 'Telefon' || r === 'PLZ')) warnings.push(`Kunde nur über ${c.reasons.join(', ')} zugeordnet – bitte kurz prüfen.`); }
   }
   const result = app.db.transaction(() => {
     if (!customerId) { customerId = createCustomerFrom(app, company, inv.buyer, row.createdByUserId); customerCreated = true; }
@@ -247,21 +293,28 @@ function applyOutgoing(app: FastifyInstance, row: ImportRow, inv: NormalizedInvo
     const markPaid = choice.markPaid === true || inv.paid === true || (inv.dueCents !== null && inv.dueCents === 0 && gross !== 0);
     const paidCents = markPaid ? gross : prepaid;
     const status = markPaid || gross <= 0 ? 'paid' : inv.dueDate && inv.dueDate < new Date().toISOString().slice(0, 10) ? 'overdue' : 'open';
+    // Vollständige Stornorechnung/Gutschrift zu einer vorhandenen Rechnung: verknüpfen (beide zählen dann nicht zum Umsatz)
+    const original = inv.kind === 'credit_note' && inv.referencedNumber ? app.db.select().from(invoices).where(and(eq(invoices.companyId, companyId), eq(invoices.invoiceNumber, inv.referencedNumber), sql`${invoices.cancelledByInvoiceId} is null`, sql`${invoices.cancelsInvoiceId} is null`)).get() : undefined;
+    const linksOriginal = Boolean(original && Math.abs(original.totalCents) === Math.abs(gross) && original.customerId === customerId);
     app.db.insert(invoices).values({
       id: invoiceId, companyId, invoiceNumber: inv.number, customerId, status,
       title: `${inv.kind === 'credit_note' ? 'Gutschrift' : inv.kind === 'correction' ? 'Rechnungskorrektur' : 'Rechnung'} ${inv.number} (importiert)`,
       notes: [inv.paymentTerms, inv.notes].filter(Boolean).join('\n').slice(0, 3000) || null,
       issueDate: inv.issueDate, serviceDate: inv.serviceDate ?? inv.issueDate, dueDate: inv.dueDate ?? inv.issueDate,
-      subtotalCents: net, vatCents: vat, totalCents: gross, paidCents, paidAt: markPaid ? nowIso() : null,
+      subtotalCents: net, vatCents: vat, totalCents: gross, paidCents, paidAt: markPaid ? `${inv.issueDate}T00:00:00.000Z` : null,
       issuedAt: `${inv.issueDate}T00:00:00.000Z`, pdfFileId: row.fileId, source: 'import', importId: row.id, createdByUserId: row.createdByUserId,
+      cancelsInvoiceId: linksOriginal ? original!.id : null,
     }).run();
+    if (linksOriginal) app.db.update(invoices).set({ status: 'cancelled', cancelledByInvoiceId: invoiceId, updatedAt: nowIso() }).where(eq(invoices.id, original!.id)).run();
     for (const it of itemRowsFrom(inv, companyId, invoiceId)) app.db.insert(invoiceItems).values(it).run();
     if (paidCents > 0) app.db.insert(payments).values({ id: newId(), companyId, invoiceId, amountCents: paidCents, paidAt: inv.issueDate!, method: 'other', note: markPaid ? 'Beim Import als bezahlt übernommen' : 'Anzahlung laut Rechnung', createdByUserId: row.createdByUserId }).run();
     if (row.fileId) app.db.update(files).set({ customerId, category: 'invoice', caption: `Rechnung ${inv.number} (importiert)` }).where(and(eq(files.id, row.fileId), eq(files.companyId, companyId))).run();
     logActivity(app.db, companyId, { customerId, userId: row.createdByUserId, type: 'invoice', subject: `Rechnung ${inv.number} importiert`, content: `${eur(gross)}${filled.length ? ` · ergänzt: ${filled.join(', ')}` : ''}`, refType: 'invoice', refId: invoiceId });
-    return { invoiceId, filled };
+    return { invoiceId, filled, markPaid, linked: linksOriginal ? original!.invoiceNumber : null };
   });
   if (result.filled.length) warnings.push(`Kundendaten ergänzt: ${result.filled.join(', ')}.`);
+  if (result.markPaid) warnings.push('Als bezahlt übernommen; Zahlungsdatum = Rechnungsdatum (bei Bedarf in der Rechnung anpassen).');
+  if (result.linked) warnings.push(`Storniert Rechnung ${result.linked} (verknüpft).`);
   writeAudit(app.db, { companyId, userId: row.createdByUserId }, { action: 'import.invoice', entityType: 'invoice', entityId: result.invoiceId, after: { number: inv.number, customerId, customerCreated, importId: row.id } });
   return { status: 'completed', invoiceId: result.invoiceId, customerId: customerId!, customerCreated, warnings };
 }
@@ -299,14 +352,17 @@ function applyIncoming(app: FastifyInstance, row: ImportRow, inv: NormalizedInvo
   const candidates = app.db.select({ id: expenses.id, vendor: expenses.vendor, documentNumber: expenses.documentNumber, date: expenses.date, grossCents: expenses.grossCents, importId: expenses.importId }).from(expenses)
     .where(and(eq(expenses.companyId, companyId), inv.number ? eq(expenses.documentNumber, inv.number) : and(eq(expenses.date, inv.issueDate!), eq(expenses.grossCents, gross)))).all();
   const dup = candidates.find((c) => normalizeName(c.vendor) === vendorKey && c.importId !== row.id);
-  if (dup) return { status: 'duplicate', message: inv.number ? `Rechnung ${inv.number} von ${vendor} ist bereits erfasst.` : `Ein Beleg von ${vendor} über ${eur(gross)} am ${inv.issueDate} ist bereits erfasst.` };
+  // Belege ohne Nummer (z. B. zwei gleiche Kassenbons am selben Tag) dürfen nach Bestätigung trotzdem erfasst werden
+  if (dup && !(choice.allowDuplicate && !inv.number)) return { status: 'duplicate', message: inv.number ? `Rechnung ${inv.number} von ${vendor} ist bereits erfasst.` : `Ein Beleg von ${vendor} über ${eur(gross)} am ${inv.issueDate} ist bereits erfasst.` };
 
   const category = categoryFor(inv, choice.category);
   const items = inv.lines.slice(0, 3).map((l) => l.name).join(', ');
   const baseDesc = `${inv.kind === 'credit_note' ? 'Gutschrift' : 'Rechnung'}${inv.number ? ` ${inv.number}` : ''}${items ? `: ${items}${inv.lines.length > 3 ? ' …' : ''}` : ''}`;
   const markPaid = choice.markPaid === true || inv.paid === true;
   // Je Steuersatz eine Ausgabe (Vorsteuer korrekt getrennt); ohne Aufteilung eine Ausgabe aus den Summen
-  const groups = inv.vat.length ? inv.vat.map((v) => ({ vatBp: v.vatBp, net: v.netCents, vat: v.vatCents })) : [{ vatBp: inv.netCents && inv.vatCents ? Math.round((inv.vatCents * 10000) / inv.netCents / 100) * 100 : 0, net: inv.netCents ?? inv.grossCents! - (inv.vatCents ?? 0), vat: inv.vatCents ?? 0 }];
+  const vg = vatGroups(inv);
+  if (vg.problem) return { status: 'needs_review', message: vg.problem };
+  const groups = vg.groups;
   const ids = app.db.transaction(() => groups.map((g) => {
     const id = newId();
     app.db.insert(expenses).values({
@@ -330,33 +386,62 @@ export function applyImport(app: FastifyInstance, row: ImportRow, inv: Normalize
 }
 
 /* ------------------------------------------------------------------ Rückgängig machen */
+const IMPORT_PAYMENT_NOTES = ['Beim Import als bezahlt übernommen', 'Anzahlung laut Rechnung'];
+const IMPORT_ACTIVITY_SUBJECTS = ['Kunde aus importierter Rechnung angelegt'];
+
+/** Grund, warum eine Übernahme nicht mehr zurückgenommen werden darf (null = möglich). */
+export function undoBlocker(app: FastifyInstance, row: ImportRow): string | null {
+  if (!row.invoiceId) return null;
+  const inv = app.db.select().from(invoices).where(and(eq(invoices.id, row.invoiceId), eq(invoices.companyId, row.companyId))).get();
+  if (!inv) return null;
+  if (inv.sentAt) return 'Die Rechnung wurde bereits aus dieser Software versendet.';
+  if (inv.status === 'cancelled' || inv.cancelledByInvoiceId || inv.cancelsInvoiceId) return 'Die Rechnung ist mit einem Storno verknüpft bzw. als storniert gekennzeichnet.';
+  const manual = app.db.select({ note: payments.note }).from(payments).where(eq(payments.invoiceId, inv.id)).all().filter((p) => !IMPORT_PAYMENT_NOTES.includes(p.note ?? ''));
+  if (manual.length) return 'Zu dieser Rechnung wurden bereits Zahlungen erfasst – bitte zuerst entfernen.';
+  return null;
+}
+
 export function undoImport(app: FastifyInstance, row: ImportRow, userId: string): { invoiceRemoved: boolean; customerRemoved: boolean; expensesRemoved: number } {
   const companyId = row.companyId;
   let invoiceRemoved = false; let customerRemoved = false; let expensesRemoved = 0;
   app.db.transaction(() => {
     if (row.invoiceId) {
-      const inv = app.db.select().from(invoices).where(and(eq(invoices.id, row.invoiceId), eq(invoices.companyId, companyId), eq(invoices.source, 'import'))).get();
+      const inv = app.db.select().from(invoices).where(and(eq(invoices.id, row.invoiceId), eq(invoices.companyId, companyId), eq(invoices.source, 'import'), eq(invoices.importId, row.id))).get();
       if (inv) {
-        app.db.delete(payments).where(eq(payments.invoiceId, inv.id)).run();
+        app.db.delete(payments).where(and(eq(payments.invoiceId, inv.id), inArray(payments.note, IMPORT_PAYMENT_NOTES))).run();
         app.db.delete(invoiceItems).where(eq(invoiceItems.invoiceId, inv.id)).run();
+        app.db.run(sql`delete from activities where company_id = ${companyId} and ref_type = 'invoice' and ref_id = ${inv.id}`);
         app.db.delete(invoices).where(eq(invoices.id, inv.id)).run();
         invoiceRemoved = true;
       }
     }
     if (row.customerCreated && row.customerId) {
       const cid = row.customerId;
-      const used = app.db.get<{ n: number }>(sql`select (select count(*) from invoices where company_id = ${companyId} and customer_id = ${cid}) + (select count(*) from offers where company_id = ${companyId} and customer_id = ${cid}) + (select count(*) from orders where company_id = ${companyId} and customer_id = ${cid}) + (select count(*) from vehicles where company_id = ${companyId} and customer_id = ${cid}) + (select count(*) from appointments where company_id = ${companyId} and customer_id = ${cid}) + (select count(*) from document_imports where company_id = ${companyId} and customer_id = ${cid} and id != ${row.id} and status = 'completed') as n`)?.n ?? 0;
+      // Kunde nur entfernen, wenn es außer dieser Übernahme nichts zu ihm gibt
+      const used = app.db.get<{ n: number }>(sql`select
+        (select count(*) from invoices where company_id = ${companyId} and customer_id = ${cid})
+      + (select count(*) from offers where company_id = ${companyId} and customer_id = ${cid})
+      + (select count(*) from orders where company_id = ${companyId} and customer_id = ${cid})
+      + (select count(*) from vehicles where company_id = ${companyId} and customer_id = ${cid})
+      + (select count(*) from appointments where company_id = ${companyId} and customer_id = ${cid})
+      + (select count(*) from tasks where company_id = ${companyId} and customer_id = ${cid})
+      + (select count(*) from leads where company_id = ${companyId} and customer_id = ${cid})
+      + (select count(*) from protocols where company_id = ${companyId} and customer_id = ${cid})
+      + (select count(*) from files where company_id = ${companyId} and customer_id = ${cid} and id != ${row.fileId ?? ''})
+      + (select count(*) from document_imports where company_id = ${companyId} and customer_id = ${cid} and id != ${row.id})
+      + (select count(*) from activities where company_id = ${companyId} and customer_id = ${cid} and coalesce(subject, '') not in (${sql.join(IMPORT_ACTIVITY_SUBJECTS.map((x) => sql`${x}`), sql`, `)}))
+      as n`)?.n ?? 0;
       if (used === 0) {
         app.db.run(sql`delete from activities where company_id = ${companyId} and customer_id = ${cid}`);
-        app.db.update(files).set({ customerId: null }).where(and(eq(files.companyId, companyId), eq(files.customerId, cid))).run();
         app.db.delete(customers).where(and(eq(customers.id, cid), eq(customers.companyId, companyId))).run();
         customerRemoved = true;
       }
     }
     const expIds = JSON.parse(row.expenseIdsJson || '[]') as string[];
     if (expIds.length) expensesRemoved = app.db.delete(expenses).where(and(eq(expenses.companyId, companyId), inArray(expenses.id, expIds), eq(expenses.importId, row.id))).run().changes;
-    if (row.fileId && !customerRemoved) app.db.update(files).set({ customerId: null }).where(and(eq(files.id, row.fileId), eq(files.companyId, companyId))).run();
-    app.db.update(documentImports).set({ status: 'undone', invoiceId: null, customerId: null, customerCreated: false, expenseIdsJson: '[]', updatedAt: nowIso() }).where(eq(documentImports.id, row.id)).run();
+    if (row.fileId) app.db.update(files).set({ customerId: null }).where(and(eq(files.id, row.fileId), eq(files.companyId, companyId))).run();
+    // Zurück in die Prüfung: Daten bleiben erhalten, erneute Übernahme oder Verwerfen möglich
+    app.db.update(documentImports).set({ status: 'needs_review', error: 'Übernahme zurückgenommen – Daten prüfen und erneut übernehmen oder verwerfen.', invoiceId: null, customerId: null, customerCreated: false, expenseIdsJson: '[]', appliedAt: null, updatedAt: nowIso() }).where(eq(documentImports.id, row.id)).run();
   });
   writeAudit(app.db, { companyId, userId }, { action: 'import.undo', entityType: 'document_import', entityId: row.id, after: { invoiceRemoved, customerRemoved, expensesRemoved } });
   return { invoiceRemoved, customerRemoved, expensesRemoved };
@@ -387,22 +472,35 @@ export async function readDocument(app: FastifyInstance, row: ImportRow): Promis
     return { method: 'ai', invoice: normalizeExtraction(r.extraction), aiModel: r.model, aiIssues: r.extraction.issues, aiConfidence: r.extraction.confidence, notInvoice: r.extraction.document_type === 'not_an_invoice' };
   } catch (err) {
     if (err instanceof DocumentRecognitionError) throw new ManualEntryRequired(err.message);
+    const status = typeof err === 'object' && err && 'status' in err ? Number((err as { status?: number }).status) : 0;
+    if (status === 400 || status === 413 || status === 422) throw new ManualEntryRequired('Die KI konnte diesen Beleg nicht verarbeiten (z. B. verschlüsselte, beschädigte oder sehr umfangreiche Datei). Bitte die Daten manuell erfassen.');
     throw err;
   }
 }
 
 /** Leeres Datenmodell für die manuelle Erfassung. */
 export function emptyInvoice(): NormalizedInvoice {
-  return { kind: 'invoice', number: null, issueDate: null, dueDate: null, serviceDate: null, currency: 'EUR', seller: emptyParty(), buyer: emptyParty(), lines: [], vat: [], netCents: null, vatCents: null, grossCents: null, prepaidCents: null, dueCents: null, paymentTerms: null, paid: null, notes: null, suggestedCategory: null };
+  return { kind: 'invoice', number: null, issueDate: null, dueDate: null, serviceDate: null, currency: 'EUR', seller: emptyParty(), buyer: emptyParty(), lines: [], vat: [], netCents: null, vatCents: null, grossCents: null, prepaidCents: null, dueCents: null, paymentTerms: null, paid: null, notes: null, suggestedCategory: null, referencedNumber: null };
 }
 
 /* ------------------------------------------------------------------ Verarbeitung eines Imports (Warteschlange) */
 export async function processImport(app: FastifyInstance, id: string): Promise<void> {
   const row = app.db.select().from(documentImports).where(eq(documentImports.id, id)).get();
   if (!row || (row.status !== 'queued' && row.status !== 'processing')) return;
-  app.db.update(documentImports).set({ status: 'processing', updatedAt: nowIso() }).where(eq(documentImports.id, id)).run();
-  const options = JSON.parse(row.optionsJson || '{}') as ImportOptions;
   const set = (patch: Partial<typeof documentImports.$inferInsert>) => app.db.update(documentImports).set({ ...patch, updatedAt: nowIso() }).where(eq(documentImports.id, id)).run();
+  try {
+    set({ status: 'processing' });
+    await processRow(app, row, set);
+  } catch (err) {
+    // Kein Beleg darf in „wird gelesen“ hängen bleiben
+    app.log.error({ importId: id, err }, 'Belegimport: unerwarteter Fehler');
+    set({ status: 'failed', error: `Verarbeitung fehlgeschlagen: ${describeError(err)}`, processedAt: nowIso() });
+  }
+}
+
+async function processRow(app: FastifyInstance, row: ImportRow, set: (patch: Partial<typeof documentImports.$inferInsert>) => unknown): Promise<void> {
+  const id = row.id;
+  const options = JSON.parse(row.optionsJson || '{}') as ImportOptions;
   let read: ReadResult;
   try {
     read = await readDocument(app, row);
@@ -413,10 +511,14 @@ export async function processImport(app: FastifyInstance, id: string): Promise<v
     return;
   }
   const company = app.db.select().from(companies).where(eq(companies.id, row.companyId)).get()!;
-  const check = checkInvoice(read.invoice, row.direction as ImportDirection, company);
+  const direction = row.direction as ImportDirection;
+  if (read.method === 'ai' && direction === 'outgoing') read.invoice.paid = null; // Zahlstatus eigener Rechnungen nie aus der Texterkennung ableiten
+  const check = checkInvoice(read.invoice, direction, company);
   if (read.notInvoice) check.blocking.unshift('Der Beleg scheint keine Rechnung zu sein.');
   if (read.method === 'ai') {
     if (read.aiConfidence === 'low') check.blocking.push('Der Beleg war nur teilweise lesbar – bitte die Werte prüfen.');
+    // Eigene Rechnungen (Kunde + Umsatz) aus der Texterkennung nur bei sicherer Erkennung automatisch buchen
+    if (read.aiConfidence === 'medium' && direction === 'outgoing') check.blocking.push('Texterkennung nicht ganz sicher – bitte die Werte kurz prüfen.');
     for (const issue of read.aiIssues ?? []) check.warnings.push(`Erkennung: ${issue}`);
   }
   const base = { method: read.method, dataJson: JSON.stringify(read.invoice), aiModel: read.aiModel ?? null, processedAt: nowIso() } as const;
@@ -469,15 +571,36 @@ export class ImportQueue {
     this.pending++;
     this.chain = this.chain.then(() => processImport(this.app, id)).catch((err) => { this.app.log.error({ err, importId: id }, 'Belegimport fehlgeschlagen'); }).finally(() => { this.pending--; });
   }
-  /** Beim Start: unterbrochene Verarbeitungen fortsetzen. */
+  /**
+   * Beim Start: Wartende fortsetzen. War ein Beleg mitten in der Verarbeitung (Absturz/Neustart), wird er
+   * einmal erneut versucht; beim zweiten Abbruch als Fehler markiert (verhindert Endlosschleifen nach Abstürzen).
+   */
   resume(): number {
-    const rows = this.app.db.select({ id: documentImports.id }).from(documentImports).where(inArray(documentImports.status, ['queued', 'processing'])).all();
-    for (const r of rows) this.enqueue(r.id);
-    return rows.length;
+    const rows = this.app.db.select().from(documentImports).where(inArray(documentImports.status, ['queued', 'processing'])).all();
+    let n = 0;
+    for (const r of rows) {
+      const opts = JSON.parse(r.optionsJson || '{}') as ImportOptions & { interrupted?: number };
+      if (r.status === 'processing') {
+        const interrupted = (opts.interrupted ?? 0) + 1;
+        if (interrupted >= 2) {
+          this.app.db.update(documentImports).set({ status: 'failed', error: 'Die Verarbeitung wurde wiederholt abgebrochen. Bitte „Erneut auslesen“ oder manuell erfassen.', updatedAt: nowIso() }).where(eq(documentImports.id, r.id)).run();
+          continue;
+        }
+        this.app.db.update(documentImports).set({ status: 'queued', optionsJson: JSON.stringify({ ...opts, interrupted }), updatedAt: nowIso() }).where(eq(documentImports.id, r.id)).run();
+      }
+      this.enqueue(r.id);
+      n++;
+    }
+    return n;
   }
   get size(): number { return this.pending; }
-  /** Wartet, bis alle eingereihten Belege verarbeitet sind (Tests, Herunterfahren). */
-  async idle(): Promise<void> { while (this.pending > 0) await this.chain; }
+  /** Wartet, bis alle eingereihten Belege verarbeitet sind – optional mit Zeitlimit (Herunterfahren). */
+  async idle(timeoutMs?: number): Promise<void> {
+    const until = timeoutMs ? Date.now() + timeoutMs : Infinity;
+    while (this.pending > 0 && Date.now() < until) {
+      await (timeoutMs ? Promise.race([this.chain, new Promise((r) => setTimeout(r, Math.max(0, until - Date.now())))]) : this.chain);
+    }
+  }
 }
 
 /** Zusammenfassung für Listen (ohne vollständige Rohdaten). */

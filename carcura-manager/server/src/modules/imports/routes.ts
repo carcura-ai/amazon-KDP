@@ -13,7 +13,7 @@ import { ctxOf } from '../../plugins/auth.js';
 import { privacySettings } from '../privacy/settings.js';
 import { EXPENSE_CATEGORIES } from '../finance/routes.js';
 import type { NormalizedInvoice } from '../../integrations/einvoice/model.js';
-import { type ImportQueue, applyImport, checkInvoice, emptyInvoice, finishWith, matchCustomer, normalizedInvoiceSchema, summarize, undoImport, categoryFor, type ImportDirection } from './service.js';
+import { type ImportQueue, undoBlocker, applyImport, checkInvoice, emptyInvoice, finishWith, matchCustomer, normalizedInvoiceSchema, summarize, undoImport, categoryFor, type ImportDirection } from './service.js';
 
 declare module 'fastify' {
   interface FastifyInstance {
@@ -132,6 +132,7 @@ export default async function importRoutes(app: FastifyInstance) {
     assertAccess(req, row.direction as ImportDirection, 'read');
     const data = row.dataJson ? (JSON.parse(row.dataJson) as NormalizedInvoice) : null;
     const match = row.direction === 'outgoing' && data && ['needs_review', 'failed'].includes(row.status) ? matchCustomer(app, ctx.companyId, data.buyer) : null;
+    const reviewable = ['needs_review', 'failed', 'duplicate'].includes(row.status);
     const customer = row.customerId ? app.db.select({ id: customers.id, customerNumber: customers.customerNumber, firstName: customers.firstName, lastName: customers.lastName, companyName: customers.companyName }).from(customers).where(and(eq(customers.id, row.customerId), eq(customers.companyId, ctx.companyId))).get() ?? null : null;
     const invoice = row.invoiceId ? app.db.select({ id: invoices.id, invoiceNumber: invoices.invoiceNumber, status: invoices.status, totalCents: invoices.totalCents }).from(invoices).where(and(eq(invoices.id, row.invoiceId), eq(invoices.companyId, ctx.companyId))).get() ?? null : null;
     const expIds = JSON.parse(row.expenseIdsJson || '[]') as string[];
@@ -139,10 +140,12 @@ export default async function importRoutes(app: FastifyInstance) {
     const file = row.fileId ? app.storage.get(ctx.companyId, row.fileId) : null;
     return {
       import: summarize(row),
-      data: data ?? (row.status === 'needs_review' ? emptyInvoice() : null),
+      data: data ?? (reviewable ? emptyInvoice() : null),
       file: file ? { id: file.id, mimeType: file.mimeType, originalName: file.originalName, sizeBytes: file.sizeBytes } : null,
       candidates: match?.candidates ?? [],
-      suggestedCustomerId: match?.decision === 'matched' ? match.customerId : null,
+      suggestedCustomerId: match?.suggestedId ?? null,
+      matchDecision: match?.decision ?? null,
+      undoBlockedReason: row.status === 'completed' ? undoBlocker(app, row) : null,
       suggestedCategory: row.direction === 'incoming' && data ? categoryFor(data) : null,
       customer, invoice, expenses: expenseRows,
       options: JSON.parse(row.optionsJson || '{}') as { markPaid?: boolean },
@@ -155,14 +158,14 @@ export default async function importRoutes(app: FastifyInstance) {
     const row = getRow(ctx.companyId, (req.params as { id: string }).id);
     assertAccess(req, row.direction as ImportDirection, 'write');
     if (!['needs_review', 'failed', 'duplicate'].includes(row.status)) throw conflict('Dieser Beleg ist bereits verarbeitet.');
-    const input = parse(z.object({ data: normalizedInvoiceSchema, customerId: z.string().uuid().nullable().default(null), createCustomer: z.boolean().default(false), category: z.enum(EXPENSE_CATEGORIES).nullable().default(null), markPaid: z.boolean().default(false) }), req.body);
+    const input = parse(z.object({ data: normalizedInvoiceSchema, customerId: z.string().uuid().nullable().default(null), createCustomer: z.boolean().default(false), category: z.enum(EXPENSE_CATEGORIES).nullable().default(null), markPaid: z.boolean().default(false), allowDuplicate: z.boolean().default(false) }), req.body);
     const data = input.data as NormalizedInvoice;
+    if (row.direction === 'outgoing' && !input.customerId && !input.createCustomer) throw badRequest('Bitte einen Kunden wählen oder „Neuen Kunden anlegen“.');
     const check = checkInvoice(data, row.direction as ImportDirection, company(ctx.companyId));
-    // Bei manueller Freigabe bleiben nur harte Pflichtangaben blockierend; rechnerische Hinweise werden protokolliert
-    const hard = check.blocking.filter((b) => /fehlt|nicht erkannt|Währung|Zukunft/.test(b));
+    // Bei manueller Freigabe bleiben Pflichtangaben und Steuerangaben blockierend; übrige Hinweise werden protokolliert
+    const hard = check.blocking.filter((b) => /fehlt|nicht erkannt|Währung|Zukunft|Steuer|Summen passen nicht/.test(b));
     if (hard.length) throw badRequest(hard.join(' '));
-    // Dubletten-Status nur übernehmen, wenn keine echte Dublette mehr vorliegt (applyImport prüft erneut)
-    const result = applyImport(app, row, data, { customerId: input.customerId, createCustomer: input.createCustomer, category: input.category, markPaid: input.markPaid });
+    const result = applyImport(app, row, data, { customerId: input.customerId, createCustomer: input.createCustomer, category: input.category, markPaid: input.markPaid, allowDuplicate: input.allowDuplicate });
     if (result.status !== 'completed') throw conflict(result.message ?? 'Übernahme nicht möglich.');
     finishWith(app, row.id, { dataJson: JSON.stringify(data), method: row.method === 'manual' || !row.method ? 'manual' : row.method, processedAt: row.processedAt ?? nowIso() }, result, check.blocking.filter((b) => !hard.includes(b)).concat(check.warnings).map((w) => `Manuell freigegeben: ${w}`));
     writeAudit(app.db, ctx, { action: 'import.apply_manual', entityType: 'document_import', entityId: row.id, after: { invoiceId: result.invoiceId, expenseIds: result.expenseIds, customerCreated: result.customerCreated } });
@@ -200,10 +203,8 @@ export default async function importRoutes(app: FastifyInstance) {
     const row = getRow(ctx.companyId, (req.params as { id: string }).id);
     assertAccess(req, row.direction as ImportDirection, 'write');
     if (row.status !== 'completed') throw conflict('Nur übernommene Belege können zurückgenommen werden.');
-    if (row.invoiceId) {
-      const inv = app.db.select({ status: invoices.status, sentAt: invoices.sentAt }).from(invoices).where(and(eq(invoices.id, row.invoiceId), eq(invoices.companyId, ctx.companyId))).get();
-      if (inv?.sentAt) throw conflict('Die Rechnung wurde bereits aus dieser Software versendet und kann nicht zurückgenommen werden.');
-    }
+    const blocked = undoBlocker(app, row);
+    if (blocked) throw conflict(`Rückgängig nicht möglich: ${blocked}`);
     const result = undoImport(app, row, ctx.userId);
     return { ok: true, ...result };
   });

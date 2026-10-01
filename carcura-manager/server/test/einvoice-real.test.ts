@@ -5,6 +5,8 @@ import { fileURLToPath } from 'node:url';
 import { embeddedInvoiceXml } from '../src/integrations/einvoice/pdf.js';
 import { parseEInvoice } from '../src/integrations/einvoice/parse.js';
 import { pdfHasActiveContent } from '../src/integrations/storage.js';
+import { parseXml } from '../src/integrations/einvoice/xml.js';
+import { ciiXml, zugferdPdf } from './fixtures/einvoice.js';
 
 const dir = path.join(path.dirname(fileURLToPath(import.meta.url)), 'fixtures', 'real');
 const read = (f: string) => fs.readFileSync(path.join(dir, f));
@@ -53,5 +55,32 @@ describe('Echte E-Rechnungen verschiedener Erzeuger', () => {
     const t0 = Date.now();
     expect(embeddedInvoiceXml(junk)).toBeNull();
     expect(Date.now() - t0).toBeLessThan(3000);
+  });
+
+  it('Sicherheitsprüfung: weitere Anhänge, maskierte Skript-Namen und versteckte Anhänge werden abgewiesen', () => {
+    const ok = zugferdPdf(ciiXml());
+    expect(pdfHasActiveContent(ok, { allowEmbeddedXml: true })).toBe(false);
+    // zweiter Anhang ohne /Type, nur über /EF verwiesen
+    const extra = Buffer.concat([ok, Buffer.from('9 0 obj\n<< /Length 4 >>\nstream\nMZ\x90\x00\nendstream\nendobj\n10 0 obj\n<< /Type /Filespec /F (tool.exe) /EF << /F 9 0 R >> >>\nendobj\n', 'latin1')]);
+    expect(pdfHasActiveContent(extra, { allowEmbeddedXml: true })).toBe(true);
+    // maskierter Name /Java#53cript
+    expect(pdfHasActiveContent(Buffer.concat([ok, Buffer.from('11 0 obj\n<< /S /Java#53cript >>\nendobj\n', 'latin1')]), { allowEmbeddedXml: true })).toBe(true);
+    // normale Uploads: jeder Anhang gesperrt
+    expect(pdfHasActiveContent(ok)).toBe(true);
+  });
+
+  it('XML-Leser: riesige Attribute/Tags blockieren den Server nicht', () => {
+    const t0 = Date.now();
+    expect(() => parseXml(`<a b${'x'.repeat(4_000_000)}>`)).toThrow();
+    expect(() => parseXml(`<a ${'b="1" '.repeat(600_000)}></a>`)).toThrow();
+    expect(Date.now() - t0).toBeLessThan(2000);
+  });
+
+  it('PDF-Durchsuchung bleibt bei vielen Stream-Schlüsselwörtern schnell', () => {
+    const junk = Buffer.from('%PDF-1.4\n' + 'x stream\n'.repeat(2_500_000), 'latin1'); // ~25 MB
+    const t0 = Date.now();
+    expect(embeddedInvoiceXml(junk)).toBeNull();
+    expect(pdfHasActiveContent(junk, { allowEmbeddedXml: true })).toBe(false);
+    expect(Date.now() - t0).toBeLessThan(4000);
   });
 });

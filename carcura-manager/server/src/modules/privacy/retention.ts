@@ -35,10 +35,15 @@ export function runRetention(app: FastifyInstance): string {
       + db.delete(seoDaily).where(and(eq(seoDaily.companyId, cid), lt(seoDaily.date, mCut))).run().changes;
     counts.assistant = db.delete(assistantMessages).where(and(eq(assistantMessages.companyId, cid), lt(assistantMessages.createdAt, daysAgo(p.assistantRetentionDays)))).run().changes
       + db.delete(aiUsageLog).where(and(eq(aiUsageLog.companyId, cid), lt(aiUsageLog.createdAt, daysAgo(Math.max(p.assistantRetentionDays, 365))))).run().changes;
-    // Belegimport: ausgelesene Rohdaten abgeschlossener Importe nach 180 Tagen entfernen (die Buchung und der Beleg bleiben);
-    // verworfene/zurückgenommene Importe nach 180 Tagen ganz löschen
-    counts.documentImports = db.update(documentImports).set({ dataJson: null }).where(and(eq(documentImports.companyId, cid), sql`${documentImports.status} in ('completed','duplicate')`, sql`${documentImports.dataJson} is not null`, lt(documentImports.updatedAt, daysAgo(180)))).run().changes
-      + db.delete(documentImports).where(and(eq(documentImports.companyId, cid), sql`${documentImports.status} in ('discarded','undone')`, sql`${documentImports.fileId} is null`, lt(documentImports.updatedAt, daysAgo(180)))).run().changes;
+    // Belegimport: ausgelesene Rohdaten abgeschlossener Importe nach 180 Tagen entfernen (Buchung und Beleg bleiben);
+    // nie übernommene Belege (Prüfung, Fehler, Dublette, verworfen) nach 180 Tagen samt nicht verwendeter Datei löschen
+    counts.documentImports = db.update(documentImports).set({ dataJson: null }).where(and(eq(documentImports.companyId, cid), eq(documentImports.status, 'completed'), sql`${documentImports.dataJson} is not null`, lt(documentImports.updatedAt, daysAgo(180)))).run().changes;
+    for (const r of db.select({ id: documentImports.id, fileId: documentImports.fileId }).from(documentImports).where(and(eq(documentImports.companyId, cid), sql`${documentImports.status} in ('needs_review','failed','duplicate','discarded','undone')`, lt(documentImports.updatedAt, daysAgo(180)))).all()) {
+      const used = r.fileId ? (db.get<{ n: number }>(sql`select (select count(*) from invoices where company_id = ${cid} and pdf_file_id = ${r.fileId}) + (select count(*) from expenses where company_id = ${cid} and receipt_file_id = ${r.fileId}) + (select count(*) from document_imports where company_id = ${cid} and file_id = ${r.fileId} and id != ${r.id}) as n`)?.n ?? 0) : 0;
+      if (r.fileId && used === 0) app.storage.remove(cid, r.fileId);
+      db.delete(documentImports).where(eq(documentImports.id, r.id)).run();
+      counts.documentImports++;
+    }
     // Export-Dateien nach Ablauf entfernen
     for (const e of db.select().from(dataExports).where(and(eq(dataExports.companyId, cid), eq(dataExports.status, 'ready'), lt(dataExports.expiresAt, nowIso()))).all()) {
       if (e.storagePath) fs.rmSync(e.storagePath, { force: true });

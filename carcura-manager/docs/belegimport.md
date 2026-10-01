@@ -28,17 +28,23 @@ auf dem Smartphone zusätzlich „Foto aufnehmen“. Max. 25 MB je Datei.
 - Netto + MwSt. = Brutto; Summe der Positionen passt zum Nettobetrag (Abweichung = Hinweis)
 - Richtung plausibel (eine an Carcura gerichtete Rechnung im Bereich „Ausgangsrechnungen“ wird erkannt)
 - Währung EUR, Datum nicht in der Zukunft
-- KI: Beleg schlecht lesbar → Prüfung statt Buchung
+- Steueraufteilung passt zu den Summen; Steuersatz eindeutig (19 %, 7 % oder 0 %)
+- Rechnungskorrekturen (Typ 384) werden nie automatisch gebucht
+- KI: Beleg schlecht lesbar → Prüfung statt Buchung; eigene Ausgangsrechnungen aus der Texterkennung werden nur bei
+  sicherer Erkennung automatisch gebucht, der Zahlstatus wird dabei nie aus der Texterkennung übernommen
 
 **Dubletten** werden erkannt: dieselbe Datei, dieselbe Rechnungsnummer (Ausgang) oder dieselbe Belegnummer beim
 selben Lieferanten (Eingang), bei Belegen ohne Nummer gleicher Lieferant + Datum + Betrag.
 
 ## Kunden-Zuordnung (Ausgangsrechnungen)
 
-Reihenfolge der Merkmale: E-Mail, Telefon, Firmenname, Vor- und Nachname, jeweils gestützt durch PLZ und Straße.
-Eine abweichende PLZ spricht gegen denselben Kunden. Passen mehrere Kunden gleich gut, wird nichts automatisch
-gebucht – unter **Prüfen** den richtigen Kunden wählen. Beim bestehenden Kunden werden nur **leere** Felder ergänzt
-(E-Mail, Telefon, Anschrift, Firmenname); vorhandene Daten werden nie überschrieben.
+Automatisch zugeordnet wird nur bei einem **starken Merkmal**: gleiche E-Mail, gleiche Telefonnummer oder gleicher
+Name bzw. Firmenname **und** gleiche PLZ/Straße. Firmen werden nur über den Firmennamen (ohne Rechtsform) verglichen,
+nie über den Ansprechpartner. Eine abweichende PLZ spricht gegen denselben Kunden.
+- Nur über den Namen erkannt → **Prüfen** mit vorgeschlagenem Kunden (bestätigen oder neu anlegen).
+- Mehrere gleich gute Treffer → **Prüfen**, Kunde muss gewählt werden.
+- Beim bestehenden Kunden werden nur **leere** Felder ergänzt (E-Mail, Telefon, Anschrift); vorhandene Daten,
+  Kundentyp und Firmenname werden nie verändert.
 
 ## Korrigieren
 
@@ -46,9 +52,15 @@ gebucht – unter **Prüfen** den richtigen Kunden wählen. Beim bestehenden Kun
 - **Erneut auslesen:** z. B. nach dem Einschalten der KI.
 - **Verwerfen:** Beleg wird nicht übernommen, Datei gelöscht.
 - **Übernahme rückgängig machen:** entfernt die importierte Rechnung bzw. die Ausgaben; ein nur dafür angelegter
-  Kunde ohne weitere Daten wird ebenfalls entfernt. Danach kann der Beleg erneut übernommen werden.
-- **Importierte Rechnung stornieren:** wird hier nur als storniert gekennzeichnet. Die Stornorechnung selbst im
-  Ursprungsprogramm erstellen und anschließend ebenfalls importieren.
+  Kunde wird nur entfernt, wenn es zu ihm sonst nichts gibt (keine Notizen, Termine, Fahrzeuge, Dateien …).
+  Nicht möglich, sobald Zahlungen erfasst, die Rechnung aus der Software versendet oder storniert wurde.
+  Der Beleg steht danach wieder unter **Prüfen**.
+- **Zwei gleiche Kassenbons ohne Nummer** (gleicher Händler, Tag, Betrag): der zweite wird als mögliche Dublette
+  angehalten und kann mit „Kein Duplikat – trotzdem erfassen“ übernommen werden.
+- **Storno aus Lexware Office:** die Stornorechnung/Gutschrift einfach importieren. Verweist sie auf die ursprüngliche
+  Rechnungsnummer und entspricht dem vollen Betrag, wird die Rechnung automatisch als storniert verknüpft; beide
+  zählen dann nicht mehr zum Umsatz. Alternativ kann eine importierte Rechnung hier nur als storniert gekennzeichnet
+  werden (ohne Gutschrift importieren).
 
 ## Datenschutz
 
@@ -56,9 +68,10 @@ gebucht – unter **Prüfen** den richtigen Kunden wählen. Beim bestehenden Kun
 - Die KI-Texterkennung überträgt den Beleg (inkl. Namen/Anschriften) an Anthropic. Vor dem Einschalten:
   Auftragsverarbeitungsvertrag mit Anthropic abschließen, Datenschutzhinweise ergänzen (rechtliche Prüfung empfohlen).
   Jede Nutzung wird im KI-Nutzungsprotokoll (Datenschutz-Center) festgehalten.
-- Ausgelesene Rohdaten werden 180 Tage nach Übernahme entfernt (Rechnung/Ausgabe und Beleg bleiben).
-  Bei Löschung/Anonymisierung eines Kunden werden sie sofort entfernt; der Rechnungsbeleg bleibt wegen der
-  Aufbewahrungspflicht erhalten.
+- Ausgelesene Rohdaten werden 180 Tage nach Übernahme entfernt (Rechnung/Ausgabe und Beleg bleiben); nie
+  übernommene Belege (Prüfung, Fehler, Dublette, verworfen) werden nach 180 Tagen samt Datei gelöscht.
+  Bei Löschung/Anonymisierung eines Kunden werden seine Importdaten sofort entfernt – auch aus Belegen, die noch
+  in der Prüfung liegen; der Rechnungsbeleg selbst bleibt wegen der Aufbewahrungspflicht erhalten.
 
 ## Hinweise zu Lexware Office
 
@@ -66,3 +79,10 @@ Lexware Office kann Rechnungen als PDF mit eingebetteten E-Rechnungsdaten (ZUGFe
 Mit diesen Dateien ist die Übernahme exakt und benötigt keine KI. Ob die eigenen Lexware-PDFs die eingebetteten
 Daten enthalten, zeigt der Import: Spalte „Beleg“ → „E-Rechnung (ZUGFeRD)“. Steht dort „Manuell“, enthält die PDF
 keine Rechnungsdaten – dann in Lexware Office den E-Rechnungs-Export (ZUGFeRD/XRechnung) verwenden.
+
+## Sicherheit
+
+E-Rechnungen werden mit einem eigenen, abgesicherten Leser verarbeitet (keine externen Verweise/DTD, Grenzen für
+Größe, Verschachtelung und Laufzeit). PDFs werden vor dem Speichern geprüft: erlaubt sind nur eingebettete
+Rechnungs-XML-Dateien; Skripte, Startaktionen und sonstige Anhänge – auch versteckt oder maskiert – werden abgewiesen.
+Geprüft u. a. mit echten Beispielrechnungen (ZUGFeRD 1.0/2.x, XRechnung CII/UBL der KoSIT).
