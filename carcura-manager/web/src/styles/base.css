@@ -84,7 +84,7 @@ img { max-width: 100%; display: block; }
 
 /* Karten */
 .card { min-width: 0; background: var(--bg-card); border: 1px solid var(--line); border-radius: var(--radius); box-shadow: var(--shadow); }
-.card-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 14px 18px; border-bottom: 1px solid var(--line); }
+.card-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 14px 18px; border-bottom: 1px solid var(--line); flex-wrap: wrap; }
 .card-body { padding: 18px; }
 .card-body.tight { padding: 0; }
 .grid { display: grid; gap: 16px; }
@@ -340,3 +340,32 @@ table.table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
 .fuel { display: flex; gap: 4px; }
 .fuel button { flex: 1; height: 28px; border: 1px solid var(--line-strong); background: var(--bg-elev); border-radius: 4px; cursor: pointer; }
 .fuel button.on { background: var(--brand); border-color: var(--brand); }
+
+/* ---------------------------------------------------------------- Belegimport */
+.hint.ok { background: var(--ok-soft); }
+.ellipsis { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; display: inline-block; vertical-align: bottom; }
+.show-mobile-flex { display: none !important; }
+.show-mobile { display: none !important; }
+.import-ai { display: flex; gap: 10px; align-items: flex-start; padding: 12px 14px; border-radius: var(--radius-sm); background: var(--warn-soft); font-size: 13px; }
+.import-ai > svg { flex: none; margin-top: 2px; color: var(--warn); }
+.tab .count { margin-left: 2px; background: var(--warn); color: #111; border-radius: 999px; font-size: 11px; font-weight: 700; padding: 0 7px; line-height: 18px; }
+.import-drop { padding: 28px 18px; }
+.import-drop svg { color: var(--brand); }
+.import-review { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr); gap: 18px; align-items: start; }
+.import-preview { position: sticky; top: 0; border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; background: var(--bg-elev); min-height: 320px; }
+.import-preview-img { display: block; width: 100%; height: auto; max-height: 76vh; object-fit: contain; background: #fff; }
+.import-preview-pdf { display: block; width: 100%; height: 76vh; border: 0; background: #fff; }
+.import-preview-xml { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; min-height: 320px; color: var(--fg-muted); }
+.import-warnings { margin: 0; padding-left: 18px; font-size: 13px; color: var(--fg-muted); display: flex; flex-direction: column; gap: 4px; }
+.import-line { display: grid; grid-template-columns: minmax(0, 1fr) 120px auto; gap: 8px; align-items: center; }
+.modal.wide:has(.import-review) { max-width: 1240px; }
+@media (max-width: 860px) {
+  .show-mobile-flex { display: inline-flex !important; }
+  .show-mobile { display: block !important; }
+  .seg button { padding: 6px 10px; }
+  .import-review { grid-template-columns: minmax(0, 1fr); }
+  .import-preview { position: static; min-height: 0; }
+  .import-preview-pdf { height: 60vh; }
+  .import-preview-img { max-height: 60vh; }
+  .import-line { grid-template-columns: minmax(0, 1fr) 96px auto; }
+}

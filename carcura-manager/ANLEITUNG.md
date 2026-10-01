@@ -205,7 +205,8 @@ Alle Punkte findest du links unter **Einstellungen**.
 | Fahrzeugannahme | Kundenakte oder Auftrag → Protokoll: Zustand, Schäden in der Skizze, Fotos, Unterschrift auf Tablet/Handy → „Abschließen“ |
 | Nach der Arbeit | Auftrag auf „fertig“ → Rechnung aus dem Auftrag erzeugen → „Ausstellen“ → per E-Mail senden oder PDF drucken |
 | Zahlungseingang | Rechnung → Zahlung erfassen. Überfällige Rechnungen erscheinen im Dashboard |
-| Ausgaben | Finanzen → Ausgaben → Beleg fotografieren und Betrag eintragen |
+| Ausgaben | **Belege importieren → Eingangsrechnungen**: Rechnung/Kassenbon hochladen oder fotografieren – Lieferant, Beträge, MwSt. und Kategorie werden automatisch erfasst |
+| Rechnungen aus Lexware Office | **Belege importieren → Ausgangsrechnungen**: PDFs hochladen – Kunde wird zugeordnet oder neu angelegt, Rechnung und Beleg landen im Kundenprofil (Details: docs/belegimport.md) |
 | Montags | Wochenbericht unter Berichte lesen (kommt automatisch um 6 Uhr) |
 | Monatsende | Rechnungen → CSV und Finanzen → Ausgaben → CSV an den Steuerberater |
 

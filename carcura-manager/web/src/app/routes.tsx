@@ -23,6 +23,7 @@ import { MarketingPage } from '../pages/Marketing';
 import { ReportsPage } from '../pages/Reports';
 import { AssistantPage } from '../pages/Assistant';
 import { CompetitorsPage } from '../pages/Competitors';
+import { DocumentImportsPage } from '../pages/DocumentImports';
 import { OffersPage, OfferFormPage, OfferDetailPage, InvoicesPage, InvoiceFormPage, InvoiceDetailPage } from '../pages/Billing';
 
 function FullscreenLoader() {
@@ -72,6 +73,7 @@ export function AppRoutes() {
         <Route path="/rechnungen/neu" element={<InvoiceFormPage />} />
         <Route path="/rechnungen/:id" element={<InvoiceDetailPage />} />
         <Route path="/rechnungen/:id/bearbeiten" element={<InvoiceFormPage />} />
+        <Route path="/belege" element={<DocumentImportsPage />} />
         <Route path="/lager" element={<InventoryPage />} />
         <Route path="/finanzen" element={<FinancePage />} />
         <Route path="/marketing" element={<MarketingPage />} />

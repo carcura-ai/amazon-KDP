@@ -68,8 +68,6 @@ await page.click('.card:has(h2:has-text("Fahrzeuge")) button');
 await page.locator('.modal label:has-text("Kennzeichen") + input').fill('K-MM 2024');
 await page.locator('.modal label:has-text("Marke") + input').fill('Audi');
 await page.locator('.modal label:has-text("Modell") + input').fill('A4 Avant');
-await page.locator('.modal label:has-text("Baujahr") + input').fill('2021');
-await page.locator('.modal label:has-text("Kilometerstand") + input').fill('48000');
 await page.click('.modal button:has-text("Hinzufügen")');
 await page.waitForSelector('text=Fahrzeug angelegt');
 await page.waitForSelector('text=K-MM 2024');

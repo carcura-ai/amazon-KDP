@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { NavLink, Outlet, useLocation, useNavigate } from 'react-router';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { LayoutDashboard, Users, UserPlus, Car, Settings, LogOut, Menu, Search, ShieldCheck, Building2, CalendarDays, ClipboardList, FileText, Receipt, Package, PiggyBank, Megaphone, BarChart3, CheckSquare, Sparkles, Radar } from 'lucide-react';
+import { LayoutDashboard, Users, UserPlus, Car, Settings, LogOut, Menu, Search, ShieldCheck, Building2, CalendarDays, ClipboardList, FileText, Receipt, Package, PiggyBank, Megaphone, BarChart3, CheckSquare, Sparkles, Radar, ScanLine } from 'lucide-react';
 import { useAuth } from './auth';
 import { get, post, qs } from '../api/client';
 import type { SearchHit } from '../api/types';
@@ -18,6 +18,7 @@ const NAV = [
   { to: '/auftraege', label: 'Aufträge', icon: ClipboardList, perm: 'orders:read' },
   { to: '/angebote', label: 'Angebote', icon: FileText, perm: 'offers:read' },
   { to: '/rechnungen', label: 'Rechnungen', icon: Receipt, perm: 'invoices:read' },
+  { to: '/belege', label: 'Belege importieren', icon: ScanLine, perm: 'invoices:write|finance:write' },
   { to: '/lager', label: 'Lager', icon: Package, perm: 'inventory:read' },
   { to: '/finanzen', label: 'Finanzen', icon: PiggyBank, perm: 'finance:read' },
   { to: '/marketing', label: 'Marketing', icon: Megaphone, perm: 'marketing:read' },
@@ -38,6 +39,8 @@ export function AppShell() {
   const newLeads = leadStats.data?.byStatus.new ?? 0;
   const taskStats = useQuery({ queryKey: ['tasks', 'stats'], queryFn: () => get<{ open: number; dueToday: number; overdue: number }>('/api/tasks/stats'), enabled: can('tasks:read'), refetchInterval: 60_000 });
   const dueTasks = (taskStats.data?.dueToday ?? 0) + (taskStats.data?.overdue ?? 0);
+  const importStatus = useQuery({ queryKey: ['document-imports', 'status'], queryFn: () => get<{ counts: Array<{ status: string; n: number }> }>('/api/document-imports/status'), enabled: can('invoices:write') || can('finance:write'), refetchInterval: 60_000 });
+  const importsToReview = (importStatus.data?.counts ?? []).filter((c) => c.status === 'needs_review' || c.status === 'failed').reduce((s, c) => s + c.n, 0);
 
   const logout = async () => {
     await post('/api/auth/logout');
@@ -60,11 +63,12 @@ export function AppShell() {
           </div>
         </div>
         <div className="nav-section">Arbeit</div>
-        {NAV.filter((n) => can(n.perm)).map((n) => (
+        {NAV.filter((n) => n.perm.split('|').some((p) => can(p))).map((n) => (
           <NavLink key={n.to} to={n.to} end={n.end} className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}>
             <n.icon />
             <span>{n.label}</span>
             {n.to === '/leads' && newLeads > 0 ? <span className="count">{newLeads}</span> : null}
+            {n.to === '/belege' && importsToReview > 0 ? <span className="count" title="Belege zu prüfen">{importsToReview}</span> : null}
             {n.to === '/aufgaben' && dueTasks > 0 ? <span className="count" style={taskStats.data?.overdue ? { background: 'var(--danger)', color: '#fff' } : undefined}>{dueTasks}</span> : null}
           </NavLink>
         ))}

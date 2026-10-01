@@ -111,7 +111,7 @@ function ExpensesTab() {
           <thead><tr><th>Datum</th><th>Beschreibung</th><th className="hide-mobile">Kategorie</th><th className="num">Netto</th><th className="num hide-mobile">MwSt.</th><th className="num">Brutto</th><th>Status</th><th></th></tr></thead>
           <tbody>{q.data?.items.map((e) => (
             <tr key={e.id}>
-              <td className="muted">{fmtDate(e.date)}</td><td><div className="primary">{e.description}</div><div className="secondary">{[e.vendor, e.recurringExpenseId ? 'wiederkehrend' : null].filter(Boolean).join(' · ')}</div></td><td className="hide-mobile muted">{e.category}</td>
+              <td className="muted">{fmtDate(e.date)}</td><td><div className="primary">{e.description}</div><div className="secondary">{[e.vendor, e.recurringExpenseId ? 'wiederkehrend' : null, e.importId ? 'aus Belegimport' : null].filter(Boolean).join(' · ')}{e.receiptFileId ? <> · <a href={`/files/${e.receiptFileId}`} target="_blank" rel="noreferrer">Beleg öffnen</a></> : null}</div></td><td className="hide-mobile muted">{e.category}</td>
               <td className="num">{fmtMoney(e.netCents)}</td><td className="num hide-mobile muted">{fmtMoney(e.vatCents)}</td><td className="num">{fmtMoney(e.grossCents)}</td>
               <td>{e.isPaid ? <Badge tone="ok">bezahlt</Badge> : <Badge tone="warn">offen</Badge>}</td>
               <td className="num">{can('finance:write') ? <div className="row" style={{ justifyContent: 'flex-end' }}><Button size="sm" variant="ghost" onClick={() => setEdit(e)}><Pencil /></Button><Button size="sm" variant="ghost" onClick={() => setRemove(e)}><Trash2 /></Button></div> : null}</td>

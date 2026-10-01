@@ -278,11 +278,11 @@ export function InvoiceDetailPage() {
   const q = useQuery({ queryKey: ['invoice', id], queryFn: () => get<InvoiceDetail>(`/api/invoices/${id}`) });
   const invalidate = () => { qc.invalidateQueries({ queryKey: ['invoice', id] }); qc.invalidateQueries({ queryKey: ['invoices'] }); qc.invalidateQueries({ queryKey: ['dashboard'] }); };
   const doIssue = useMutation({ mutationFn: () => post<InvoiceDetail>(`/api/invoices/${id}/issue`, {}), onSuccess: (r) => { invalidate(); toast.ok(`Rechnung ${r.invoice.invoiceNumber} ausgestellt`); setIssue(false); }, onError: (e) => toast.fromError(e) });
-  const doCancel = useMutation({ mutationFn: () => post<InvoiceDetail | { deleted: boolean }>(`/api/invoices/${id}/cancel`, {}), onSuccess: (r) => { invalidate(); setCancel(false); if ('deleted' in r) { toast.ok('Entwurf gelöscht'); navigate('/rechnungen'); } else { toast.ok(`Storniert durch ${r.invoice.invoiceNumber}`); navigate(`/rechnungen/${r.invoice.id}`); } }, onError: (e) => toast.fromError(e) });
+  const doCancel = useMutation({ mutationFn: () => post<InvoiceDetail | { deleted: boolean }>(`/api/invoices/${id}/cancel`, {}), onSuccess: (r) => { invalidate(); setCancel(false); if ('deleted' in r) { toast.ok('Entwurf gelöscht'); navigate('/rechnungen'); } else if (r.invoice.id === id) { toast.ok('Als storniert gekennzeichnet'); } else { toast.ok(`Storniert durch ${r.invoice.invoiceNumber}`); navigate(`/rechnungen/${r.invoice.id}`); } }, onError: (e) => toast.fromError(e) });
   const removePayment = useMutation({ mutationFn: (p: Payment) => del(`/api/invoices/${id}/payments/${p.id}`), onSuccess: () => { invalidate(); toast.ok('Zahlung entfernt'); }, onError: (e) => toast.fromError(e) });
   if (q.isLoading) return <Card><Skeleton /></Card>;
   if (!q.data) return <Card><div className="empty"><h3>Rechnung nicht gefunden</h3></div></Card>;
-  const { invoice: inv, items, payments, customer, vehicle, order, totals, cancels, cancelledBy } = q.data;
+  const { invoice: inv, items, payments, customer, vehicle, order, totals, cancels, cancelledBy, imported } = q.data;
   const remaining = inv.totalCents - inv.paidCents;
   const unpaid = ['open', 'sent', 'overdue'].includes(inv.status);
   return (
@@ -294,6 +294,7 @@ export function InvoiceDetailPage() {
           {can('invoices:write') && unpaid ? <><Button variant="primary" onClick={() => setSend(true)}><Send /> Senden</Button><Button onClick={() => setPay(true)}><Banknote /> Zahlung</Button></> : null}
           {can('invoices:write') && inv.status !== 'cancelled' && !inv.cancelsInvoiceId ? <Button variant="danger" onClick={() => setCancel(true)}><Ban /> {inv.status === 'draft' ? 'Löschen' : 'Stornieren'}</Button> : null}
         </>} />
+      {imported ? <div className="dup-box" style={{ marginBottom: 16 }}>Importierte Rechnung (z. B. aus Lexware Office): Nummer, Positionen und Beträge entsprechen dem Originalbeleg; „PDF“ öffnet das Original.</div> : null}
       {cancelledBy ? <div className="dup-box" style={{ marginBottom: 16 }}>Diese Rechnung wurde storniert durch <Link to={`/rechnungen/${cancelledBy.id}`}>{cancelledBy.invoiceNumber}</Link>.</div> : null}
       {cancels ? <div className="dup-box" style={{ marginBottom: 16 }}>Stornorechnung zu <Link to={`/rechnungen/${cancels.id}`}>{cancels.invoiceNumber}</Link>.</div> : null}
       <div className="grid main-side">
@@ -315,7 +316,7 @@ export function InvoiceDetailPage() {
       {send ? <SendModal kind="invoices" id={id} customer={customer} onClose={() => setSend(false)} onSent={invalidate} /> : null}
       {pay ? <PaymentModal invoiceId={id} remaining={remaining} onClose={() => setPay(false)} onDone={invalidate} /> : null}
       {issue ? <Confirm title="Rechnung ausstellen?" text="Die Rechnung erhält die nächste fortlaufende Nummer mit heutigem Datum und ist danach unveränderlich. Fehler lassen sich nur per Storno korrigieren." confirmLabel="Ausstellen" loading={doIssue.isPending} onConfirm={() => doIssue.mutate()} onClose={() => setIssue(false)} /> : null}
-      {cancel ? <Confirm title={inv.status === 'draft' ? 'Entwurf löschen?' : 'Rechnung stornieren?'} text={inv.status === 'draft' ? 'Der Entwurf wird endgültig gelöscht.' : 'Es wird eine Stornorechnung mit eigener Nummer erzeugt; die Originalrechnung bleibt als storniert erhalten (GoBD).'} confirmLabel={inv.status === 'draft' ? 'Löschen' : 'Stornieren'} danger loading={doCancel.isPending} onConfirm={() => doCancel.mutate()} onClose={() => setCancel(false)} /> : null}
+      {cancel ? <Confirm title={inv.status === 'draft' ? 'Entwurf löschen?' : 'Rechnung stornieren?'} text={inv.status === 'draft' ? 'Der Entwurf wird endgültig gelöscht.' : imported ? 'Die importierte Rechnung wird hier als storniert gekennzeichnet. Die Stornorechnung selbst bitte im Ursprungsprogramm (z. B. Lexware Office) erstellen und anschließend unter „Belege importieren“ hochladen.' : 'Es wird eine Stornorechnung mit eigener Nummer erzeugt; die Originalrechnung bleibt als storniert erhalten (GoBD).'} confirmLabel={inv.status === 'draft' ? 'Löschen' : 'Stornieren'} danger loading={doCancel.isPending} onConfirm={() => doCancel.mutate()} onClose={() => setCancel(false)} /> : null}
     </>
   );
 }
