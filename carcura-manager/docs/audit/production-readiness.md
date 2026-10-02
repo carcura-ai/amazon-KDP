@@ -159,13 +159,13 @@ veröffentlicht, Vorfallprozess, Code-Signatur, die offenen Sicherheitspunkte au
 
 | Posten | Empfehlung | ca. Kosten/Monat |
 |---|---|---|
-| Server | Hetzner Cloud, Shared vCPU, **2 vCPU / 4 GB RAM / 40 GB**, Standort Deutschland, Ubuntu 24.04 (4 GB wegen Chromium-PDF und Docker-Build) | ca. 4–6 € |
+| Server | Hetzner Cloud, Shared vCPU, **2 vCPU / 4 GB RAM / 40 GB**, Standort Deutschland, Ubuntu 24.04 (4 GB wegen Chromium-PDF und Docker-Build) | ca. 7 € (CX23), ersatzweise ca. 14–16 € (CPX22); Stand Okt. 2026 |
 | Server-Backups | Hetzner-Backup-Option (tägliche Server-Snapshots, 7 Stände) | + 20 % des Serverpreises ≈ 1 € |
 | Externe Sicherung | Hetzner Storage Box (kleinste Stufe) mit täglichem `rsync` der Sicherungs-ZIPs – oder wöchentlicher Download auf einen eigenen PC/NAS | ca. 3–4 € (oder 0 €) |
 | Domain/DNS | vorhanden (carcura.info) – nur ein A-Eintrag `app` | 0 € |
 | E-Mail | vorhandenes Postfach von carcura.info per SMTP (Port **587**, STARTTLS – Hetzner sperrt bei neuen Konten ausgehend Port 25/465) | 0 € |
 | Firewall | Hetzner Cloud Firewall (22, 80, 443) | 0 € |
-| **Summe Minimum** | | **ca. 5–11 €** |
+| **Summe Minimum** | | **ca. 9–20 €** |
 | Später, vor externen Kunden | Code-Signing-Zertifikat | ca. 10 $/Monat (Azure Trusted Signing) bis ca. 300 €/Jahr (OV) |
 
 Nicht nötig: Kubernetes, Managed Database, Load Balancer, CDN, externes Monitoring-Abo. Optional kostenlos: ein

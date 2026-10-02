@@ -17,8 +17,9 @@ oberster grüner Lauf → ganz unten „Artifacts“ → „Carcura-Management-W
 
 ### A1. Server mieten (EU)
 Empfehlung für den Start: virtueller Server bei einem Anbieter mit Rechenzentrum in Deutschland,
-z. B. Hetzner Cloud CX22 (2 vCPU, 4 GB RAM, 40 GB SSD, Standort Nürnberg oder Falkenstein), Betriebssystem
-Ubuntu 24.04. Kosten derzeit rund 4 bis 6 € im Monat (Preis beim Anbieter prüfen). Beim Anbieter den
+z. B. Hetzner Cloud CX23 („Cost-Optimized“, 2 vCPU, 4 GB RAM, 40 GB SSD, Standort Nürnberg oder Falkenstein),
+Betriebssystem Ubuntu 24.04. Kosten laut Hetzner-Seite (Stand Oktober 2026) ab ca. 7 € im Monat; ist CX23 nicht
+verfügbar, „Regular Performance“ mit 4 GB RAM (z. B. CPX22) ab ca. 14 € im Monat (Preis beim Anbieter prüfen). Beim Anbieter den
 **Auftragsverarbeitungsvertrag** (Art. 28 DSGVO) abschließen – bei Hetzner im Kundenkonto online möglich.
 
 ### A2. Domain verbinden
@@ -124,7 +125,7 @@ und den Installer neu bauen.
 
 | Posten | Kosten | Pflicht |
 |---|---|---|
-| Server (EU, 4 GB RAM) | ca. 4–6 €/Monat | ja |
+| Server (EU, 4 GB RAM) | ca. 7 €/Monat (CX23), ersatzweise ca. 14–16 € (CPX22) | ja |
 | Domain | vorhanden (carcura.info) | ja |
 | Externe Sicherung (Storage Box 1 TB) | ca. 4 €/Monat | dringend empfohlen |
 | Code-Signing-Zertifikat | ca. 10 $/Monat (Azure Trusted Signing) bis 300 €/Jahr (OV) | vor dem Verkauf an andere Betriebe |
