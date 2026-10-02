@@ -33,7 +33,7 @@ function parseTag(body: string): { name: string; attrs: Record<string, string> }
     i++;
     while (i < n && isWs(body[i])) i++;
     const q = body[i];
-    if (q !== '"' && q !== "'") break;
+    if (q !== '"' && q !== "'") throw new Error('XML-Attribut ohne Anführungszeichen.');
     const end = body.indexOf(q, i + 1);
     if (end < 0) throw new Error('XML-Attribut nicht geschlossen.');
     if (key) attrs[local(key)] = decodeEntities(body.slice(i + 1, end));
@@ -56,6 +56,18 @@ function decodeEntities(s: string): string {
 
 const local = (qname: string) => qname.slice(qname.indexOf(':') + 1);
 
+/** Ende eines Tags („>“ außerhalb von Anführungszeichen) – linear, mit Größenlimit. */
+function tagEnd(src: string, from: number): number {
+  let quote = '';
+  const limit = Math.min(src.length, from + MAX_TAG_CHARS + 1);
+  for (let j = from; j < limit; j++) {
+    const c = src[j];
+    if (quote) { if (c === quote) quote = ''; } else if (c === '"' || c === "'") quote = c!; else if (c === '>') return j;
+  }
+  if (limit < src.length) throw new Error('XML-Element zu groß.');
+  return -1;
+}
+
 export function parseXml(input: string): XmlNode {
   if (input.length > MAX_XML_BYTES) throw new Error('XML-Datei ist zu groß.');
   const src = input.replace(/^﻿/, '');
@@ -71,7 +83,7 @@ export function parseXml(input: string): XmlNode {
     if (src.startsWith('<!--', lt)) { const end = src.indexOf('-->', lt + 4); i = end < 0 ? src.length : end + 3; continue; }
     if (src.startsWith('<![CDATA[', lt)) { const end = src.indexOf(']]>', lt + 9); stack[stack.length - 1]!.text += src.slice(lt + 9, end < 0 ? src.length : end); i = end < 0 ? src.length : end + 3; continue; }
     if (src.startsWith('<?', lt)) { const end = src.indexOf('?>', lt + 2); i = end < 0 ? src.length : end + 2; continue; }
-    const gt = src.indexOf('>', lt + 1);
+    const gt = tagEnd(src, lt + 1);
     if (gt < 0) throw new Error('XML unvollständig.');
     const raw = src.slice(lt + 1, gt);
     if (raw.startsWith('/')) {

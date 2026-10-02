@@ -37,7 +37,7 @@ function parseMoney(v: string): number | null {
   s = s.replace(/^[-+]/, '');
   const comma = s.lastIndexOf(','); const dot = s.lastIndexOf('.');
   if (comma > dot) s = s.replace(/\./g, '').replace(',', '.');
-  else if (dot >= 0 && comma < 0 && /^\d{1,3}(\.\d{3})+$/.test(s)) s = s.replace(/\./g, ''); // „1.500“ = Tausenderpunkt
+  else if (dot >= 0 && comma < 0 && /^[1-9]\d{0,2}(\.\d{3})+$/.test(s)) s = s.replace(/\./g, ''); // „1.500“ = Tausenderpunkt („0.500“ bleibt 0,50)
   else s = s.replace(/,/g, '');
   if (!/^\d+(\.\d+)?$/.test(s)) return null;
   const [int, frac = ''] = s.split('.');
@@ -267,7 +267,19 @@ function ReviewModal({ id, direction, categories, canWrite, onClose }: { id: str
     const vat = gross - net;
     return { ...next, netCents: net, vatCents: vat, grossCents: gross, vat: [{ vatBp: bp, netCents: net, vatCents: vat }], lines: next.lines.map((l) => ({ ...l, vatBp: bp })) };
   };
-  const setVatRate = (rate: string) => { setRateChoice(rate); if (data) setData(recalc(rate, data, data.grossCents !== null ? 'gross' : 'net')); };
+  /** Aufteilung nach Steuersätzen (mehrere Sätze): Summen ergeben Netto, MwSt. und Brutto. */
+  const setBreakdown = (vat: InvoiceData['vat']) => setData((s) => {
+    if (!s) return s;
+    const net = vat.reduce((a, v) => a + v.netCents, 0);
+    const tax = vat.reduce((a, v) => a + v.vatCents, 0);
+    return { ...s, vat, netCents: net, vatCents: tax, grossCents: net + tax };
+  });
+  const setVatRate = (rate: string) => {
+    setRateChoice(rate);
+    if (!data) return;
+    if (rate === 'mixed') { if (data.vat.length < 2) setBreakdown(data.vat.length ? data.vat : [{ vatBp: 1900, netCents: data.netCents ?? 0, vatCents: data.vatCents ?? 0 }]); return; }
+    setData(recalc(rate, data, data.grossCents !== null ? 'gross' : 'net'));
+  };
   const setAmount = (k: 'netCents' | 'vatCents' | 'grossCents', v: number | null) => {
     if (!data) return;
     const next = { ...data, [k]: v };
@@ -323,10 +335,25 @@ function ReviewModal({ id, direction, categories, canWrite, onClose }: { id: str
                   <Field label={direction === 'outgoing' ? 'Rechnungsnummer *' : 'Rechnungs-/Belegnummer'}><Input value={data!.number ?? ''} onChange={(e) => setField('number', e.target.value || null)} /></Field>
                   <Field label="Rechnungsdatum *"><Input type="date" value={data!.issueDate ?? ''} onChange={(e) => setField('issueDate', e.target.value || null)} /></Field>
                   <Field label="Fällig am"><Input type="date" value={data!.dueDate ?? ''} onChange={(e) => setField('dueDate', e.target.value || null)} /></Field>
-                  <Field label="Netto (€)"><Input inputMode="decimal" defaultValue={money(data!.netCents)} key={`n${data!.netCents}`} onBlur={(e) => setAmount('netCents', parseMoney(e.target.value))} /></Field>
-                  <Field label="MwSt.-Satz" hint="Satz wählen und Brutto eingeben – Netto und MwSt. werden berechnet."><Select value={vatRate} onChange={(e) => setVatRate(e.target.value)}><option value="">–</option><option value="19">19 %</option><option value="7">7 %</option><option value="0">0 % (steuerfrei / § 19 UStG)</option>{vatRate === 'mixed' ? <option value="mixed">mehrere Sätze (laut Beleg)</option> : null}</Select></Field>
-                  <Field label="MwSt. (€)"><Input inputMode="decimal" defaultValue={money(data!.vatCents)} key={`v${data!.vatCents}`} onBlur={(e) => setAmount('vatCents', parseMoney(e.target.value))} /></Field>
-                  <Field label="Brutto (€) *" error={arithmeticOk ? undefined : 'Netto + MwSt. ergibt nicht Brutto'}><Input inputMode="decimal" defaultValue={money(data!.grossCents)} key={`g${data!.grossCents}`} onBlur={(e) => setAmount('grossCents', parseMoney(e.target.value))} /></Field>
+                  <Field label="Netto (€)"><Input inputMode="decimal" defaultValue={money(data!.netCents)} key={`n${data!.netCents}`} readOnly={vatRate === 'mixed'} onBlur={(e) => setAmount('netCents', parseMoney(e.target.value))} /></Field>
+                  <Field label="MwSt.-Satz" hint="Satz wählen und Brutto eingeben – Netto und MwSt. werden berechnet."><Select value={vatRate} onChange={(e) => setVatRate(e.target.value)}><option value="">–</option><option value="19">19 %</option><option value="7">7 %</option><option value="0">0 % (steuerfrei / § 19 UStG{direction === 'incoming' ? ' / ausländische USt.' : ''})</option><option value="16">16 % (Jul.–Dez. 2020)</option><option value="5">5 % (Jul.–Dez. 2020)</option><option value="mixed">mehrere Sätze</option></Select></Field>
+                  <Field label="MwSt. (€)"><Input inputMode="decimal" defaultValue={money(data!.vatCents)} key={`v${data!.vatCents}`} readOnly={vatRate === 'mixed'} onBlur={(e) => setAmount('vatCents', parseMoney(e.target.value))} /></Field>
+                  <Field label="Brutto (€) *" error={arithmeticOk ? undefined : 'Netto + MwSt. ergibt nicht Brutto'}><Input inputMode="decimal" defaultValue={money(data!.grossCents)} key={`g${data!.grossCents}`} readOnly={vatRate === 'mixed'} onBlur={(e) => setAmount('grossCents', parseMoney(e.target.value))} /></Field>
+                  {vatRate === 'mixed' ? (
+                    <div className="span-2 stack" style={{ gap: 6 }}>
+                      <div className="small muted">Aufteilung nach Steuersätzen – Netto, MwSt. und Brutto ergeben sich aus der Summe.</div>
+                      {data!.vat.map((v, i) => (
+                        <div key={i} className="import-vat">
+                          <Select aria-label="Steuersatz" value={String(v.vatBp)} onChange={(e) => { const bp = Number(e.target.value); setBreakdown(data!.vat.map((x, j) => (j === i ? { vatBp: bp, netCents: x.netCents, vatCents: Math.round((x.netCents * bp) / 10000) } : x))); }}>{[1900, 1600, 700, 500, 0].concat([1900, 1600, 700, 500, 0].includes(v.vatBp) ? [] : [v.vatBp]).map((bp) => <option key={bp} value={bp}>{bp / 100} %</option>)}</Select>
+                          <Input aria-label="Netto" inputMode="decimal" placeholder="Netto" defaultValue={money(v.netCents)} key={`vn${i}-${v.netCents}`} onBlur={(e) => { const n = parseMoney(e.target.value) ?? 0; if (n !== v.netCents) setBreakdown(data!.vat.map((x, j) => (j === i ? { ...x, netCents: n, vatCents: Math.round((n * x.vatBp) / 10000) } : x))); }} />
+                          <Input aria-label="MwSt." inputMode="decimal" placeholder="MwSt." defaultValue={money(v.vatCents)} key={`vv${i}-${v.vatCents}`} onBlur={(e) => { const t = parseMoney(e.target.value) ?? 0; if (t !== v.vatCents) setBreakdown(data!.vat.map((x, j) => (j === i ? { ...x, vatCents: t } : x))); }} />
+                          <button className="btn ghost icon" type="button" aria-label="Steuersatz entfernen" disabled={data!.vat.length <= 1} onClick={() => setBreakdown(data!.vat.filter((_, j) => j !== i))}><X size={14} /></button>
+                        </div>
+                      ))}
+                      <div><Button size="sm" variant="ghost" onClick={() => setBreakdown([...data!.vat, { vatBp: 700, netCents: 0, vatCents: 0 }])}><Plus /> Steuersatz</Button></div>
+                    </div>
+                  ) : null}
+                  {direction === 'incoming' && vatRate === '0' ? <p className="small muted span-2">Ausländische Umsatzsteuer (z. B. 20 %) ist in der deutschen Umsatzsteuer-Voranmeldung nicht als Vorsteuer abziehbar – mit 0 % wird der Bruttobetrag als Kosten erfasst. Im Zweifel mit dem Steuerberater klären.</p> : null}
                   {direction === 'incoming' ? <Field label="Kategorie"><Select value={category} onChange={(e) => setCategory(e.target.value)}><option value="">automatisch</option>{categories.map((c) => <option key={c}>{c}</option>)}</Select></Field> : null}
                   <label className="check span-2"><input type="checkbox" checked={markPaid} onChange={(e) => setMarkPaid(e.target.checked)} /> Bereits bezahlt</label>
                   {isDuplicateNoNumber ? <label className="check span-2"><input type="checkbox" checked={allowDuplicate} onChange={(e) => setAllowDuplicate(e.target.checked)} /> Kein Duplikat – es ist ein weiterer, gleicher Beleg (trotzdem erfassen)</label> : null}

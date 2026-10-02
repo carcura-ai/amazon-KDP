@@ -108,6 +108,32 @@ await mp.click('tr:has-text("RE0042")');
 await mp.waitForSelector('.modal >> text=Übernommen am');
 await overflow(mp, 'belege-mobil-detail');
 await mp.screenshot({ path: `${S}/b10-mobil-detail.png`, fullPage: false });
+await mp.click('.modal button[aria-label="Schließen"]').catch(() => mp.keyboard.press('Escape'));
+
+// Smartphone: Beleg mit zwei Steuersätzen erfassen (Aufteilung nach Steuersätzen)
+await mp.click('button[role=tab]:has-text("Eingangsrechnungen")');
+await mp.setInputFiles('input[type=file][multiple]', [`${F}/rechnung-mix.jpg`]);
+await mp.waitForSelector('tr:has-text("rechnung-mix.jpg") >> text=Prüfen >> visible=true', { timeout: 20000 });
+await mp.click('tr:has-text("rechnung-mix.jpg")');
+await mp.waitForSelector('.modal >> text=Prüfen und übernehmen');
+await mp.locator('.modal label:has-text("Lieferant *") + input').fill('Fachhandel Klein');
+await mp.locator('.modal label:has-text("Rechnungs-/Belegnummer") + input').fill('FK-77');
+await mp.locator('.modal label:has-text("Rechnungsdatum *") + input').fill('2026-09-26');
+await mp.locator('.modal label:has-text("MwSt.-Satz") + select').selectOption('mixed');
+await mp.waitForSelector('.modal .import-vat');
+const row1 = mp.locator('.modal .import-vat').nth(0);
+await row1.locator('select').selectOption('1900');
+await row1.locator('input[aria-label="Netto"]').fill('100,00'); await row1.locator('input[aria-label="Netto"]').blur();
+await mp.click('.modal button:has-text("Steuersatz")');
+const row2 = mp.locator('.modal .import-vat').nth(1);
+await row2.locator('select').selectOption('700');
+await row2.locator('input[aria-label="Netto"]').fill('50,00'); await row2.locator('input[aria-label="Netto"]').blur();
+await mp.waitForTimeout(200);
+check(await mp.locator('.modal label:has-text("Brutto (€) *") + input').inputValue() === '172,50', 'Mehrere Sätze: Brutto nicht aus der Aufteilung berechnet');
+await overflow(mp, 'belege-mobil-aufteilung');
+await mp.screenshot({ path: `${S}/b11-mobil-aufteilung.png`, fullPage: false });
+await mp.click('.modal button:has-text("Prüfen und übernehmen")');
+await mp.waitForSelector('tr:has-text("FK-77") >> text=Übernommen >> visible=true', { timeout: 10000 });
 
 await browser.close();
 console.log(JSON.stringify({ issues, consoleErrors }, null, 2));

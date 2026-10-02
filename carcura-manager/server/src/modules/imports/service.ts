@@ -86,7 +86,8 @@ function isOwnCompany(p: InvoiceParty, company: Company): boolean {
 }
 
 /* ------------------------------------------------------------------ Steueraufteilung */
-const STANDARD_RATES = [1900, 700, 0];
+/** Deutsche Sätze inkl. der befristeten Sätze 16 %/5 % (Juli–Dezember 2020) für ältere Belege */
+const STANDARD_RATES = [1900, 700, 0, 1600, 500];
 /** Steuersatz aus Netto/MwSt. – nur wenn er einem üblichen deutschen Satz entspricht (sonst null). */
 export function standardRate(net: number | null, vat: number | null): number | null {
   if (net === null || vat === null) return null;
@@ -107,7 +108,7 @@ export function vatGroups(inv: NormalizedInvoice): { groups: VatGroup[]; problem
     if (inv.vat.length > 1) return { groups: [], problem: 'Die Aufteilung nach Steuersätzen passt nicht zu den Gesamtbeträgen – bitte prüfen.' };
   }
   const bp = standardRate(net, vat);
-  if (net === null || bp === null) return { groups: [], problem: 'Steuersatz nicht eindeutig (kein üblicher Satz von 19 %, 7 % oder 0 %) – bitte Beträge prüfen.' };
+  if (net === null || bp === null) return { groups: [], problem: 'Steuersatz nicht eindeutig (kein deutscher Satz von 19 %, 7 % oder 0 %) – bitte Steuersatz wählen bzw. bei mehreren Sätzen die Aufteilung erfassen.' };
   return { groups: [{ vatBp: bp, net, vat }], problem: null };
 }
 
@@ -263,6 +264,25 @@ function createCustomerFrom(app: FastifyInstance, company: Company, buyer: Invoi
   return id;
 }
 
+/**
+ * Zu welcher Rechnung gehört eine importierte Gutschrift/Stornorechnung?
+ * - Mit Bezugsnummer: diese Rechnung, wenn Kunde und voller Betrag übereinstimmen (sonst Hinweis, z. B. Teilgutschrift).
+ * - Ohne Bezugsnummer: nur die eine bereits als storniert gekennzeichnete, noch nicht verknüpfte Rechnung desselben
+ *   Kunden über denselben Betrag (verhindert, dass der Umsatz doppelt gemindert wird). Sonst keine Verknüpfung.
+ */
+function creditNoteTarget(app: FastifyInstance, companyId: string, customerId: string, referencedNumber: string | null, gross: number, issueDate: string): { original: typeof invoices.$inferSelect | undefined; warning: string | null } {
+  const unlinked = [eq(invoices.companyId, companyId), sql`${invoices.cancelledByInvoiceId} is null`, sql`${invoices.cancelsInvoiceId} is null`, sql`${invoices.status} != 'draft'`];
+  if (referencedNumber) {
+    const ref = app.db.select().from(invoices).where(and(...unlinked, eq(invoices.invoiceNumber, referencedNumber))).get();
+    if (ref && ref.customerId === customerId && ref.totalCents > 0 && ref.totalCents === Math.abs(gross)) return { original: ref, warning: null };
+    if (ref) return { original: undefined, warning: `Bezieht sich auf Rechnung ${referencedNumber}, wurde aber nicht als Storno verknüpft (${ref.customerId !== customerId ? 'anderer Kunde' : 'Betrag weicht ab, z. B. Teilgutschrift'}). Offenen Betrag der Rechnung bei Bedarf anpassen.` };
+    return { original: undefined, warning: `Bezieht sich auf Rechnung ${referencedNumber}, die hier nicht vorhanden ist (oder bereits verknüpft) – nicht verknüpft.` };
+  }
+  const cancelled = app.db.select().from(invoices).where(and(...unlinked, eq(invoices.customerId, customerId), eq(invoices.status, 'cancelled'), eq(invoices.totalCents, Math.abs(gross)), sql`${invoices.issueDate} <= ${issueDate}`)).all();
+  if (cancelled.length === 1) return { original: cancelled[0], warning: null };
+  return { original: undefined, warning: 'Gutschrift ohne Bezug auf eine Rechnungsnummer – nicht mit einer Rechnung verknüpft. Storniert sie eine Rechnung vollständig, die Rechnung unter „Rechnungen“ als storniert kennzeichnen (wird dann automatisch verknüpft).' };
+}
+
 function applyOutgoing(app: FastifyInstance, row: ImportRow, inv: NormalizedInvoice, choice: ApplyChoice, company: Company): ApplyResult {
   const companyId = row.companyId;
   // Dublette: gleiche Rechnungsnummer bereits vorhanden
@@ -294,8 +314,9 @@ function applyOutgoing(app: FastifyInstance, row: ImportRow, inv: NormalizedInvo
     const paidCents = markPaid ? gross : prepaid;
     const status = markPaid || gross <= 0 ? 'paid' : inv.dueDate && inv.dueDate < new Date().toISOString().slice(0, 10) ? 'overdue' : 'open';
     // Vollständige Stornorechnung/Gutschrift zu einer vorhandenen Rechnung: verknüpfen (beide zählen dann nicht zum Umsatz)
-    const original = inv.kind === 'credit_note' && inv.referencedNumber ? app.db.select().from(invoices).where(and(eq(invoices.companyId, companyId), eq(invoices.invoiceNumber, inv.referencedNumber), sql`${invoices.cancelledByInvoiceId} is null`, sql`${invoices.cancelsInvoiceId} is null`)).get() : undefined;
-    const linksOriginal = Boolean(original && Math.abs(original.totalCents) === Math.abs(gross) && original.customerId === customerId);
+    const link = inv.kind === 'credit_note' ? creditNoteTarget(app, companyId, customerId!, inv.referencedNumber ?? null, gross, inv.issueDate!) : { original: undefined, warning: null };
+    const original = link.original;
+    const linksOriginal = Boolean(original);
     app.db.insert(invoices).values({
       id: invoiceId, companyId, invoiceNumber: inv.number, customerId, status,
       title: `${inv.kind === 'credit_note' ? 'Gutschrift' : inv.kind === 'correction' ? 'Rechnungskorrektur' : 'Rechnung'} ${inv.number} (importiert)`,
@@ -305,16 +326,22 @@ function applyOutgoing(app: FastifyInstance, row: ImportRow, inv: NormalizedInvo
       issuedAt: `${inv.issueDate}T00:00:00.000Z`, pdfFileId: row.fileId, source: 'import', importId: row.id, createdByUserId: row.createdByUserId,
       cancelsInvoiceId: linksOriginal ? original!.id : null,
     }).run();
-    if (linksOriginal) app.db.update(invoices).set({ status: 'cancelled', cancelledByInvoiceId: invoiceId, updatedAt: nowIso() }).where(eq(invoices.id, original!.id)).run();
+    if (linksOriginal) {
+      app.db.update(invoices).set({ status: 'cancelled', cancelledByInvoiceId: invoiceId, updatedAt: nowIso() }).where(eq(invoices.id, original!.id)).run();
+      // vorherigen Status merken, damit „Rückgängig“ die Rechnung exakt wiederherstellen kann
+      const opts = JSON.parse(app.db.select({ o: documentImports.optionsJson }).from(documentImports).where(eq(documentImports.id, row.id)).get()?.o || '{}') as Record<string, unknown>;
+      app.db.update(documentImports).set({ optionsJson: JSON.stringify({ ...opts, linkedOriginal: { id: original!.id, prevStatus: original!.status } }) }).where(eq(documentImports.id, row.id)).run();
+    }
     for (const it of itemRowsFrom(inv, companyId, invoiceId)) app.db.insert(invoiceItems).values(it).run();
     if (paidCents > 0) app.db.insert(payments).values({ id: newId(), companyId, invoiceId, amountCents: paidCents, paidAt: inv.issueDate!, method: 'other', note: markPaid ? 'Beim Import als bezahlt übernommen' : 'Anzahlung laut Rechnung', createdByUserId: row.createdByUserId }).run();
     if (row.fileId) app.db.update(files).set({ customerId, category: 'invoice', caption: `Rechnung ${inv.number} (importiert)` }).where(and(eq(files.id, row.fileId), eq(files.companyId, companyId))).run();
     logActivity(app.db, companyId, { customerId, userId: row.createdByUserId, type: 'invoice', subject: `Rechnung ${inv.number} importiert`, content: `${eur(gross)}${filled.length ? ` · ergänzt: ${filled.join(', ')}` : ''}`, refType: 'invoice', refId: invoiceId });
-    return { invoiceId, filled, markPaid, linked: linksOriginal ? original!.invoiceNumber : null };
+    return { invoiceId, filled, markPaid, linked: linksOriginal ? original!.invoiceNumber : null, linkWarning: link.warning };
   });
   if (result.filled.length) warnings.push(`Kundendaten ergänzt: ${result.filled.join(', ')}.`);
   if (result.markPaid) warnings.push('Als bezahlt übernommen; Zahlungsdatum = Rechnungsdatum (bei Bedarf in der Rechnung anpassen).');
   if (result.linked) warnings.push(`Storniert Rechnung ${result.linked} (verknüpft).`);
+  if (result.linkWarning) warnings.push(result.linkWarning);
   writeAudit(app.db, { companyId, userId: row.createdByUserId }, { action: 'import.invoice', entityType: 'invoice', entityId: result.invoiceId, after: { number: inv.number, customerId, customerCreated, importId: row.id } });
   return { status: 'completed', invoiceId: result.invoiceId, customerId: customerId!, customerCreated, warnings };
 }
@@ -395,7 +422,13 @@ export function undoBlocker(app: FastifyInstance, row: ImportRow): string | null
   const inv = app.db.select().from(invoices).where(and(eq(invoices.id, row.invoiceId), eq(invoices.companyId, row.companyId))).get();
   if (!inv) return null;
   if (inv.sentAt) return 'Die Rechnung wurde bereits aus dieser Software versendet.';
-  if (inv.status === 'cancelled' || inv.cancelledByInvoiceId || inv.cancelsInvoiceId) return 'Die Rechnung ist mit einem Storno verknüpft bzw. als storniert gekennzeichnet.';
+  if (inv.cancelledByInvoiceId) {
+    const credit = app.db.select({ number: invoices.invoiceNumber, source: invoices.source }).from(invoices).where(eq(invoices.id, inv.cancelledByInvoiceId)).get();
+    return credit?.source === 'import' ? `Die Rechnung ist durch die Gutschrift ${credit.number} storniert – zuerst deren Übernahme rückgängig machen.` : 'Die Rechnung ist storniert.';
+  }
+  if (inv.status === 'cancelled') return 'Die Rechnung ist als storniert gekennzeichnet.';
+  // Importierte Gutschrift, die eine Rechnung storniert: rückgängig möglich (Rechnung wird wiederhergestellt)
+  if (inv.cancelsInvoiceId && inv.source !== 'import') return 'Die Rechnung ist mit einem Storno verknüpft.';
   const manual = app.db.select({ note: payments.note }).from(payments).where(eq(payments.invoiceId, inv.id)).all().filter((p) => !IMPORT_PAYMENT_NOTES.includes(p.note ?? ''));
   if (manual.length) return 'Zu dieser Rechnung wurden bereits Zahlungen erfasst – bitte zuerst entfernen.';
   return null;
@@ -408,6 +441,16 @@ export function undoImport(app: FastifyInstance, row: ImportRow, userId: string)
     if (row.invoiceId) {
       const inv = app.db.select().from(invoices).where(and(eq(invoices.id, row.invoiceId), eq(invoices.companyId, companyId), eq(invoices.source, 'import'), eq(invoices.importId, row.id))).get();
       if (inv) {
+        if (inv.cancelsInvoiceId) {
+          // Verknüpfte Rechnung wieder in den Zustand vor der Gutschrift versetzen
+          const linked = (JSON.parse(row.optionsJson || '{}') as { linkedOriginal?: { id: string; prevStatus: string } }).linkedOriginal;
+          const orig = app.db.select().from(invoices).where(and(eq(invoices.id, inv.cancelsInvoiceId), eq(invoices.companyId, companyId))).get();
+          if (orig && orig.cancelledByInvoiceId === inv.id) {
+            const prev = linked?.id === orig.id ? linked.prevStatus : 'cancelled'; // ohne Merker: nachträglich zugeordnet → war bereits storniert gekennzeichnet
+            app.db.update(invoices).set({ status: prev, cancelledByInvoiceId: null, updatedAt: nowIso() }).where(eq(invoices.id, orig.id)).run();
+            logActivity(app.db, companyId, { customerId: orig.customerId, userId, type: 'invoice', subject: `Storno-Verknüpfung von Rechnung ${orig.invoiceNumber} aufgehoben (Gutschrift ${inv.invoiceNumber} entfernt)`, refType: 'invoice', refId: orig.id });
+          }
+        }
         app.db.delete(payments).where(and(eq(payments.invoiceId, inv.id), inArray(payments.note, IMPORT_PAYMENT_NOTES))).run();
         app.db.delete(invoiceItems).where(eq(invoiceItems.invoiceId, inv.id)).run();
         app.db.run(sql`delete from activities where company_id = ${companyId} and ref_type = 'invoice' and ref_id = ${inv.id}`);
@@ -441,7 +484,8 @@ export function undoImport(app: FastifyInstance, row: ImportRow, userId: string)
     if (expIds.length) expensesRemoved = app.db.delete(expenses).where(and(eq(expenses.companyId, companyId), inArray(expenses.id, expIds), eq(expenses.importId, row.id))).run().changes;
     if (row.fileId) app.db.update(files).set({ customerId: null }).where(and(eq(files.id, row.fileId), eq(files.companyId, companyId))).run();
     // Zurück in die Prüfung: Daten bleiben erhalten, erneute Übernahme oder Verwerfen möglich
-    app.db.update(documentImports).set({ status: 'needs_review', error: 'Übernahme zurückgenommen – Daten prüfen und erneut übernehmen oder verwerfen.', invoiceId: null, customerId: null, customerCreated: false, expenseIdsJson: '[]', appliedAt: null, updatedAt: nowIso() }).where(eq(documentImports.id, row.id)).run();
+    const { linkedOriginal: _l, ...restOpts } = JSON.parse(row.optionsJson || '{}') as Record<string, unknown>;
+    app.db.update(documentImports).set({ optionsJson: JSON.stringify(restOpts), status: 'needs_review', error: 'Übernahme zurückgenommen – Daten prüfen und erneut übernehmen oder verwerfen.', invoiceId: null, customerId: null, customerCreated: false, expenseIdsJson: '[]', appliedAt: null, updatedAt: nowIso() }).where(eq(documentImports.id, row.id)).run();
   });
   writeAudit(app.db, { companyId, userId }, { action: 'import.undo', entityType: 'document_import', entityId: row.id, after: { invoiceRemoved, customerRemoved, expensesRemoved } });
   return { invoiceRemoved, customerRemoved, expensesRemoved };
@@ -496,6 +540,10 @@ export async function processImport(app: FastifyInstance, id: string): Promise<v
     app.log.error({ importId: id, err }, 'Belegimport: unerwarteter Fehler');
     set({ status: 'failed', error: `Verarbeitung fehlgeschlagen: ${describeError(err)}`, processedAt: nowIso() });
   }
+  // Abbruchzähler (Neustart während der Verarbeitung) nach einem regulären Durchlauf zurücksetzen
+  const after = app.db.select({ optionsJson: documentImports.optionsJson }).from(documentImports).where(eq(documentImports.id, id)).get();
+  const opts = JSON.parse(after?.optionsJson || '{}') as { interrupted?: number };
+  if (opts.interrupted) { delete opts.interrupted; app.db.update(documentImports).set({ optionsJson: JSON.stringify(opts) }).where(eq(documentImports.id, id)).run(); }
 }
 
 async function processRow(app: FastifyInstance, row: ImportRow, set: (patch: Partial<typeof documentImports.$inferInsert>) => unknown): Promise<void> {

@@ -34,17 +34,25 @@ export function sniffMime(buf: Buffer): string | null {
 /**
  * PDFs mit aktiven Inhalten (JavaScript, Startaktionen, eingebettete Dateien) werden abgewiesen.
  * Ausnahme für den Belegimport: E-Rechnungen (ZUGFeRD/Factur-X) enthalten ihre Rechnungsdaten als
- * eingebettete XML-Datei – erlaubt, wenn ausschließlich XML eingebettet ist und sonst nichts Aktives.
+ * eingebettete XML-Datei – erlaubt, wenn jeder Anhang-Verweis auf eine eingebettete Rechnungs-XML zeigt
+ * und sonst nichts Aktives enthalten ist.
+ * Ergebnis: null = unbedenklich, sonst der Grund ('active' | 'uncheckable').
  */
-export function pdfHasActiveContent(buf: Buffer, opts: { allowEmbeddedXml?: boolean } = {}): boolean {
+export function pdfRisk(buf: Buffer, opts: { allowEmbeddedXml?: boolean } = {}): 'active' | 'uncheckable' | null {
   const scan = pdfSecurityScan(buf);
-  if (scan.active) return true;
+  if (scan.active) return 'active';
+  if (scan.uncheckable) return 'uncheckable';
   const hasAttachments = scan.attachmentRefs > 0 || scan.embedded.length > 0 || /\/EmbeddedFiles?\b/.test(buf.toString('latin1'));
-  if (!hasAttachments) return false;
-  if (!opts.allowEmbeddedXml) return true;
-  // Nur XML-Anhänge erlaubt – und jeder Anhang-Verweis muss zu einem erkannten XML-Anhang gehören
-  const xml = scan.embedded.filter((f) => f.isXml).length;
-  return xml === 0 || scan.embedded.some((f) => !f.isXml) || scan.attachmentRefs > xml;
+  if (!hasAttachments) return null;
+  if (!opts.allowEmbeddedXml) return 'active';
+  const xmlObjects = new Set(scan.embedded.filter((f) => f.isXml && f.objNum !== null).map((f) => f.objNum));
+  if (xmlObjects.size === 0 || scan.embedded.some((f) => !f.isXml)) return 'active';
+  if (scan.attachmentTargets === null) return 'active';
+  return scan.attachmentTargets.every((n) => xmlObjects.has(n)) ? null : 'active';
+}
+
+export function pdfHasActiveContent(buf: Buffer, opts: { allowEmbeddedXml?: boolean } = {}): boolean {
+  return pdfRisk(buf, opts) !== null;
 }
 
 /** XML-Datei (z. B. XRechnung): Inhalt beginnt mit einer XML-Deklaration oder einem Element. */
@@ -93,7 +101,9 @@ export class FileStorage {
     // Der erkannte Inhalt zählt; ein abweichend gemeldeter Typ (z. B. PDF als Bild getarnt) wird abgewiesen
     if (ALLOWED_MIME[input.mimeType] && input.mimeType !== sniffed && !(input.mimeType.startsWith('image/') && sniffed.startsWith('image/'))) throw badRequest('Dateiinhalt passt nicht zum Dateityp.');
     input = { ...input, mimeType: sniffed };
-    if (sniffed === 'application/pdf' && pdfHasActiveContent(input.buffer, { allowEmbeddedXml: input.allowEInvoice })) throw badRequest('PDF mit aktiven Inhalten (Skripte, eingebettete Dateien) wird aus Sicherheitsgründen nicht angenommen.');
+    const risk = sniffed === 'application/pdf' ? pdfRisk(input.buffer, { allowEmbeddedXml: input.allowEInvoice }) : null;
+    if (risk === 'active') throw badRequest('PDF mit aktiven Inhalten (Skripte, eingebettete Dateien) wird aus Sicherheitsgründen nicht angenommen.');
+    if (risk === 'uncheckable') throw badRequest('Diese PDF ist geschützt oder beschädigt und kann nicht auf Schadinhalte geprüft werden. Bitte ungeschützt speichern (z. B. „Drucken → Als PDF speichern“) oder ein Foto hochladen.');
     const ext = ALLOWED_MIME[sniffed]!;
     const id = newId();
     const now = new Date();

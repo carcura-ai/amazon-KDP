@@ -5,7 +5,8 @@ import { eq } from 'drizzle-orm';
 import { loadConfig } from '../src/config.js';
 import { openDatabase } from '../src/db/index.js';
 import { buildApp } from '../src/app.js';
-import { documentImports, aiUsageLog, files } from '../src/db/schema.js';
+import { documentImports, aiUsageLog, files, expenses } from '../src/db/schema.js';
+import { runRetention } from '../src/modules/privacy/retention.js';
 import { parseEInvoice } from '../src/integrations/einvoice/parse.js';
 import { parseXml } from '../src/integrations/einvoice/xml.js';
 import { toCents, toIsoDate } from '../src/integrations/einvoice/model.js';
@@ -97,6 +98,8 @@ describe('E-Rechnung lesen (ohne KI)', () => {
     expect(splitStreet('Bahnhofstraße 12a')).toEqual({ street: 'Bahnhofstraße', houseNumber: '12a' });
     expect(splitStreet('Am Markt 3-5, Hinterhaus')).toEqual({ street: 'Am Markt', houseNumber: '3-5' });
     expect(() => parseXml('<?xml version="1.0"?><!DOCTYPE x [<!ENTITY e SYSTEM "file:///etc/passwd">]><x>&e;</x>')).toThrow();
+    expect(parseXml('<a b="x > y"><c d=\'1>2\'>t</c></a>').children[0]!.attrs.d).toBe('1>2');
+    expect(() => parseXml('<a b=1></a>')).toThrow();
   });
 
   it('findet die eingebettete XML in der PDF; PDFs mit anderen Anhängen oder Skripten bleiben gesperrt', () => {
@@ -310,6 +313,66 @@ describe('Ausgangsrechnungen (z. B. Lexware Office) hochladen', () => {
     expect(await rev()).toBe(base);
   });
 
+  const revSep = async () => (await app.inject(as(admin, { url: '/api/finance/overview?period=month&date=2026-09-10' }))).json().revenueNetCents as number;
+
+  it('Gutschrift ohne Bezugsnummer nach Storno-Kennzeichnung: wird verknüpft, Umsatz nur einmal gemindert', async () => {
+    const base = await revSep();
+    const r1 = await upload(admin, 'outgoing', { name: 'RE0090.xml', type: 'application/xml', data: Buffer.from(ciiXml({ number: 'RE0090', date: '20260905', buyerName: 'Gerd Gutschrift', buyerEmail: 'gerd@example.de' })) });
+    const inv = (await detail(r1.json().items[0].id)).import;
+    expect(await revSep()).toBe(base + 24900);
+    await app.inject(as(admin, { method: 'POST', url: `/api/invoices/${inv.invoiceId}/cancel` }));
+    expect(await revSep()).toBe(base);
+    const r2 = await upload(admin, 'outgoing', { name: 'GS0090.xml', type: 'application/xml', data: Buffer.from(ciiXml({ number: 'GS0090', typeCode: '381', date: '20260908', buyerName: 'Gerd Gutschrift', buyerEmail: 'gerd@example.de' })) });
+    const credit = (await detail(r2.json().items[0].id)).import;
+    expect(credit.status).toBe('completed');
+    expect(credit.warnings.join(' ')).toContain('Storniert Rechnung RE0090');
+    expect(await revSep()).toBe(base);
+  });
+
+  it('Gutschrift zuerst importiert, danach Rechnung als storniert gekennzeichnet: wird verknüpft, Umsatz nur einmal gemindert', async () => {
+    const base = await revSep();
+    const r1 = await upload(admin, 'outgoing', { name: 'RE0091.xml', type: 'application/xml', data: Buffer.from(ciiXml({ number: 'RE0091', date: '20260905', buyerName: 'Hanna Hinterher', buyerEmail: 'hanna@example.de' })) });
+    const inv = (await detail(r1.json().items[0].id)).import;
+    const r2 = await upload(admin, 'outgoing', { name: 'GS0091.xml', type: 'application/xml', data: Buffer.from(ciiXml({ number: 'GS0091', typeCode: '381', date: '20260909', buyerName: 'Hanna Hinterher', buyerEmail: 'hanna@example.de' })) });
+    const credit = (await detail(r2.json().items[0].id)).import;
+    expect(credit.warnings.join(' ')).toContain('ohne Bezug');
+    expect(await revSep()).toBe(base); // Rechnung + Gutschrift = 0
+    await app.inject(as(admin, { method: 'POST', url: `/api/invoices/${inv.invoiceId}/cancel` }));
+    expect(await revSep()).toBe(base);
+    const cn = (await app.inject(as(admin, { url: `/api/invoices/${credit.invoiceId}` }))).json().invoice;
+    expect(cn.cancelsInvoiceId).toBe(inv.invoiceId);
+  });
+
+  it('Gutschrift mit Bezug, aber abweichendem Betrag (Teilgutschrift): keine Verknüpfung, Hinweis', async () => {
+    await upload(admin, 'outgoing', { name: 'RE0093.xml', type: 'application/xml', data: Buffer.from(ciiXml({ number: 'RE0093', date: '20260905', buyerName: 'Tina Teil', buyerEmail: 'tina@example.de' })) });
+    const r2 = await upload(admin, 'outgoing', { name: 'GS0093.xml', type: 'application/xml', data: Buffer.from(ciiXml({ number: 'GS0093', typeCode: '381', date: '20260909', referenced: 'RE0093', buyerName: 'Tina Teil', buyerEmail: 'tina@example.de', lines: [{ name: 'Nachlass', qty: 1, price: '49.00', total: '49.00' }], net: '49.00', gross: '49.00' })) });
+    const credit = (await detail(r2.json().items[0].id)).import;
+    expect(credit.status).toBe('completed');
+    expect(credit.warnings.join(' ')).toContain('nicht als Storno verknüpft');
+  });
+
+  it('falsch verknüpfte Gutschrift lässt sich rückgängig machen; die Rechnung erhält ihren vorherigen Status zurück', async () => {
+    const r1 = await upload(admin, 'outgoing', { name: 'RE0092.xml', type: 'application/xml', data: Buffer.from(ciiXml({ number: 'RE0092', date: '20260905', buyerName: 'Udo Umkehr', buyerEmail: 'udo@example.de' })) });
+    const inv = (await detail(r1.json().items[0].id)).import;
+    const statusBefore = (await app.inject(as(admin, { url: `/api/invoices/${inv.invoiceId}` }))).json().invoice.status;
+    const r2 = await upload(admin, 'outgoing', { name: 'GS0092.xml', type: 'application/xml', data: Buffer.from(ciiXml({ number: 'GS0092', typeCode: '381', date: '20260909', referenced: 'RE0092', buyerName: 'Udo Umkehr', buyerEmail: 'udo@example.de' })) });
+    const credit = (await detail(r2.json().items[0].id)).import;
+    const blocked = await app.inject(as(admin, { method: 'POST', url: `/api/document-imports/${inv.id}/undo` }));
+    expect(blocked.statusCode).toBe(409);
+    expect(blocked.json().message).toContain('GS0092');
+    const undo = await app.inject(as(admin, { method: 'POST', url: `/api/document-imports/${credit.id}/undo` }));
+    expect(undo.statusCode).toBe(200);
+    const orig = (await app.inject(as(admin, { url: `/api/invoices/${inv.invoiceId}` }))).json().invoice;
+    expect(orig).toMatchObject({ status: statusBefore, cancelledByInvoiceId: null });
+    expect((await app.inject(as(admin, { method: 'POST', url: `/api/document-imports/${inv.id}/undo` }))).statusCode).toBe(200);
+  });
+
+  it('befristete Steuersätze 2020 (16 %) werden erkannt', async () => {
+    const res = await upload(admin, 'outgoing', { name: 'RE2020.xml', type: 'application/xml', data: Buffer.from(ciiXml({ number: 'RE2020-7', date: '20200915', due: '20200929', taxRate: '16', taxCategory: 'S', tax: '39.84', gross: '288.84', buyerName: 'Otto Oldtimer', buyerEmail: 'otto@example.de' })) });
+    const d = await detail(res.json().items[0].id);
+    expect(d.import.status).toBe('completed');
+  });
+
   it('Rechnungskorrektur (Typ 384) wird nicht automatisch gebucht', async () => {
     const res = await upload(admin, 'outgoing', { name: 'RK0071.xml', type: 'application/xml', data: Buffer.from(ciiXml({ number: 'RK0071', typeCode: '384', buyerName: 'Karl Korrektur', buyerEmail: 'karl@example.de' })) });
     const d = await detail(res.json().items[0].id);
@@ -442,6 +505,53 @@ describe('Eingangsrechnungen von Händlern hochladen', () => {
     expect((await detail(id)).import.status).toBe('failed');
   });
 
+  it('nach erfolgreicher Verarbeitung wird der Abbruchzähler zurückgesetzt', async () => {
+    const res = await upload(admin, 'incoming', { name: 'LS-10.xml', type: 'application/xml', data: Buffer.from(ublXml({ number: 'LS-10' })) });
+    const id = res.json().items[0].id;
+    // erster Abbruch: Neustart setzt den Zähler auf 1 und verarbeitet erneut; danach ist er wieder zurückgesetzt
+    app.db.update(documentImports).set({ status: 'processing', optionsJson: '{}' }).where(eq(documentImports.id, id)).run();
+    app.db.delete(expenses).where(eq(expenses.importId, id)).run();
+    app.importQueue.resume();
+    await app.importQueue.idle();
+    const row = app.db.select().from(documentImports).where(eq(documentImports.id, id)).get()!;
+    expect(row.status).toBe('completed');
+    expect(JSON.parse(row.optionsJson || '{}').interrupted).toBeUndefined();
+  });
+
+  it('mehrere Steuersätze: abweichende Aufteilung wird gesperrt, korrigierte Aufteilung gebucht', async () => {
+    aiExtraction = receiptExtraction({
+      invoice_number: 'MIX-1', document_type: 'invoice',
+      line_items: [{ name: 'Politur', description: null, quantity: 1, unit: null, unit_net_price: 100, net_amount: 100, vat_rate_percent: 19 }, { name: 'Fachbuch', description: null, quantity: 1, unit: null, unit_net_price: 50, net_amount: 50, vat_rate_percent: 7 }],
+      vat_breakdown: [{ vat_rate_percent: 19, net_amount: 100, vat_amount: 19 }, { vat_rate_percent: 7, net_amount: 40, vat_amount: 2.8 }],
+      total_net: 150, total_vat: 22.5, total_gross: 172.5, paid: null,
+    });
+    const res = await upload(admin, 'incoming', { name: 'mix.pdf', type: 'application/pdf', data: Buffer.concat([plainPdf(), Buffer.from('%mix-1\n')]) });
+    const d = await detail(res.json().items[0].id);
+    expect(d.import.status).toBe('needs_review');
+    const bad = await app.inject(as(admin, { method: 'POST', url: `/api/document-imports/${d.import.id}/apply`, payload: { data: d.data } }));
+    expect(bad.statusCode).toBe(400);
+    const fixed = { ...d.data, vat: [{ vatBp: 1900, netCents: 10000, vatCents: 1900 }, { vatBp: 700, netCents: 5000, vatCents: 350 }], netCents: 15000, vatCents: 2250, grossCents: 17250 };
+    const ok = await app.inject(as(admin, { method: 'POST', url: `/api/document-imports/${d.import.id}/apply`, payload: { data: fixed } }));
+    expect(ok.statusCode).toBe(200);
+    const after = await detail(d.import.id);
+    expect(after.expenses.map((e: { vatBp: number; grossCents: number }) => [e.vatBp, e.grossCents]).sort()).toEqual([[1900, 11900], [700, 5350]].sort());
+  });
+
+  it('Aufbewahrung: offene Belege bleiben samt Original erhalten, verworfene/doppelte werden nach 180 Tagen gelöscht', async () => {
+    const res = await upload(admin, 'incoming', { name: 'alt.pdf', type: 'application/pdf', data: Buffer.concat([plainPdf(), Buffer.from('%alt-1\n')]) });
+    const open = app.db.select().from(documentImports).where(eq(documentImports.id, res.json().items[0].id)).get()!;
+    const old = new Date(Date.now() - 200 * 86_400_000).toISOString();
+    app.db.update(documentImports).set({ status: 'needs_review', updatedAt: old }).where(eq(documentImports.id, open.id)).run();
+    const dupRes = await upload(admin, 'incoming', { name: 'alt2.pdf', type: 'application/pdf', data: Buffer.concat([plainPdf(), Buffer.from('%alt-2\n')]) });
+    const dup = app.db.select().from(documentImports).where(eq(documentImports.id, dupRes.json().items[0].id)).get()!;
+    app.db.update(documentImports).set({ status: 'duplicate', updatedAt: old }).where(eq(documentImports.id, dup.id)).run();
+    runRetention(app);
+    expect(app.db.select().from(documentImports).where(eq(documentImports.id, open.id)).get()).toBeTruthy();
+    expect(app.db.select().from(files).where(eq(files.id, open.fileId!)).get()).toBeTruthy();
+    expect(app.db.select().from(documentImports).where(eq(documentImports.id, dup.id)).get()).toBeUndefined();
+    expect(app.db.select().from(files).where(eq(files.id, dup.fileId!)).get()).toBeUndefined();
+  });
+
   it('Verwerfen löscht den unbenutzten Beleg', async () => {
     const list = (await app.inject(as(admin, { url: '/api/document-imports?direction=incoming&status=needs_review' }))).json().items;
     const target = list.find((i: { fileName: string }) => i.fileName === 'unscharf.pdf');
@@ -480,6 +590,15 @@ describe('Rechte, Mandantentrennung, Datenschutz', () => {
     expect((await detail(id)).import.status).toBe('needs_review');
     await app.inject(as(admin, { method: 'POST', url: `/api/customers/${c.id}/anonymize`, payload: {} }));
     expect(app.db.select().from(documentImports).where(eq(documentImports.id, id)).get()!.dataJson).toBeNull();
+  });
+
+  it('Kunde löschen bereinigt nur Belege dieser Person (nicht ähnliche Namen)', async () => {
+    const c = (await app.inject(as(admin, { method: 'POST', url: '/api/customers', payload: { firstName: 'Anna', lastName: 'Bauer', email: 'anna.bauer@example.de' } }))).json().customer;
+    const other = await upload(admin, 'outgoing', { name: 'RE0081.xml', type: 'application/xml', data: Buffer.from(ciiXml({ number: 'RE0081', typeCode: '384', buyerName: 'Johanna Bauer', buyerEmail: 'johanna@example.de' })) });
+    const same = await upload(admin, 'outgoing', { name: 'RE0082.xml', type: 'application/xml', data: Buffer.from(ciiXml({ number: 'RE0082', typeCode: '384', buyerName: 'Anna Bauer', buyerEmail: 'anders@example.de' })) });
+    await app.inject(as(admin, { method: 'POST', url: `/api/customers/${c.id}/anonymize`, payload: {} }));
+    expect(app.db.select().from(documentImports).where(eq(documentImports.id, other.json().items[0].id)).get()!.dataJson).not.toBeNull();
+    expect(app.db.select().from(documentImports).where(eq(documentImports.id, same.json().items[0].id)).get()!.dataJson).toBeNull();
   });
 
   it('Kunde löschen: ausgelesene Importdaten werden entfernt, der Rechnungsbeleg bleibt aufbewahrt', async () => {

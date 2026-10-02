@@ -3,6 +3,24 @@ import type { Db } from '../../db/index.js';
 import { customers, vehicles, activities, leads, tasks, appointments, orders, protocols, files, emailLog, auditLog, documentImports } from '../../db/schema.js';
 import type { FileStorage } from '../../integrations/storage.js';
 import { nowIso } from '../../core/ids.js';
+import { normalizeEmail, normalizePhone } from '../../core/normalize.js';
+
+const norm = (v: unknown) => (typeof v === 'string' ? v.toLowerCase().replace(/\s+/g, ' ').trim() : '');
+/** Ist der Rechnungsempfänger eines ausgelesenen Belegs dieser Kunde? (nur eindeutige Merkmale) */
+function buyerIsCustomer(dataJson: string | null, c: { email: string | null; phone: string | null; firstName: string; lastName: string; companyName: string | null }): boolean {
+  let buyer: Record<string, unknown> | undefined;
+  try { buyer = (JSON.parse(dataJson ?? '{}') as { buyer?: Record<string, unknown> }).buyer; } catch { return false; }
+  if (!buyer) return false;
+  const email = normalizeEmail(c.email);
+  if (email && normalizeEmail(typeof buyer.email === 'string' ? buyer.email : null) === email) return true;
+  const phone = normalizePhone(c.phone);
+  if (phone && phone.replace(/\D/g, '').length >= 6 && normalizePhone(typeof buyer.phone === 'string' ? buyer.phone : null) === phone) return true;
+  const full = norm(`${c.firstName} ${c.lastName}`);
+  const names = [norm(buyer.name), norm(buyer.personName)];
+  if (full.length >= 5 && full.includes(' ') && names.includes(full)) return true;
+  const company = norm(c.companyName);
+  return company.length >= 4 && [norm(buyer.name), norm(buyer.companyName)].includes(company);
+}
 
 /**
  * Löschkonzept: Personenbezogene Daten eines Kunden werden entfernt, steuerlich aufbewahrungspflichtige
@@ -38,9 +56,11 @@ export function anonymizeCustomer(db: Db, storage: FileStorage, companyId: strin
     tx.update(customers).set({ salutation: null, firstName: 'Gelöschter', lastName: `Kunde ${c.customerNumber}`, companyName: null, street: null, houseNumber: null, zip: null, city: null, email: null, phone: null, phone2: null, notes: null, tagsJson: '[]', source: null, leadId: null, normalizedEmail: null, normalizedPhone: null, isActive: false, anonymizedAt: nowIso(), updatedAt: nowIso() }).where(eq(customers.id, customerId)).run();
     // Belegimport: ausgelesene Rohdaten (Name, Anschrift) entfernen; Beleg und Buchung bleiben
     tx.update(documentImports).set({ dataJson: null, fileName: 'Beleg (anonymisiert)', updatedAt: nowIso() }).where(and(eq(documentImports.companyId, companyId), eq(documentImports.customerId, customerId))).run();
-    // auch noch nicht zugeordnete Belege (in Prüfung, Dublette, zurückgenommen), die diese Person enthalten
-    const needles = [c.email, c.phone, `${c.firstName} ${c.lastName}`.trim().length >= 5 ? `${c.firstName} ${c.lastName}`.trim() : null, c.companyName && c.companyName.length >= 4 ? c.companyName : null].filter((x): x is string => Boolean(x));
-    if (needles.length) tx.update(documentImports).set({ dataJson: null, fileName: 'Beleg (anonymisiert)', updatedAt: nowIso() }).where(and(eq(documentImports.companyId, companyId), sql`${documentImports.status} != 'completed'`, sql`(${sql.join(needles.map((n) => sql`instr(lower(coalesce(${documentImports.dataJson}, '')), lower(${n})) > 0`), sql` or `)})`)).run();
+    // auch noch nicht zugeordnete Ausgangsrechnungs-Belege (in Prüfung, Dublette, zurückgenommen), deren
+    // Rechnungsempfänger diese Person ist – exakter Vergleich (E-Mail, Telefon, vollständiger Name, Firmenname)
+    const pending = tx.select({ id: documentImports.id, dataJson: documentImports.dataJson }).from(documentImports).where(and(eq(documentImports.companyId, companyId), eq(documentImports.direction, 'outgoing'), sql`${documentImports.status} != 'completed'`, sql`${documentImports.dataJson} is not null`)).all();
+    const hits = pending.filter((r) => buyerIsCustomer(r.dataJson, c)).map((r) => r.id);
+    if (hits.length) tx.update(documentImports).set({ dataJson: null, fileName: 'Beleg (anonymisiert)', error: 'Personendaten nach Löschung/Anonymisierung des Kunden entfernt – Beleg verwerfen oder Daten manuell erfassen.', updatedAt: nowIso() }).where(inArray(documentImports.id, hits)).run();
     if (c.email) tx.update(emailLog).set({ toAddress: 'anonymisiert' }).where(and(eq(emailLog.companyId, companyId), eq(emailLog.toAddress, c.email))).run();
     // Audit-Log: Einträge bleiben (Nachweis), aber ohne Vorher/Nachher-Inhalte mit Personenbezug
     tx.update(auditLog).set({ beforeJson: null, afterJson: null }).where(and(eq(auditLog.companyId, companyId), eq(auditLog.entityType, 'customer'), eq(auditLog.entityId, customerId))).run();

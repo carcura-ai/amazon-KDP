@@ -36,9 +36,10 @@ export function runRetention(app: FastifyInstance): string {
     counts.assistant = db.delete(assistantMessages).where(and(eq(assistantMessages.companyId, cid), lt(assistantMessages.createdAt, daysAgo(p.assistantRetentionDays)))).run().changes
       + db.delete(aiUsageLog).where(and(eq(aiUsageLog.companyId, cid), lt(aiUsageLog.createdAt, daysAgo(Math.max(p.assistantRetentionDays, 365))))).run().changes;
     // Belegimport: ausgelesene Rohdaten abgeschlossener Importe nach 180 Tagen entfernen (Buchung und Beleg bleiben);
-    // nie übernommene Belege (Prüfung, Fehler, Dublette, verworfen) nach 180 Tagen samt nicht verwendeter Datei löschen
+    // verworfene Belege und Dubletten nach 180 Tagen samt nicht verwendeter Datei löschen. Offene Belege (Prüfen,
+    // Fehler, rückgängig gemacht) bleiben samt Original erhalten – sie können aufbewahrungspflichtig sein (GoBD).
     counts.documentImports = db.update(documentImports).set({ dataJson: null }).where(and(eq(documentImports.companyId, cid), eq(documentImports.status, 'completed'), sql`${documentImports.dataJson} is not null`, lt(documentImports.updatedAt, daysAgo(180)))).run().changes;
-    for (const r of db.select({ id: documentImports.id, fileId: documentImports.fileId }).from(documentImports).where(and(eq(documentImports.companyId, cid), sql`${documentImports.status} in ('needs_review','failed','duplicate','discarded','undone')`, lt(documentImports.updatedAt, daysAgo(180)))).all()) {
+    for (const r of db.select({ id: documentImports.id, fileId: documentImports.fileId }).from(documentImports).where(and(eq(documentImports.companyId, cid), sql`${documentImports.status} in ('duplicate','discarded')`, lt(documentImports.updatedAt, daysAgo(180)))).all()) {
       const used = r.fileId ? (db.get<{ n: number }>(sql`select (select count(*) from invoices where company_id = ${cid} and pdf_file_id = ${r.fileId}) + (select count(*) from expenses where company_id = ${cid} and receipt_file_id = ${r.fileId}) + (select count(*) from document_imports where company_id = ${cid} and file_id = ${r.fileId} and id != ${r.id}) as n`)?.n ?? 0) : 0;
       if (r.fileId && used === 0) app.storage.remove(cid, r.fileId);
       db.delete(documentImports).where(eq(documentImports.id, r.id)).run();

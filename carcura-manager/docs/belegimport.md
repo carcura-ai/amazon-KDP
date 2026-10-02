@@ -58,9 +58,18 @@ nie über den Ansprechpartner. Eine abweichende PLZ spricht gegen denselben Kund
 - **Zwei gleiche Kassenbons ohne Nummer** (gleicher Händler, Tag, Betrag): der zweite wird als mögliche Dublette
   angehalten und kann mit „Kein Duplikat – trotzdem erfassen“ übernommen werden.
 - **Storno aus Lexware Office:** die Stornorechnung/Gutschrift einfach importieren. Verweist sie auf die ursprüngliche
-  Rechnungsnummer und entspricht dem vollen Betrag, wird die Rechnung automatisch als storniert verknüpft; beide
-  zählen dann nicht mehr zum Umsatz. Alternativ kann eine importierte Rechnung hier nur als storniert gekennzeichnet
-  werden (ohne Gutschrift importieren).
+  Rechnungsnummer und entspricht dem vollen Betrag (gleicher Kunde), wird die Rechnung automatisch als storniert
+  verknüpft; beide zählen dann nicht mehr zum Umsatz. Ohne Bezugsnummer wird nur verknüpft, wenn genau eine bereits
+  als storniert gekennzeichnete Rechnung desselben Kunden über denselben Betrag existiert. Umgekehrt: Wird eine
+  importierte Rechnung als storniert gekennzeichnet und gibt es genau eine passende, noch nicht zugeordnete
+  importierte Gutschrift, wird diese verknüpft. So wird der Umsatz nie doppelt gemindert. Teilgutschriften werden
+  nicht verknüpft (Hinweis am Beleg).
+- **Falsch verknüpfte Gutschrift:** Übernahme der Gutschrift rückgängig machen – die Rechnung erhält ihren vorherigen
+  Status zurück. (Die Rechnung selbst kann erst danach zurückgenommen werden.)
+- **Mehrere Steuersätze:** im Prüfformular „MwSt.-Satz → mehrere Sätze“ wählen und die Aufteilung (Satz, Netto, MwSt.)
+  erfassen; Netto, MwSt. und Brutto ergeben sich daraus. Die befristeten Sätze 16 %/5 % (Juli–Dezember 2020) werden
+  erkannt. Ausländische Umsatzsteuer auf Eingangsbelegen: 0 % wählen (Bruttobetrag als Kosten) – im Zweifel mit
+  dem Steuerberater klären.
 
 ## Datenschutz
 
@@ -68,10 +77,12 @@ nie über den Ansprechpartner. Eine abweichende PLZ spricht gegen denselben Kund
 - Die KI-Texterkennung überträgt den Beleg (inkl. Namen/Anschriften) an Anthropic. Vor dem Einschalten:
   Auftragsverarbeitungsvertrag mit Anthropic abschließen, Datenschutzhinweise ergänzen (rechtliche Prüfung empfohlen).
   Jede Nutzung wird im KI-Nutzungsprotokoll (Datenschutz-Center) festgehalten.
-- Ausgelesene Rohdaten werden 180 Tage nach Übernahme entfernt (Rechnung/Ausgabe und Beleg bleiben); nie
-  übernommene Belege (Prüfung, Fehler, Dublette, verworfen) werden nach 180 Tagen samt Datei gelöscht.
-  Bei Löschung/Anonymisierung eines Kunden werden seine Importdaten sofort entfernt – auch aus Belegen, die noch
-  in der Prüfung liegen; der Rechnungsbeleg selbst bleibt wegen der Aufbewahrungspflicht erhalten.
+- Ausgelesene Rohdaten werden 180 Tage nach Übernahme entfernt (Rechnung/Ausgabe und Beleg bleiben). Verworfene
+  Belege und Dubletten werden nach 180 Tagen samt Datei gelöscht. **Offene Belege** (Prüfen, Fehler, zurückgenommen)
+  bleiben samt Original erhalten, bis sie übernommen oder verworfen werden – sie können aufbewahrungspflichtig sein.
+  Bei Löschung/Anonymisierung eines Kunden werden seine Importdaten sofort entfernt – auch aus Ausgangsrechnungs-
+  Belegen in der Prüfung, deren Empfänger eindeutig dieser Kunde ist (gleiche E-Mail, Telefonnummer, vollständiger
+  Name oder Firmenname); der Rechnungsbeleg selbst bleibt wegen der Aufbewahrungspflicht erhalten.
 
 ## Hinweise zu Lexware Office
 
@@ -84,5 +95,8 @@ keine Rechnungsdaten – dann in Lexware Office den E-Rechnungs-Export (ZUGFeRD/
 
 E-Rechnungen werden mit einem eigenen, abgesicherten Leser verarbeitet (keine externen Verweise/DTD, Grenzen für
 Größe, Verschachtelung und Laufzeit). PDFs werden vor dem Speichern geprüft: erlaubt sind nur eingebettete
-Rechnungs-XML-Dateien; Skripte, Startaktionen und sonstige Anhänge – auch versteckt oder maskiert – werden abgewiesen.
+Rechnungs-XML-Dateien; jeder Anhang-Verweis (auch indirekt) muss auf eine solche Rechnungs-XML zeigen. Skripte,
+Startaktionen und sonstige Anhänge – auch versteckt oder maskiert – werden abgewiesen. PDFs, deren Inhalt sich nicht
+vollständig prüfen lässt (passwortgeschützt/verschlüsselt, beschädigt, übergroße komprimierte Bereiche), werden mit
+Hinweis abgewiesen: ungeschützt speichern („Drucken → Als PDF speichern“) oder als Foto hochladen.
 Geprüft u. a. mit echten Beispielrechnungen (ZUGFeRD 1.0/2.x, XRechnung CII/UBL der KoSIT).

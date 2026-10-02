@@ -269,11 +269,18 @@ export default async function invoiceRoutes(app: FastifyInstance) {
       return { ok: true, deleted: true };
     }
     if (inv.source === 'import') {
-      // Importierte Rechnung: Storno erfolgt im Ursprungsprogramm (eigene Stornonummer dort). Hier nur kennzeichnen;
-      // die Stornorechnung aus dem Ursprungsprogramm kann anschließend importiert werden.
-      app.db.update(invoices).set({ status: 'cancelled', updatedAt: nowIso() }).where(eq(invoices.id, id)).run();
-      logActivity(app.db, ctx.companyId, { customerId: inv.customerId, userId: ctx.userId, type: 'invoice', subject: `Importierte Rechnung ${inv.invoiceNumber} als storniert gekennzeichnet`, refType: 'invoice', refId: id });
-      writeAudit(app.db, ctx, { action: 'invoice.cancel_imported', entityType: 'invoice', entityId: id });
+      // Importierte Rechnung: Storno erfolgt im Ursprungsprogramm (eigene Stornonummer dort). Hier nur kennzeichnen.
+      // Wurde die Gutschrift/Stornorechnung (ohne Bezugsnummer) schon importiert und passt eindeutig (gleicher Kunde,
+      // voller Betrag), wird sie verknüpft – sonst minderten Storno-Kennzeichen und Gutschrift den Umsatz doppelt.
+      // Andernfalls wird eine später importierte Gutschrift beim Import automatisch zugeordnet.
+      const credits = app.db.select().from(invoices).where(and(eq(invoices.companyId, ctx.companyId), eq(invoices.source, 'import'), eq(invoices.customerId, inv.customerId), eq(invoices.totalCents, -inv.totalCents), sql`${invoices.cancelsInvoiceId} is null`, sql`${invoices.cancelledByInvoiceId} is null`, sql`${invoices.issueDate} >= ${inv.issueDate ?? ''}`)).all();
+      const credit = inv.totalCents > 0 && credits.length === 1 ? credits[0]! : null;
+      app.db.transaction(() => {
+        app.db.update(invoices).set({ status: 'cancelled', cancelledByInvoiceId: credit?.id ?? null, updatedAt: nowIso() }).where(eq(invoices.id, id)).run();
+        if (credit) app.db.update(invoices).set({ cancelsInvoiceId: id, updatedAt: nowIso() }).where(eq(invoices.id, credit.id)).run();
+      });
+      logActivity(app.db, ctx.companyId, { customerId: inv.customerId, userId: ctx.userId, type: 'invoice', subject: `Importierte Rechnung ${inv.invoiceNumber} als storniert gekennzeichnet${credit ? ` (Gutschrift ${credit.invoiceNumber} zugeordnet)` : ''}`, refType: 'invoice', refId: id });
+      writeAudit(app.db, ctx, { action: 'invoice.cancel_imported', entityType: 'invoice', entityId: id, after: { creditNoteId: credit?.id ?? null } });
       return detail(ctx.companyId, id);
     }
     const company = companyOf(app, ctx.companyId);
