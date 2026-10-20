@@ -7,6 +7,7 @@ hier als Regel eingetragen (mit Datum) und gilt ab dann fuer jedes Video. Vor je
 1. **Nie ohne Musik.** Ohne Sprache traegt Musik das Video; bei Sprache leise darunter (Ducking). (20.10.2026)
    **Ausnahme ASMR:** Hat der Nutzer mit Mikro aufgenommen und sagt „keine Musik“, traegt der Originalton das Video –
    nur dezente Sounds auf Einblendungen, Clip-Ton ohne Knackser (Ein-/Ausblenden), Pegel je Clip angleichen. (20.10.2026)
+   Klarstellung Nutzer: **Soundeffekte ausdruecklich erwuenscht** (Uebergaenge, Einblendungen, Akzente) – nur keine durchgehende Musik. (20.10.2026)
 2. **Musik cool: Phonk, Trap, Rap, Cloud** – Stil der Playlist „526“, keine Bibliotheks-Pop-Musik. (20.10.2026)
 3. Jeder Uebergang und jede Einblendung bekommt einen passenden Sound; Whooshes nie lauter als vol 0.3. (20.10.2026)
 4. Lautheit −14 LUFS, render.sh muss „Ton-Check ok“ melden. (20.10.2026)
