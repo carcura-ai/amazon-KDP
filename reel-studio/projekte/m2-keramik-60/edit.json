@@ -61,25 +61,25 @@
     {
      "id": "B6",
      "from": 0.3,
-     "dur": 3.0,
+     "dur": 3.2,
      "vol": 0.88
     },
     {
      "id": "B7",
-     "from": 3.5,
-     "dur": 3.2,
+     "from": 5.8,
+     "dur": 2.6,
      "vol": 0.91
     },
     {
      "id": "B8",
-     "from": 0.5,
+     "from": 2.0,
      "dur": 2.8,
      "vol": 0.94
     },
     {
      "id": "B9",
-     "from": 1.8,
-     "dur": 3.2,
+     "from": 1.6,
+     "dur": 3.6,
      "vol": 1.0
     }
    ],
@@ -95,13 +95,13 @@
     },
     {
      "id": "B12",
-     "from": 0.4,
-     "dur": 2.4
+     "from": 0.0,
+     "dur": 2.8
     },
     {
      "id": "B11",
-     "from": 5.8,
-     "dur": 2.3
+     "from": 5.7,
+     "dur": 1.9
     }
    ],
    "schnitt": "hart",
@@ -336,13 +336,8 @@
    "dur": 0.6
   },
   {
-   "at": "t:seg3+1.8",
+   "at": "t:seg3+1.75",
    "name": "m2/tuch_entfetten.wav",
-   "vol": 1.0
-  },
-  {
-   "at": "t:seg3+4.2",
-   "name": "m2/tuch_entfetten2.wav",
    "vol": 1.0
   },
   {
@@ -396,11 +391,6 @@
    "vol": 0.08
   },
   {
-   "at": "t:seg6+9.1",
-   "name": "ding",
-   "vol": 0.15
-  },
-  {
    "at": "t:seg4+0.02",
    "name": "whoosh",
    "vol": 0.22
@@ -409,6 +399,51 @@
    "at": "t:seg5+0.02",
    "name": "whoosh",
    "vol": 0.22
+  },
+  {
+   "at": "t:seg2+1.3",
+   "name": "shimmer",
+   "vol": 0.18
+  },
+  {
+   "at": "t:seg2+8.8",
+   "name": "shimmer",
+   "vol": 0.25
+  },
+  {
+   "at": "t:seg4+1.25",
+   "name": "shimmer",
+   "vol": 0.18
+  },
+  {
+   "at": "t:seg5+2.25",
+   "name": "whoosh",
+   "vol": 0.25
+  },
+  {
+   "at": "t:seg6+9.1",
+   "name": "pop",
+   "vol": 0.06
+  },
+  {
+   "at": 57.0,
+   "name": "click",
+   "vol": 0.12
+  },
+  {
+   "at": 58.0,
+   "name": "click",
+   "vol": 0.12
+  },
+  {
+   "at": 59.0,
+   "name": "click",
+   "vol": 0.12
+  },
+  {
+   "at": 59.7,
+   "name": "ding",
+   "vol": 0.15
   }
  ],
  "grade": [

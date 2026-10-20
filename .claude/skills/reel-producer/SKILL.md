@@ -24,7 +24,7 @@ Werkzeug: `reel-studio/` (Remotion + ffmpeg + faster-whisper + rembg). Bedienung
 1. **Material** nach `reel-studio/projekte/<name>/raw/` (Videos) und `voice/` (Sprache). Uebergabewege: `references/material-uebergabe.md`.
 1a. **Lange Rohclips (POV, Daueraufnahmen):** erst sichten (Kontaktbogen 1 Bild/s, Pegel je Sekunde), dann nur die besten Stellen als
    Ausschnitte nach `raw/` schneiden – mit Drehung, Zuschnitt auf Haende/Auto und Aufhellung (Vorlage: `projekte/m2-keramik-60/ausschnitte.sh`).
-   Spart 90 % Aufbereitungszeit. Stummes Mikro (< −55 dB) → CC0-Foley synchron zur Bewegung (`foley.sh`), dem Nutzer offen sagen.
+   Spart 90 % Aufbereitungszeit. Stummes Mikro (< −55 dB) → CC0-Foley synchron zur Bewegung: `pipeline/foley.py` reiht nur aktive Stellen aneinander (keine Ton-Loecher), dem Nutzer offen sagen.
    Rendern ohne Filmkorn ist doppelt so schnell (`look.grain` nur bei sauberem Material).
 2. `python3 -I pipeline/analyze.py projekte/<name>` (bei bereits geschnittenem Material `--no-cut`). Bausteine: A = Sprecher im Bild, V = Voiceover, B = B-Roll.
 3. **Musik waehlen (Pflicht, Auto-Content = Phonk/Trap/Hip-Hop von ccMixter, siehe `references/sounddesign.md`):** `python3 -I pipeline/asset.py musik "<stimmung>" --bpm 100-130` → `musikhole "<Titel>" projekte/<name>` (Beats + bester Abschnitt → `music.from`). Ohne Sprache vol 0.5–0.6, mit Sprache vol 0.16 / duck 0.05. Nur ohne Musik liefern, wenn der Nutzer es verlangt.

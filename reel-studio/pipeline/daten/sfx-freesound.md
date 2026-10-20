@@ -21,3 +21,14 @@
 | freesound/pouring_water_into_a_glass_by_ahamirikia.mp3 | water pour glass | CC0 | https://freesound.org/people/ahamirikia/sounds/710550/ |
 | freesound/pour_water_metal_pot_liquid_cook_wav_by_.mp3 | water pour glass | CC0 | https://freesound.org/people/ValentinPetiteau/sounds/627625/ |
 | freesound/pouring_water_into_a_glass_bowl_wav_by_t.mp3 | water pour glass | CC0 | https://freesound.org/people/The_Runner_01/sounds/554444/ |
+| freesound/trickling_water_5_by_yoyodaman234.mp3 | water trickle | CC0 | https://freesound.org/people/Yoyodaman234/sounds/349076/ |
+| freesound/water_trickling_ambience_old1_wav_by_bir.mp3 | water trickle | CC0 | https://freesound.org/people/Bird_man/sounds/316778/ |
+| freesound/badlands_water_trickling_stream_close_al.mp3 | water trickle | CC0 | https://freesound.org/people/TRP/sounds/575454/ |
+| freesound/fabric_sofa_rubbing_movements_mono_19200.mp3 | cloth rubbing | CC0 | https://freesound.org/people/Sonicquinn/sounds/435830/ |
+| freesound/clothing_by_cb9382.mp3 | cloth rubbing | CC0 | https://freesound.org/people/cb9382/sounds/873898/ |
+| freesound/rubbing_cloth_by_vandale.mp3 | cloth rubbing | CC0 | https://freesound.org/people/vandale/sounds/512287/ |
+| freesound/light_material_on_light_material_light_f.mp3 | fabric rub | CC0 | https://freesound.org/people/Rinaldobowles56/sounds/708110/ |
+| freesound/4_strokes_on_a_fabric_desk_mat_by_franck.mp3 | fabric rub | CC0 | https://freesound.org/people/franckwalden/sounds/832225/ |
+| freesound/car_windshield_wipers_spray_water_squeak.mp3 | wiping car | CC0 | https://freesound.org/people/RutgerMuller/sounds/50905/ |
+| freesound/windscreen_wipers_wav_by_lyndseymel.mp3 | wiping car | CC0 | https://freesound.org/people/lyndseymel/sounds/241369/ |
+| freesound/car_windshield_wipers_by_kev_durr.mp3 | wiping car | CC0 | https://freesound.org/people/kev_durr/sounds/349188/ |
