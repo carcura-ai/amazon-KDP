@@ -34,7 +34,7 @@ Die alten, eingebrannten Texte sind mit einem Milchglas-Band abgedeckt – mit R
 - Vorteile als Checkliste synchron zum gesprochenen Wort (Salz ✓ Schmutz ✓ Wasser ✓)
 - **3D-Schneefall** mit Tiefenwirkung bei „erst recht für den Winter“
 - CTA-Karte: „Schreib uns KERAMIK per DM“ + „Nur 1 Platz“ (konsistent mit Beschreibung)
-- Punch-In-Zooms an jedem Satzwechsel, Farblook, Auto-Szene aufgehellt, Sounds, −14 LUFS
+- Punch-In-Zooms an jedem Satzwechsel, Farblook, Auto-Szene aufgehellt, Sounds, −14,5 LUFS
 
 ## Empfehlung V3 (Neudreh, ca. 25 s) – Skript
 

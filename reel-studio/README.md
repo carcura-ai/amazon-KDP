@@ -20,7 +20,7 @@ Wer danach noch manuell nachschneiden will, importiert MP4 + SRT in Resolve/CapC
 | `pipeline/glossar.json` | Fachbegriffe und bekannte Hörfehler (z. B. „Keramikversicherung“ → „Keramikversiegelung“) |
 | `projekte/<name>/edit.json` | Das Drehbuch des Schnitts: Look, Zooms, Grafiken, 3D, Sounds, CTA |
 | `remotion/` | Rendering: Untertitel mit Wort-Highlight, Hook, Preis-Durchstreichung, Checkliste, CTA-Karte, 3D-Rabattmünze, 3D-Schnee |
-| `pipeline/render.sh` | Rendern → Lautheit auf −14 LUFS / −1 dBTP → `export/<name>_final.mp4` + `.srt` |
+| `pipeline/render.sh` | Rendern → Lautheit ≈ −14 LUFS, Spitzen ≤ −1,5 dBTP (Zwei-Pass) → `export/<name>_final.mp4` + `.srt` |
 
 ## Ablauf pro Reel
 
@@ -64,7 +64,7 @@ Technik-Regeln:
 - **Sichere Zone:** wichtige Texte nicht in die oberen ~14 % und unteren ~35 % – dort liegen bei
   Reels-Anzeigen die Instagram-Bedienelemente (Meta-Richtlinie für Reels-Ads; organisch etwas weniger).
   Die Pipeline setzt Untertitel auf 61,5 % Höhe.
-- Lautheit −14 LUFS, Spitzen max. −1 dBTP (macht `render.sh` automatisch).
+- Lautheit ≈ −14 LUFS, Spitzen max. −1,5 dBTP (macht `render.sh` automatisch; Demo: −14,5 LUFS).
 - 3D/Effekte nur, wo sie eine Aussage verstärken (Rabatt, Winter, Glanz) – nie als Selbstzweck.
 
 ## Rechtliches (Deutschland) – vor Veröffentlichung prüfen
