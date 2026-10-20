@@ -79,3 +79,21 @@ Technik-Regeln:
   darüber ist eine Firmenlizenz nötig. Schriften Anton/Montserrat: SIL Open Font License (frei nutzbar).
 
 Bei Unsicherheit zu Preiswerbung: kurze Prüfung durch einen Anwalt für Wettbewerbsrecht.
+
+## Erweiterungen (Stand 20.10.2026)
+
+| Funktion | Befehl / Feld |
+|---|---|
+| Voiceover über Arbeitsaufnahmen | Sprachdateien nach `voice/`; in `edit.json`: `{"v": "V1", "b": ["B2", "B4"]}` |
+| Medienaufbereitung | `analyze.py` macht automatisch: iPhone-HDR → SDR, max. 2560 px, Stimmveredelung (Filter, Entrauschen, Kompressor, Präsenz) |
+| Zeitanker statt Sekunden | `"from": "t:Salz-0.1"`, `"t:seg2"`, `"t:end-1.5"` |
+| Automatik | `"auto": {"zoom": true, "transitions": true, "sfx": true}` – Zooms, Übergänge, Sounds |
+| Musik mit Ducking | `"music": {"src": "musik/titel.mp3", "vol": 0.16, "duck": 0.05}` (nur lizenzierte Titel) |
+| Effekte | `sticker`, `lowerthird`, `compare` (Vorher/Nachher), `blur` (Kennzeichen), `badge3d`, `snow`, `price`, `checklist`, `cta` |
+| Bilder & 3D-Emojis | `pipeline/asset.py emoji|suche|hole|freistellen` – mit Lizenzprotokoll `assets/LIZENZEN.md` |
+| Sound-Bibliothek | `pipeline/sfx.sh` – 14 eigene + 282 Kenney-Sounds (CC0) |
+| Referenz-Reels analysieren | `python3 -I pipeline/referenz.py <url>` |
+| Material-Übergabe | `MATERIAL-UEBERGABE.md` |
+| Kennzahlen sammeln | `LERNLOG.md` |
+
+Arbeitsanweisung für Claude: Skill `.claude/skills/reel-producer/` (wird in jeder Sitzung automatisch geladen).

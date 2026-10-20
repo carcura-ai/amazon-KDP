@@ -41,3 +41,5 @@ reel-studio/projekte/*/export/
 reel-studio/projekte/*/analysis/*.wav
 !reel-studio/remotion/package.json
 !reel-studio/remotion/package-lock.json
+reel-studio/referenzen/
+reel-studio/projekte/test-vo/

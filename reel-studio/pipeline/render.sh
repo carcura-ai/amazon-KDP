@@ -6,7 +6,8 @@ ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 P="$(cd "$1" && pwd)"; NAME="$(basename "$P")"
 PUB="$ROOT/remotion/public/projekte/$NAME"
 mkdir -p "$PUB" "$P/export"
-cp -u "$P"/raw/* "$PUB"/
+# Medien bereitet analyze.py auf; hier nur Projekt-Assets und Musik spiegeln
+for d in assets musik; do [ -d "$P/$d" ] && mkdir -p "$PUB/$d" && cp -u "$P/$d"/* "$PUB/$d"/; done
 python3 -I "$ROOT/pipeline/props.py" "$P"
 
 CHROME=$(ls -d /opt/pw-browsers/chromium_headless_shell-*/chrome-linux/headless_shell 2>/dev/null | head -1 || true)

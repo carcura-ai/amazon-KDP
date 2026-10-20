@@ -1,5 +1,5 @@
 import type {CSSProperties} from 'react';
-import {interpolate, spring, useCurrentFrame, useVideoConfig} from 'remotion';
+import {AbsoluteFill, Easing, Img, interpolate, OffthreadVideo, spring, staticFile, useCurrentFrame, useVideoConfig} from 'remotion';
 import {BODY, HEAD} from '../fonts';
 import type {Brand, Overlay} from '../types';
 import {Badge3D, Snow} from './Three';
@@ -140,6 +140,79 @@ const Cta: React.FC<OverlayProps> = ({o, brand}) => {
   );
 };
 
+// Freigestelltes Bild/3D-Emoji mit Feder-Einstieg, Schweben und leichter 3D-Neigung
+const Sticker: React.FC<OverlayProps> = ({o, brand}) => {
+  const f = useCurrentFrame();
+  const {fps, width, height} = useVideoConfig();
+  const t = f / fps;
+  const a = useIn(0, {damping: 10, stiffness: 170});
+  const out = useOut(o);
+  const w: number = o.w ?? o.size ?? 300; // Hochformat-Freisteller: w/h getrennt angeben
+  const h: number = o.h ?? o.size ?? 300;
+  const enter = o.enter === 'drop' ? `translateY(${(1 - a) * -500}px)` : o.enter === 'slide' ? `translateX(${(1 - a) * (o.x > 0.5 ? 600 : -600)}px)` : `scale(${a})`;
+  const tilt = o.tilt === false ? '' : `perspective(900px) rotateY(${Math.sin(t * 1.6) * 14}deg) rotateX(${Math.cos(t * 1.2) * 6}deg)`;
+  return (
+    <div style={{position: 'absolute', left: o.x * width - w / 2, top: o.y * height - h / 2, width: w, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10, opacity: out, transform: `${enter} translateY(${Math.sin(t * 2.2) * 8}px) rotate(${o.rot ?? -6}deg)`}}>
+      <Img src={staticFile(o.src)} style={{width: w, height: h, objectFit: 'contain', transform: tilt, filter: 'drop-shadow(0 22px 28px rgba(0,0,0,.5))'}} />
+      {o.label && <div style={{fontFamily: BODY, fontWeight: 900, fontSize: 34, color: brand.dark, background: brand.accent, padding: '8px 18px', borderRadius: 999, whiteSpace: 'nowrap'}}>{o.label}</div>}
+    </div>
+  );
+};
+
+type MediaRef = {src: string; from?: number; rate?: number};
+const Media: React.FC<{m: MediaRef}> = ({m}) => {
+  const {fps} = useVideoConfig();
+  const st = {width: '100%', height: '100%', objectFit: 'cover'} as const;
+  return /\.(png|jpe?g|webp)$/i.test(m.src) ? <Img src={staticFile(m.src)} style={st} /> : <OffthreadVideo src={staticFile(m.src)} trimBefore={Math.round((m.from ?? 0) * fps)} playbackRate={m.rate ?? 1} muted style={st} />;
+};
+
+const Tag: React.FC<{text: string; right?: boolean; vis: number; bg: string; fg: string}> = ({text, right, vis, bg, fg}) => (
+  <div style={{position: 'absolute', top: '16%', [right ? 'right' : 'left']: 48, fontFamily: HEAD, fontSize: 60, color: fg, background: bg, padding: '6px 24px 10px', borderRadius: 14, opacity: vis, transform: `scale(${0.8 + 0.2 * vis})`}}>{text}</div>
+);
+
+// Vorher/Nachher: Nachher-Bild wird mit leuchtender Kante ueber das Vorher-Bild gewischt
+const Compare: React.FC<OverlayProps> = ({o, brand}) => {
+  const f = useCurrentFrame();
+  const {fps, width} = useVideoConfig();
+  const w0 = (o.wipeAt - o.from) * fps;
+  const p = interpolate(f, [w0, w0 + (o.wipeDur ?? 1.2) * fps], [0, 1], {extrapolateLeft: 'clamp', extrapolateRight: 'clamp', easing: Easing.inOut(Easing.cubic)});
+  const a = useIn(0);
+  const out = useOut(o);
+  return (
+    <AbsoluteFill style={{opacity: out}}>
+      <AbsoluteFill><Media m={o.after} /></AbsoluteFill>
+      <AbsoluteFill style={{clipPath: `inset(0 ${p * 100}% 0 0)`}}><Media m={o.before} /></AbsoluteFill>
+      {p > 0 && p < 1 && <div style={{position: 'absolute', top: 0, bottom: 0, left: (1 - p) * width - 3, width: 6, background: '#fff', boxShadow: `0 0 34px 10px ${brand.accent}`}} />}
+      <Tag text={o.beforeLabel ?? 'VORHER'} vis={a * (1 - p)} bg="rgba(10,12,16,.75)" fg="#fff" />
+      <Tag text={o.afterLabel ?? 'NACHHER'} right vis={p} bg={brand.accent} fg={brand.dark} />
+    </AbsoluteFill>
+  );
+};
+
+// Unschaerfe-Feld, z. B. fuer Kennzeichen oder Gesichter (Koordinaten 0..1)
+const Blur: React.FC<OverlayProps> = ({o}) => {
+  const {width, height} = useVideoConfig();
+  const r = `blur(${o.r ?? 22}px)`;
+  return <div style={{position: 'absolute', left: o.x * width, top: o.y * height, width: o.w * width, height: o.h * height, backdropFilter: r, WebkitBackdropFilter: r, borderRadius: 12}} />;
+};
+
+// Bauchbinde: Icon + Titel + Unterzeile, z. B. Fahrzeugmodell oder Leistung
+const LowerThird: React.FC<OverlayProps> = ({o, brand}) => {
+  const {height} = useVideoConfig();
+  const a = useIn(0);
+  const b = useIn(0.15);
+  const out = useOut(o);
+  return (
+    <div style={{...glass, position: 'absolute', left: 60, top: o.y * height, display: 'flex', alignItems: 'center', gap: 20, padding: '18px 34px 18px 18px', opacity: out, transform: `translateX(${(1 - a) * -800}px)`}}>
+      {o.icon && <Img src={staticFile(o.icon)} style={{width: 120, height: 120, objectFit: 'contain', transform: `scale(${b}) rotate(${(1 - b) * -30}deg)`, filter: 'drop-shadow(0 10px 14px rgba(0,0,0,.5))'}} />}
+      <div style={{borderLeft: `6px solid ${brand.accent}`, paddingLeft: 20}}>
+        <div style={{fontFamily: HEAD, fontSize: 64, lineHeight: 1.05, color: '#fff'}}>{o.title}</div>
+        {o.sub && <div style={{fontFamily: BODY, fontWeight: 700, fontSize: 32, color: 'rgba(255,255,255,.8)', opacity: b}}>{o.sub}</div>}
+      </div>
+    </div>
+  );
+};
+
 export const OVERLAYS: Record<string, React.FC<OverlayProps>> = {
   hook: Hook,
   price: Price,
@@ -148,4 +221,8 @@ export const OVERLAYS: Record<string, React.FC<OverlayProps>> = {
   cta: Cta,
   badge3d: Badge3D,
   snow: Snow,
+  sticker: Sticker,
+  compare: Compare,
+  blur: Blur,
+  lowerthird: LowerThird,
 };

@@ -1,5 +1,6 @@
 {
   "fps": 30,
+  "auto": {"zoom": false, "transitions": false, "sfx": false},
   "brand": {"accent": "#FFD60A", "dark": "#0B0F14", "handle": "@_carcura_"},
 
   "grade": [

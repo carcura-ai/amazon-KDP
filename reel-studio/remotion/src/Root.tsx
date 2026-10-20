@@ -1,6 +1,6 @@
 import {Composition} from 'remotion';
 import {Reel} from './Reel';
-import type {EditSpec} from './types';
+import {clipDur, type EditSpec} from './types';
 
 const empty: EditSpec = {
   fps: 30,
@@ -22,7 +22,7 @@ export const RemotionRoot = () => (
     defaultProps={empty}
     calculateMetadata={({props}) => ({
       fps: props.fps,
-      durationInFrames: Math.max(1, Math.round(props.clips.reduce((d, c) => d + c.to - c.from, 0) * props.fps)),
+      durationInFrames: Math.max(1, Math.round(props.clips.reduce((d, c) => d + clipDur(c), 0) * props.fps)),
     })}
   />
 );
