@@ -22,6 +22,10 @@ Werkzeug: `reel-studio/` (Remotion + ffmpeg + faster-whisper + rembg). Bedienung
 0. **Markendaten** stehen in `reel-studio/brand/MARKE.md` (Kontakt, WhatsApp, Website, Preise, Farben, Logo) – nie erneut erfragen; Farben/Handle kommen automatisch aus `brand/brand.json`.
    **Briefing** aus Nachricht oder `projekte/<name>/notes.md`: Leistung, Fahrzeug, Angebot/Preis, Ziel (Reichweite / Anfragen / Website), CTA-Kanal, Frist. Fehlendes als Annahme kennzeichnen, nur bei Ergebnis-relevanten Luecken fragen.
 1. **Material** nach `reel-studio/projekte/<name>/raw/` (Videos) und `voice/` (Sprache). Uebergabewege: `references/material-uebergabe.md`.
+1a. **Lange Rohclips (POV, Daueraufnahmen):** erst sichten (Kontaktbogen 1 Bild/s, Pegel je Sekunde), dann nur die besten Stellen als
+   Ausschnitte nach `raw/` schneiden – mit Drehung, Zuschnitt auf Haende/Auto und Aufhellung (Vorlage: `projekte/m2-keramik-60/ausschnitte.sh`).
+   Spart 90 % Aufbereitungszeit. Stummes Mikro (< −55 dB) → CC0-Foley synchron zur Bewegung (`foley.sh`), dem Nutzer offen sagen.
+   Rendern ohne Filmkorn ist doppelt so schnell (`look.grain` nur bei sauberem Material).
 2. `python3 -I pipeline/analyze.py projekte/<name>` (bei bereits geschnittenem Material `--no-cut`). Bausteine: A = Sprecher im Bild, V = Voiceover, B = B-Roll.
 3. **Musik waehlen (Pflicht, Auto-Content = Phonk/Trap/Hip-Hop von ccMixter, siehe `references/sounddesign.md`):** `python3 -I pipeline/asset.py musik "<stimmung>" --bpm 100-130` → `musikhole "<Titel>" projekte/<name>` (Beats + bester Abschnitt → `music.from`). Ohne Sprache vol 0.5–0.6, mit Sprache vol 0.16 / duck 0.05. Nur ohne Musik liefern, wenn der Nutzer es verlangt.
    **Story planen** mit `references/stil-handbuch.md`: Format waehlen, Hook festlegen, beste Takes, B-Roll-Zuordnung zum gesprochenen Wort, 3D-/Sticker-Ideen.
@@ -31,6 +35,25 @@ Werkzeug: `reel-studio/` (Remotion + ffmpeg + faster-whisper + rembg). Bedienung
 7. **QA-Checkliste** (unten) gegen den Kontaktbogen und die Lautheitsmessung.
 8. **Lieferung**: MP4 + SRT + `BESCHREIBUNG.md` nach `references/lieferung-vorlage.md` inkl. Werbeplan aus `references/werbung.md`. Dateien per SendUserFile senden.
 9. `edit.json`, `notes.md`, `BESCHREIBUNG.md`, `assets/LIZENZEN.md` committen (keine Videos).
+
+## Regie-Modus (immer – nach der Referenz „Skill = Regisseur“)
+
+Sieben Stationen, jede mit Ergebnis, in dieser Reihenfolge:
+
+| Station | Ergebnis |
+|---|---|
+| 1 Drehbuch | Hook (≤ 2 s), Story-Beats, ein CTA; Saetze ≤ 8 Woerter |
+| 2 Storyboard | `projekte/<n>/STORYBOARD.md`: Zeit · Bild (Baustein-ID) · Text/Grafik · Sound · Musik-Moment – **vor** edit.json |
+| 3 Animation | Overlays in edit.json (Grafik nur, wo sie die Aussage traegt) |
+| 4 Untertitel | Stil waehlen: `standard` (Wort-Highlight) oder `kinetik` (Satz baut sich auf, betonte Woerter kursiv/Serif/Akzent) |
+| 5 Voiceover | A-Roll/Sprachmemo; Musik automatisch geduckt |
+| 6 Sounddesign | Sound-Paare, Glitch/Whip/Whoosh, echte Sounds (Freesound) |
+| 7 Endmischung | −14 LUFS, „Ton-Check ok“, Stimme klar vor Musik |
+
+Danach **Regie-Durchgang** (Pflicht, hoechstens 2 Runden): Kontaktbogen + Pegelprofil pruefen und konkrete Notizen in
+`projekte/<n>/REGIE.md` schreiben wie ein Regisseur („Uebergang bei 6,4 s haerter“, „Whoosh bei 9 s leiser“, „Ende einen Beat
+laenger“, „Text bei 2 s angeschnitten“) → umsetzen → neu rendern. Vorher `references/regie-regeln.md` abgleichen.
+**Jede Rueckmeldung des Nutzers wird sofort eine neue Regel in `references/regie-regeln.md`.**
 
 ## edit.json – Kurzreferenz
 
@@ -56,6 +79,7 @@ Werkzeug: `reel-studio/` (Remotion + ffmpeg + faster-whisper + rembg). Bedienung
 Schriften: Titel `Anton` (Standard, schmal) · `Clash Display` / `Cabinet Grotesk` (modern, breiter – Titel kuerzer/kleiner) · Text `Montserrat` / `Satoshi` (Fontshare, ITF FFL).
 `look.grain` 0.05–0.1 = analoges Filmkorn (Kino-Textur). Sound-Eintraege mit `"dur"` begrenzen.
 
+Untertitel-Stil: `"captions": {"style": "kinetik", "betonen": ["tag", "1", "halle"], "y": 0.6}` · Uebergang `tin: "glitch"` · `"ende_halten": true`.
 Zeitanker: `t:Wort`, `t:Wort.e` (Ende), `t:Wort#2`, `t:für den Winter` (Phrase), `t:seg3`, `t:seg3.e`, `t:end`, Versatz `t:Wort-0.2`.
 Segment-Optionen: `tin` (zoom|whip|flash|none), `zoom` [von, bis], `bvol` (B-Roll-Ton unter VO), `vvol`, `pad`, `schnitt` (hart|beat), bei `a`: `von`/`bis`.
 B-Roll-Element: `{"id", "from", "dur", "rate", "vol", "ramp": true}` (Speed-Ramp normal → Zeitlupe → normal).
@@ -77,6 +101,8 @@ B-Roll-Element: `{"id", "from", "dur", "rate", "vol", "ramp": true}` (Speed-Ramp
 | `chat` | Kunden-Chat als Hook oder CTA | messages [{who: kunde/wir, text, at}], y, title |
 | `letterbox` | Kino-Balken | h (Anteil, 0.1) |
 | `collage` | 2–4 Clips/Bilder als Postkarten | items [{id, from} oder {src}, at], w |
+| `timer` | Zeit + Fortschrittsbalken oben („in 60 Sekunden“) | label, total (60), y (0.1), countdown, offset |
+| `step` | 3D-Schrittkarte mit Zahlenkachel | nr (ohne = nur Kicker), of, kicker, text (\n = Zeilenumbruch), size, y, fx: glanz \| spray (setzt sich wie Nebel ab) \| wisch (wird weggewischt) |
 
 Jedes Overlay: `from`, `to`; optional `"sfx": "name"` oder `false`.
 Positionen: x/y als Anteil der Bildbreite/-hoehe. Sichere Zone: wichtige Inhalte zwischen y 0.15 und 0.63.

@@ -14,6 +14,7 @@ const ClipView: React.FC<{c: Clip; muted?: boolean}> = ({c, muted}) => {
   const vol = muted ? 0 : (c.vol ?? 1);
   const style =
     c.tin === 'zoom' ? {transform: `scale(${interpolate(f, [0, 8], [1.25, 1], clamp)})`, filter: `blur(${interpolate(f, [0, 6], [8, 0], clamp)}px)`}
+    : c.tin === 'glitch' ? {transform: `translateX(${f < 6 ? [18, -24, 12, -8, 5, 0][f] : 0}px) skewX(${f < 4 ? [8, -6, 4, 0][f] : 0}deg)`, filter: f < 6 ? `saturate(2.2) contrast(1.5) hue-rotate(${[0, 40, -30, 20, -10, 0][f]}deg)` : undefined}
     : c.tin === 'whip' ? {transform: `translateX(${interpolate(f, [0, 7], [-220, 0], clamp)}px)`, filter: `blur(${interpolate(f, [0, 6], [18, 0], clamp)}px)`}
     : {};
   return (
@@ -21,7 +22,11 @@ const ClipView: React.FC<{c: Clip; muted?: boolean}> = ({c, muted}) => {
       {c.img ? (
         <Img src={staticFile(c.src)} style={media} />
       ) : (
-        <OffthreadVideo src={staticFile(c.src)} trimBefore={Math.round(c.from * fps)} playbackRate={c.rate ?? 1} muted={!vol} volume={vol} style={media} />
+        <OffthreadVideo src={staticFile(c.src)} trimBefore={Math.round(c.from * fps)} playbackRate={c.rate ?? 1} muted={!vol}
+          volume={(fr) => vol * Math.min(1, (fr + 1) / 4, (clipDur(c) * fps - fr) / 4)} style={media} />
+      )}
+      {c.tin === 'glitch' && f < 6 && (
+        <AbsoluteFill style={{background: `repeating-linear-gradient(0deg, rgba(255,0,60,.22) 0 ${6 + f * 3}px, transparent ${6 + f * 3}px ${18 + f * 7}px)`, mixBlendMode: 'screen'}} />
       )}
       {c.tin === 'flash' && <AbsoluteFill style={{background: '#fff', opacity: interpolate(f, [0, 5], [0.9, 0], clamp)}} />}
     </AbsoluteFill>

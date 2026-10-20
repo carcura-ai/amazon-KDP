@@ -306,6 +306,59 @@ const Collage: React.FC<OverlayProps> = ({o}) => {
   );
 };
 
+// 60-Sekunden-Timer: Zeit + Fortschrittsbalken oben (Halte-Effekt „gleich ist es fertig“)
+const Timer: React.FC<OverlayProps> = ({o, brand}) => {
+  const f = useCurrentFrame();
+  const {fps, width, height} = useVideoConfig();
+  const total = o.total ?? 60;
+  const sec = Math.min(total, (o.offset ?? 0) + f / fps * ((o.total ?? 60) / (o.to - o.from)));
+  const a = useIn(0);
+  const out = useOut(o);
+  const shown = o.countdown ? total - sec : sec;
+  const label = `${Math.floor(shown / 60)}:${String(Math.floor(shown % 60)).padStart(2, '0')}`;
+  return (
+    <div style={{position: 'absolute', left: 60, right: 60, top: (o.y ?? 0.135) * height, opacity: a * out}}>
+      <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10}}>
+        <div style={{fontFamily: BODY, fontWeight: 900, fontSize: 30, letterSpacing: 3, color: '#fff', textShadow: '0 2px 10px rgba(0,0,0,.7)'}}>{o.label ?? ''}</div>
+        <div style={{fontFamily: BODY, fontWeight: 900, fontSize: 40, color: brand.dark, background: brand.accent, padding: '4px 16px', borderRadius: 12, fontVariantNumeric: 'tabular-nums'}}>{label}</div>
+      </div>
+      <div style={{height: 10, borderRadius: 5, background: 'rgba(255,255,255,.25)', overflow: 'hidden', width: width - 120}}>
+        <div style={{height: '100%', width: `${(sec / total) * 100}%`, background: brand.accent, boxShadow: `0 0 18px ${brand.accent}`}} />
+      </div>
+    </div>
+  );
+};
+
+// 3D-Schrittkarte: extrudierte Schrift dreht sich ins Bild, Lichtschimmer laeuft darueber.
+// fx: 'glanz' (zweiter Hochglanz-Schimmer) | 'spray' (Schrift setzt sich wie Spruehnebel ab) | 'wisch' (wird am Ende weggewischt)
+const Step: React.FC<OverlayProps> = ({o, brand}) => {
+  const f = useCurrentFrame();
+  const {fps, height} = useVideoConfig();
+  const a = useIn(0, {damping: 12, stiffness: 130});
+  const out = useOut(o);
+  const end = (o.to - o.from) * fps;
+  const clamp = {extrapolateLeft: 'clamp', extrapolateRight: 'clamp'} as const;
+  const depth = (c: string, n: number) => Array.from({length: n}, (_, i) => `${i + 1}px ${i + 1}px 0 ${c}`).join(', ');
+  const glint = interpolate(f, o.fx === 'glanz' && f > 30 ? [34, 54] : [8, 26], [-40, 140], clamp);
+  const mist = o.fx === 'spray' ? interpolate(f, [0, 18], [1, 0], clamp) : 0;
+  const wipe = interpolate(f, [end - 20, end - 3], [-20, 120], clamp);
+  const mask = o.fx === 'wisch' ? `linear-gradient(100deg, transparent ${wipe}%, #000 ${wipe + 20}%)` : undefined;
+  const textStyle = {fontFamily: HEAD, lineHeight: 0.95, color: '#fff', whiteSpace: 'pre-line', textShadow: `${depth('#3a3d45', 10)}, 0 18px 40px rgba(0,0,0,.6)`} as const;
+  return (
+    <div style={{position: 'absolute', left: 0, right: 0, top: (o.y ?? 0.2) * height, display: 'flex', justifyContent: 'center', perspective: 1000, opacity: o.fx === 'wisch' ? 1 : out, WebkitMaskImage: mask, maskImage: mask}}>
+      <div style={{transform: `rotateX(${(1 - a) * 70}deg) rotateY(${(1 - a) * -25}deg) scale(${0.7 + 0.3 * a})`, transformStyle: 'preserve-3d', textAlign: 'center', position: 'relative'}}>
+        <div style={{position: 'absolute', inset: '-40px -90px', background: 'radial-gradient(ellipse at center, rgba(0,0,0,.45) 0%, rgba(0,0,0,0) 68%)'}} />
+        <div style={{display: 'inline-flex', alignItems: 'center', gap: 14, marginBottom: 10, position: 'relative'}}>
+          {o.nr !== undefined && <div style={{fontFamily: HEAD, fontSize: 64, lineHeight: 1, color: brand.dark, background: brand.accent, padding: '6px 18px', borderRadius: 14, boxShadow: `${depth('#8a8f12', 8)}, 0 12px 30px rgba(0,0,0,.5)`}}>{o.nr}</div>}
+          <div style={{fontFamily: BODY, fontWeight: 900, fontSize: 30, letterSpacing: 5, color: brand.accent, background: 'rgba(9,9,10,.62)', padding: '6px 14px', borderRadius: 10}}>{o.kicker ?? `SCHRITT ${o.nr}/${o.of}`}</div>
+        </div>
+        <div style={{...textStyle, position: 'relative', fontSize: o.size ?? 104, filter: mist ? `blur(${mist * 16}px)` : undefined, letterSpacing: mist * 40, opacity: 1 - mist * 0.6}}>{o.text}</div>
+        <div style={{position: 'absolute', inset: 0, background: `linear-gradient(105deg, transparent ${glint - 20}%, rgba(255,255,255,.55) ${glint}%, transparent ${glint + 20}%)`, mixBlendMode: 'overlay', pointerEvents: 'none'}} />
+      </div>
+    </div>
+  );
+};
+
 export const OVERLAYS: Record<string, React.FC<OverlayProps>> = {
   hook: Hook,
   price: Price,
@@ -322,4 +375,6 @@ export const OVERLAYS: Record<string, React.FC<OverlayProps>> = {
   chat: Chat,
   letterbox: Letterbox,
   collage: Collage,
+  timer: Timer,
+  step: Step,
 };

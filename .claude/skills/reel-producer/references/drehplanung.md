@@ -91,3 +91,14 @@ Musik-Stimmung: <z. B. motivierend 120 bpm> · Sounds: <Schluesselmomente>
 Sprechtext (Sprachmemo, 20 s): „...“
 Nicht vergessen: Kennzeichen · HDR aus · Vorher-Position markieren
 ```
+
+## POV / ASMR – Lehren aus dem M2-Dreh (20.10.2026)
+
+- **Kamera 25–35° nach unten neigen** (Brust- oder Kopfhalterung): Hände und Lack gehören in die **untere Bildhälfte bis Mitte**.
+  Beim M2 zeigte die Kamera oft auf Wand und LED-Leisten – nutzbar nur durch Zuschnitt (Qualitätsverlust, Hände am Rand).
+- **Mikro vor jedem Clip prüfen** (Pegelanzeige, Funkmikro verbunden, Akku): Ab dem Entfetten war der Ton stumm (−63 dB).
+  Für ASMR ist der Ton der halbe Content – Mikro nah an die Arbeit (Clip am Ärmel/Handgelenk), nicht am Körper hinter Kleidung.
+- **Kamera-Ausrichtung festhalten**: Ein Clip lag kopfüber, einer quer. Vor dem Start einmal das Bild auf dem Handy prüfen.
+- **Pro Schritt 2–3 klare Einstellungen à 5–8 s** statt minutenlanger Daueraufnahme: Nah (Hand + Produkt), Detail (Pad/Tuch/Applikator),
+  Ergebnis (Spiegelung im Lack). Zwischen den Takes nicht an der Kamera verstellen – Aufnahme stoppen, neu starten.
+- **Finale (Wassertest) mit 60 fps**, Kamera ruhig, Glas langsam über die Fläche führen; Ton direkt am Handy nah am Wasser.

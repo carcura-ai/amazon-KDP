@@ -1,0 +1,24 @@
+A-ROLL (Sprecher im Bild)
+
+VOICEOVER
+
+B-ROLL
+B1   b01_front.mp4  3.6s  25fps  1440x2560  Schnitte []
+B2   b02_spruehen.mp4  11.5s  25fps  1440x2560  Schnitte []
+B3   b03_nebel.mp4  6.0s  25fps  1440x2560  Schnitte []
+B4   b04_nebel.mp4  3.6s  25fps  1440x2560  Schnitte []
+B5   b05_lanze.mp4  7.6s  25fps  1440x2560  Schnitte []
+B6   b06_maschine.mp4  7.6s  25fps  1440x2560  Schnitte []
+B7   b07_m2.mp4  8.6s  25fps  1440x2560  Schnitte []
+B8   b08_spiegel.mp4  7.6s  25fps  1440x2560  Schnitte []
+B9   b09_reflex.mp4  6.6s  25fps  1440x2560  Schnitte []
+B10  b10_spray.mp4  4.6s  25fps  1440x2560  Schnitte []
+B11  b11_tuch.mp4  9.6s  25fps  1440x2560  Schnitte []
+B12  b12_tuch2.mp4  5.0s  25fps  1440x2560  Schnitte []
+B13  b13_auftrag.mp4  10.6s  25fps  1440x2560  Schnitte []
+B14  b14_auftrag2.mp4  6.6s  25fps  1440x2560  Schnitte []
+B15  b15_abtrag.mp4  6.6s  25fps  1440x2560  Schnitte []
+B16  b16_abtrag2.mp4  9.6s  25fps  1440x2560  Schnitte []
+B17  b17_wasser.mp4  12.7s  60fps  1440x2560  Schnitte []
+
+A-Roll gesamt: 0.0s · Kontaktbogen: analysis/uebersicht-*.jpg

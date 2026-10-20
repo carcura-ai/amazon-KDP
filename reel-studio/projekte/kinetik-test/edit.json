@@ -1,0 +1,19 @@
+{
+  "fps": 30,
+  "brand": {"fontBody": "Satoshi", "fontHead": "Clash Display"},
+  "look": {"grade": "contrast(1.08) saturate(1.05)", "vignette": 0.35, "grain": 0.06},
+  "music": {"src": "musik/mr_wozzie.mp3", "from": 22.0, "vol": 0.5, "duck": 0.08},
+  "ende_halten": true,
+  "timeline": [
+    {"b": [{"id": "B1", "from": 2.6, "dur": 1.8}], "tin": "none"},
+    {"a": "A3", "tin": "glitch"},
+    {"b": [{"id": "B2", "from": 0.0, "dur": 1.2}, {"id": "B10", "from": 5.0, "dur": 1.0}], "schnitt": "beat", "tin": "glitch"},
+    {"a": "A6", "bis": "bringen", "tin": "glitch"},
+    {"b": [{"id": "B14", "from": 3.4, "dur": 2.2, "ramp": true, "vol": 0.3}], "tin": "flash"}
+  ],
+  "captions": {"y": 0.6, "maxWords": 3, "maxChars": 18, "style": "kinetik", "betonen": ["tag", "1", "halle", "100", "projekt"]},
+  "overlays": [
+    {"type": "title", "from": "t:seg1", "to": "t:seg1.e", "y": 0.18, "kicker": "CARCURA", "text": "VON 0 AUF 100"}
+  ],
+  "sfx": [{"at": "t:seg5", "name": "impact", "vol": 0.35}]
+}

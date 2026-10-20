@@ -18,7 +18,7 @@ export type EditSpec = {
   grade?: (Range & {filter: string})[];
   zooms?: (Range & {scale: [number, number]})[];
   cover?: (Range & {top: number; bottom: number})[]; // Milchglas-Band ueber eingebrannten Texten
-  captions: {y: number; maxWords: number; maxChars: number; hide?: [number, number][]};
+  captions: {y: number; maxWords: number; maxChars: number; hide?: [number, number][]; style?: 'standard' | 'kinetik'; betonen?: string[]};
   overlays: Overlay[];
   sfx?: {at: number; name: string; vol?: number; dur?: number}[];
 };

@@ -8,13 +8,14 @@ Zeitleiste in edit.json ("timeline", optional – ohne sie gilt analysis/auto_ed
   {"v": "V1", "b": ["B2", {"id": "B4", "from": 1.5, "rate": 0.5}]}   Voiceover ueber B-Roll
   {"b": [{"id": "B3", "dur": 2.0}], "vol": 0.7}       reine B-Roll mit Originalton (z. B. Schaum-ASMR)
   {"b": [{"img": "assets/foto.jpg", "dur": 2}]}        Standbild (Ken-Burns-Zoom automatisch)
-  Optionen je Segment: "tin" (zoom|whip|flash|none), "zoom" [von, bis], "bvol" (B-Roll-Ton unter VO), "pad",
+  Optionen je Segment: "tin" (zoom|whip|flash|glitch|none), "zoom" [von, bis], "bvol" (B-Roll-Ton unter VO), "pad",
   "schnitt": "hart" (Montage ohne Zwischen-Uebergaenge) | "beat" (Schnitte auf Musik-Beats), bei "a": "von"/"bis"
   B-Roll-Element: {"id", "from", "dur", "rate", "vol", "ramp": true (Speed-Ramp normal -> Zeitlupe -> normal)}
 Zeitanker statt Sekunden, ueberall ausser in der Zeitleiste:
   "t:Salz" Wortbeginn · "t:Salz.e" Wortende · "t:Salz#2" 2. Vorkommen · "t:für den Winter" Phrase
   "t:seg3" / "t:seg3.e" Segment 3 · "t:end" Videoende · Versatz: "t:Salz-0.2", "t:end-1.5"
 "auto": {"zoom": true, "transitions": true, "sfx": true} erzeugt Zooms, Uebergaenge und Sounds automatisch.
+"ende_halten": true haelt das letzte Bild einen Musik-Beat laenger (Regie-Regel).
 """
 import json, re, subprocess, sys
 from pathlib import Path
@@ -160,6 +161,20 @@ else:
         t += c["to"] - c["from"]
     words = auto_edit["words"]
 
+# Regie-Regel „Ende einen Beat laenger halten“: letzter Clip wird um einen Musik-Beat (sonst 0,5 s) verlaengert
+if edit.get("ende_halten") and clips:
+    hold = (beats[1] - beats[0]) if len(beats) > 1 else 0.5
+    c = clips[-1]
+    if not c.get("img") and "projekte/" in c["src"]:
+        dur_src = next((r["duration"] for r in (json.loads((ana / "blocks.json").read_text(encoding="utf-8"))["broll"].values()
+                        if (ana / "blocks.json").exists() else []) if r["src"] == c["src"]), None)
+        if dur_src is not None:
+            hold = min(hold, max(0.0, (dur_src - c["to"]) / c.get("rate", 1)))
+    hold = q(hold)
+    c["to"] = round(c["to"] + hold * c.get("rate", 1), 4)
+    t += hold
+    segs[-1]["to"] = round(t, 4)
+
 T = t
 ANCHOR = re.compile(r"^t:(.+?)(?:#(\d+))?(\.e)?([+-]\d+(?:\.\d+)?)?$")
 
@@ -245,8 +260,8 @@ if auto.get("sfx", True):
     DEFAULT = {"hook": "subdrop", "title": "whoosh", "sticker": "pop", "lowerthird": "whip", "checklist": "pop",
                "price": "pop", "cta": "whoosh", "badge3d": "whoosh", "snow": "shimmer", "compare": "whip",
                "textbehind": "impact", "collage": "whoosh", "chat": None, "letterbox": None}
-    extra = [{"at": c["at"], "name": "whip" if c["tin"] == "whip" else "whoosh", "vol": 0.22}
-             for c in clips if c.get("tin") in ("zoom", "whip")]
+    TIN_SFX = {"zoom": "whoosh", "whip": "whip", "glitch": "kenney/glitch_001.ogg"}
+    extra = [{"at": c["at"], "name": TIN_SFX[c["tin"]], "vol": 0.22} for c in clips if c.get("tin") in TIN_SFX]
     for o in overlays:
         if o.get("sfx") is False:
             continue

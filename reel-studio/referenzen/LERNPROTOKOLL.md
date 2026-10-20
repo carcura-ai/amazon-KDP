@@ -61,3 +61,13 @@ Fremde Videos liegen nur lokal in `referenzen/runde1/raw/` und werden nicht verw
 Format selbst: weisser Editorial-Look, rote Akzente, Kommentar-CTA „TOOLS“.
 
 Nutzer-Playlist „526“ ausgewertet → Musik-DNA (Strassenrap, Phonk, Cloud-Rap) in `sounddesign.md`.
+
+## Runde 3 (20.10.2026): miftahul_islam_efaz – „Skill = Regisseur“ (75 Tsd. Aufrufe, 15 Tsd. Kommentare)
+
+Gesagt: Kein magischer Prompt – ein Regisseur. Seine Regie steckt in einer Skill-Datei (Drehbuch, Storyboard, Animation,
+Untertitel, Voiceover, Sounddesign, Endmischung). Sechs Versionen pro Video mit Notizen wie „Uebergang fixen, Whoosh leiser,
+Ende einen Beat laenger“. Skill = 75 %, Idee/Geschmack/Notizen des Nutzers = 25 %.
+Gezeigt: kinetische Typografie synchron zur Stimme (Serif-kursiv-Akzente + fette Grotesk, rote Schluesselwoerter),
+Pixel/Glitch-Uebergaenge, Maskottchen-Figuren, Zaehler, Kommentar-CTA als UI-Karte, Serie „1/3“.
+Umgesetzt: Regie-Modus mit 7 Stationen + Regie-Durchgang (SKILL.md), `references/regie-regeln.md` (alle Nutzer-Notizen als Regeln),
+Untertitel-Stil `kinetik` (Instrument Serif, OFL), Uebergang `glitch` mit Sound, `ende_halten`. Offen: Maskottchen fuer Carcura.
