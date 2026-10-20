@@ -52,6 +52,6 @@ Die Zielwerte sind Startannahmen ohne Vergleichsdaten – nach dem ersten Test i
 
 ## Vor dem Upload prüfen
 
-- [ ] Musik-Nennung (CC BY 4.0) in jeder Beschreibung
+- [ ] Musik-Nennung („Mr. Wozzie“ by Robbero, CC BY 3.0) in jeder Beschreibung
 - [ ] Keine Kennzeichen sichtbar (geprüft im Kontaktbogen der Endfassung)
 - [ ] Lizenzen: 3D-Emojis Microsoft Fluent (MIT), Schriften OFL, Sounds eigene + Kenney (CC0) – keine Nennung nötig
