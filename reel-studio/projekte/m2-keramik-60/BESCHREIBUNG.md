@@ -56,7 +56,7 @@ Kommentar → DM automatisch: möglich mit ManyChat (Instagram, kostenloser Eins
 
 ## Vor dem Upload prüfen
 
-- [ ] Fahrzeughalter einverstanden, dass sein M2 gezeigt wird (falls Kundenauto) – Kennzeichen ist im Video nicht zu sehen (Kontaktbogen der Endfassung geprüft)
+- [ ] Fahrzeughalter einverstanden, dass sein M2 gezeigt wird (falls Kundenauto) – Kennzeichen ist im Video nicht zu sehen (Kontaktbogen der Endfassung geprüft ✓)
 - [ ] Ton: Wäsche und Politur sind Originalton; Entfetten, Keramik auf-/abtragen und Wasser sind nachvertonte Geräusche (am Mikro war dort kein Ton) – deshalb in der Beschreibung **nicht** „100 % Originalton“ schreiben
 - [ ] Lizenzen: Geräusche Freesound CC0 + eigene Synthese, 3D-Emojis Microsoft Fluent (MIT), Schriften Anton (OFL) / Satoshi (ITF FFL) – keine Nennung nötig (`assets/LIZENZEN.md`)
 - [ ] Preis „ab 650 €“ entspricht der Website (Endpreis, Kleinunternehmer – kein „inkl. MwSt.“)

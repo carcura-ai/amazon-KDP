@@ -24,4 +24,4 @@ Regie-Durchgang 1 → 2: 3 s Kotflügel ohne Handlung ersetzt (Pad + M2-Emblem),
 Maschinenton gewählt, Foley ohne Löcher, Stille in den letzten 2,5 s beseitigt (Wasser bis zum Ende), Effekt-Akzente ergänzt.
 
 Regie-Regeln geprüft: Hook 0–2 s ✓ · ASMR-Ausnahme (keine Musik, Pegel je Clip, Ein-/Ausblenden) ✓ · Übergänge nur an Kapitelwechseln ✓ ·
-ein CTA (Kommentar-Stichwort) ✓ · Preis = Website, Endpreis ✓ · Kennzeichen: siehe Kontaktbogen der Endfassung.
+ein CTA (Kommentar-Stichwort) ✓ · Preis = Website, Endpreis ✓ · Kennzeichen nicht sichtbar ✓ · −14,1 LUFS, keine Stille-Lücken ✓
