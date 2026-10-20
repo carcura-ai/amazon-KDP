@@ -1,0 +1,13 @@
+{
+  "prompt": "Carcura Fahrzeugaufbereitung: Keramikversiegelung, Lackversiegelung, Politur, Lackkorrektur, Hologramme, Swirls, Innenraumreinigung, Lederpflege, Felgenreinigung, Umwelteinflüsse, Wasserflecken, Abperleffekt, Fahrzeuggröße.",
+  "ersetzen": {
+    "Umweltanflüsse": "Umwelteinflüsse",
+    "Keramikversicherung": "Keramikversiegelung",
+    "Karkura": "Carcura",
+    "Carkura": "Carcura"
+  },
+  "phrasen": [
+    ["erste der kommt mal zuerst", "Erste, der kommt, mahlt zuerst"]
+  ],
+  "fueller": ["äh", "ähm", "öhm", "hm", "ehm"]
+}
