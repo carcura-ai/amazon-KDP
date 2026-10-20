@@ -37,7 +37,8 @@ Werkzeug: `reel-studio/` (Remotion + ffmpeg + faster-whisper + rembg). Bedienung
 ```json
 {
   "fps": 30,
-  "look": {"grade": "contrast(1.06) saturate(1.1)", "vignette": 0.35},
+  "brand": {"fontHead": "Clash Display", "fontBody": "Satoshi"},
+  "look": {"grade": "contrast(1.06) saturate(1.1)", "vignette": 0.35, "grain": 0.07},
   "timeline": [
     {"a": "A1"},
     {"v": "V1", "b": ["B2", {"id": "B4", "from": 1.5, "rate": 0.5}], "bvol": 0.15},
@@ -51,6 +52,9 @@ Werkzeug: `reel-studio/` (Remotion + ffmpeg + faster-whisper + rembg). Bedienung
   "sfx": [{"at": "t:Preis", "name": "impact", "vol": 0.35}]
 }
 ```
+
+Schriften: Titel `Anton` (Standard, schmal) · `Clash Display` / `Cabinet Grotesk` (modern, breiter – Titel kuerzer/kleiner) · Text `Montserrat` / `Satoshi` (Fontshare, ITF FFL).
+`look.grain` 0.05–0.1 = analoges Filmkorn (Kino-Textur). Sound-Eintraege mit `"dur"` begrenzen.
 
 Zeitanker: `t:Wort`, `t:Wort.e` (Ende), `t:Wort#2`, `t:für den Winter` (Phrase), `t:seg3`, `t:seg3.e`, `t:end`, Versatz `t:Wort-0.2`.
 Segment-Optionen: `tin` (zoom|whip|flash|none), `zoom` [von, bis], `bvol` (B-Roll-Ton unter VO), `vvol`, `pad`, `schnitt` (hart|beat), bei `a`: `von`/`bis`.

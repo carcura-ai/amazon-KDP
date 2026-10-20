@@ -41,12 +41,22 @@ Kenney (CC0, `kenney/<name>.ogg`, Name mit Endung angeben): z. B. `kenney/confir
 
 ## Carcura-Musikstil (Nutzervorgabe)
 
-Auto-/Carporn-Content: **cool – Phonk, Trap, Hip-Hop/Rap-Beats**, kein Bibliotheks-Pop. Quelle: ccMixter (nur CC BY):
-`python3 -I pipeline/asset.py ccmixter "phonk"` / `"trap,instrumental"` / `"hip_hop,instrumental,dark"` → `ccmixterhole <id> projekte/<n>`
-(misst BPM, Bass-Anteil, Gesang; waehlen: Bass ≥ 35 %, Gesang 0 % bei Montagen). Bewaehrt: „Red Eyed Beast“ (SkyeJordan, Phonk, 99 bpm),
-„Mr. Wozzie“ (Robbero, Dark Hip-Hop, 96 bpm), „Spheres“ (Robbero, chill). Stil-Vorlage: oeffentliche Spotify-Playlist des Nutzers
-(`asset.py spotify <link>`) → Artists/Tempo auswerten → passende CC-BY-Beats suchen. Spotify-Songs nie selbst einbauen (Urheberrecht).
-Kevin MacLeod nur fuer Nicht-Auto-Themen (Story, ruhige Formate), wenn nichts Passendes bei ccMixter.
+**Musik-DNA aus der Nutzer-Playlist „526“** (100 Titel, ausgewertet am 20.10.2026):
+- Deutscher Strassenrap: KITSCHKRIEG/SFR/Trettmann, Gzuz, Bonez MC, RAF Camora, Luciano, Olexesh, Haftbefehl, Kolja Goldstein („Audi Bande“)
+- Phonk / Drift-Phonk: DRAGONMANE, ZODIVK („Tokyo Drift“), RAIZHELL, „BRAZILIAN DANÇA PHONK“, Undagroundmane („Burnin' Tires“)
+- Cloud-Rap / Underground: BONES (Top-Artist), $uicideboy$, Night Lovell
+→ dunkel, bassig, cool-aggressiv. Auto-Montagen = Phonk; Story/Sprecher = Dark Hip-Hop oder Strasse; ruhig/Premium = Cloud.
+
+Quellen in dieser Reihenfolge (alle rechtssicher):
+1. **Eigene Beats** `python3 -I pipeline/beatgen.py projekte/<n> --stil phonk|cloud|strasse --dauer <s> --seed <n>`
+   (keine Lizenz/Nennung, exaktes Beat-Raster; Seed variiert Tonart/Muster). Nutzerbewertung der Stile im LERNLOG festhalten.
+2. **ccMixter (CC BY)** `asset.py ccmixter "phonk"` → `ccmixterhole <id>`: bewaehrt „Red Eyed Beast“ (Phonk), „Mr. Wozzie“ (Dark Hip-Hop),
+   „Spheres“ (chill). Auswahl: Bass ≥ 35 %, Gesang 0 % bei Montagen.
+3. Kevin MacLeod nur fuer Nicht-Auto-Themen.
+Playlist-Songs selbst nie einbauen (Urheberrecht) – nur ueber die App-Bibliothek, falls dort vorhanden.
+
+**Echte Sounds (Freesound, nur CC0):** `asset.py sound "water splash"` → `freesound/<datei>.mp3`; Katalog `pipeline/daten/sfx-freesound.md`.
+Vorhanden: Wasserspritzer, Spruehflasche, Autotuer, Hochdruckreiniger, Motorstart/Rev, Poliermaschine. In edit.json mit `"dur"` begrenzen.
 
 ## Musik nach Stimmung (Pflicht in jedem Video)
 

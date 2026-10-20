@@ -77,7 +77,7 @@ export const Reel: React.FC<EditSpec> = (spec) => {
   const cover = at(spec.cover, t);
 
   return (
-    <AbsoluteFill style={{backgroundColor: '#000'}}>
+    <AbsoluteFill style={{backgroundColor: '#000', ['--font-head' as string]: `'${spec.brand.fontHead ?? 'Anton'}'`, ['--font-body' as string]: `'${spec.brand.fontBody ?? 'Montserrat'}'`}}>
       <AbsoluteFill style={look}>
         <Footage spec={spec} />
       </AbsoluteFill>
@@ -93,6 +93,17 @@ export const Reel: React.FC<EditSpec> = (spec) => {
 
       {!!spec.look?.vignette && (
         <AbsoluteFill style={{background: `radial-gradient(ellipse at 50% 45%, transparent 55%, rgba(0,0,0,${spec.look.vignette}) 100%)`}} />
+      )}
+
+      {!!spec.look?.grain && (
+        <AbsoluteFill style={{mixBlendMode: 'overlay', opacity: spec.look.grain}}>
+          <svg width="100%" height="100%">
+            <filter id="korn">
+              <feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves={2} seed={frame % 997} stitchTiles="stitch" />
+            </filter>
+            <rect width="100%" height="100%" filter="url(#korn)" />
+          </svg>
+        </AbsoluteFill>
       )}
 
       <Captions spec={spec} />
@@ -115,7 +126,7 @@ export const Reel: React.FC<EditSpec> = (spec) => {
       {spec.music && <Music spec={spec} />}
 
       {spec.sfx?.map((s, i) => (
-        <Sequence key={`sfx${i}`} from={Math.round(s.at * fps)} layout="none">
+        <Sequence key={`sfx${i}`} from={Math.round(s.at * fps)} durationInFrames={s.dur ? Math.round(s.dur * fps) : undefined} layout="none">
           <Audio src={staticFile(`sfx/${s.name}${/\.\w+$/.test(s.name) ? '' : '.wav'}`)} volume={s.vol ?? 0.3} />
         </Sequence>
       ))}

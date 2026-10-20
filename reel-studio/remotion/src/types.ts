@@ -3,7 +3,7 @@ export type Word = {w: string; s: number; e: number};
 export type Clip = {src: string; from: number; to: number; rate?: number; vol?: number; img?: boolean; tin?: string; kind?: string};
 export type AudioTrack = {src: string; from: number; to: number; at: number; vol?: number};
 export type Range = {from: number; to: number};
-export type Brand = {accent: string; dark: string; handle: string};
+export type Brand = {accent: string; dark: string; handle: string; fontHead?: string; fontBody?: string};
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type Overlay = Range & {type: string; [k: string]: any};
 
@@ -13,14 +13,14 @@ export type EditSpec = {
   words: Word[];
   audio?: AudioTrack[]; // Voiceover-Spuren
   music?: {src: string; vol?: number; duck?: number; from?: number};
-  look?: {grade?: string; vignette?: number};
+  look?: {grade?: string; vignette?: number; grain?: number};
   brand: Brand;
   grade?: (Range & {filter: string})[];
   zooms?: (Range & {scale: [number, number]})[];
   cover?: (Range & {top: number; bottom: number})[]; // Milchglas-Band ueber eingebrannten Texten
   captions: {y: number; maxWords: number; maxChars: number; hide?: [number, number][]};
   overlays: Overlay[];
-  sfx?: {at: number; name: string; vol?: number}[];
+  sfx?: {at: number; name: string; vol?: number; dur?: number}[];
 };
 
 export const clipDur = (c: Clip) => (c.to - c.from) / (c.rate ?? 1);

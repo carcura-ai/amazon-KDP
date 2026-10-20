@@ -48,3 +48,16 @@ Fremde Videos liegen nur lokal in `referenzen/runde1/raw/` und werden nicht verw
 8. **Kino-Look:** Kino-Balken, Gegenlicht, Details/Texturen, Spiegelungen.
 9. **Lautheit −14 LUFS** – alle 28 Referenzen liegen zwischen −14 und −15,5.
 10. **Dienstleister-Muster (Makler):** Person + B-Roll + Nutzen + Kommentar-CTA – direkt auf Carcura uebertragbar.
+
+## Runde 2 (20.10.2026): rabinn.fx – „5 websites pro editors use“ (159 Tsd. Aufrufe)
+
+| Werkzeug im Reel | Erkannt | Umgesetzt |
+|---|---|---|
+| 500.000 echte Soundeffekte, kostenlos | Freesound | `asset.py sound` (nur CC0), 12 Sounds geladen |
+| Kostenlose 3D-Modelle | Modell-Viewer (Name nicht lesbar) | offen (Three.js kann GLB laden) |
+| ASCII/Dither-Retro im Browser | nicht lesbar | – (passt nicht zum Carcura-Stil) |
+| Echtes Filmkorn Super 8/16 mm | Free Film Grain Overlays | `look.grain` (animiertes Korn) |
+| 100 Schriften mit Kombinationen | Fontshare (Satoshi, Clash Display, Cabinet Grotesk …) | `asset.py schrift`, `brand.fontHead/fontBody` |
+Format selbst: weisser Editorial-Look, rote Akzente, Kommentar-CTA „TOOLS“.
+
+Nutzer-Playlist „526“ ausgewertet → Musik-DNA (Strassenrap, Phonk, Cloud-Rap) in `sounddesign.md`.

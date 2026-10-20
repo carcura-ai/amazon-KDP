@@ -4,7 +4,7 @@ import {useEffect, useMemo, useState} from 'react';
 import {continueRender, delayRender, interpolate, random, spring, useCurrentFrame, useVideoConfig} from 'remotion';
 import * as THREE from 'three';
 import {RoomEnvironment} from 'three/examples/jsm/environments/RoomEnvironment.js';
-import {BODY, fontsReady, HEAD} from '../fonts';
+import {BODY, CANVAS_HEAD, fontsReady, HEAD} from '../fonts';
 import type {OverlayProps} from './Overlays';
 
 // Studio-Reflexionen fuer Metall/Lack-Look (Keramik = Glanz)
@@ -40,7 +40,7 @@ const useCoinFace = (text: string, accent: string, dark: string) => {
       g.fillStyle = dark;
       g.textAlign = 'center';
       g.textBaseline = 'middle';
-      g.font = `300px ${HEAD}`;
+      g.font = `300px ${CANVAS_HEAD}`;
       g.fillText(text, 512, 548);
       const t = new THREE.CanvasTexture(c);
       t.colorSpace = THREE.SRGBColorSpace;

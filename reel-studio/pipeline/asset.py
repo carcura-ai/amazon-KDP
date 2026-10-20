@@ -12,6 +12,8 @@
   asset.py ccmixter "<tags>"                      Hip-Hop/Trap/Phonk von ccMixter (nur CC BY), z. B. "trap" oder "hip_hop,instrumental"
   asset.py ccmixterhole <id> <projekt>            laden + Beats + Bass-/Gesangsanalyse + Quellenangabe
   asset.py spotify <playlist-link>                Titel/Artists einer oeffentlichen Playlist (nur als Stil-Vorlage!)
+  asset.py sound "<englischer Begriff>" [--n 3]   echte Soundeffekte von Freesound, nur CC0 → remotion/public/sfx/freesound/
+  asset.py schrift <fontshare-slug>               Schrift von Fontshare (z. B. clash-display, satoshi, cabinet-grotesk)
 Aufruf jeweils mit: python3 -I pipeline/asset.py ...
 """
 import argparse, json, re, subprocess, sys, tempfile, urllib.parse, urllib.request
@@ -190,6 +192,41 @@ def spotify(link):
         print(f"  {t.get('title')} – {t.get('subtitle')} ({round(t.get('duration', 0) / 1000)} s)")
 
 
+def sound(begriff, n):
+    """Freesound-Suche (Filter CC0), HQ-Vorschau laden; CC0 wird auf jeder Soundseite erneut geprueft."""
+    d = ROOT / "remotion" / "public" / "sfx" / "freesound"; d.mkdir(parents=True, exist_ok=True)
+    q = urllib.parse.urlencode({"q": begriff, "f": 'license:"Creative Commons 0"'})
+    links = list(dict.fromkeys(re.findall(r'/people/[^/"]+/sounds/\d+/', get(f"https://freesound.org/search/?{q}").decode("utf-8", "ignore"))))
+    katalog = ROOT / "pipeline" / "daten" / "sfx-freesound.md"
+    for link in links[:n]:
+        page = get("https://freesound.org" + link).decode("utf-8", "ignore")
+        if "publicdomain/zero" not in page:
+            continue
+        mp3 = re.search(r"https://cdn\.freesound\.org/previews/[^\"]+-hq\.mp3", page)
+        title = re.search(r"<title>Freesound - ([^<]+)", page)
+        if not mp3:
+            continue
+        name = re.sub(r"[^a-z0-9]+", "_", (title.group(1) if title else link).lower()).strip("_")[:40] + ".mp3"
+        (d / name).write_bytes(get(mp3.group(0)))
+        with katalog.open("a", encoding="utf-8") as fh:
+            fh.write(f"| freesound/{name} | {begriff} | CC0 | https://freesound.org{link} |\n")
+        print(f"freesound/{name}  (CC0)  ← {title.group(1) if title else link}")
+
+
+def schrift(slug):
+    """Fontshare-Schrift (ITF Free Font License, kommerziell frei) als WOFF2 nach public/fonts/fontshare/."""
+    import io, zipfile
+    z = zipfile.ZipFile(io.BytesIO(get(f"https://api.fontshare.com/v2/fonts/download/{slug}")))
+    d = ROOT / "remotion" / "public" / "fonts" / "fontshare"; d.mkdir(parents=True, exist_ok=True)
+    found = [n for n in z.namelist() if "/WEB/fonts/" in n and n.endswith(".woff2") and "Variable" not in n and "Italic" not in n]
+    for n in found:
+        (d / Path(n).name).write_bytes(z.read(n))
+    lic = next((n for n in z.namelist() if n.endswith("FFL.txt")), None)
+    if lic:
+        (d / f"LICENSE-{slug}.txt").write_bytes(z.read(lic))
+    print(f"{slug}: " + ", ".join(Path(n).name for n in found))
+
+
 def standbild(src, projekt, t, name):
     d = assets_dir(projekt)
     out = d / f"{name or Path(src).stem}_{t:g}s.png"
@@ -222,15 +259,17 @@ def freistellen(src, projekt, t, name, voll=False):
 
 if __name__ == "__main__":
     ap = argparse.ArgumentParser()
-    ap.add_argument("befehl", choices=["emoji", "suche", "hole", "freistellen", "standbild", "musik", "musikhole", "ccmixter", "ccmixterhole", "spotify"])
+    ap.add_argument("befehl", choices=["emoji", "suche", "hole", "freistellen", "standbild", "musik", "musikhole", "ccmixter", "ccmixterhole", "spotify", "sound", "schrift"])
     ap.add_argument("arg")
     ap.add_argument("projekt", nargs="?")
     ap.add_argument("--t", type=float, default=0.0)
     ap.add_argument("--name")
     ap.add_argument("--voll", action="store_true")
     ap.add_argument("--bpm", default="90-135")
+    ap.add_argument("--n", type=int, default=3)
     a = ap.parse_args()
     {"emoji": lambda: emoji(a.arg, a.projekt), "suche": lambda: suche(a.arg), "hole": lambda: hole(a.arg, a.projekt),
      "freistellen": lambda: freistellen(a.arg, a.projekt, a.t, a.name, a.voll), "standbild": lambda: standbild(a.arg, a.projekt, a.t, a.name),
      "musik": lambda: musik(a.arg, a.bpm), "musikhole": lambda: musikhole(a.arg, a.projekt),
-     "ccmixter": lambda: ccmixter(a.arg), "ccmixterhole": lambda: ccmixterhole(a.arg, a.projekt), "spotify": lambda: spotify(a.arg)}[a.befehl]()
+     "ccmixter": lambda: ccmixter(a.arg), "ccmixterhole": lambda: ccmixterhole(a.arg, a.projekt), "spotify": lambda: spotify(a.arg),
+     "sound": lambda: sound(a.arg, a.n), "schrift": lambda: schrift(a.arg)}[a.befehl]()
