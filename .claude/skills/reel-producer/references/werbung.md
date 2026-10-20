@@ -39,7 +39,7 @@ Faustregel: Angebots- und Aktions-Reels → WhatsApp-Nachrichten. Transformation
 
 ## 5. Recht (Deutschland) – vor jeder Anzeige
 
-- **Endpreise inkl. MwSt.** gegenueber Verbrauchern (PAngV); bei Preisspanne „ab“-Preis klar formulieren.
+- **Endpreise** gegenueber Verbrauchern (PAngV). Carcura ist Kleinunternehmer (§ 19 UStG): „Endpreis“, **nie „inkl. MwSt.“**; „ab“-Preise wie auf der Website.
 - Statt-Preise nur, wenn real zuvor verlangt (§ 5 UWG).
 - Lead-Formulare/WhatsApp/Pixel: Datenschutzerklaerung muss Meta-/TikTok-Werbung, Pixel und WhatsApp abdecken; Pixel nur mit Einwilligung (Cookie-Banner, § 25 TDDDG).
 - Bei Unsicherheit: Datenschutz-/Wettbewerbsanwalt; steuerlich Werbekosten als Betriebsausgabe mit Rechnung von Meta/TikTok (Reverse-Charge beachten → Steuerberater).

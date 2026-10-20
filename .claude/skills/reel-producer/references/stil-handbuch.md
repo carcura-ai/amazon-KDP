@@ -47,7 +47,8 @@ Visuell: Bewegung im ersten Frame (kein Standbild), Close-up, Punch-In, 3D-Eleme
 
 - Farblook: leicht mehr Kontrast und Saettigung (`look.grade`), Vignette 0.3–0.4 fuer Fokus.
 - Dunkle Szenen: `grade`-Bereich mit `brightness(1.2–1.3)`.
-- Akzentfarbe Gelb #FFD60A + Schwarz; Schriften Anton (Titel) und Montserrat (Text).
+- Markenfarben Neon-Gelb #E8F320 + Fast-Schwarz #09090A (automatisch aus `brand/brand.json`); Schriften Anton (Titel) und Montserrat (Text).
+- Logo-Abbinder am Ende: `{"type": "sticker", "src": "brand/logo_weiss.png", "w": 520, "h": 250, "tilt": false, "rot": 0, "x": 0.5, "y": 0.3}`.
 - Hochkant 1080×1920, 30 fps; Zeitlupen aus 60/120-fps-Material.
 
 ## 6. 3D und Sticker – Ideenkatalog (sinnvoll, nie als Selbstzweck)

@@ -1,6 +1,6 @@
 # Vorlage: projekte/<name>/BESCHREIBUNG.md (zu jedem fertigen Video)
 
-Regeln: deutsch, Du-Ansprache, keine erfundenen Fakten, CTA identisch zum Video, Preise inkl. MwSt.
+Regeln: deutsch, Du-Ansprache, keine erfundenen Fakten, CTA identisch zum Video, Preise als Endpreise (Kleinunternehmer – nie „inkl. MwSt.“), Kontakt/Preise aus `reel-studio/brand/MARKE.md`
 Hashtags sparsam (3–5, Thema + Ort), Ortsangabe setzen. Suchbegriffe (z. B. „Keramikversiegelung [Stadt]“) in Text und Bildschirmtext – Instagram und TikTok werden zunehmend wie Suchmaschinen genutzt.
 
 ```markdown
@@ -46,7 +46,7 @@ Hashtags sparsam (3–5, Thema + Ort), Ortsangabe setzen. Suchbegriffe (z. B. �
 | Danach | <Retargeting-Schritt> |
 
 ## Vor dem Upload pruefen
-- [ ] Preise inkl. MwSt. / Statt-Preis belegbar
+- [ ] Preise = Website-Preise (MARKE.md), als Endpreis / Statt-Preis belegbar
 - [ ] Einwilligungen gezeigter Personen
 - [ ] Lizenznennungen: <aus assets/LIZENZEN.md oder „keine noetig“>
 ```

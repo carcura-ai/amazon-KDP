@@ -28,7 +28,7 @@
 ```
 Leistung: Keramikversiegelung + Innenraum
 Fahrzeug: BMW M2 (G87), schwarz
-Angebot/Preis: ab 349 € inkl. MwSt. (bis 15.11.)
+Angebot/Preis: ab 349 € Endpreis (bis 15.11.) – Standardpreise kenne ich von der Website
 Ziel: WhatsApp-Anfragen
 CTA: WhatsApp-Link in Bio / „Schreib KERAMIK“
 Besonderes: Kunde einverstanden mit Gesicht? ja/nein · Kennzeichen zeigen? nein

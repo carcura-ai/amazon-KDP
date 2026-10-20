@@ -7,6 +7,7 @@ P="$(cd "$1" && pwd)"; NAME="$(basename "$P")"
 PUB="$ROOT/remotion/public/projekte/$NAME"
 mkdir -p "$PUB" "$P/export"
 # Medien bereitet analyze.py auf; hier nur Projekt-Assets und Musik spiegeln
+mkdir -p "$ROOT/remotion/public/brand" && cp -u "$ROOT"/brand/*.png "$ROOT/remotion/public/brand/"
 for d in assets musik; do [ -d "$P/$d" ] && mkdir -p "$PUB/$d" && cp -u "$P/$d"/* "$PUB/$d"/; done
 python3 -I "$ROOT/pipeline/props.py" "$P"
 

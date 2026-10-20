@@ -19,7 +19,8 @@ Werkzeug: `reel-studio/` (Remotion + ffmpeg + faster-whisper + rembg). Bedienung
 
 ## Ablauf pro Video
 
-0. **Briefing** aus Nachricht oder `projekte/<name>/notes.md`: Leistung, Fahrzeug, Angebot/Preis, Ziel (Reichweite / Anfragen / Website), CTA-Kanal, Frist. Fehlendes als Annahme kennzeichnen, nur bei Ergebnis-relevanten Luecken fragen.
+0. **Markendaten** stehen in `reel-studio/brand/MARKE.md` (Kontakt, WhatsApp, Website, Preise, Farben, Logo) – nie erneut erfragen; Farben/Handle kommen automatisch aus `brand/brand.json`.
+   **Briefing** aus Nachricht oder `projekte/<name>/notes.md`: Leistung, Fahrzeug, Angebot/Preis, Ziel (Reichweite / Anfragen / Website), CTA-Kanal, Frist. Fehlendes als Annahme kennzeichnen, nur bei Ergebnis-relevanten Luecken fragen.
 1. **Material** nach `reel-studio/projekte/<name>/raw/` (Videos) und `voice/` (Sprache). Uebergabewege: `references/material-uebergabe.md`.
 2. `python3 -I pipeline/analyze.py projekte/<name>` (bei bereits geschnittenem Material `--no-cut`). Bausteine: A = Sprecher im Bild, V = Voiceover, B = B-Roll.
 3. **Story planen** mit `references/stil-handbuch.md`: Format waehlen, Hook festlegen, beste Takes, B-Roll-Zuordnung zum gesprochenen Wort, 3D-/Sticker-Ideen.
@@ -35,7 +36,6 @@ Werkzeug: `reel-studio/` (Remotion + ffmpeg + faster-whisper + rembg). Bedienung
 ```json
 {
   "fps": 30,
-  "brand": {"accent": "#FFD60A", "dark": "#0B0F14", "handle": "@_carcura_"},
   "look": {"grade": "contrast(1.06) saturate(1.1)", "vignette": 0.35},
   "timeline": [
     {"a": "A1"},
@@ -79,7 +79,7 @@ Positionen: x/y als Anteil der Bildbreite/-hoehe. Sichere Zone: wichtige Inhalte
 - [ ] Texte in der sicheren Zone; Schrift auf dem Handy lesbar (≥ 32 px bei 1080 Breite)
 - [ ] Lautheit ≈ −14 LUFS, Spitze ≤ −1 dBTP; Stimme immer klar ueber Musik und Sounds
 - [ ] Ein einziger CTA, identisch in Video, Beschreibung und angepinntem Kommentar
-- [ ] Preise als Endpreise inkl. MwSt.; Statt-Preise und Leistungsversprechen belegbar
+- [ ] Preise = Website-Preise aus `brand/MARKE.md`, als Endpreis (Kleinunternehmer – nie „inkl. MwSt.“); Statt-Preise und Versprechen belegbar
 - [ ] Lizenzen in `assets/LIZENZEN.md`; CC-BY-Nennungen in der Beschreibung; keine fremden Logos als Werbetraeger
 - [ ] Kennzeichen/Gesichter Dritter ohne Einwilligung unkenntlich
 

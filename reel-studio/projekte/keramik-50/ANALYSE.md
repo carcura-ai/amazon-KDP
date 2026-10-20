@@ -46,5 +46,7 @@ Die alten, eingebrannten Texte sind mit einem Milchglas-Band abgedeckt – mit R
 | 12–19 s | Vorher/Nachher 50/50, Glanzkante | „Dein Lack ist dann geschützt gegen Streusalz, Schmutz und Wasser – perfekt vor dem Winter.“ | Checkliste + Schnee |
 | 19–25 s | Gesicht, zeigt nach unten | „Schreib uns jetzt KERAMIK per DM. Es gibt nur einen Platz.“ | CTA-Karte + NUR 1 PLATZ |
 
+Abgleich Website (20.10.2026): Keramik regulär „ab 650 €“ (inkl. 1-stufiger Politur) – im Video deshalb „statt ab 650 €“ sagen, nicht „600–700 €“. Carcura ist Kleinunternehmer: Preise als Endpreise, nie „inkl. MwSt.“.
+
 Vor Veröffentlichung prüfen: Der Referenzpreis 600–700 € muss der tatsächlich regulär verlangte Preis sein (§ 5 UWG).
 Haltbarkeitsangaben („hält X Jahre“) nur mit Herstellerbeleg verwenden.

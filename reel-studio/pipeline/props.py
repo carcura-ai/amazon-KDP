@@ -20,6 +20,9 @@ from pathlib import Path
 proj = Path(sys.argv[1]).resolve()
 name = proj.name
 edit = json.loads((proj / "edit.json").read_text(encoding="utf-8"))
+brand_file = Path(__file__).resolve().parent.parent / "brand" / "brand.json"
+if brand_file.exists():  # Markenfarben/Handle zentral; edit.json darf einzelne Werte ueberschreiben
+    edit["brand"] = {**json.loads(brand_file.read_text(encoding="utf-8")), **edit.get("brand", {})}
 ana = proj / "analysis"
 fps = edit.get("fps", 30)
 PUNCT = ".,!?;:„“\"'"
