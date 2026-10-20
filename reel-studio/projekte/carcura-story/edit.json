@@ -1,32 +1,283 @@
 {
-  "fps": 30,
-  "look": {"grade": "contrast(1.07) saturate(1.08)", "vignette": 0.32},
-  "timeline": [
-    {"b": [{"id": "B1", "from": 2.4, "dur": 2.3}], "tin": "none"},
-    {"a": "A3"},
-    {"b": [{"id": "B2", "from": 0.0, "dur": 2.0, "vol": 0.6}, {"id": "B3", "from": 4.0, "dur": 2.0, "vol": 0.4}, {"id": "B6", "from": 1.4, "dur": 1.4}], "schnitt": "hart"},
-    {"b": [{"id": "B4", "from": 5.2, "dur": 2.6, "vol": 0.8}, {"id": "B19", "from": 1.5, "dur": 2.0, "vol": 0.5}], "schnitt": "hart"},
-    {"a": "A6", "bis": "bringen"},
-    {"b": [{"id": "B7", "from": 16.0, "dur": 1.4}, {"id": "B8", "from": 9.5, "dur": 1.3}, {"id": "B7", "from": 29.5, "dur": 1.3}, {"id": "B9", "from": 2.0, "dur": 1.5}, {"id": "B7", "from": 49.5, "dur": 1.5}], "schnitt": "hart"},
-    {"b": [{"id": "B10", "from": 5.0, "dur": 1.8, "vol": 0.4}, {"id": "B11", "from": 3.0, "dur": 1.6}, {"id": "B12", "from": 1.0, "dur": 1.5, "vol": 0.4}, {"id": "B13", "from": 10.4, "dur": 1.5}, {"id": "B17", "from": 1.4, "dur": 1.15}, {"id": "B17", "from": 15.4, "dur": 0.8}, {"id": "B14", "from": 3.6, "dur": 2.6, "rate": 0.5, "vol": 0.6}, {"id": "B15", "from": 0.8, "dur": 1.4, "vol": 0.6}], "schnitt": "hart"},
-    {"b": [{"id": "B1", "from": 0.2, "dur": 4.2}], "tin": "flash"}
-  ],
-  "captions": {"y": 0.615, "maxWords": 3, "maxChars": 18},
-  "overlays": [
-    {"type": "hook", "from": "t:seg1", "to": "t:seg1.e", "y": 0.3, "line1": "VOR 6 MONATEN", "line2": "WAR HIER NICHTS."},
-    {"type": "title", "from": "t:seg2", "to": "t:seg2+2.2", "y": 0.16, "kicker": "APRIL 2026", "text": "TAG 1"},
-    {"type": "title", "from": "t:seg3", "to": "t:seg3.e", "y": 0.16, "kicker": "MAI – SEPTEMBER", "text": "DER AUSBAU"},
-    {"type": "sticker", "from": "t:seg4+0.5", "to": "t:seg4.e", "src": "assets/emoji_grinning_squinting_face.png", "x": 0.76, "y": 0.27, "size": 230, "label": "MIT VIEL SPASS"},
-    {"type": "title", "from": "t:seg6", "to": "t:seg6.e", "y": 0.16, "kicker": "JUNI – SEPTEMBER", "text": "AUTO FÜR AUTO"},
-    {"type": "title", "from": "t:seg7", "to": "t:seg7+2.6", "y": 0.16, "kicker": "OKTOBER 2026", "text": "KERAMIK-STUDIO"},
-    {"type": "sticker", "from": "t:seg7+5.0", "to": "t:seg7+7.3", "src": "assets/emoji_sparkles.png", "x": 0.8, "y": 0.22, "size": 200, "sfx": "shimmer", "tilt": false},
-    {"type": "sticker", "from": "t:seg7+8.4", "to": "t:seg7.e", "src": "assets/emoji_droplet.png", "x": 0.2, "y": 0.22, "size": 190, "sfx": "drop"},
-    {"type": "sticker", "from": "t:seg8+0.2", "to": "t:end", "src": "brand/logo_weiss.png", "w": 440, "h": 212, "x": 0.5, "y": 0.2, "tilt": false, "rot": 0, "sfx": false},
-    {"type": "cta", "from": "t:seg8+0.5", "to": "t:end", "y": 0.28, "kicker": "VON 0 AUF 100", "main": "DEIN AUTO IST DAS NÄCHSTE", "sub": "Termin per WhatsApp", "mainAt": "t:seg8+0.8", "alt": "0170 6669516 · Link in Bio", "altAt": "t:seg8+1.4", "urgency": "CARCURA · WALTERSCHEN", "urgencyAt": "t:seg8+2.0"}
-  ],
-  "sfx": [
-    {"at": "t:seg8-1.4", "name": "riser", "vol": 0.3},
-    {"at": "t:seg8", "name": "impact", "vol": 0.4},
-    {"at": "t:seg7+6.9", "name": "kenney/glass_002.ogg", "vol": 0.25}
-  ]
+ "fps": 30,
+ "look": {
+  "grade": "contrast(1.07) saturate(1.08)",
+  "vignette": 0.32
+ },
+ "timeline": [
+  {
+   "b": [
+    {
+     "id": "B1",
+     "from": 2.4,
+     "dur": 2.3
+    }
+   ],
+   "tin": "none"
+  },
+  {
+   "a": "A3"
+  },
+  {
+   "b": [
+    {
+     "id": "B2",
+     "from": 0.0,
+     "dur": 2.0,
+     "vol": 0.3
+    },
+    {
+     "id": "B3",
+     "from": 4.0,
+     "dur": 2.0,
+     "vol": 0.24
+    },
+    {
+     "id": "B6",
+     "from": 1.4,
+     "dur": 1.4
+    }
+   ],
+   "schnitt": "hart"
+  },
+  {
+   "b": [
+    {
+     "id": "B4",
+     "from": 5.2,
+     "dur": 2.6,
+     "vol": 0.3
+    },
+    {
+     "id": "B19",
+     "from": 1.5,
+     "dur": 2.0,
+     "vol": 0.3
+    }
+   ],
+   "schnitt": "hart"
+  },
+  {
+   "a": "A6",
+   "bis": "bringen"
+  },
+  {
+   "b": [
+    {
+     "id": "B7",
+     "from": 16.0,
+     "dur": 1.4
+    },
+    {
+     "id": "B8",
+     "from": 9.5,
+     "dur": 1.3
+    },
+    {
+     "id": "B7",
+     "from": 29.5,
+     "dur": 1.3
+    },
+    {
+     "id": "B9",
+     "from": 2.0,
+     "dur": 1.5
+    },
+    {
+     "id": "B7",
+     "from": 49.5,
+     "dur": 1.5
+    }
+   ],
+   "schnitt": "hart"
+  },
+  {
+   "b": [
+    {
+     "id": "B10",
+     "from": 5.0,
+     "dur": 1.8,
+     "vol": 0.24
+    },
+    {
+     "id": "B11",
+     "from": 3.0,
+     "dur": 1.6
+    },
+    {
+     "id": "B12",
+     "from": 1.0,
+     "dur": 1.5,
+     "vol": 0.24
+    },
+    {
+     "id": "B13",
+     "from": 10.4,
+     "dur": 1.5
+    },
+    {
+     "id": "B17",
+     "from": 1.4,
+     "dur": 1.15
+    },
+    {
+     "id": "B17",
+     "from": 15.4,
+     "dur": 0.8
+    },
+    {
+     "id": "B14",
+     "from": 3.6,
+     "dur": 2.6,
+     "rate": 0.5,
+     "vol": 0.3
+    },
+    {
+     "id": "B15",
+     "from": 0.8,
+     "dur": 1.4,
+     "vol": 0.3
+    }
+   ],
+   "schnitt": "hart"
+  },
+  {
+   "b": [
+    {
+     "id": "B1",
+     "from": 0.2,
+     "dur": 4.2
+    }
+   ],
+   "tin": "flash"
+  }
+ ],
+ "captions": {
+  "y": 0.615,
+  "maxWords": 3,
+  "maxChars": 18
+ },
+ "overlays": [
+  {
+   "type": "hook",
+   "from": "t:seg1",
+   "to": "t:seg1.e",
+   "y": 0.3,
+   "line1": "VOR 6 MONATEN",
+   "line2": "WAR HIER NICHTS."
+  },
+  {
+   "type": "title",
+   "from": "t:seg2",
+   "to": "t:seg2+2.2",
+   "y": 0.16,
+   "kicker": "APRIL 2026",
+   "text": "TAG 1"
+  },
+  {
+   "type": "title",
+   "from": "t:seg3",
+   "to": "t:seg3.e",
+   "y": 0.16,
+   "kicker": "MAI – SEPTEMBER",
+   "text": "DER AUSBAU"
+  },
+  {
+   "type": "sticker",
+   "from": "t:seg4+0.5",
+   "to": "t:seg4.e",
+   "src": "assets/emoji_grinning_squinting_face.png",
+   "x": 0.76,
+   "y": 0.27,
+   "size": 230,
+   "label": "MIT VIEL SPASS"
+  },
+  {
+   "type": "title",
+   "from": "t:seg6",
+   "to": "t:seg6.e",
+   "y": 0.16,
+   "kicker": "JUNI – SEPTEMBER",
+   "text": "AUTO FÜR AUTO"
+  },
+  {
+   "type": "title",
+   "from": "t:seg7",
+   "to": "t:seg7+2.6",
+   "y": 0.16,
+   "kicker": "OKTOBER 2026",
+   "text": "KERAMIK-STUDIO"
+  },
+  {
+   "type": "sticker",
+   "from": "t:seg7+5.0",
+   "to": "t:seg7+7.3",
+   "src": "assets/emoji_sparkles.png",
+   "x": 0.8,
+   "y": 0.22,
+   "size": 200,
+   "sfx": "shimmer",
+   "tilt": false
+  },
+  {
+   "type": "sticker",
+   "from": "t:seg7+8.4",
+   "to": "t:seg7.e",
+   "src": "assets/emoji_droplet.png",
+   "x": 0.2,
+   "y": 0.22,
+   "size": 190,
+   "sfx": "drop"
+  },
+  {
+   "type": "sticker",
+   "from": "t:seg8+0.2",
+   "to": "t:end",
+   "src": "brand/logo_weiss.png",
+   "w": 440,
+   "h": 212,
+   "x": 0.5,
+   "y": 0.2,
+   "tilt": false,
+   "rot": 0,
+   "sfx": false
+  },
+  {
+   "type": "cta",
+   "from": "t:seg8+0.5",
+   "to": "t:end",
+   "y": 0.28,
+   "kicker": "VON 0 AUF 100",
+   "main": "DEIN AUTO IST DAS NÄCHSTE",
+   "sub": "Termin per WhatsApp",
+   "mainAt": "t:seg8+0.8",
+   "alt": "0170 6669516 · Link in Bio",
+   "altAt": "t:seg8+1.4",
+   "urgency": "CARCURA · WALTERSCHEN",
+   "urgencyAt": "t:seg8+2.0"
+  }
+ ],
+ "sfx": [
+  {
+   "at": "t:seg8-1.4",
+   "name": "riser",
+   "vol": 0.3
+  },
+  {
+   "at": "t:seg8",
+   "name": "impact",
+   "vol": 0.4
+  },
+  {
+   "at": "t:seg7+6.9",
+   "name": "kenney/glass_002.ogg",
+   "vol": 0.25
+  }
+ ],
+ "music": {
+  "src": "musik/undaunted.mp3",
+  "from": 80.0,
+  "vol": 0.5,
+  "duck": 0.08
+ }
 }

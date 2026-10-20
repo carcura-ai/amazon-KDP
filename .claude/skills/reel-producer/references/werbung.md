@@ -32,6 +32,10 @@ Faustregel: Angebots- und Aktions-Reels → WhatsApp-Nachrichten. Transformation
 
 ## 4. CTA und Tracking
 
+- **Kommentar-Stichwort** (Referenzen: 2–11 Tsd. Kommentare): „Kommentiere KERAMIK – wir schicken dir Preis & freie Termine per DM.“
+  Steigert Reichweite und erzeugt Leads. Voraussetzung: jede Antwort innerhalb weniger Stunden (manuell oder Meta-zertifiziertes Tool wie ManyChat).
+  Organisch bevorzugen; in Anzeigen lieber direkter WhatsApp-Button.
+
 - **WhatsApp-Link mit vorausgefuelltem Text** je Video: `https://wa.me/49XXXXXXXXXXX?text=Hallo%2C%20ich%20komme%20vom%20Keramik-Video` → Herkunft jeder Anfrage sichtbar.
 - Website-Links mit UTM: `?utm_source=instagram&utm_medium=paid&utm_campaign=keramik-50`.
 - Kommentar-Stichwort („Schreib KERAMIK“) per Meta-zertifiziertem DM-Tool automatisch beantworten (z. B. ManyChat) – Antwort enthaelt WhatsApp-Link.

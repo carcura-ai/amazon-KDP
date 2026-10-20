@@ -9,13 +9,14 @@ Zeitleiste in edit.json ("timeline", optional – ohne sie gilt analysis/auto_ed
   {"b": [{"id": "B3", "dur": 2.0}], "vol": 0.7}       reine B-Roll mit Originalton (z. B. Schaum-ASMR)
   {"b": [{"img": "assets/foto.jpg", "dur": 2}]}        Standbild (Ken-Burns-Zoom automatisch)
   Optionen je Segment: "tin" (zoom|whip|flash|none), "zoom" [von, bis], "bvol" (B-Roll-Ton unter VO), "pad",
-  "schnitt": "hart" (Montage ohne Zwischen-Uebergaenge), bei "a": "von"/"bis" (Baustein wortgenau kuerzen)
+  "schnitt": "hart" (Montage ohne Zwischen-Uebergaenge) | "beat" (Schnitte auf Musik-Beats), bei "a": "von"/"bis"
+  B-Roll-Element: {"id", "from", "dur", "rate", "vol", "ramp": true (Speed-Ramp normal -> Zeitlupe -> normal)}
 Zeitanker statt Sekunden, ueberall ausser in der Zeitleiste:
   "t:Salz" Wortbeginn · "t:Salz.e" Wortende · "t:Salz#2" 2. Vorkommen · "t:für den Winter" Phrase
   "t:seg3" / "t:seg3.e" Segment 3 · "t:end" Videoende · Versatz: "t:Salz-0.2", "t:end-1.5"
 "auto": {"zoom": true, "transitions": true, "sfx": true} erzeugt Zooms, Uebergaenge und Sounds automatisch.
 """
-import json, re, sys
+import json, re, subprocess, sys
 from pathlib import Path
 
 proj = Path(sys.argv[1]).resolve()
@@ -32,6 +33,18 @@ q = lambda x: round(x * fps) / fps  # auf ganze Frames runden -> kein Versatz zw
 
 clips, audio, words, segs = [], [], [], []
 t = 0.0
+beats = []  # Musik-Beats auf der Ausgabe-Zeitachse (fuer "schnitt": "beat")
+if "music" in edit:
+    bf = proj / Path(edit["music"]["src"]).with_suffix(".beats.json")
+    if bf.exists():
+        off = edit["music"].get("from", 0)
+        beats = [b - off for b in json.loads(bf.read_text(encoding="utf-8"))["beats"] if b >= off]
+
+
+def snap(x, lo, hi):
+    """Naechster Beat zu x innerhalb [lo, hi], sonst x."""
+    cand = [b for b in beats if lo <= b <= hi]
+    return min(cand, key=lambda b: abs(b - x)) if cand else x
 
 
 def add_clip(c, kind, at):
@@ -50,7 +63,7 @@ if "timeline" in edit:
     def fill(items, need):
         """Verteilt B-Roll-Clips auf die Laenge need; reicht das Material nicht, wird zyklisch wiederholt."""
         items = [i if isinstance(i, dict) else {"id": i} for i in items]
-        avail = lambda i: 1e9 if "img" in i else (R[i["id"]]["duration"] - i.get("from", 0)) / i.get("rate", 1)
+        avail = lambda i: 1e9 if "img" in i else (R[i["id"]]["duration"] - i.get("from", 0)) / (0.6 if i.get("ramp") else i.get("rate", 1))
         free = need - sum(i.get("dur", 0) for i in items)
         n_free = sum("dur" not in i for i in items)
         plan = [i["dur"] if "dur" in i else max(free, 0) / n_free for i in items] if n_free else [i["dur"] for i in items]
@@ -71,11 +84,40 @@ if "timeline" in edit:
         return list(zip(items, plan))
 
     def broll_clip(i, d, vol):
+        """Ein B-Roll-Stueck; mit "ramp": true als Speed-Ramp normal -> Zeitlupe -> normal (3 Clips)."""
         d = q(d)
         if "img" in i:
-            return {"src": f"projekte/{name}/{i['img']}", "from": 0, "to": d, "img": True, "vol": 0}
-        start, rate = i.get("from", 0), i.get("rate", 1)
-        return {"src": R[i["id"]]["src"], "from": start, "to": round(start + d * rate, 4), "rate": rate, "vol": i.get("vol", vol)}
+            return [{"src": f"projekte/{name}/{i['img']}", "from": 0, "to": d, "img": True, "vol": 0}]
+        start, rate, src, v = i.get("from", 0), i.get("rate", 1), R[i["id"]]["src"], i.get("vol", vol)
+        if not i.get("ramp"):
+            return [{"src": src, "from": start, "to": round(start + d * rate, 4), "rate": rate, "vol": v}]
+        out, pos = [], start
+        for part, r in ((0.3, 1.0), (0.5, 0.35), (0.2, 1.0)):
+            pd = q(d * part)
+            out.append({"src": src, "from": round(pos, 4), "to": round(pos + pd * r, 4), "rate": r, "vol": v, "tin": "none"})
+            pos += pd * r
+        return out
+
+    def place(items_d, vol, fixed_end):
+        """Clips setzen; bei Beat-Schnitt Grenzen auf Beats ziehen (Ende nur, wenn nicht durch VO festgelegt)."""
+        global t
+        bounds, acc = [], t
+        for _, d in items_d:
+            acc += d; bounds.append(acc)
+        if seg.get("schnitt") == "beat" and beats:
+            prev = t
+            for k, b in enumerate(bounds):
+                last = k == len(bounds) - 1
+                if last and fixed_end:
+                    break
+                nb = snap(b, prev + 0.35, b + 0.5 if last else bounds[k + 1] - 0.35)
+                bounds[k] = prev = nb
+        prev = t
+        for (i, _), b in zip(items_d, bounds):
+            for c in broll_clip(i, b - prev, vol):
+                add_clip(c, "img" if c.get("img") else "b", t)
+                t += (c["to"] - c["from"]) / c.get("rate", 1)
+            prev = b
 
     for k, seg in enumerate(edit["timeline"], 1):
         start, first = t, len(clips)
@@ -95,19 +137,13 @@ if "timeline" in edit:
             need = q(b["to"] - b["from"] + seg.get("pad", 0.2))
             audio.append({"src": b["src"], "from": b["from"], "to": b["to"], "at": round(t, 4), "vol": seg.get("vvol", 1)})
             add_words(b["words"], b["from"], t)
-            for i, d in fill(seg["b"], need):
-                c = broll_clip(i, d, seg.get("bvol", 0))
-                add_clip(c, "img" if c.get("img") else "b", t)
-                t += (c["to"] - c["from"]) / c.get("rate", 1)
+            place(fill(seg["b"], need), seg.get("bvol", 0), fixed_end=True)
         else:
             items = [i if isinstance(i, dict) else {"id": i} for i in seg["b"]]
             need = seg.get("dur") or sum(i.get("dur", 2.0) for i in items)
-            for i, d in fill(items, need):
-                c = broll_clip(i, d, seg.get("vol", 0))
-                add_clip(c, "img" if c.get("img") else "b", t)
-                t += (c["to"] - c["from"]) / c.get("rate", 1)
+            place(fill(items, need), seg.get("vol", 0), fixed_end="dur" in seg)
         if clips[first:]:
-            if seg.get("schnitt") == "hart":  # Montage: harte Schnitte, Uebergang nur am Segmentanfang
+            if seg.get("schnitt") in ("hart", "beat"):  # Montage: harte Schnitte, Uebergang nur am Segmentanfang
                 for c in clips[first + 1:]:
                     c["tin"] = "none"
             if "tin" in seg:
@@ -173,6 +209,9 @@ for o in overlays:
     for key in ("before", "after"):
         if key in o:
             o[key] = media_path(o[key])
+    for it in o.get("items", []):
+        if isinstance(it, dict) and ("id" in it or "src" in it):
+            it.update(media_path(it))
     for key in ("src", "icon"):
         if isinstance(o.get(key), str) and not o[key].startswith(("projekte/", "brand/")):
             o[key] = f"projekte/{name}/{o[key]}"
@@ -204,7 +243,8 @@ if auto.get("zoom", True):
 sfx = list(edit.get("sfx", []))
 if auto.get("sfx", True):
     DEFAULT = {"hook": "subdrop", "title": "whoosh", "sticker": "pop", "lowerthird": "whip", "checklist": "pop",
-               "price": "pop", "cta": "whoosh", "badge3d": "whoosh", "snow": "shimmer", "compare": "whip"}
+               "price": "pop", "cta": "whoosh", "badge3d": "whoosh", "snow": "shimmer", "compare": "whip",
+               "textbehind": "impact", "collage": "whoosh", "chat": None, "letterbox": None}
     extra = [{"at": c["at"], "name": "whip" if c["tin"] == "whip" else "whoosh", "vol": 0.22}
              for c in clips if c.get("tin") in ("zoom", "whip")]
     for o in overlays:
@@ -213,7 +253,8 @@ if auto.get("sfx", True):
         nm = o["sfx"] if isinstance(o.get("sfx"), str) else DEFAULT.get(o["type"])
         if nm:
             extra.append({"at": o["from"], "name": nm, "vol": 0.45 if nm == "subdrop" else 0.3})
-        extra += [{"at": it["at"], "name": "ding", "vol": 0.28} for it in o.get("items", [])]
+        extra += [{"at": it["at"], "name": "ding", "vol": 0.28} for it in o.get("items", []) if "at" in it]
+        extra += [{"at": m["at"], "name": "pop", "vol": 0.3} for m in o.get("messages", [])]
         if o["type"] == "price":
             extra += [{"at": o["strikeAt"], "name": "whoosh", "vol": 0.25}, {"at": o["newAt"], "name": "cash", "vol": 0.35}]
         if o["type"] == "compare":
@@ -223,7 +264,16 @@ if auto.get("sfx", True):
     sfx += [x for x in extra if all(abs(x["at"] - m["at"]) > 0.12 for m in sfx)]
 
 if "music" in edit and not edit["music"]["src"].startswith("projekte/"):
-    edit["music"]["src"] = f"projekte/{name}/{edit['music']['src']}"
+    m = edit["music"]
+    rel = m["src"]
+    if m.get("from"):  # Abschnitt vorab ausschneiden: Remotion spielt loop + trimBefore stumm ab
+        cut = f"musik/{Path(rel).stem}_ab{m['from']:g}.wav"
+        dst = Path(__file__).resolve().parent.parent / "remotion" / "public" / "projekte" / name / cut
+        dst.parent.mkdir(parents=True, exist_ok=True)
+        subprocess.run(["ffmpeg", "-v", "error", "-y", "-ss", str(m["from"]), "-i", str(proj / rel), "-t", str(T + 3),
+                        "-ar", "48000", "-ac", "2", str(dst)], check=True)
+        rel, m["from"] = cut, 0
+    m["src"] = f"projekte/{name}/{rel}"
 
 props = {**edit, "fps": fps, "clips": clips, "audio": audio, "words": words, "segments": segs,
          "zooms": zooms, "sfx": sorted(sfx, key=lambda x: x["at"]), "overlays": overlays}

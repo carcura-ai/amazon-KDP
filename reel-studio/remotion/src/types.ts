@@ -12,7 +12,7 @@ export type EditSpec = {
   clips: Clip[];
   words: Word[];
   audio?: AudioTrack[]; // Voiceover-Spuren
-  music?: {src: string; vol?: number; duck?: number};
+  music?: {src: string; vol?: number; duck?: number; from?: number};
   look?: {grade?: string; vignette?: number};
   brand: Brand;
   grade?: (Range & {filter: string})[];

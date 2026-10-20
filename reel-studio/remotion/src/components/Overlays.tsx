@@ -213,6 +213,99 @@ const LowerThird: React.FC<OverlayProps> = ({o, brand}) => {
   );
 };
 
+// Text hinter dem Objekt: grosser Titel, darueber der vollformatige Freisteller (ruhiger Shot, Segment-Zoom [1, 1])
+const TextBehind: React.FC<OverlayProps> = ({o, brand}) => {
+  const {height} = useVideoConfig();
+  const a = useIn(0, {damping: 12, stiffness: 120});
+  const out = useOut(o);
+  return (
+    <AbsoluteFill style={{opacity: out}}>
+      <div style={{position: 'absolute', left: 0, right: 0, top: o.y * height, transform: `translateY(-50%) scale(${0.7 + 0.3 * a})`, textAlign: 'center',
+        fontFamily: HEAD, fontSize: o.size ?? 300, lineHeight: 0.9, letterSpacing: 4, color: o.color ?? brand.accent, opacity: a, textShadow: '0 10px 40px rgba(0,0,0,.35)'}}>
+        {o.text}
+      </div>
+      <Img src={staticFile(o.src)} style={{position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover'}} />
+    </AbsoluteFill>
+  );
+};
+
+// Chat-Verlauf (Kunde links, Carcura rechts) mit Tipp-Animation vor jeder Nachricht
+const Chat: React.FC<OverlayProps> = ({o, brand}) => {
+  const f = useCurrentFrame();
+  const {fps, height} = useVideoConfig();
+  const a = useIn(0);
+  const out = useOut(o);
+  const msgs: {who: string; text: string; at: number}[] = o.messages;
+  const typing = msgs.find((m) => f < (m.at - o.from) * fps && f > (m.at - o.from - 0.7) * fps);
+  return (
+    <div style={{position: 'absolute', left: 60, right: 60, top: o.y * height, opacity: a * out, transform: `translateY(${(1 - a) * 60}px)`}}>
+      <div style={{...glass, padding: '22px 26px 26px', display: 'flex', flexDirection: 'column', gap: 14}}>
+        <div style={{display: 'flex', alignItems: 'center', gap: 16, paddingBottom: 12, borderBottom: '1px solid rgba(255,255,255,.12)'}}>
+          <div style={{width: 64, height: 64, borderRadius: 32, background: brand.dark, border: `3px solid ${brand.accent}`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: HEAD, fontSize: 34, color: brand.accent}}>C</div>
+          <div>
+            <div style={{fontFamily: BODY, fontWeight: 800, fontSize: 34, color: '#fff'}}>{o.title ?? 'Carcura'}</div>
+            <div style={{fontFamily: BODY, fontWeight: 700, fontSize: 24, color: brand.accent}}>{typing ? 'schreibt …' : 'online'}</div>
+          </div>
+        </div>
+        {msgs.map((m, i) => {
+          const s = spring({frame: f - Math.round((m.at - o.from) * fps), fps, config: {damping: 13, stiffness: 200}});
+          const mine = m.who !== 'kunde';
+          return s > 0.01 ? (
+            <div key={i} style={{alignSelf: mine ? 'flex-end' : 'flex-start', maxWidth: '82%', padding: '16px 22px', borderRadius: 26,
+              borderBottomRightRadius: mine ? 6 : 26, borderBottomLeftRadius: mine ? 26 : 6, background: mine ? brand.accent : '#fff',
+              color: brand.dark, fontFamily: BODY, fontWeight: 700, fontSize: 38, lineHeight: 1.25, transform: `scale(${s})`, transformOrigin: mine ? 'right bottom' : 'left bottom'}}>
+              {m.text}
+            </div>
+          ) : null;
+        })}
+        {typing && (
+          <div style={{alignSelf: typing.who !== 'kunde' ? 'flex-end' : 'flex-start', display: 'flex', gap: 8, padding: '18px 22px', borderRadius: 26, background: 'rgba(255,255,255,.18)'}}>
+            {[0, 1, 2].map((k) => <div key={k} style={{width: 12, height: 12, borderRadius: 6, background: '#fff', opacity: 0.4 + 0.6 * Math.abs(Math.sin(f / 5 + k))}} />)}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
+// Kino-Balken oben/unten
+const Letterbox: React.FC<OverlayProps> = ({o}) => {
+  const {height} = useVideoConfig();
+  const a = useIn(0, {damping: 20, stiffness: 120});
+  const out = useOut(o);
+  const h = (o.h ?? 0.12) * height * a * out;
+  return (
+    <>
+      <div style={{position: 'absolute', left: 0, right: 0, top: 0, height: h, background: '#000'}} />
+      <div style={{position: 'absolute', left: 0, right: 0, bottom: 0, height: h, background: '#000'}} />
+    </>
+  );
+};
+
+// Collage: Clips/Bilder als gekippte Postkarten, nacheinander eingeworfen
+const Collage: React.FC<OverlayProps> = ({o}) => {
+  const {width, height} = useVideoConfig();
+  const out = useOut(o);
+  const items: (MediaRef & {at?: number})[] = o.items;
+  const pos = [[0.3, 0.3, -7], [0.68, 0.42, 5], [0.36, 0.6, 3], [0.66, 0.74, -5]];
+  return (
+    <AbsoluteFill style={{opacity: out}}>
+      {items.slice(0, 4).map((m, i) => {
+        const s = useIn((m.at ?? o.from + i * 0.35) - o.from, {damping: 12, stiffness: 140});
+        const [x, y, r] = pos[i];
+        const w = width * (o.w ?? 0.52);
+        return (
+          <div key={i} style={{position: 'absolute', left: x * width - w / 2, top: y * height - (w * 1.25) / 2, width: w, height: w * 1.25,
+            border: '12px solid #fff', borderRadius: 10, overflow: 'hidden', boxShadow: '0 24px 50px rgba(0,0,0,.5)', opacity: s,
+            transform: `translateY(${(1 - s) * 500}px) rotate(${r * s + (1 - s) * 20}deg) scale(${0.85 + 0.15 * s})`}}>
+            <Media m={m} />
+          </div>
+        );
+      })}
+    </AbsoluteFill>
+  );
+};
+
 export const OVERLAYS: Record<string, React.FC<OverlayProps>> = {
   hook: Hook,
   price: Price,
@@ -225,4 +318,8 @@ export const OVERLAYS: Record<string, React.FC<OverlayProps>> = {
   compare: Compare,
   blur: Blur,
   lowerthird: LowerThird,
+  textbehind: TextBehind,
+  chat: Chat,
+  letterbox: Letterbox,
+  collage: Collage,
 };

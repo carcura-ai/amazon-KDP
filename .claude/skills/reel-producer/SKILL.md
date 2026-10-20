@@ -23,7 +23,8 @@ Werkzeug: `reel-studio/` (Remotion + ffmpeg + faster-whisper + rembg). Bedienung
    **Briefing** aus Nachricht oder `projekte/<name>/notes.md`: Leistung, Fahrzeug, Angebot/Preis, Ziel (Reichweite / Anfragen / Website), CTA-Kanal, Frist. Fehlendes als Annahme kennzeichnen, nur bei Ergebnis-relevanten Luecken fragen.
 1. **Material** nach `reel-studio/projekte/<name>/raw/` (Videos) und `voice/` (Sprache). Uebergabewege: `references/material-uebergabe.md`.
 2. `python3 -I pipeline/analyze.py projekte/<name>` (bei bereits geschnittenem Material `--no-cut`). Bausteine: A = Sprecher im Bild, V = Voiceover, B = B-Roll.
-3. **Story planen** mit `references/stil-handbuch.md`: Format waehlen, Hook festlegen, beste Takes, B-Roll-Zuordnung zum gesprochenen Wort, 3D-/Sticker-Ideen.
+3. **Musik waehlen (Pflicht):** `python3 -I pipeline/asset.py musik "<stimmung>" --bpm 100-130` → `musikhole "<Titel>" projekte/<name>` (Beats + bester Abschnitt → `music.from`). Ohne Sprache vol 0.5–0.6, mit Sprache vol 0.16 / duck 0.05. Nur ohne Musik liefern, wenn der Nutzer es verlangt.
+   **Story planen** mit `references/stil-handbuch.md`: Format waehlen, Hook festlegen, beste Takes, B-Roll-Zuordnung zum gesprochenen Wort, 3D-/Sticker-Ideen.
 4. **Assets** (immer mit Lizenzprotokoll): `pipeline/asset.py emoji|suche|hole|freistellen` – Regeln in `references/assets-und-lizenzen.md`.
 5. **edit.json** schreiben (Schema unten), dann `./pipeline/render.sh projekte/<name>` im Hintergrund.
 6. **Sounddesign** pruefen/ergaenzen nach `references/sounddesign.md` (auto-Sounds sind die Basis, Akzente manuell).
@@ -52,7 +53,8 @@ Werkzeug: `reel-studio/` (Remotion + ffmpeg + faster-whisper + rembg). Bedienung
 ```
 
 Zeitanker: `t:Wort`, `t:Wort.e` (Ende), `t:Wort#2`, `t:für den Winter` (Phrase), `t:seg3`, `t:seg3.e`, `t:end`, Versatz `t:Wort-0.2`.
-Segment-Optionen: `tin` (zoom|whip|flash|none), `zoom` [von, bis], `bvol` (B-Roll-Ton unter VO), `vvol`, `pad`.
+Segment-Optionen: `tin` (zoom|whip|flash|none), `zoom` [von, bis], `bvol` (B-Roll-Ton unter VO), `vvol`, `pad`, `schnitt` (hart|beat), bei `a`: `von`/`bis`.
+B-Roll-Element: `{"id", "from", "dur", "rate", "vol", "ramp": true}` (Speed-Ramp normal → Zeitlupe → normal).
 
 | Overlay `type` | Zweck | Wichtige Felder |
 |---|---|---|
@@ -67,6 +69,10 @@ Segment-Optionen: `tin` (zoom|whip|flash|none), `zoom` [von, bis], `bvol` (B-Rol
 | `snow` | 3D-Schneefall (Winter) | label, sub, y |
 | `cta` | Handlungsaufforderung | kicker, main, sub, alt, urgency, mainAt, altAt, urgencyAt, y |
 | `blur` | Kennzeichen/Gesichter unkenntlich | x, y, w, h (0..1), r – Segment mit `"zoom": [1, 1]` |
+| `textbehind` | grosser Titel hinter dem Auto (Hook) | text, src (`freistellen --voll` vom selben ruhigen Shot), y, size – Segment `zoom` [1, 1], `tin` none |
+| `chat` | Kunden-Chat als Hook oder CTA | messages [{who: kunde/wir, text, at}], y, title |
+| `letterbox` | Kino-Balken | h (Anteil, 0.1) |
+| `collage` | 2–4 Clips/Bilder als Postkarten | items [{id, from} oder {src}, at], w |
 
 Jedes Overlay: `from`, `to`; optional `"sfx": "name"` oder `false`.
 Positionen: x/y als Anteil der Bildbreite/-hoehe. Sichere Zone: wichtige Inhalte zwischen y 0.15 und 0.63.
@@ -78,10 +84,19 @@ Positionen: x/y als Anteil der Bildbreite/-hoehe. Sichere Zone: wichtige Inhalte
 - [ ] Alle 2–3 s ein visueller Wechsel; keine toten Pausen > 0,5 s
 - [ ] Texte in der sicheren Zone; Schrift auf dem Handy lesbar (≥ 32 px bei 1080 Breite)
 - [ ] Lautheit ≈ −14 LUFS, Spitze ≤ −1 dBTP; Stimme immer klar ueber Musik und Sounds
+- [ ] Musik durchgehend hoerbar – render.sh meldet „Ton-Check ok“ (sonst Stille-Luecke pruefen)
 - [ ] Ein einziger CTA, identisch in Video, Beschreibung und angepinntem Kommentar
 - [ ] Preise = Website-Preise aus `brand/MARKE.md`, als Endpreis (Kleinunternehmer – nie „inkl. MwSt.“); Statt-Preise und Versprechen belegbar
 - [ ] Lizenzen in `assets/LIZENZEN.md`; CC-BY-Nennungen in der Beschreibung; keine fremden Logos als Werbetraeger
 - [ ] Kennzeichen/Gesichter Dritter ohne Einwilligung unkenntlich
+
+## Drehplanung
+
+Nennt der Nutzer einen Auftrag (Fahrzeug, Leistung), antworte mit einem Drehzettel nach `references/drehplanung.md` (Hook, Shotliste mit Perspektive/Bewegung/Dauer/fps, Sprechtext, Musik-Stimmung) und schlage eine Reel-Idee vor, die zu Ziel und Saison passt.
+
+## Referenzen lernen
+
+Neue Referenz-Links: `python3 -I pipeline/referenzen.py referenzen/<runde> <urls…>` → `sichten.py referenzen/<runde>/raw` → Inhalte (gezeigt/gesagt) auswerten → `reel-studio/referenzen/LERNPROTOKOLL.md` und Stil-Handbuch ergaenzen → neue Techniken als Werkzeug bauen und an einem Test-Reel pruefen.
 
 ## Archiv sichten
 

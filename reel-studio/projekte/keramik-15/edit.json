@@ -1,0 +1,24 @@
+{
+  "fps": 30,
+  "look": {"grade": "contrast(1.08) saturate(1.06)", "vignette": 0.35},
+  "music": {"src": "musik/raving_energy.mp3", "from": 210.1, "vol": 0.55, "duck": 0.15},
+  "timeline": [
+    {"b": [{"id": "B1", "from": 2.6, "dur": 3.2}], "zoom": [1, 1], "tin": "none"},
+    {"b": [{"id": "B10", "from": 5.0, "dur": 1.0}, {"id": "B11", "from": 3.0, "dur": 1.0}, {"id": "B12", "from": 1.0, "dur": 1.0},
+           {"id": "B13", "from": 10.4, "dur": 1.0}, {"id": "B18", "from": 2.0, "dur": 1.0}, {"id": "B14", "from": 3.3, "dur": 2.2, "ramp": true},
+           {"id": "B15", "from": 0.8, "dur": 1.0}, {"id": "B16", "from": 1.0, "dur": 1.0}], "schnitt": "beat", "vol": 0.25, "tin": "flash"},
+    {"b": [{"id": "B1", "from": 0.4, "dur": 5.2}], "zoom": [1.0, 1.06], "tin": "zoom"}
+  ],
+  "overlays": [
+    {"type": "letterbox", "from": "t:seg1", "to": "t:seg1.e", "h": 0.1},
+    {"type": "textbehind", "from": "t:seg1+1.4", "to": "t:seg1.e", "text": "KERAMIK", "src": "assets/m2_licht_frei.png", "y": 0.29, "size": 300},
+    {"type": "title", "from": "t:seg2", "to": "t:seg2+1.9", "y": 0.16, "kicker": "IN 10 SEKUNDEN", "text": "SO ENTSTEHT GLANZ"},
+    {"type": "sticker", "from": "t:seg2+3.1", "to": "t:seg2+4.9", "src": "assets/emoji_sparkles.png", "x": 0.8, "y": 0.22, "size": 200, "sfx": "shimmer", "tilt": false},
+    {"type": "sticker", "from": "t:seg2+5.2", "to": "t:seg2+7.6", "src": "assets/emoji_droplet.png", "x": 0.2, "y": 0.22, "size": 190, "sfx": "drop"},
+    {"type": "chat", "from": "t:seg3", "to": "t:end", "y": 0.14, "title": "Carcura",
+     "messages": [{"who": "kunde", "text": "Was kostet eine Keramikversiegelung?", "at": "t:seg3+0.8"},
+                  {"who": "wir", "text": "Ab 650 € – inkl. Handwäsche, Kneten & Politur.", "at": "t:seg3+2.0"},
+                  {"who": "wir", "text": "Kommentiere KERAMIK – wir schicken dir freie Termine.", "at": "t:seg3+3.2"}]}
+  ],
+  "sfx": [{"at": "t:seg1", "name": "riser", "vol": 0.35}]
+}

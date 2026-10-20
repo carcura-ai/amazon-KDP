@@ -22,13 +22,13 @@ Von 0 auf 100 – und wir fangen gerade erst an.
 **Angepinnter Kommentar:** Termin oder Frage zu deinem Auto? Schreib uns per WhatsApp – Link in Bio 🚗
 **Cover:** Bild bei 1,0 s (Hook „Vor 6 Monaten war hier nichts.“) – Cover-Text: „6 MONATE CARCURA“
 **Ort:** Carcura, Walterschen · **Alt-Text:** Zeitraffer der Halle von Carcura: leere Halle im April, Ausbau, Fahrzeugpflege, Keramikversiegelung im Oktober.
-**Musik:** Das Video ist ohne Musik exportiert (Stimme + Soundeffekte). In der App einen Titel aus der Musikbibliothek für Unternehmenskonten hinzufügen (eher treibend/positiv), Musik auf ca. 20–30 %, Originalton 100 %.
+**Musik:** "Undaunted" Kevin MacLeod (incompetech.com), Lizenz CC BY 4.0 – creativecommons.org/licenses/by/4.0/ (diese Zeile in die Beschreibung übernehmen). Unter euren O-Tönen läuft die Musik automatisch leiser.
 
 ## TikTok
 
 Von der leeren Halle zum Keramik-Studio in 6 Monaten 🚗 Fahrzeugaufbereitung im Westerwald – Termin per WhatsApp (Link im Profil)
 #fahrzeugaufbereitung #westerwald #keramikversiegelung #vorhernachher #carcleaning
-Ton: Titel aus der Commercial Music Library leise ergänzen.
+Musik ist enthalten (Nennung wie oben in die Beschreibung).
 
 ## YouTube Shorts
 
@@ -52,6 +52,6 @@ Die Zielwerte sind Startannahmen ohne Vergleichsdaten – nach dem ersten Test i
 
 ## Vor dem Upload prüfen
 
-- [ ] Musik nur aus der Bibliothek für Unternehmenskonten
+- [ ] Musik-Nennung (CC BY 4.0) in jeder Beschreibung
 - [ ] Keine Kennzeichen sichtbar (geprüft im Kontaktbogen der Endfassung)
 - [ ] Lizenzen: 3D-Emojis Microsoft Fluent (MIT), Schriften OFL, Sounds eigene + Kenney (CC0) – keine Nennung nötig

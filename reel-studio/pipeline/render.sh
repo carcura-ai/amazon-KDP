@@ -28,4 +28,17 @@ LN="loudnorm=I=-14:TP=-1.5:LRA=11:measured_I=$(get input_i):measured_TP=$(get in
 ffmpeg -v error -y -i "$P/export/render.mp4" -c:v copy -af "$LN" \
   -c:a aac -b:a 192k -ar 48000 -movflags +faststart "$P/export/${NAME}_final.mp4"
 rm "$P/export/render.mp4"
+# Qualitaetssicherung: Pegel je 0,5 s direkt aus den Audiodaten; >= 1,5 s unter -45 dB = Stille-Luecke (fehlende Musik?)
+ffmpeg -v error -i "$P/export/${NAME}_final.mp4" -ac 1 -ar 8000 -f s16le - | python3 -c "
+import sys, numpy as np
+a = np.frombuffer(sys.stdin.buffer.read(), np.int16).astype(np.float32) / 32768
+w = a[: len(a) // 4000 * 4000].reshape(-1, 4000)
+db = 20 * np.log10(np.sqrt((w ** 2).mean(1)) + 1e-9)
+gaps, k = [], 0
+while k < len(db):
+    j = k
+    while j < len(db) and db[j] < -45: j += 1
+    if j - k >= 3: gaps.append(f'{k / 2:.1f}-{j / 2:.1f}s')
+    k = j + 1
+print('WARNUNG Stille-Luecke: ' + ', '.join(gaps) if gaps else 'Ton-Check ok: keine Stille-Luecken')"
 echo "Fertig: $P/export/${NAME}_final.mp4"

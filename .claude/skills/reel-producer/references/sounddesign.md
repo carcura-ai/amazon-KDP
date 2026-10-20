@@ -39,12 +39,32 @@ Kenney (CC0, `kenney/<name>.ogg`, Name mit Endung angeben): z. B. `kenney/confir
 | Wasser perlt ab | drop (2–3 Stueck versetzt) | auf sichtbare Tropfen |
 | Winter/Schnee | shimmer leise | Einblendung |
 
+## Musik nach Stimmung (Pflicht in jedem Video)
+
+| Stimmung (`asset.py musik`) | Einsatz | Referenz |
+|---|---|---|
+| transformation | Vorher/Nachher, Aufbau zum Reveal | „Halfway Down“-Prinzip (kienobifilms) |
+| motivierend / energie | Prozess-Montagen, Beat-Schnitt 110–130 bpm | „Now or Never“-Prinzip |
+| episch | Zeitlupe, Weite, Hero-Shot | „Interstellar“-Prinzip |
+| spannung / dramatisch | Hook, Problem zeigen | „New Computers“-Prinzip |
+| entspannt / chill / luxus | Innenraum, Abholung, Premium | „Daisies“-Prinzip |
+| froehlich | Blooper, Behind the Scenes | |
+
+Quelle: Kevin MacLeod (incompetech.com, CC BY 4.0, Nennung in der Beschreibung). Charts-Songs aus Referenzen nur ueber die
+App-Bibliothek fuer Unternehmenskonten. Musik startet im energiereichsten Abschnitt (`music.from` aus `musikhole`).
+
+## Sound-Paare (Uebergang/Aktion → Sound)
+
+Zoom-out/Pull → tiefer whoosh · Whip → whip · Flash/Reveal → riser davor + impact · Text erscheint → pop/click ·
+Chat-Nachricht → pop · Geld/Preis → cash · Glanz → shimmer/`kenney/glass_*.ogg` · Wasser → drop · Foto/Vorher-Nachher → shutter ·
+UI/Tippen → typing. Schichten wie bei via.masi: Riser → Aktion → Pop, nie mehr als ein Akzent pro ~0,5 s.
+
 ## Regeln
 
 - Hoechstens ein Akzent pro ~1 s; mehr wirkt billig.
 - Gleichen Sound nicht dreimal hintereinander – variieren (eigene + Kenney).
 - Vor einer Pointe 0,3–0,5 s Stille statt Sound.
-- ASMR-Momente (Schaum, Polierer): Musik und Effekte weg, Originalton hoch (Segment `vol` 0.8).
-- **Musik:** Unternehmenskonten nur mit kommerziell lizenzierter Musik. Liefert der Nutzer keinen lizenzierten Titel,
-  ohne Musik exportieren und empfehlen, in der App einen Titel aus der kommerziellen Bibliothek
-  (Instagram: fuer Business-Konten freigegebene Auswahl; TikTok: Commercial Music Library) leise (ca. 15–20 %) zu ergaenzen.
+- ASMR-Momente (Schaum, Polierer): Musik kurz stark absenken (eigenes Segment, `music.duck`-Prinzip), Originalton hoch (`vol` 0.8).
+- **Musik ist Pflicht** (Nutzervorgabe): ohne Sprache traegt sie das Video, mit Sprache leise darunter (vol 0.16, duck 0.05).
+  Quelle standardmaessig Kevin MacLeod (CC BY 4.0, Nennung in der Beschreibung); Trend-Sounds nur zusaetzlich ueber die App-Bibliothek
+  fuer Unternehmenskonten (TikTok: Commercial Music Library).

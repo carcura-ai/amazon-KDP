@@ -49,6 +49,7 @@ const Music: React.FC<{spec: EditSpec}> = ({spec}) => {
   return (
     <Audio
       src={staticFile(m.src)}
+      trimBefore={Math.round((m.from ?? 0) * fps)}
       loop
       volume={(f) => {
         const t = f / fps;
