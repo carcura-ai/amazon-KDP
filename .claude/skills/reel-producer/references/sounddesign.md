@@ -39,6 +39,15 @@ Kenney (CC0, `kenney/<name>.ogg`, Name mit Endung angeben): z. B. `kenney/confir
 | Wasser perlt ab | drop (2–3 Stueck versetzt) | auf sichtbare Tropfen |
 | Winter/Schnee | shimmer leise | Einblendung |
 
+## Carcura-Musikstil (Nutzervorgabe)
+
+Auto-/Carporn-Content: **cool – Phonk, Trap, Hip-Hop/Rap-Beats**, kein Bibliotheks-Pop. Quelle: ccMixter (nur CC BY):
+`python3 -I pipeline/asset.py ccmixter "phonk"` / `"trap,instrumental"` / `"hip_hop,instrumental,dark"` → `ccmixterhole <id> projekte/<n>`
+(misst BPM, Bass-Anteil, Gesang; waehlen: Bass ≥ 35 %, Gesang 0 % bei Montagen). Bewaehrt: „Red Eyed Beast“ (SkyeJordan, Phonk, 99 bpm),
+„Mr. Wozzie“ (Robbero, Dark Hip-Hop, 96 bpm), „Spheres“ (Robbero, chill). Stil-Vorlage: oeffentliche Spotify-Playlist des Nutzers
+(`asset.py spotify <link>`) → Artists/Tempo auswerten → passende CC-BY-Beats suchen. Spotify-Songs nie selbst einbauen (Urheberrecht).
+Kevin MacLeod nur fuer Nicht-Auto-Themen (Story, ruhige Formate), wenn nichts Passendes bei ccMixter.
+
 ## Musik nach Stimmung (Pflicht in jedem Video)
 
 | Stimmung (`asset.py musik`) | Einsatz | Referenz |

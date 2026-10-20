@@ -9,6 +9,9 @@
   asset.py standbild <video> <projekt> --t 3.2 [--name x]   Einzelbild (z. B. Freeze-Frame als {"img": ...})
   asset.py musik "<stimmung>" [--bpm 100-130]     Musikvorschlaege (Kevin MacLeod, CC BY 4.0)
   asset.py musikhole "<Titel>" <projekt>          laden + Beats erkennen + Quellenangabe
+  asset.py ccmixter "<tags>"                      Hip-Hop/Trap/Phonk von ccMixter (nur CC BY), z. B. "trap" oder "hip_hop,instrumental"
+  asset.py ccmixterhole <id> <projekt>            laden + Beats + Bass-/Gesangsanalyse + Quellenangabe
+  asset.py spotify <playlist-link>                Titel/Artists einer oeffentlichen Playlist (nur als Stil-Vorlage!)
 Aufruf jeweils mit: python3 -I pipeline/asset.py ...
 """
 import argparse, json, re, subprocess, sys, tempfile, urllib.parse, urllib.request
@@ -20,8 +23,9 @@ FLUENT = "https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets
 OPENVERSE = "https://api.openverse.org/v1/images/"
 
 
-def get(url):
-    with urllib.request.urlopen(urllib.request.Request(url, headers=UA), timeout=60) as r:
+def get(url, referer=None):
+    headers = {**UA, "Referer": referer} if referer else UA  # ccMixter: Hotlink-Schutz verlangt Referer
+    with urllib.request.urlopen(urllib.request.Request(url, headers=headers), timeout=120) as r:
         return r.read()
 
 
@@ -123,6 +127,69 @@ def musikhole(titel, projekt):
     print(f"musik/{mp3.name}  ({len(beats)} Beats, {beats[1] - beats[0]:.2f}s Abstand, bester Start {best:.1f}s → \"from\") – Nennung: {nennung}")
 
 
+CCM = "http://ccmixter.org/api/query"
+
+
+def ccmixter(tags):
+    q = urllib.parse.urlencode({"tags": tags, "lic": "by", "f": "json", "limit": 15, "sort": "rank"})
+    for r in json.loads(get(f"{CCM}?{q}")):
+        t = r.get("upload_tags", "")
+        if "acappella" in t:  # reine Gesangsspuren ueberspringen
+            continue
+        print(f"{r['upload_id']} | {r['upload_name'][:40]} | {r['user_name']} | {(r.get('upload_extra') or {}).get('bpm')} bpm | {r['license_name']}")
+
+
+def analyse_musik(mp3):
+    """BPM, Beats, energiereichster Abschnitt, Bass-Anteil (808) und Gesang (Whisper) – ich kann Musik nicht hoeren, nur messen."""
+    import librosa
+    import numpy as np
+    y, sr = librosa.load(str(mp3), sr=22050, mono=True)
+    tempo, frames = librosa.beat.beat_track(y=y, sr=sr)
+    beats = [round(float(b), 3) for b in librosa.frames_to_time(frames, sr=sr)]
+    rms = librosa.feature.rms(y=y, hop_length=sr)[0]
+    best = max(range(max(1, len(rms) - 20)), key=lambda k: float(rms[k:k + 20].mean()))
+    best = min(beats, key=lambda x: abs(x - best)) if beats else float(best)
+    spec = np.abs(librosa.stft(y[: sr * 60], n_fft=4096))
+    freqs = librosa.fft_frequencies(sr=sr, n_fft=4096)
+    bass = float(spec[freqs < 150].sum() / spec.sum())
+    from faster_whisper import WhisperModel
+    segs, _ = WhisperModel("large-v3-turbo", device="cpu", compute_type="int8").transcribe(
+        y[: sr * 60].astype(np.float32) if sr == 16000 else librosa.resample(y[: sr * 60], orig_sr=sr, target_sr=16000), vad_filter=True)
+    gesang = sum(s.end - s.start for s in segs) / 60
+    info = {"bpm": float(np.atleast_1d(tempo)[0]), "bester_start": round(best, 3), "bass_anteil": round(bass, 3),
+            "gesang_anteil": round(gesang, 2), "beats": beats}
+    Path(mp3).with_suffix(".beats.json").write_text(json.dumps(info), encoding="utf-8")
+    return info
+
+
+def ccmixterhole(uid, projekt):
+    r = json.loads(get(f"{CCM}?{urllib.parse.urlencode({'ids': uid, 'f': 'json'})}"))[0]
+    if "Attribution" not in r["license_name"] or "Noncommercial" in r["license_name"]:
+        sys.exit(f"Lizenz {r['license_name']} nicht zulaessig")
+    d = Path(projekt).resolve() / "musik"; d.mkdir(parents=True, exist_ok=True)
+    mp3 = d / (re.sub(r"[^a-z0-9]+", "_", r["upload_name"].lower()).strip("_")[:40] + ".mp3")
+    url = next(f["download_url"] for f in r["files"] if f["download_url"].endswith(".mp3"))
+    mp3.write_bytes(get(url, referer=r["file_page_url"]))
+    a = analyse_musik(mp3)
+    feat = (r.get("upload_extra") or {}).get("featuring")
+    nennung = f'"{r["upload_name"]}" by {r["user_name"]}{" ft. " + feat if feat else ""} (ccmixter.org) – {r["license_name"]}'
+    log(assets_dir(projekt), f"musik/{mp3.name}", "ccmixter.org", r["license_name"], r["user_name"], r["file_page_url"], f"JA: {nennung}")
+    print(f"musik/{mp3.name} | {a['bpm']:.0f} bpm | Bass {a['bass_anteil']:.0%} | Gesang {a['gesang_anteil']:.0%} | bester Start {a['bester_start']:.1f}s | {nennung}")
+
+
+def spotify(link):
+    """Oeffentliche Playlist ueber die Einbettungsseite lesen. Die Songs selbst sind nicht lizenziert – nur Stil-Vorlage."""
+    pid = re.search(r"playlist/([A-Za-z0-9]+)", link).group(1)
+    page = get(f"https://open.spotify.com/embed/playlist/{pid}").decode("utf-8", "ignore")
+    e = json.loads(re.search(r'<script id="__NEXT_DATA__" type="application/json">(.*?)</script>', page, re.S).group(1))
+    e = e["props"]["pageProps"]["state"]["data"]["entity"]
+    from collections import Counter
+    artists = Counter(a.strip() for t in e.get("trackList", []) for a in (t.get("subtitle") or "").split(","))
+    print(f"{e.get('name')} – {len(e.get('trackList', []))} Titel\nTop-Artists: " + ", ".join(f"{a} ({n})" for a, n in artists.most_common(15)))
+    for t in e.get("trackList", []):
+        print(f"  {t.get('title')} – {t.get('subtitle')} ({round(t.get('duration', 0) / 1000)} s)")
+
+
 def standbild(src, projekt, t, name):
     d = assets_dir(projekt)
     out = d / f"{name or Path(src).stem}_{t:g}s.png"
@@ -155,7 +222,7 @@ def freistellen(src, projekt, t, name, voll=False):
 
 if __name__ == "__main__":
     ap = argparse.ArgumentParser()
-    ap.add_argument("befehl", choices=["emoji", "suche", "hole", "freistellen", "standbild", "musik", "musikhole"])
+    ap.add_argument("befehl", choices=["emoji", "suche", "hole", "freistellen", "standbild", "musik", "musikhole", "ccmixter", "ccmixterhole", "spotify"])
     ap.add_argument("arg")
     ap.add_argument("projekt", nargs="?")
     ap.add_argument("--t", type=float, default=0.0)
@@ -165,4 +232,5 @@ if __name__ == "__main__":
     a = ap.parse_args()
     {"emoji": lambda: emoji(a.arg, a.projekt), "suche": lambda: suche(a.arg), "hole": lambda: hole(a.arg, a.projekt),
      "freistellen": lambda: freistellen(a.arg, a.projekt, a.t, a.name, a.voll), "standbild": lambda: standbild(a.arg, a.projekt, a.t, a.name),
-     "musik": lambda: musik(a.arg, a.bpm), "musikhole": lambda: musikhole(a.arg, a.projekt)}[a.befehl]()
+     "musik": lambda: musik(a.arg, a.bpm), "musikhole": lambda: musikhole(a.arg, a.projekt),
+     "ccmixter": lambda: ccmixter(a.arg), "ccmixterhole": lambda: ccmixterhole(a.arg, a.projekt), "spotify": lambda: spotify(a.arg)}[a.befehl]()

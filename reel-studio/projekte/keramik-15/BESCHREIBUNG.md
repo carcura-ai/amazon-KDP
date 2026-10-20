@@ -16,7 +16,7 @@ Ab 650 € Endpreis (PKW/Kombi, normaler Zustand) – den verbindlichen Preis be
 
 #keramikversiegelung #fahrzeugaufbereitung #westerwald #autopflege #carcura
 
-Musik: "Raving Energy" Kevin MacLeod (incompetech.com), Lizenz CC BY 4.0 – creativecommons.org/licenses/by/4.0/
+Musik: "Red Eyed Beast" by SkyeJordan (ccmixter.org) – CC BY 3.0
 
 **Angepinnter Kommentar:** Kommentiere KERAMIK 👇 – wir melden uns per DM mit Preis und freien Terminen.
 **Cover:** Bild bei 2,0 s („KERAMIK“ hinter dem M2) · **Alt-Text:** BMW M2 in der Carcura-Halle, Keramikversiegelung: Auftragen, Politur, Wasser perlt ab.
@@ -27,7 +27,7 @@ So entsteht Glanz 🚗✨ Keramikversiegelung im Westerwald ab 650 €. Kommenti
 
 ## YouTube Shorts
 **Titel:** Keramikversiegelung in 15 Sekunden | Carcura Westerwald
-**Beschreibung:** Ab 650 € inkl. Handwäsche, Kneten & Politur. Termin: https://wa.me/491706669516 · Musik: "Raving Energy" Kevin MacLeod (incompetech.com), CC BY 4.0
+**Beschreibung:** Ab 650 € inkl. Handwäsche, Kneten & Politur. Termin: https://wa.me/491706669516 · Musik: "Red Eyed Beast" by SkyeJordan (ccmixter.org), CC BY 3.0
 
 ## Werbeplan
 

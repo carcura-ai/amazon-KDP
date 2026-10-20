@@ -4,3 +4,4 @@
 | m2_licht_frei.png | eigenes Material (b01_licht.mp4 @ 5.0s) | eigene Rechte | Carcura | - | nein |
 | emoji_sparkles.png | Microsoft Fluent Emoji | MIT | Microsoft | github.com/microsoft/fluentui-emoji | nein |
 | emoji_droplet.png | Microsoft Fluent Emoji | MIT | Microsoft | github.com/microsoft/fluentui-emoji | nein |
+| musik/red_eyed_beast.mp3 | ccmixter.org | Attribution (3.0) | SkyeJordan | https://ccmixter.org/files/SkyeJordan/64884 | JA: "Red Eyed Beast" by SkyeJordan (ccmixter.org) – Attribution (3.0) |

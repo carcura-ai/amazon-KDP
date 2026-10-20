@@ -23,7 +23,7 @@ Werkzeug: `reel-studio/` (Remotion + ffmpeg + faster-whisper + rembg). Bedienung
    **Briefing** aus Nachricht oder `projekte/<name>/notes.md`: Leistung, Fahrzeug, Angebot/Preis, Ziel (Reichweite / Anfragen / Website), CTA-Kanal, Frist. Fehlendes als Annahme kennzeichnen, nur bei Ergebnis-relevanten Luecken fragen.
 1. **Material** nach `reel-studio/projekte/<name>/raw/` (Videos) und `voice/` (Sprache). Uebergabewege: `references/material-uebergabe.md`.
 2. `python3 -I pipeline/analyze.py projekte/<name>` (bei bereits geschnittenem Material `--no-cut`). Bausteine: A = Sprecher im Bild, V = Voiceover, B = B-Roll.
-3. **Musik waehlen (Pflicht):** `python3 -I pipeline/asset.py musik "<stimmung>" --bpm 100-130` → `musikhole "<Titel>" projekte/<name>` (Beats + bester Abschnitt → `music.from`). Ohne Sprache vol 0.5–0.6, mit Sprache vol 0.16 / duck 0.05. Nur ohne Musik liefern, wenn der Nutzer es verlangt.
+3. **Musik waehlen (Pflicht, Auto-Content = Phonk/Trap/Hip-Hop von ccMixter, siehe `references/sounddesign.md`):** `python3 -I pipeline/asset.py musik "<stimmung>" --bpm 100-130` → `musikhole "<Titel>" projekte/<name>` (Beats + bester Abschnitt → `music.from`). Ohne Sprache vol 0.5–0.6, mit Sprache vol 0.16 / duck 0.05. Nur ohne Musik liefern, wenn der Nutzer es verlangt.
    **Story planen** mit `references/stil-handbuch.md`: Format waehlen, Hook festlegen, beste Takes, B-Roll-Zuordnung zum gesprochenen Wort, 3D-/Sticker-Ideen.
 4. **Assets** (immer mit Lizenzprotokoll): `pipeline/asset.py emoji|suche|hole|freistellen` – Regeln in `references/assets-und-lizenzen.md`.
 5. **edit.json** schreiben (Schema unten), dann `./pipeline/render.sh projekte/<name>` im Hintergrund.

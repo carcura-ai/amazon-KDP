@@ -275,8 +275,8 @@
   }
  ],
  "music": {
-  "src": "musik/undaunted.mp3",
-  "from": 80.0,
+  "src": "musik/mr_wozzie.mp3",
+  "from": 22.0,
   "vol": 0.5,
   "duck": 0.08
  }

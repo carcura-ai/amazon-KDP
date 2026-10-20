@@ -22,7 +22,7 @@ Von 0 auf 100 – und wir fangen gerade erst an.
 **Angepinnter Kommentar:** Termin oder Frage zu deinem Auto? Schreib uns per WhatsApp – Link in Bio 🚗
 **Cover:** Bild bei 1,0 s (Hook „Vor 6 Monaten war hier nichts.“) – Cover-Text: „6 MONATE CARCURA“
 **Ort:** Carcura, Walterschen · **Alt-Text:** Zeitraffer der Halle von Carcura: leere Halle im April, Ausbau, Fahrzeugpflege, Keramikversiegelung im Oktober.
-**Musik:** "Undaunted" Kevin MacLeod (incompetech.com), Lizenz CC BY 4.0 – creativecommons.org/licenses/by/4.0/ (diese Zeile in die Beschreibung übernehmen). Unter euren O-Tönen läuft die Musik automatisch leiser.
+**Musik:** "Mr. Wozzie" by Robbero (ccmixter.org) – CC BY 3.0 (diese Zeile in die Beschreibung übernehmen). Unter euren O-Tönen läuft die Musik automatisch leiser.
 
 ## TikTok
 
