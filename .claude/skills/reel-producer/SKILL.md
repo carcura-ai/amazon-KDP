@@ -83,6 +83,10 @@ Positionen: x/y als Anteil der Bildbreite/-hoehe. Sichere Zone: wichtige Inhalte
 - [ ] Lizenzen in `assets/LIZENZEN.md`; CC-BY-Nennungen in der Beschreibung; keine fremden Logos als Werbetraeger
 - [ ] Kennzeichen/Gesichter Dritter ohne Einwilligung unkenntlich
 
+## Archiv sichten
+
+Ganze Ordner (z. B. Drive-Link mit vielen Videos): `gdown --folder <link> -O projekte/<name>/raw` → `python3 -I pipeline/sichten.py projekte/<name>/raw` → `sichtung/sichtung.md` + `sichtung/seite-*.jpg` (6 Videos pro Bild) lesen → Bericht nach Vorbild `projekte/lernphase/BERICHT.md`. Clips fuer ein Projekt per Symlink mit Praefix `a_`/`b_` uebernehmen (legt die Rolle fest; Dateinamen mit Leerzeichen einzeln verlinken).
+
 ## Lernschleife
 
 - Nach Veroeffentlichung Kennzahlen in `reel-studio/LERNLOG.md` festhalten (Nutzer liefert Insights-Screenshots oder Zahlen). Wiederkehrende Muster ins Stil-Handbuch uebernehmen.

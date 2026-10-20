@@ -57,7 +57,9 @@ def transcribe(model, f):
     audio = np.frombuffer(w.readframes(w.getnframes()), np.int16).astype(np.float32) / 32768
     wav.unlink()
     segs, _ = model.transcribe(audio, language="de", word_timestamps=True, vad_filter=True, initial_prompt=GLOSSAR["prompt"])
-    return correct([{"w": x.word.strip(), "s": round(x.start, 2), "e": round(x.end, 2)} for s in segs for x in s.words])
+    bad = GLOSSAR.get("halluzinationen", [])  # typische Whisper-Erfindungen bei Musik/Stille
+    return correct([{"w": x.word.strip(), "s": round(x.start, 2), "e": round(x.end, 2)}
+                    for s in segs if not any(b.lower() in s.text.lower() for b in bad) for x in s.words])
 
 
 def correct(words):
@@ -152,10 +154,15 @@ def main():
 
     blocks, broll, info, rows, lines = {}, {}, {}, [], {"A": [], "V": [], "B": []}
     for f in files("raw", VIDEO_EXT):
-        meta = probe(f)
+        try:
+            meta = probe(f)
+        except (KeyError, ValueError, json.JSONDecodeError):
+            print(f"WARNUNG: {f.name} nicht lesbar – uebersprungen"); continue
         words = transcribe(model, f) if meta["audio"] else []
         coverage = sum(w["e"] - w["s"] for w in words) / max(meta["duration"], 0.1)
-        kind = "aroll" if coverage >= 0.25 else "broll"  # wenig Sprache = Atmo/Halluzination -> B-Roll
+        # Dateiname a_/b_ legt die Rolle fest, sonst entscheidet der Sprachanteil (wenig Sprache = Atmo -> B-Roll)
+        forced = "broll" if re.match(r"b[_\d]", f.stem.lower()) else "aroll" if re.match(r"a[_\d]", f.stem.lower()) else None
+        kind = forced or ("aroll" if coverage >= 0.25 else "broll")
         dst = pub / (f.stem + ".mp4")
         prep_video(f, dst, meta, speech=kind == "aroll")
         scenes, lufs = silences_scenes(dst, meta)

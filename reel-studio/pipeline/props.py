@@ -8,7 +8,8 @@ Zeitleiste in edit.json ("timeline", optional – ohne sie gilt analysis/auto_ed
   {"v": "V1", "b": ["B2", {"id": "B4", "from": 1.5, "rate": 0.5}]}   Voiceover ueber B-Roll
   {"b": [{"id": "B3", "dur": 2.0}], "vol": 0.7}       reine B-Roll mit Originalton (z. B. Schaum-ASMR)
   {"b": [{"img": "assets/foto.jpg", "dur": 2}]}        Standbild (Ken-Burns-Zoom automatisch)
-  Optionen je Segment: "tin" (zoom|whip|flash|none), "zoom" [von, bis], "bvol" (B-Roll-Ton unter VO), "pad"
+  Optionen je Segment: "tin" (zoom|whip|flash|none), "zoom" [von, bis], "bvol" (B-Roll-Ton unter VO), "pad",
+  "schnitt": "hart" (Montage ohne Zwischen-Uebergaenge), bei "a": "von"/"bis" (Baustein wortgenau kuerzen)
 Zeitanker statt Sekunden, ueberall ausser in der Zeitleiste:
   "t:Salz" Wortbeginn · "t:Salz.e" Wortende · "t:Salz#2" 2. Vorkommen · "t:für den Winter" Phrase
   "t:seg3" / "t:seg3.e" Segment 3 · "t:end" Videoende · Versatz: "t:Salz-0.2", "t:end-1.5"
@@ -79,7 +80,12 @@ if "timeline" in edit:
     for k, seg in enumerate(edit["timeline"], 1):
         start, first = t, len(clips)
         if "a" in seg:
-            b = B[seg["a"]]
+            b = dict(B[seg["a"]])
+            if "von" in seg or "bis" in seg:  # Baustein wortgenau kuerzen
+                ws = b["words"]
+                i0 = next((k for k, w in enumerate(ws) if norm(w["w"]) == norm(seg["von"])), 0) if "von" in seg else 0
+                i1 = next((k for k, w in enumerate(ws) if k >= i0 and norm(w["w"]) == norm(seg["bis"])), len(ws) - 1) if "bis" in seg else len(ws) - 1
+                b.update(words=ws[i0:i1 + 1], **{"from": max(b["from"], ws[i0]["s"] - 0.1), "to": min(b["to"], ws[i1]["e"] + 0.2)})
             d = q(b["to"] - b["from"])
             add_clip({"src": b["src"], "from": b["from"], "to": b["from"] + d, "vol": seg.get("vol", 1)}, "a", t)
             add_words(b["words"], b["from"], t)
@@ -101,6 +107,9 @@ if "timeline" in edit:
                 add_clip(c, "img" if c.get("img") else "b", t)
                 t += (c["to"] - c["from"]) / c.get("rate", 1)
         if clips[first:]:
+            if seg.get("schnitt") == "hart":  # Montage: harte Schnitte, Uebergang nur am Segmentanfang
+                for c in clips[first + 1:]:
+                    c["tin"] = "none"
             if "tin" in seg:
                 clips[first]["tin"] = seg["tin"]
             if "zoom" in seg:

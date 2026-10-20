@@ -43,3 +43,4 @@ reel-studio/projekte/*/analysis/*.wav
 !reel-studio/remotion/package-lock.json
 reel-studio/referenzen/
 reel-studio/projekte/test-vo/
+reel-studio/projekte/*/sichtung/*.jpg

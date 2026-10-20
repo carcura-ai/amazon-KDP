@@ -73,4 +73,13 @@ Platzierung: neben dem Gesicht, nie darueber; Groesse 220–320 px; erscheint ex
 
 ## 7. Gelernt aus Referenzen
 
-(Hier Erkenntnisse aus `pipeline/referenz.py`-Analysen eintragen: Quelle, Schnitte pro Sekunde, Hook-Typ, Effekte, was wir uebernehmen.)
+(Erkenntnisse aus `pipeline/referenz.py`-Analysen hier eintragen: Quelle, Schnitte pro Sekunde, Hook-Typ, Effekte, was wir uebernehmen.)
+
+**Eigenes Archiv (Sichtung 20.10.2026, 35 Videos – `reel-studio/projekte/lernphase/BERICHT.md`):**
+- Staerkstes Markenkapital ist die Entwicklung „leere Halle (April) → Keramik-Studio (Oktober)“ – Story-Formate nutzen.
+- Bildmaterial ab September ist werbetauglich; Schwaeche frueherer Edits: kein Hook-Text, keine Untertitel, kein Bogen, 36–64 s.
+- Montagen hart schneiden (`"schnitt": "hart"`), Uebergang + Sound nur an Kapitelwechseln; Kapitel-Titel mit Monat geben Orientierung.
+- Echte O-Toene der Gruender (`"a": "A6", "bis": "bringen"`) tragen eine Story besser als reine Texttafeln.
+- Gold-B-Roll fuer Hooks: Scheinwerfer gehen an, Wasser perlt ab (Zeitlupe `rate` 0.5 aus 60 fps), Spiegelung beim Polieren.
+- Kennzeichen tauchen oft auf – Clips/Zeitpunkte so waehlen, dass keine Kennzeichen sichtbar sind, sonst `blur`.
+- Alte Exporte waren uebersteuert (+0,7 dBFS): immer ueber render.sh exportieren.

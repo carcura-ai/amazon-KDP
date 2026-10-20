@@ -18,7 +18,8 @@ export const Captions: React.FC<{spec: EditSpec}> = ({spec}) => {
     for (const w of spec.words) {
       const prev = cur[cur.length - 1];
       const len = cur.map((x) => x.w).join(' ').length + w.w.length + 1;
-      if (prev && (cur.length >= maxWords || len > maxChars || PUNCT.test(prev.w) || w.s - prev.e > 0.6)) {
+      const keepNumber = /^\d/.test(w.w) && !PUNCT.test(prev?.w ?? '') && len <= maxChars + 4; // "Tag 1" nicht trennen
+      if (prev && !keepNumber && (cur.length >= maxWords || len > maxChars || PUNCT.test(prev.w) || w.s - prev.e > 0.6)) {
         out.push(cur);
         cur = [];
       }

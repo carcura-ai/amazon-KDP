@@ -4,10 +4,31 @@
     "Umweltanflüsse": "Umwelteinflüsse",
     "Keramikversicherung": "Keramikversiegelung",
     "Karkura": "Carcura",
-    "Carkura": "Carcura"
+    "Carkura": "Carcura",
+    "Richie": "Richy",
+    "Richi": "Richy"
   },
   "phrasen": [
-    ["erste der kommt mal zuerst", "Erste, der kommt, mahlt zuerst"]
+    [
+      "erste der kommt mal zuerst",
+      "Erste, der kommt, mahlt zuerst"
+    ]
   ],
-  "fueller": ["äh", "ähm", "öhm", "hm", "ehm"]
+  "fueller": [
+    "äh",
+    "ähm",
+    "öhm",
+    "hm",
+    "ehm"
+  ],
+  "halluzinationen": [
+    "Untertitelung des ZDF",
+    "Untertitel im Auftrag des ZDF",
+    "Untertitel von",
+    "Vielen Dank fürs Zuschauen",
+    "Danke fürs Zuschauen",
+    "Copyright WDR",
+    "SWR 20",
+    "Amara.org"
+  ]
 }
