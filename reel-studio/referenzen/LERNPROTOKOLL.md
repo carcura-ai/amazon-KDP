@@ -71,3 +71,12 @@ Gezeigt: kinetische Typografie synchron zur Stimme (Serif-kursiv-Akzente + fette
 Pixel/Glitch-Uebergaenge, Maskottchen-Figuren, Zaehler, Kommentar-CTA als UI-Karte, Serie „1/3“.
 Umgesetzt: Regie-Modus mit 7 Stationen + Regie-Durchgang (SKILL.md), `references/regie-regeln.md` (alle Nutzer-Notizen als Regeln),
 Untertitel-Stil `kinetik` (Instrument Serif, OFL), Uebergang `glitch` mit Sound, `ende_halten`. Offen: Maskottchen fuer Carcura.
+
+## Runde 4 (21.10.2026): claudetipsandtricks – „Claude can't generate video. It can still edit yours.“ (Karussell, 6 Folien)
+
+Gezeigt: Schnitt als Code (eine Zeile ändern = ein Shot), HTML-Szenen + Playwright-Bildschleife, Remotion/HyperFrames für Motion
+Graphics, Voiceover per TTS über MCP mit Wort-Zeitstempeln, Grobschnitt aus dem Transkript, Selbstkontrolle des Renders,
+ffmpeg für H.264 + Ton; Grenzen: echte Aufnahmen für Gesichter/Tiere.
+Abgleich: Remotion, ffmpeg, Transkript-Schnitt (Whisper, Füllwörter raus), Wort-Anker, Render-Selbstkontrolle (Kontaktbogen,
+Lautheit, Stille) sind bei uns umgesetzt. Offen: KI-Stimme (TTS mit Wort-Zeitstempeln) – nur für Erklär-/Varianten-Videos,
+für Vertrauen bleibt die echte Stimme von Alex/Richy erste Wahl.
