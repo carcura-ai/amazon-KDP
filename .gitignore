@@ -45,6 +45,7 @@ reel-studio/referenzen/*/
 reel-studio/projekte/test-vo/
 reel-studio/projekte/*/sichtung/*.jpg
 reel-studio/projekte/*/sichtung/**/*.jpg
+reel-studio/projekte/*/sichtung/*.png
 reel-studio/projekte/*/quelle/
 reel-studio/projekte/*/quelle_links/
 reel-studio/projekte/*/musik/*.mp3
