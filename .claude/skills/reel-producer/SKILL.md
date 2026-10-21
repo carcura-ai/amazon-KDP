@@ -103,6 +103,11 @@ B-Roll-Element: `{"id", "from", "dur", "rate", "vol", "ramp": true}` (Speed-Ramp
 | `collage` | 2–4 Clips/Bilder als Postkarten | items [{id, from} oder {src}, at], w |
 | `timer` | Zeit + Fortschrittsbalken oben („in 60 Sekunden“) | label, total (60), y (0.1), countdown, offset |
 | `step` | 3D-Schrittkarte mit Zahlenkachel | nr (ohne = nur Kicker), of, kicker, text (\n = Zeilenumbruch), size, y, fx: glanz \| spray (setzt sich wie Nebel ab) \| wisch (wird weggewischt) |
+| `polishreveal` | Start: stumpfer Lack mit Swirls + Problem-Woertern, Pad-Ring poliert frei | x, y (Pad-Mitte), start, dur, lines [..], y0, size |
+| `lichtbalken` | Ende: LED-Lichtbalken legt Endkarte frei (Chrom-Titel, Preis, CTA, Logo) | over, kicker, pre, price, sub, cta, site, logo, y, sweep |
+| `callout` | Hinweis-Linie vom Objekt zur Beschriftung | x, y (Punkt), lx, ly (Beschriftung), text, sub |
+| `glint` | diagonaler Glanz-Streifen ueber das Bild | – (Dauer = from/to) |
+Musik legt der Nutzer selbst an → `"lautheit": false` (Effekt-Spur + Fassung ohne Ton).
 
 Jedes Overlay: `from`, `to`; optional `"sfx": "name"` oder `false`.
 Positionen: x/y als Anteil der Bildbreite/-hoehe. Sichere Zone: wichtige Inhalte zwischen y 0.15 und 0.63.

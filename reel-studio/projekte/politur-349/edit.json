@@ -1,0 +1,39 @@
+{
+ "fps": 30,
+ "lautheit": false,
+ "auto": {"transitions": false, "zoom": true, "sfx": true},
+ "look": {"grade": "contrast(1.05) saturate(1.05)", "vignette": 0.25, "grain": 0},
+ "brand": {"fontHead": "Anton", "fontBody": "Satoshi"},
+ "captions": {"y": 0.7, "maxWords": 3, "maxChars": 18},
+ "timeline": [
+  {"b": [{"id": "B1", "from": 0.4, "dur": 4.2}], "schnitt": "hart", "tin": "none"},
+  {"b": [{"id": "B1", "from": 5.6, "dur": 3.2}], "schnitt": "hart", "tin": "whip"},
+  {"b": [{"id": "B2", "from": 0.2, "dur": 3.4}], "schnitt": "hart", "tin": "whip"},
+  {"b": [{"id": "B2", "from": 6.4, "dur": 5.2}], "schnitt": "hart", "tin": "zoom"}
+ ],
+ "overlays": [
+  {"type": "polishreveal", "from": 0, "to": 2.3, "x": 0.66, "y": 0.43, "start": 0.95, "dur": 1.15, "lines": ["SWIRLS?", "KRATZER?", "GRAUSCHLEIER?"], "y0": 0.1, "size": 118, "sfx": false},
+  {"type": "step", "from": 2.15, "to": 4.2, "kicker": "PROFESSIONELLE POLITUR", "text": "AB 349 €", "fx": "glanz", "size": 130, "y": 0.1},
+  {"type": "callout", "from": "t:seg2+0.25", "to": "t:seg2.e-0.05", "x": 0.57, "y": 0.43, "lx": 0.06, "ly": 0.15, "text": "SWIRLS RAUS", "sub": "& feine Kratzer", "sfx": false},
+  {"type": "callout", "from": "t:seg3+0.25", "to": "t:seg3.e-0.05", "x": 0.36, "y": 0.5, "lx": 0.4, "ly": 0.14, "text": "TIEFENGLANZ", "sub": "Politur sauber abgenommen", "sfx": false},
+  {"type": "glint", "from": "t:seg4+0.15", "to": "t:seg4+1.15", "sfx": false},
+  {"type": "lichtbalken", "from": "t:seg4+1.4", "to": "t:end", "over": "LACK WIE NEU", "kicker": "POLITUR", "pre": "AB", "price": "349 €",
+   "sub": "inkl. Handwäsche & Kneten", "cta": "TERMIN PER WHATSAPP", "site": "carcura.info · Walterschen", "y": 0.17, "sfx": false}
+ ],
+ "sfx": [
+  {"at": 0.05, "name": "click", "vol": 0.25},
+  {"at": 0.27, "name": "click", "vol": 0.25},
+  {"at": 0.49, "name": "click", "vol": 0.25},
+  {"at": 0.9, "name": "m2/polierer.wav", "vol": 1.0},
+  {"at": 2.05, "name": "shimmer", "vol": 0.35},
+  {"at": 2.1, "name": "subdrop", "vol": 0.25},
+  {"at": 2.15, "name": "whoosh", "vol": 0.3},
+  {"at": "t:seg2+0.25", "name": "pop", "vol": 0.2},
+  {"at": "t:seg3+0.25", "name": "pop", "vol": 0.2},
+  {"at": "t:seg4+0.15", "name": "shimmer", "vol": 0.25},
+  {"at": "t:seg4+0.05", "name": "riser", "vol": 0.2},
+  {"at": "t:seg4+1.5", "name": "whoosh", "vol": 0.35},
+  {"at": "t:seg4+2.06", "name": "impact", "vol": 0.25},
+  {"at": "t:seg4+2.82", "name": "ding", "vol": 0.25}
+ ]
+}

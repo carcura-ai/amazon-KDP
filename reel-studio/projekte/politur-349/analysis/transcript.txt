@@ -1,0 +1,9 @@
+A-ROLL (Sprecher im Bild)
+
+VOICEOVER
+
+B-ROLL
+B1   b01_polieren.mp4  25.6s  30fps  2160x3840  Schnitte []
+B2   b02_abnehmen.mp4  11.8s  30fps  2160x3840  Schnitte []
+
+A-Roll gesamt: 0.0s · Kontaktbogen: analysis/uebersicht-*.jpg

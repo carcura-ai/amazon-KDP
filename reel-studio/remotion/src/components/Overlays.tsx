@@ -3,6 +3,7 @@ import {AbsoluteFill, Easing, Img, interpolate, OffthreadVideo, spring, staticFi
 import {BODY, HEAD} from '../fonts';
 import type {Brand, Overlay} from '../types';
 import {Badge3D, Snow} from './Three';
+import {Callout, Glint, LichtBalken, PolishReveal} from './Politur';
 
 export type OverlayProps = {o: Overlay; brand: Brand};
 type SpringCfg = Partial<{damping: number; stiffness: number; mass: number}>;
@@ -377,4 +378,8 @@ export const OVERLAYS: Record<string, React.FC<OverlayProps>> = {
   collage: Collage,
   timer: Timer,
   step: Step,
+  polishreveal: PolishReveal,
+  lichtbalken: LichtBalken,
+  callout: Callout,
+  glint: Glint,
 };

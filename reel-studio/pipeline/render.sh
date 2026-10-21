@@ -21,6 +21,16 @@ if [[ "${2:-}" == "--still" ]]; then  # Einzelbild zur Kontrolle
 fi
 
 npx remotion render src/index.ts Reel "$P/export/render.mp4" --codec=h264 --crf=17 --concurrency=4 "${FLAGS[@]}"
+# Nutzer legt Musik selbst an ("lautheit": false in edit.json): nur Effekt-Spur, Spitzen auf -6 dBFS, plus Fassung ohne Ton
+if python3 -c "import json,sys; sys.exit(0 if json.load(open('$P/edit.json')).get('lautheit', True) is False else 1)"; then
+  PK=$(ffmpeg -i "$P/export/render.mp4" -af volumedetect -f null - 2>&1 | sed -n 's/.*max_volume: \(-*[0-9.]*\) dB/\1/p')
+  ffmpeg -v error -y -i "$P/export/render.mp4" -c:v copy -af "volume=$(python3 -c "print(round(-6-($PK),2))")dB" \
+    -c:a aac -b:a 192k -ar 48000 -movflags +faststart "$P/export/${NAME}_final.mp4"
+  ffmpeg -v error -y -i "$P/export/render.mp4" -c:v copy -an -movflags +faststart "$P/export/${NAME}_ohne_ton.mp4"
+  rm "$P/export/render.mp4"
+  echo "Fertig (Effekt-Spur, Musik legt der Nutzer an): $P/export/${NAME}_final.mp4 + ${NAME}_ohne_ton.mp4"
+  exit 0
+fi
 # Lautheit in zwei Durchgaengen (linear, ohne Pumpen): Ziel -14 LUFS, Spitzen max. -1,5 dBTP
 M=$(ffmpeg -hide_banner -i "$P/export/render.mp4" -af loudnorm=I=-14:TP=-1.5:LRA=11:print_format=json -f null - 2>&1 | sed -n '/^{/,/^}/p')
 get() { echo "$M" | python3 -c "import sys,json; print(json.load(sys.stdin)['$1'])"; }
