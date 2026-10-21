@@ -80,3 +80,14 @@ ffmpeg für H.264 + Ton; Grenzen: echte Aufnahmen für Gesichter/Tiere.
 Abgleich: Remotion, ffmpeg, Transkript-Schnitt (Whisper, Füllwörter raus), Wort-Anker, Render-Selbstkontrolle (Kontaktbogen,
 Lautheit, Stille) sind bei uns umgesetzt. Offen: KI-Stimme (TTS mit Wort-Zeitstempeln) – nur für Erklär-/Varianten-Videos,
 für Vertrauen bleibt die echte Stimme von Alex/Richy erste Wahl.
+
+## Runde 5 (21.10.2026): riverisbuilding – „OpenFilm“ (32,6 Tsd. Aufrufe, 3,1 Tsd. Likes, **484 Kommentare**)
+
+Gesagt/gezeigt: Open-Source-Videoagent (MIT, github.com/openfilm/openfilm, aktiv gepflegt): Agent schreibt den Film als
+`film.html` (Szenen = Webseiten mit `frame(t)`), „Studio“ im Browser zum Selbst-Nachbessern (Text/Farbe/Position/Schnitt per Klick),
+Export als MP4 und als Timeline fuer DaVinci Resolve/Premiere/Final Cut; KI-Stimme/Musik nur mit eigenen API-Schluesseln.
+Einschaetzung: gleiche Idee wie unsere Remotion-Pipeline; echter Mehrwert = **Selbst-Nachbessern + DaVinci-Export** –
+lohnt sich erst, wenn Claude lokal auf dem Laptop des Nutzers laeuft (Studio braucht einen Browser auf dem Rechner).
+Uebernommen fuers Format: Kommentar-CTA „Was soll ich als Naechstes machen? Top-Kommentar setze ich um“ (1,5 % Kommentarquote)
+→ fuer Carcura: „Welches Auto sollen wir als Naechstes zeigen? Top-Kommentar drehen wir“ (ohne Gewinn = kein Gewinnspielrecht noetig);
+witziger Folgen-CTA („Early-Investor-Zertifikat“), Notizzettel-Moodboard als Uebergang.
