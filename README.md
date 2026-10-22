@@ -100,6 +100,12 @@ amazon-kdp-business/
 | `challenge` | Pre-Mortem eines gewählten Plans |
 | `weekly-review` | Wochenrückblick gegen Verzettelung |
 | `skill-security-auditor` | Vorprüfung fremder Skills |
+| `impeccable` | Design-Regelwerk: Modi, Qualitätsuntergrenze, Audit, Polish (ohne Binär-Startskript) |
+| `ui-ux-pro-max` | Datenbank für Stile, Paletten, Schriften, Landingpage-Muster |
+| `emil-design-eng`, `review-animations` | UI-Feinschliff und Animationsqualität |
+| `interaction-design` | Mikrointeraktionen und Feedback-Zustände |
+| `web-design-guidelines` | ~100 prüfbare UI-Regeln (lokale, geprüfte Kopie) |
+| `dramatic`, `premium`, `refined` | Stilreferenzen |
 
 ## Erster Schwerpunkt
 

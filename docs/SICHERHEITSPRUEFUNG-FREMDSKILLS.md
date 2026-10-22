@@ -31,6 +31,8 @@ eine Warnung vor dem Umgehen von Einreichungslimits.
 | mcpmarket.com amazon-kdp-category-researcher | — | unbekannt | **Nicht installiert** |
 | JuliusBrussee/caveman | `bad48a0` (2026-10-17) | Apache 2.0 | **Teilweise installiert** (1 von 22 Skills) |
 | alirezarezvani/claude-skills | `27cfcd0` (2026-10-21) | MIT | **Teilweise installiert** (6 von 398 Skills) |
+| bergside/awesome-design-skills | `f631a09` (2026-06-28) | MIT | **Teilweise installiert** (3 von 67 Stilvorlagen) |
+| Design-Runde: impeccable, ui-ux-pro-max, emilkowalski, wshobson, vercel-labs | siehe Abschnitt 9 | MIT / Apache 2.0 | **Teilweise installiert** (6 Skills) |
 
 ---
 
@@ -255,6 +257,35 @@ das Werkzeug schlägt also an).
 | `cold-email` | B2B-Kaltakquise per E-Mail ist in Deutschland nur mit mutmaßlicher Einwilligung zulässig (§ 7 UWG) |
 | `aeo`, `free-tool-strategy`, `marketing-psychology` | Kein Mehrwert gegenüber vorhandenem Wissen |
 | C-Level-, Engineering-, Compliance-, Medizintechnik-, Jira-, Cloud-Skills (~350) | Kein Bezug zu den Geschäftsfeldern |
+
+---
+
+## 8 bergside/awesome-design-skills — teilweise installiert
+
+**Commit** `f631a09` (2026-06-28) · **MIT** · 67 Stilvorlagen des Generators typeui.sh, nur Markdown und Bilder.
+Die Vorlagen unterscheiden sich nur in rund 16 Zeilen (Name, Farbwerte; Tailwind-Standardfarben).
+**Installiert:** `dramatic`, `premium`, `refined` als Stilreferenz. Auditor: WARN nur wegen `.DS_Store`.
+
+---
+
+## 9 Design-Runde — teilweise installiert
+
+**Prüfdatum** 2026-10-22. Angefragt als `npx skills add …` für acht Pakete; `npx` nicht ausgeführt.
+
+| Angefragt | Tatsächliche Quelle | Entscheidung |
+|---|---|---|
+| pbakaus/impeccable | dto., Apache 2.0 | **installiert ohne `scripts/`** — Startskript lädt ungeprüfte Binärdatei |
+| nextlevelbuilder/ui-ux-pro-max | `ui-ux-pro-max-skill`, MIT | **`ui-ux-pro-max` installiert**; `design` (Logo-Generierung über externe KI-APIs mit Schlüsseln), `ui-styling` (shadcn/Tailwind), `brand`, `banner-design`, `slides` nicht |
+| emilkowalski/skill | dto., MIT | **`emil-design-eng`, `review-animations`**; Swift, Expo, React-Toasts, `break-ui` (React-Komponenten mit Datenquellen) nicht |
+| shadcn/ui | dto., MIT | **nicht installiert** — nur React/Tailwind-Projekte mit `components.json`, passt nicht zu WordPress/Kubio |
+| ui-skills/interaction-design | existiert nicht; Quelle `wshobson/agents`, MIT | **installiert** |
+| ui-skills/interface-design | existiert nicht; Quelle `Dammyjay93/interface-design`, MIT | **nicht installiert** — schließt Marketing-Seiten laut eigener Beschreibung aus |
+| ui-skills/web-design-guidelines | existiert nicht; Quelle `vercel-labs/agent-skills`, MIT | **installiert mit lokaler Regelkopie** — Original lädt Anweisungen live nach |
+| vercel/skills-hub | existiert nicht; `vercel-labs/skills` ist das `npx skills`-Installationsprogramm | **nicht installiert** — kein Skill |
+
+**Auditor-Befunde und Bewertung:** impeccable FAIL (Regex-`.exec()` in gebündeltem JS = Fehlalarm;
+echter Befund ist der Binär-Download), break-ui FAIL (Schutzregel gegen Prompt-Injection und
+Emoji-Testdaten = Fehlalarm), ui-ux-pro-max WARN (atomares Schreiben = unbedenklich).
 
 ---
 
