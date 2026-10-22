@@ -29,6 +29,7 @@ eine Warnung vor dem Umgehen von Einreichungslimits.
 | nikmcfly/kindle-cover-skill | `954eb8e` (2026-03-27) | **keine** | **Nicht installiert** |
 | MarketplaceAdPros/skill-amazon-ads | `47d7d78` (2026-03-10) | MIT | **Nicht installiert** |
 | mcpmarket.com amazon-kdp-category-researcher | — | unbekannt | **Nicht installiert** |
+| JuliusBrussee/caveman | `bad48a0` (2026-10-17) | Apache 2.0 | **Teilweise installiert** (1 von 22 Skills) |
 
 ---
 
@@ -195,6 +196,33 @@ Er deckt die beschriebene Funktion ab (Kategorieanalyse, BSR-Einordnung,
 Wettbewerbsauswertung) und geht darüber hinaus mit einem 100-Punkte-Schema,
 der 70-Punkte-Grenze, einer Mindestzahl von zehn geprüften Wettbewerbstiteln
 und dem Verbot, BSR als Verkaufszahl darzustellen.
+
+---
+
+## 6 JuliusBrussee/caveman — teilweise installiert
+
+**Prüfdatum** 2026-10-22 · **Commit** `bad48a0e1df55e05e3f52249afa35ecc1909ee76`,
+2026-10-17 · **Apache 2.0** · Anfrage: `npx skills add JuliusBrussee/caveman`
+
+`npx` wurde nicht ausgeführt. Das Repo wurde in den Prüfbereich geklont und
+gelesen; der gewählte Skill wurde von Hand kopiert.
+
+**Umfang:** 1.791 Dateien, 27 MB — ein ganzes Ökosystem (CLI, SDKs, Proxy, MCP-Server,
+Go-Engine) mit 22 Skills. `npx skills add` hätte nur Skill-Ordner kopiert.
+
+**Sicherheitsbefund: unbedenklich, aber mit Datenschutzhaken.**
+- Kern-Skill `caveman`: reiner Text, keine Skripte, kein Netzwerk.
+- Sieben Skills bedienen den kommerziellen Dienst „Caveman Cloud".
+  `caveman-setup` leitet die KI-Anfragen einer App über ein fremdes Gateway
+  (`gateway.caveman.so`) — Kundendaten in Prompts gingen dann an Dritte
+  (Auftragsverarbeitung nach DSGVO nötig).
+- `caveman-compress` startet `claude` bzw. `opencode` als Unterprozess, schickt
+  die Zieldatei an ein Sprachmodell und überschreibt sie. Dokumentiert und ohne
+  Shell-Interpolation, aber für dieses Projekt schädlich.
+- Keine Prompt-Injection-Muster in den Skill-Texten gefunden.
+
+**Installiert:** `SKILL.md`, `LICENSE`, `NOTICE` → `.claude/skills/caveman/`.
+Details und Gründe je ausgelassenem Skill: `.claude/skills/caveman/HERKUNFT.md`.
 
 ---
 

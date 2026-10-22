@@ -16,5 +16,8 @@ und kombiniert sie, wenn sinnvoll. Der Nutzer kann einen Modus mit `/name` erzwi
 - **Grundeinstellung ist godmode-Form**: Antwort zuerst, dicht, ehrlich.
 - Bei umfangreichen Antworten den gewählten Modus in der ersten Zeile nennen
   (z. B. `Modus: OODA + L99`), bei kurzen nicht.
+- **`caveman` nur auf Zuruf** (`/caveman`), nie automatisch: Er bleibt bis
+  „stop caveman" aktiv und verträgt sich nicht mit ghost, l99 und der
+  Abschlussstruktur. Solange er läuft, entfällt diese Abschlussstruktur.
 - Die Modi ändern nie die Regeln dieses Projekts: keine erfundenen Zahlen,
   harte Tore im KDP-Prozess, KI-Angabepflicht gegenüber KDP, Freigaben beim Menschen.
