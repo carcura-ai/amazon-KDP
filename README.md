@@ -89,6 +89,18 @@ amazon-kdp-business/
 | `ooda` | Entscheidung: Lage, Optionen, Entscheidung, Aktionsplan mit Abbruchkriterium |
 | `ghost` | natürlicher Schreibstil für kundensichtbare Texte, ohne KI-Floskeln |
 
+### Geprüfte Fremd-Skills (Herkunft je Skill in `HERKUNFT.md`)
+
+| Skill | Aufgabe |
+|---|---|
+| `caveman` | knapper Antwortmodus, nur auf Zuruf |
+| `local-seo-manager` | Google-Unternehmensprofil, Verzeichnisse, Bewertungen, lokales Schema (für DE angepasst) |
+| `business-investment-advisor` | ROI, Amortisation, Kapitalwert, Kauf/Leasing (für DE angepasst) |
+| `a11y-audit` | WCAG 2.2 AA, Kontrastprüfung, BFSG |
+| `challenge` | Pre-Mortem eines gewählten Plans |
+| `weekly-review` | Wochenrückblick gegen Verzettelung |
+| `skill-security-auditor` | Vorprüfung fremder Skills |
+
 ## Erster Schwerpunkt
 
 Deutschsprachige Kinderbuchmarke mit einer wiederkehrenden **eigenen Fuchsfigur**:

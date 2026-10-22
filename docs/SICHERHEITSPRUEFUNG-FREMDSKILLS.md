@@ -30,6 +30,7 @@ eine Warnung vor dem Umgehen von Einreichungslimits.
 | MarketplaceAdPros/skill-amazon-ads | `47d7d78` (2026-03-10) | MIT | **Nicht installiert** |
 | mcpmarket.com amazon-kdp-category-researcher | — | unbekannt | **Nicht installiert** |
 | JuliusBrussee/caveman | `bad48a0` (2026-10-17) | Apache 2.0 | **Teilweise installiert** (1 von 22 Skills) |
+| alirezarezvani/claude-skills | `27cfcd0` (2026-10-21) | MIT | **Teilweise installiert** (6 von 398 Skills) |
 
 ---
 
@@ -223,6 +224,37 @@ Go-Engine) mit 22 Skills. `npx skills add` hätte nur Skill-Ordner kopiert.
 
 **Installiert:** `SKILL.md`, `LICENSE`, `NOTICE` → `.claude/skills/caveman/`.
 Details und Gründe je ausgelassenem Skill: `.claude/skills/caveman/HERKUNFT.md`.
+
+---
+
+## 7 alirezarezvani/claude-skills — teilweise installiert
+
+**Prüfdatum** 2026-10-22 · **Commit** `27cfcd0fb0a41f60adffcbd5271fdf8839f86ed2` · **MIT**
+
+**Umfang:** 4.132 Dateien, 55 MB, 398 Skills (plus 468 Gemini-Kopien), 786 Python-Skripte.
+
+**Verfahren:** Katalog aller 398 Beschreibungen → Vorauswahl nach Geschäftsbezug
+(Carcura, Webdesign, Vertrieb, KDP) → 24 Kandidaten auf Skripte, Netzwerkzugriffe und
+Querverweise geprüft → Finalisten vollständig gelesen → Gegenprobe mit
+`skill-security-auditor` (alle sechs PASS; Kontrolltest auf `caveman-compress` = FAIL,
+das Werkzeug schlägt also an).
+
+**Installiert:** `local-seo-manager`, `business-investment-advisor`, `a11y-audit`
+(alle drei mit Abschnitt „Deutschland"), `challenge`, `weekly-review`,
+`skill-security-auditor`. Herkunft und Änderungen je Skill in dessen `HERKUNFT.md`.
+
+**Bewusst nicht installiert (Auswahl):**
+
+| Skill | Grund |
+|---|---|
+| `contract-and-proposal-writer` | Rechtlich riskant für Deutschland: überträgt „Urheberrecht" (§ 29 UrhG: nicht übertragbar), Haftungsausschluss „as is" (in AGB unwirksam, § 309 Nr. 7 BGB), Schiedsgericht für Kleinaufträge, keine Werkvertrags-Abnahme |
+| `page-cro`, `seo-audit`, `schema-markup`, `copywriting`, `analytics-tracking`, `site-architecture` | Solide, aber deckungsgleich mit `agency-website-builder` und `ghost` — doppelte Auslöser, US-Rechtsrahmen |
+| `content-humanizer`, `behuman`, `caveman` (Kopie) | Durch `ghost` bzw. den geprüften `caveman` abgedeckt |
+| `roast` | Startet fünf parallele Agenten je Idee — hoher Tokenverbrauch; `challenge` leistet das Wesentliche in einem Durchgang |
+| `referral-program`, `pricing-strategist`, `email-sequence`, `paid-ads`, `churn-prevention` | SaaS-lastig oder ohne Mehrwert gegenüber `l99` |
+| `cold-email` | B2B-Kaltakquise per E-Mail ist in Deutschland nur mit mutmaßlicher Einwilligung zulässig (§ 7 UWG) |
+| `aeo`, `free-tool-strategy`, `marketing-psychology` | Kein Mehrwert gegenüber vorhandenem Wissen |
+| C-Level-, Engineering-, Compliance-, Medizintechnik-, Jira-, Cloud-Skills (~350) | Kein Bezug zu den Geschäftsfeldern |
 
 ---
 

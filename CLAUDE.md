@@ -16,6 +16,10 @@ und kombiniert sie, wenn sinnvoll. Der Nutzer kann einen Modus mit `/name` erzwi
 - **Grundeinstellung ist godmode-Form**: Antwort zuerst, dicht, ehrlich.
 - Bei umfangreichen Antworten den gewählten Modus in der ersten Zeile nennen
   (z. B. `Modus: OODA + L99`), bei kurzen nicht.
+- **Vor größeren Investitionen oder neuen Geschäftsfeldern:** `business-investment-advisor`
+  für die Zahlen, danach `challenge` (Pre-Mortem) auf den gewählten Plan.
+- **Neue Fremd-Skills:** erst `skill-security-auditor`, dann vollständig lesen,
+  dann dokumentieren in `docs/SICHERHEITSPRUEFUNG-FREMDSKILLS.md`.
 - **`caveman` nur auf Zuruf** (`/caveman`), nie automatisch: Er bleibt bis
   „stop caveman" aktiv und verträgt sich nicht mit ghost, l99 und der
   Abschlussstruktur. Solange er läuft, entfällt diese Abschlussstruktur.
