@@ -80,6 +80,15 @@ amazon-kdp-business/
 | `kdp-listing-launch` | Titel, Beschreibung, 7 Keywords, Preis, Startplan, Messplan |
 | `ebook-publishing` | Fremd-Skill (MIT), Nachschlagewerk — US-lastig, undatiert |
 
+### Arbeitsmodi (immer aktiv, Auswahl automatisch — siehe `CLAUDE.md`)
+
+| Skill | Aufgabe |
+|---|---|
+| `godmode` | Direktmodus: Antwort zuerst, dicht, ungeschönt |
+| `l99` | Expertenniveau: Annahmen, Rechenweg, Gegenargument, Konfidenz |
+| `ooda` | Entscheidung: Lage, Optionen, Entscheidung, Aktionsplan mit Abbruchkriterium |
+| `ghost` | natürlicher Schreibstil für kundensichtbare Texte, ohne KI-Floskeln |
+
 ## Erster Schwerpunkt
 
 Deutschsprachige Kinderbuchmarke mit einer wiederkehrenden **eigenen Fuchsfigur**:
