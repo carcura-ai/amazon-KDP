@@ -1,0 +1,31 @@
+# Start auf dem Server:  docker compose up -d --build
+# Logs ansehen:          docker compose logs -f assistent
+services:
+  assistent:
+    build: .
+    restart: unless-stopped
+    env_file: .env
+    volumes:
+      - assistent_data:/app/data
+    expose:
+      - "3000"
+
+  caddy:
+    image: caddy:2
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./deploy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    environment:
+      - BOT_DOMAIN=${BOT_DOMAIN}
+    depends_on:
+      - assistent
+
+volumes:
+  assistent_data:
+  caddy_data:
+  caddy_config:

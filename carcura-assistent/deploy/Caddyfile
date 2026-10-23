@@ -1,0 +1,5 @@
+# Caddy holt das HTTPS-Zertifikat automatisch (Let's Encrypt).
+{$BOT_DOMAIN} {
+	encode gzip
+	reverse_proxy assistent:3000
+}

@@ -1,0 +1,17 @@
+{
+  "name": "carcura-assistent",
+  "version": "1.0.0",
+  "private": true,
+  "description": "WhatsApp-Assistent für Carcura: Anfragen melden, Wochenauswertung, KI-Chat mit Alex und Richy",
+  "type": "module",
+  "main": "src/server.js",
+  "engines": { "node": ">=20" },
+  "scripts": {
+    "start": "node src/server.js",
+    "test": "node --test test/*.test.js"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^1.1.0",
+    "nodemailer": "^7.0.0"
+  }
+}
