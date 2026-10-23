@@ -1,0 +1,461 @@
+{
+ "fps": 30,
+ "auto": {
+  "transitions": false,
+  "zoom": true,
+  "sfx": true
+ },
+ "look": {
+  "grade": "contrast(1.06) saturate(1.06)",
+  "vignette": 0.3,
+  "grain": 0
+ },
+ "brand": {
+  "fontHead": "Anton",
+  "fontBody": "Satoshi"
+ },
+ "captions": {
+  "y": 0.7,
+  "maxWords": 3,
+  "maxChars": 18
+ },
+ "timeline": [
+  {
+   "b": [
+    {
+     "id": "B1",
+     "from": 0.3,
+     "dur": 2.4,
+     "vol": 0.86
+    },
+    {
+     "id": "B2",
+     "from": 0.3,
+     "dur": 2.9,
+     "vol": 0.78
+    },
+    {
+     "id": "B2",
+     "from": 4.6,
+     "dur": 1.5,
+     "vol": 0.78
+    },
+    {
+     "id": "B3",
+     "from": 0.0,
+     "dur": 2.5,
+     "vol": 0.56
+    },
+    {
+     "id": "B5",
+     "from": 1.8,
+     "dur": 3.7,
+     "vol": 0.58
+    }
+   ],
+   "schnitt": "hart",
+   "tin": "none"
+  },
+  {
+   "b": [
+    {
+     "id": "B6",
+     "from": 0.3,
+     "dur": 3.2,
+     "vol": 0.88
+    },
+    {
+     "id": "B7",
+     "from": 5.8,
+     "dur": 2.6,
+     "vol": 0.91
+    },
+    {
+     "id": "B8",
+     "from": 2.0,
+     "dur": 2.8,
+     "vol": 0.94
+    },
+    {
+     "id": "B9",
+     "from": 1.6,
+     "dur": 3.6,
+     "vol": 1.0
+    }
+   ],
+   "schnitt": "hart",
+   "tin": "zoom"
+  },
+  {
+   "b": [
+    {
+     "id": "B10",
+     "from": 0.5,
+     "dur": 1.8
+    },
+    {
+     "id": "B12",
+     "from": 0.0,
+     "dur": 2.8
+    },
+    {
+     "id": "B11",
+     "from": 5.7,
+     "dur": 1.9
+    }
+   ],
+   "schnitt": "hart",
+   "tin": "zoom"
+  },
+  {
+   "b": [
+    {
+     "id": "B13",
+     "from": 1.5,
+     "dur": 4.3
+    },
+    {
+     "id": "B14",
+     "from": 1.0,
+     "dur": 2.5
+    },
+    {
+     "id": "B13",
+     "from": 7.2,
+     "dur": 2.6
+    }
+   ],
+   "schnitt": "hart",
+   "tin": "zoom"
+  },
+  {
+   "b": [
+    {
+     "id": "B16",
+     "from": 0.0,
+     "dur": 2.2
+    },
+    {
+     "id": "B16",
+     "from": 4.4,
+     "dur": 4.0
+    }
+   ],
+   "schnitt": "hart",
+   "tin": "zoom"
+  },
+  {
+   "b": [
+    {
+     "id": "B17",
+     "from": 1.6,
+     "dur": 1.4
+    },
+    {
+     "id": "B17",
+     "from": 3.0,
+     "dur": 5.9,
+     "ramp": true
+    },
+    {
+     "id": "B17",
+     "from": 7.0,
+     "dur": 5.4
+    }
+   ],
+   "schnitt": "hart",
+   "tin": "flash"
+  }
+ ],
+ "overlays": [
+  {
+   "type": "timer",
+   "from": 0,
+   "to": "t:end",
+   "label": "KERAMIK IN 60 SEK",
+   "y": 0.1,
+   "total": 60
+  },
+  {
+   "type": "step",
+   "from": 0.1,
+   "to": 2.4,
+   "kicker": "BMW M2 · KERAMIKVERSIEGELUNG",
+   "text": "IN 60 SEKUNDEN",
+   "size": 116,
+   "y": 0.3
+  },
+  {
+   "type": "sticker",
+   "from": 0.7,
+   "to": 3.6,
+   "src": "assets/emoji_headphone.png",
+   "x": 0.78,
+   "y": 0.6,
+   "size": 140,
+   "label": "TON AN",
+   "sfx": false
+  },
+  {
+   "type": "step",
+   "from": 2.5,
+   "to": 5.2,
+   "nr": "1",
+   "of": 5,
+   "text": "WASCHEN",
+   "y": 0.3
+  },
+  {
+   "type": "step",
+   "from": "t:seg2+0.15",
+   "to": "t:seg2+2.9",
+   "nr": "2",
+   "of": 5,
+   "text": "POLIEREN",
+   "fx": "glanz",
+   "y": 0.3
+  },
+  {
+   "type": "step",
+   "from": "t:seg3+0.1",
+   "to": "t:seg3+2.7",
+   "nr": "3",
+   "of": 5,
+   "text": "ENTFETTEN",
+   "fx": "spray",
+   "y": 0.3
+  },
+  {
+   "type": "step",
+   "from": "t:seg4+0.1",
+   "to": "t:seg4+2.9",
+   "nr": "4",
+   "kicker": "KERAMIKVERSIEGELUNG",
+   "text": "AUFTRAGEN",
+   "fx": "glanz",
+   "y": 0.3
+  },
+  {
+   "type": "step",
+   "from": "t:seg5+0.1",
+   "to": "t:seg5+2.9",
+   "nr": "5",
+   "kicker": "KERAMIKVERSIEGELUNG",
+   "text": "ABTRAGEN",
+   "fx": "wisch",
+   "y": 0.3
+  },
+  {
+   "type": "step",
+   "from": "t:seg6+0.1",
+   "to": "t:seg6+2.6",
+   "kicker": "DER BEWEIS",
+   "text": "WASSERTEST",
+   "y": 0.3
+  },
+  {
+   "type": "letterbox",
+   "from": "t:seg6+1.4",
+   "to": "t:seg6+7.3",
+   "h": 0.07
+  },
+  {
+   "type": "sticker",
+   "from": "t:seg6+3.6",
+   "to": "t:seg6+7.1",
+   "src": "assets/emoji_droplet.png",
+   "x": 0.5,
+   "y": 0.34,
+   "size": 200,
+   "label": "ABPERLEFFEKT",
+   "enter": "drop",
+   "sfx": false
+  },
+  {
+   "type": "cta",
+   "from": "t:seg6+7.6",
+   "to": "t:end",
+   "y": 0.24,
+   "kicker": "DEIN AUTO ALS NÄCHSTES?",
+   "main": "Kommentiere „KERAMIK“",
+   "sub": "Preis & freie Termine per DM",
+   "alt": "Keramik ab 650 € · inkl. Wäsche & Politur",
+   "urgency": "CARCURA · WESTERWALD",
+   "mainAt": "t:seg6+7.95",
+   "altAt": "t:seg6+8.6",
+   "urgencyAt": "t:seg6+9.1",
+   "sfx": false
+  }
+ ],
+ "sfx": [
+  {
+   "at": 0.0,
+   "name": "subdrop",
+   "vol": 0.13
+  },
+  {
+   "at": 0.1,
+   "name": "whoosh",
+   "vol": 0.3
+  },
+  {
+   "at": 0.75,
+   "name": "pop",
+   "vol": 0.08
+  },
+  {
+   "at": 2.5,
+   "name": "whoosh",
+   "vol": 0.3
+  },
+  {
+   "at": 2.8,
+   "name": "pop",
+   "vol": 0.08
+  },
+  {
+   "at": "t:seg2+0.45",
+   "name": "pop",
+   "vol": 0.08
+  },
+  {
+   "at": "t:seg3+0.4",
+   "name": "pop",
+   "vol": 0.08
+  },
+  {
+   "at": "t:seg3+0.9",
+   "name": "spray",
+   "vol": 0.7,
+   "dur": 0.5
+  },
+  {
+   "at": "t:seg3+1.45",
+   "name": "spray",
+   "vol": 0.7,
+   "dur": 0.6
+  },
+  {
+   "at": "t:seg3+1.75",
+   "name": "m2/tuch_entfetten.wav",
+   "vol": 1.0
+  },
+  {
+   "at": "t:seg4",
+   "name": "m2/auftrag_striche.wav",
+   "vol": 1.0
+  },
+  {
+   "at": "t:seg4+0.4",
+   "name": "pop",
+   "vol": 0.08
+  },
+  {
+   "at": "t:seg5",
+   "name": "m2/tuch_abtragen.wav",
+   "vol": 1.0
+  },
+  {
+   "at": "t:seg5+0.4",
+   "name": "pop",
+   "vol": 0.08
+  },
+  {
+   "at": "t:seg6-1.4",
+   "name": "riser",
+   "vol": 0.15
+  },
+  {
+   "at": "t:seg6",
+   "name": "impact",
+   "vol": 0.12
+  },
+  {
+   "at": "t:seg6+0.4",
+   "name": "pop",
+   "vol": 0.08
+  },
+  {
+   "at": "t:seg6+1.3",
+   "name": "m2/wasser_giessen.wav",
+   "vol": 1.0
+  },
+  {
+   "at": "t:seg6+3.65",
+   "name": "drop",
+   "vol": 0.18
+  },
+  {
+   "at": "t:seg6+7.95",
+   "name": "pop",
+   "vol": 0.08
+  },
+  {
+   "at": "t:seg4+0.02",
+   "name": "whoosh",
+   "vol": 0.22
+  },
+  {
+   "at": "t:seg5+0.02",
+   "name": "whoosh",
+   "vol": 0.22
+  },
+  {
+   "at": "t:seg2+1.3",
+   "name": "shimmer",
+   "vol": 0.18
+  },
+  {
+   "at": "t:seg2+8.8",
+   "name": "shimmer",
+   "vol": 0.25
+  },
+  {
+   "at": "t:seg4+1.25",
+   "name": "shimmer",
+   "vol": 0.18
+  },
+  {
+   "at": "t:seg5+2.25",
+   "name": "whoosh",
+   "vol": 0.25
+  },
+  {
+   "at": "t:seg6+9.1",
+   "name": "pop",
+   "vol": 0.06
+  },
+  {
+   "at": 57.0,
+   "name": "click",
+   "vol": 0.12
+  },
+  {
+   "at": 58.0,
+   "name": "click",
+   "vol": 0.12
+  },
+  {
+   "at": 59.0,
+   "name": "click",
+   "vol": 0.12
+  },
+  {
+   "at": 59.7,
+   "name": "ding",
+   "vol": 0.15
+  }
+ ],
+ "grade": [
+  {
+   "from": "t:seg2",
+   "to": "t:seg2+3.0",
+   "filter": "brightness(1.22) contrast(1.04)"
+  },
+  {
+   "from": "t:seg5",
+   "to": "t:seg6",
+   "filter": "brightness(1.15) contrast(1.04)"
+  }
+ ]
+}

@@ -1,0 +1,43 @@
+{
+ "blocks": {},
+ "broll": {
+  "B1": {
+   "src": "projekte/politur-349/b01_polieren.mp4",
+   "duration": 25.58839,
+   "fps": 30.0,
+   "scenes": []
+  },
+  "B2": {
+   "src": "projekte/politur-349/b02_abnehmen.mp4",
+   "duration": 11.842154,
+   "fps": 30.0,
+   "scenes": []
+  }
+ },
+ "files": {
+  "b01_polieren.mp4": {
+   "duration": 25.58839,
+   "width": 2160,
+   "height": 3840,
+   "fps": 30.0,
+   "video": true,
+   "audio": true,
+   "hdr": false,
+   "kind": "broll",
+   "scenes": [],
+   "lufs": -70.0
+  },
+  "b02_abnehmen.mp4": {
+   "duration": 11.842154,
+   "width": 2160,
+   "height": 3840,
+   "fps": 30.0,
+   "video": true,
+   "audio": true,
+   "hdr": false,
+   "kind": "broll",
+   "scenes": [],
+   "lufs": -70.0
+  }
+ }
+}

@@ -1,0 +1,313 @@
+{
+ "blocks": {},
+ "broll": {
+  "B1": {
+   "src": "projekte/m2-keramik-60/b01_front.mp4",
+   "duration": 3.56,
+   "fps": 25.0,
+   "scenes": []
+  },
+  "B2": {
+   "src": "projekte/m2-keramik-60/b02_spruehen.mp4",
+   "duration": 11.52,
+   "fps": 25.0,
+   "scenes": []
+  },
+  "B3": {
+   "src": "projekte/m2-keramik-60/b03_nebel.mp4",
+   "duration": 6.04,
+   "fps": 25.0,
+   "scenes": []
+  },
+  "B4": {
+   "src": "projekte/m2-keramik-60/b04_nebel.mp4",
+   "duration": 3.56,
+   "fps": 25.0,
+   "scenes": []
+  },
+  "B5": {
+   "src": "projekte/m2-keramik-60/b05_lanze.mp4",
+   "duration": 7.56,
+   "fps": 25.0,
+   "scenes": []
+  },
+  "B6": {
+   "src": "projekte/m2-keramik-60/b06_maschine.mp4",
+   "duration": 7.56,
+   "fps": 25.0,
+   "scenes": []
+  },
+  "B7": {
+   "src": "projekte/m2-keramik-60/b07_m2.mp4",
+   "duration": 8.56,
+   "fps": 25.0,
+   "scenes": []
+  },
+  "B8": {
+   "src": "projekte/m2-keramik-60/b08_spiegel.mp4",
+   "duration": 7.56,
+   "fps": 25.0,
+   "scenes": []
+  },
+  "B9": {
+   "src": "projekte/m2-keramik-60/b09_reflex.mp4",
+   "duration": 6.56,
+   "fps": 25.0,
+   "scenes": []
+  },
+  "B10": {
+   "src": "projekte/m2-keramik-60/b10_spray.mp4",
+   "duration": 4.56,
+   "fps": 25.0,
+   "scenes": []
+  },
+  "B11": {
+   "src": "projekte/m2-keramik-60/b11_tuch.mp4",
+   "duration": 9.56,
+   "fps": 25.0,
+   "scenes": []
+  },
+  "B12": {
+   "src": "projekte/m2-keramik-60/b12_tuch2.mp4",
+   "duration": 5.0,
+   "fps": 25.0,
+   "scenes": []
+  },
+  "B13": {
+   "src": "projekte/m2-keramik-60/b13_auftrag.mp4",
+   "duration": 10.56,
+   "fps": 25.0,
+   "scenes": []
+  },
+  "B14": {
+   "src": "projekte/m2-keramik-60/b14_auftrag2.mp4",
+   "duration": 6.56,
+   "fps": 25.0,
+   "scenes": []
+  },
+  "B15": {
+   "src": "projekte/m2-keramik-60/b15_abtrag.mp4",
+   "duration": 6.56,
+   "fps": 25.0,
+   "scenes": []
+  },
+  "B16": {
+   "src": "projekte/m2-keramik-60/b16_abtrag2.mp4",
+   "duration": 9.56,
+   "fps": 25.0,
+   "scenes": []
+  },
+  "B17": {
+   "src": "projekte/m2-keramik-60/b17_wasser.mp4",
+   "duration": 12.683333,
+   "fps": 60.0,
+   "scenes": []
+  }
+ },
+ "files": {
+  "b01_front.mp4": {
+   "duration": 3.56,
+   "width": 1440,
+   "height": 2560,
+   "fps": 25.0,
+   "video": true,
+   "audio": true,
+   "hdr": false,
+   "kind": "broll",
+   "scenes": [],
+   "lufs": -29.9
+  },
+  "b02_spruehen.mp4": {
+   "duration": 11.52,
+   "width": 1440,
+   "height": 2560,
+   "fps": 25.0,
+   "video": true,
+   "audio": true,
+   "hdr": false,
+   "kind": "broll",
+   "scenes": [],
+   "lufs": -29.5
+  },
+  "b03_nebel.mp4": {
+   "duration": 6.04,
+   "width": 1440,
+   "height": 2560,
+   "fps": 25.0,
+   "video": true,
+   "audio": true,
+   "hdr": false,
+   "kind": "broll",
+   "scenes": [],
+   "lufs": -27.2
+  },
+  "b04_nebel.mp4": {
+   "duration": 3.56,
+   "width": 1440,
+   "height": 2560,
+   "fps": 25.0,
+   "video": true,
+   "audio": true,
+   "hdr": false,
+   "kind": "broll",
+   "scenes": [],
+   "lufs": -26.0
+  },
+  "b05_lanze.mp4": {
+   "duration": 7.56,
+   "width": 1440,
+   "height": 2560,
+   "fps": 25.0,
+   "video": true,
+   "audio": true,
+   "hdr": false,
+   "kind": "broll",
+   "scenes": [],
+   "lufs": -27.6
+  },
+  "b06_maschine.mp4": {
+   "duration": 7.56,
+   "width": 1440,
+   "height": 2560,
+   "fps": 25.0,
+   "video": true,
+   "audio": true,
+   "hdr": false,
+   "kind": "broll",
+   "scenes": [],
+   "lufs": -26.9
+  },
+  "b07_m2.mp4": {
+   "duration": 8.56,
+   "width": 1440,
+   "height": 2560,
+   "fps": 25.0,
+   "video": true,
+   "audio": true,
+   "hdr": false,
+   "kind": "broll",
+   "scenes": [],
+   "lufs": -28.9
+  },
+  "b08_spiegel.mp4": {
+   "duration": 7.56,
+   "width": 1440,
+   "height": 2560,
+   "fps": 25.0,
+   "video": true,
+   "audio": true,
+   "hdr": false,
+   "kind": "broll",
+   "scenes": [],
+   "lufs": -28.4
+  },
+  "b09_reflex.mp4": {
+   "duration": 6.56,
+   "width": 1440,
+   "height": 2560,
+   "fps": 25.0,
+   "video": true,
+   "audio": true,
+   "hdr": false,
+   "kind": "broll",
+   "scenes": [],
+   "lufs": -29.8
+  },
+  "b10_spray.mp4": {
+   "duration": 4.56,
+   "width": 1440,
+   "height": 2560,
+   "fps": 25.0,
+   "video": true,
+   "audio": true,
+   "hdr": false,
+   "kind": "broll",
+   "scenes": [],
+   "lufs": -59.6
+  },
+  "b11_tuch.mp4": {
+   "duration": 9.56,
+   "width": 1440,
+   "height": 2560,
+   "fps": 25.0,
+   "video": true,
+   "audio": true,
+   "hdr": false,
+   "kind": "broll",
+   "scenes": [],
+   "lufs": -61.3
+  },
+  "b12_tuch2.mp4": {
+   "duration": 5.0,
+   "width": 1440,
+   "height": 2560,
+   "fps": 25.0,
+   "video": true,
+   "audio": true,
+   "hdr": false,
+   "kind": "broll",
+   "scenes": [],
+   "lufs": -67.7
+  },
+  "b13_auftrag.mp4": {
+   "duration": 10.56,
+   "width": 1440,
+   "height": 2560,
+   "fps": 25.0,
+   "video": true,
+   "audio": true,
+   "hdr": false,
+   "kind": "broll",
+   "scenes": [],
+   "lufs": -60.1
+  },
+  "b14_auftrag2.mp4": {
+   "duration": 6.56,
+   "width": 1440,
+   "height": 2560,
+   "fps": 25.0,
+   "video": true,
+   "audio": true,
+   "hdr": false,
+   "kind": "broll",
+   "scenes": [],
+   "lufs": -62.7
+  },
+  "b15_abtrag.mp4": {
+   "duration": 6.56,
+   "width": 1440,
+   "height": 2560,
+   "fps": 25.0,
+   "video": true,
+   "audio": true,
+   "hdr": false,
+   "kind": "broll",
+   "scenes": [],
+   "lufs": -61.5
+  },
+  "b16_abtrag2.mp4": {
+   "duration": 9.56,
+   "width": 1440,
+   "height": 2560,
+   "fps": 25.0,
+   "video": true,
+   "audio": true,
+   "hdr": false,
+   "kind": "broll",
+   "scenes": [],
+   "lufs": -61.0
+  },
+  "b17_wasser.mp4": {
+   "duration": 12.683333,
+   "width": 1440,
+   "height": 2560,
+   "fps": 60.0,
+   "video": true,
+   "audio": true,
+   "hdr": false,
+   "kind": "broll",
+   "scenes": [],
+   "lufs": -25.9
+  }
+ }
+}

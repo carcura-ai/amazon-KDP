@@ -1,0 +1,34 @@
+A-ROLL (Sprecher im Bild)
+A1   a_tag1.mov  2.48-3.81 (1.3s)  Das ist Richy.
+A2   a_tag1.mov  6.22-7.45 (1.2s)  Das bin ich.
+A3   a_tag1.mov  9.38-14.01 (4.6s)  Das ist Tag 1 unserer Fahrzeugaufbereitung und das hier, das ist unsere neue Halle.
+A4   a_tag1.mov  14.36-24.69 (10.3s)  Wir haben lange überlegt, ob wir eine mobile Fahrzeugaufbereitung starten sollen oder eine stationäre mit einer Halle und naja, wir haben uns dazu entschieden, dass wir das Ganze in einer Halle machen werden.
+A5   a_tag1.mov  24.92-41.79 (16.9s)  Hier unten werden die Fahrzeuge aufbereitet. Sie werden von innen gereinigt, sie werden von außen gereinigt, sie werden poliert und versiegelt. Und hier, hier werden wir unser Büro aufbauen. Wir werden ein kleines Lager errichten, aber so wie auch einen kleinen Ort, wo wir uns zurückziehen können, um den Feierabend ausgehen zu lassen.
+A6   a_tag1.mov  42.00-59.93 (17.9s)  Wir wollen dieses Projekt von 0 auf 100 bringen. Wir wollen euch zeigen, wie wir diese Halle umbauen werden. Wir wollen euch zeigen, welche Fahrzeuge wir hier täglich aufbereiten. Wir wollen euch zeigen, auf welche Produkte wir besonders vertrauen. Wenn ihr sehen wollt, wie wir hier alles umbauen und welche Fahrzeuge wir hier drin machen,
+A7   a_tag1.mov  60.24-63.05 (2.8s)  liked gerne dieses Video und folgt uns. Haut rein!
+
+VOICEOVER
+
+B-ROLL
+B1   b01_licht.mp4  6.1s  60.07fps  720x1280  Schnitte []
+B2   b02_boden.mov  3.5s  59.94fps  2160x3840  Schnitte []
+B3   b03_beschichtung.mov  7.7s  59.97fps  2160x3840  Schnitte []
+B4   b04_treppe.mp4  8.2s  30fps  720x1280  Schnitte []
+B5   b05_treppe2.mp4  2.7s  30fps  720x1280  Schnitte []
+B6   b06_geruest.mov  2.9s  29.98fps  720x1280  Schnitte []
+B7   b07_audi.mp4  53.6s  29.97fps  2160x3840  Schnitte []
+B8   b08_audi2.mov  23.4s  29.84fps  2160x3840  Schnitte []
+B9   b09_felge.mov  13.3s  30fps  1080x1920  Schnitte [0.03, 0.07, 0.1, 0.17, 0.27]
+B10  b10_tropfen.mov  15.0s  59.97fps  2160x3840  Schnitte []
+B11  b11_polieren.mp4  13.8s  30fps  2160x3840  Schnitte []
+B12  b12_spiegel.mov  6.9s  59.97fps  2160x3840  Schnitte []
+B13  b13_glanz.mp4  12.8s  30fps  1080x1920  Schnitte []
+B14  b14_abperlen.mov  8.1s  59.94fps  2160x3840  Schnitte []
+B15  b15_abperlen2.mov  3.8s  60fps  2160x3840  Schnitte []
+B16  b16_scheibe.mov  6.9s  59.97fps  2160x3840  Schnitte []
+B17  b17_m2.mov  36.3s  59.94fps  1080x1920  Schnitte [1.35, 2.62, 4.12, 4.54, 5.37, 6.19, 7.02, 7.87, 9.54, 10.34, 11.21, 12.05, 12.86, 13.68, 14.51, 15.37, 16.2, 17.03, 17.87, 18.7, 19.54, 20.37, 21.17, 22.01, 22.86, 23.67, 24.54, 25.38, 27.03, 27.86, 28.68, 29.53, 31.23, 32.02]
+B18  b18_wischen.mp4  11.8s  30fps  2160x3840  Schnitte []
+B19  b19_bts.mov  4.9s  59.98fps  2160x3840  Schnitte []
+B20  b20_innen.mov  12.5s  29.99fps  2160x3840  Schnitte []
+
+A-Roll gesamt: 55.1s · Kontaktbogen: analysis/uebersicht-*.jpg

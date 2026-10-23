@@ -80,6 +80,33 @@ amazon-kdp-business/
 | `kdp-listing-launch` | Titel, Beschreibung, 7 Keywords, Preis, Startplan, Messplan |
 | `ebook-publishing` | Fremd-Skill (MIT), Nachschlagewerk — US-lastig, undatiert |
 
+### Arbeitsmodi (immer aktiv, Auswahl automatisch — siehe `CLAUDE.md`)
+
+| Skill | Aufgabe |
+|---|---|
+| `godmode` | Direktmodus: Antwort zuerst, dicht, ungeschönt |
+| `l99` | Expertenniveau: Annahmen, Rechenweg, Gegenargument, Konfidenz |
+| `ooda` | Entscheidung: Lage, Optionen, Entscheidung, Aktionsplan mit Abbruchkriterium |
+| `ghost` | natürlicher Schreibstil für kundensichtbare Texte, ohne KI-Floskeln |
+
+### Geprüfte Fremd-Skills (Herkunft je Skill in `HERKUNFT.md`)
+
+| Skill | Aufgabe |
+|---|---|
+| `caveman` | knapper Antwortmodus, nur auf Zuruf |
+| `local-seo-manager` | Google-Unternehmensprofil, Verzeichnisse, Bewertungen, lokales Schema (für DE angepasst) |
+| `business-investment-advisor` | ROI, Amortisation, Kapitalwert, Kauf/Leasing (für DE angepasst) |
+| `a11y-audit` | WCAG 2.2 AA, Kontrastprüfung, BFSG |
+| `challenge` | Pre-Mortem eines gewählten Plans |
+| `weekly-review` | Wochenrückblick gegen Verzettelung |
+| `skill-security-auditor` | Vorprüfung fremder Skills |
+| `impeccable` | Design-Regelwerk: Modi, Qualitätsuntergrenze, Audit, Polish (ohne Binär-Startskript) |
+| `ui-ux-pro-max` | Datenbank für Stile, Paletten, Schriften, Landingpage-Muster |
+| `emil-design-eng`, `review-animations` | UI-Feinschliff und Animationsqualität |
+| `interaction-design` | Mikrointeraktionen und Feedback-Zustände |
+| `web-design-guidelines` | ~100 prüfbare UI-Regeln (lokale, geprüfte Kopie) |
+| `dramatic`, `premium`, `refined` | Stilreferenzen |
+
 ## Erster Schwerpunkt
 
 Deutschsprachige Kinderbuchmarke mit einer wiederkehrenden **eigenen Fuchsfigur**:

@@ -30,7 +30,8 @@ claude
 
 Erwartet werden: `kdp-business-orchestrator`, `kdp-trend-scout`,
 `kdp-opportunity-validator`, `kinderbuch-entwickler`, `character-consistency`,
-`kdp-quality-compliance`, `kdp-listing-launch`, `ebook-publishing`
+`kdp-quality-compliance`, `kdp-listing-launch`, `ebook-publishing`,
+die Arbeitsmodi `godmode`, `l99`, `ooda`, `ghost`
 sowie der Befehl `/kdp-weekly-scan`.
 
 ## Zwei Wege, die Skills zu nutzen

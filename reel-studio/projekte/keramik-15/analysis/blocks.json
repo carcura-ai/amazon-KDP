@@ -1,0 +1,1412 @@
+{
+ "blocks": {
+  "A1": {
+   "src": "projekte/carcura-story/a_tag1.mp4",
+   "from": 2.48,
+   "to": 3.81,
+   "kind": "aroll",
+   "words": [
+    {
+     "w": "Das",
+     "s": 2.58,
+     "e": 3.14
+    },
+    {
+     "w": "ist",
+     "s": 3.14,
+     "e": 3.32
+    },
+    {
+     "w": "Richy.",
+     "s": 3.32,
+     "e": 3.66
+    }
+   ]
+  },
+  "A2": {
+   "src": "projekte/carcura-story/a_tag1.mp4",
+   "from": 6.22,
+   "to": 7.45,
+   "kind": "aroll",
+   "words": [
+    {
+     "w": "Das",
+     "s": 6.32,
+     "e": 6.76
+    },
+    {
+     "w": "bin",
+     "s": 6.76,
+     "e": 7.04
+    },
+    {
+     "w": "ich.",
+     "s": 7.04,
+     "e": 7.3
+    }
+   ]
+  },
+  "A3": {
+   "src": "projekte/carcura-story/a_tag1.mp4",
+   "from": 9.38,
+   "to": 14.01,
+   "kind": "aroll",
+   "words": [
+    {
+     "w": "Das",
+     "s": 9.48,
+     "e": 9.92
+    },
+    {
+     "w": "ist",
+     "s": 9.92,
+     "e": 10.1
+    },
+    {
+     "w": "Tag",
+     "s": 10.1,
+     "e": 10.3
+    },
+    {
+     "w": "1",
+     "s": 10.3,
+     "e": 10.6
+    },
+    {
+     "w": "unserer",
+     "s": 10.6,
+     "e": 11.0
+    },
+    {
+     "w": "Fahrzeugaufbereitung",
+     "s": 11.0,
+     "e": 12.04
+    },
+    {
+     "w": "und",
+     "s": 12.04,
+     "e": 12.2
+    },
+    {
+     "w": "das",
+     "s": 12.2,
+     "e": 12.4
+    },
+    {
+     "w": "hier,",
+     "s": 12.4,
+     "e": 12.56
+    },
+    {
+     "w": "das",
+     "s": 12.66,
+     "e": 12.9
+    },
+    {
+     "w": "ist",
+     "s": 12.9,
+     "e": 13.04
+    },
+    {
+     "w": "unsere",
+     "s": 13.04,
+     "e": 13.3
+    },
+    {
+     "w": "neue",
+     "s": 13.3,
+     "e": 13.52
+    },
+    {
+     "w": "Halle.",
+     "s": 13.52,
+     "e": 13.86
+    }
+   ]
+  },
+  "A4": {
+   "src": "projekte/carcura-story/a_tag1.mp4",
+   "from": 14.36,
+   "to": 24.69,
+   "kind": "aroll",
+   "words": [
+    {
+     "w": "Wir",
+     "s": 14.46,
+     "e": 14.9
+    },
+    {
+     "w": "haben",
+     "s": 14.9,
+     "e": 15.06
+    },
+    {
+     "w": "lange",
+     "s": 15.06,
+     "e": 15.28
+    },
+    {
+     "w": "überlegt,",
+     "s": 15.28,
+     "e": 15.76
+    },
+    {
+     "w": "ob",
+     "s": 15.86,
+     "e": 15.96
+    },
+    {
+     "w": "wir",
+     "s": 15.96,
+     "e": 16.14
+    },
+    {
+     "w": "eine",
+     "s": 16.14,
+     "e": 16.54
+    },
+    {
+     "w": "mobile",
+     "s": 16.54,
+     "e": 16.96
+    },
+    {
+     "w": "Fahrzeugaufbereitung",
+     "s": 16.96,
+     "e": 18.0
+    },
+    {
+     "w": "starten",
+     "s": 18.0,
+     "e": 18.44
+    },
+    {
+     "w": "sollen",
+     "s": 18.44,
+     "e": 18.7
+    },
+    {
+     "w": "oder",
+     "s": 18.7,
+     "e": 18.9
+    },
+    {
+     "w": "eine",
+     "s": 18.9,
+     "e": 19.1
+    },
+    {
+     "w": "stationäre",
+     "s": 19.1,
+     "e": 19.74
+    },
+    {
+     "w": "mit",
+     "s": 19.74,
+     "e": 19.92
+    },
+    {
+     "w": "einer",
+     "s": 19.92,
+     "e": 20.12
+    },
+    {
+     "w": "Halle",
+     "s": 20.12,
+     "e": 20.44
+    },
+    {
+     "w": "und",
+     "s": 20.44,
+     "e": 21.04
+    },
+    {
+     "w": "naja,",
+     "s": 21.04,
+     "e": 21.44
+    },
+    {
+     "w": "wir",
+     "s": 21.5,
+     "e": 21.6
+    },
+    {
+     "w": "haben",
+     "s": 21.6,
+     "e": 21.72
+    },
+    {
+     "w": "uns",
+     "s": 21.72,
+     "e": 21.84
+    },
+    {
+     "w": "dazu",
+     "s": 21.84,
+     "e": 22.0
+    },
+    {
+     "w": "entschieden,",
+     "s": 22.0,
+     "e": 22.44
+    },
+    {
+     "w": "dass",
+     "s": 22.64,
+     "e": 22.8
+    },
+    {
+     "w": "wir",
+     "s": 22.8,
+     "e": 22.9
+    },
+    {
+     "w": "das",
+     "s": 22.9,
+     "e": 23.0
+    },
+    {
+     "w": "Ganze",
+     "s": 23.0,
+     "e": 23.22
+    },
+    {
+     "w": "in",
+     "s": 23.22,
+     "e": 23.48
+    },
+    {
+     "w": "einer",
+     "s": 23.48,
+     "e": 23.7
+    },
+    {
+     "w": "Halle",
+     "s": 23.7,
+     "e": 24.04
+    },
+    {
+     "w": "machen",
+     "s": 24.04,
+     "e": 24.26
+    },
+    {
+     "w": "werden.",
+     "s": 24.26,
+     "e": 24.54
+    }
+   ]
+  },
+  "A5": {
+   "src": "projekte/carcura-story/a_tag1.mp4",
+   "from": 24.92,
+   "to": 41.79,
+   "kind": "aroll",
+   "words": [
+    {
+     "w": "Hier",
+     "s": 25.02,
+     "e": 25.26
+    },
+    {
+     "w": "unten",
+     "s": 25.26,
+     "e": 25.56
+    },
+    {
+     "w": "werden",
+     "s": 25.56,
+     "e": 26.0
+    },
+    {
+     "w": "die",
+     "s": 26.0,
+     "e": 26.14
+    },
+    {
+     "w": "Fahrzeuge",
+     "s": 26.14,
+     "e": 26.6
+    },
+    {
+     "w": "aufbereitet.",
+     "s": 26.6,
+     "e": 27.32
+    },
+    {
+     "w": "Sie",
+     "s": 27.54,
+     "e": 27.68
+    },
+    {
+     "w": "werden",
+     "s": 27.68,
+     "e": 27.88
+    },
+    {
+     "w": "von",
+     "s": 27.88,
+     "e": 28.06
+    },
+    {
+     "w": "innen",
+     "s": 28.06,
+     "e": 28.26
+    },
+    {
+     "w": "gereinigt,",
+     "s": 28.26,
+     "e": 28.74
+    },
+    {
+     "w": "sie",
+     "s": 28.84,
+     "e": 28.9
+    },
+    {
+     "w": "werden",
+     "s": 28.9,
+     "e": 29.08
+    },
+    {
+     "w": "von",
+     "s": 29.08,
+     "e": 29.22
+    },
+    {
+     "w": "außen",
+     "s": 29.22,
+     "e": 29.5
+    },
+    {
+     "w": "gereinigt,",
+     "s": 29.5,
+     "e": 29.96
+    },
+    {
+     "w": "sie",
+     "s": 30.04,
+     "e": 30.1
+    },
+    {
+     "w": "werden",
+     "s": 30.1,
+     "e": 30.3
+    },
+    {
+     "w": "poliert",
+     "s": 30.3,
+     "e": 30.76
+    },
+    {
+     "w": "und",
+     "s": 30.76,
+     "e": 31.32
+    },
+    {
+     "w": "versiegelt.",
+     "s": 31.32,
+     "e": 32.04
+    },
+    {
+     "w": "Und",
+     "s": 32.04,
+     "e": 32.6
+    },
+    {
+     "w": "hier,",
+     "s": 32.6,
+     "e": 32.86
+    },
+    {
+     "w": "hier",
+     "s": 32.94,
+     "e": 33.38
+    },
+    {
+     "w": "werden",
+     "s": 33.38,
+     "e": 33.6
+    },
+    {
+     "w": "wir",
+     "s": 33.6,
+     "e": 33.74
+    },
+    {
+     "w": "unser",
+     "s": 33.74,
+     "e": 33.98
+    },
+    {
+     "w": "Büro",
+     "s": 33.98,
+     "e": 34.38
+    },
+    {
+     "w": "aufbauen.",
+     "s": 34.38,
+     "e": 35.04
+    },
+    {
+     "w": "Wir",
+     "s": 35.2,
+     "e": 35.28
+    },
+    {
+     "w": "werden",
+     "s": 35.28,
+     "e": 35.46
+    },
+    {
+     "w": "ein",
+     "s": 35.46,
+     "e": 35.6
+    },
+    {
+     "w": "kleines",
+     "s": 35.6,
+     "e": 35.9
+    },
+    {
+     "w": "Lager",
+     "s": 35.9,
+     "e": 36.22
+    },
+    {
+     "w": "errichten,",
+     "s": 36.22,
+     "e": 36.64
+    },
+    {
+     "w": "aber",
+     "s": 36.86,
+     "e": 37.3
+    },
+    {
+     "w": "so",
+     "s": 37.3,
+     "e": 37.5
+    },
+    {
+     "w": "wie",
+     "s": 37.5,
+     "e": 37.74
+    },
+    {
+     "w": "auch",
+     "s": 37.74,
+     "e": 37.98
+    },
+    {
+     "w": "einen",
+     "s": 37.98,
+     "e": 38.28
+    },
+    {
+     "w": "kleinen",
+     "s": 38.28,
+     "e": 38.82
+    },
+    {
+     "w": "Ort,",
+     "s": 38.82,
+     "e": 39.16
+    },
+    {
+     "w": "wo",
+     "s": 39.24,
+     "e": 39.3
+    },
+    {
+     "w": "wir",
+     "s": 39.3,
+     "e": 39.42
+    },
+    {
+     "w": "uns",
+     "s": 39.42,
+     "e": 39.56
+    },
+    {
+     "w": "zurückziehen",
+     "s": 39.56,
+     "e": 39.92
+    },
+    {
+     "w": "können,",
+     "s": 39.92,
+     "e": 40.2
+    },
+    {
+     "w": "um",
+     "s": 40.36,
+     "e": 40.42
+    },
+    {
+     "w": "den",
+     "s": 40.42,
+     "e": 40.52
+    },
+    {
+     "w": "Feierabend",
+     "s": 40.52,
+     "e": 40.96
+    },
+    {
+     "w": "ausgehen",
+     "s": 40.96,
+     "e": 41.28
+    },
+    {
+     "w": "zu",
+     "s": 41.28,
+     "e": 41.42
+    },
+    {
+     "w": "lassen.",
+     "s": 41.42,
+     "e": 41.64
+    }
+   ]
+  },
+  "A6": {
+   "src": "projekte/carcura-story/a_tag1.mp4",
+   "from": 42.0,
+   "to": 59.93,
+   "kind": "aroll",
+   "words": [
+    {
+     "w": "Wir",
+     "s": 42.1,
+     "e": 42.32
+    },
+    {
+     "w": "wollen",
+     "s": 42.32,
+     "e": 42.56
+    },
+    {
+     "w": "dieses",
+     "s": 42.56,
+     "e": 42.86
+    },
+    {
+     "w": "Projekt",
+     "s": 42.86,
+     "e": 43.26
+    },
+    {
+     "w": "von",
+     "s": 43.26,
+     "e": 43.5
+    },
+    {
+     "w": "0",
+     "s": 43.5,
+     "e": 43.74
+    },
+    {
+     "w": "auf",
+     "s": 43.74,
+     "e": 44.1
+    },
+    {
+     "w": "100",
+     "s": 44.1,
+     "e": 44.36
+    },
+    {
+     "w": "bringen.",
+     "s": 44.36,
+     "e": 44.66
+    },
+    {
+     "w": "Wir",
+     "s": 45.02,
+     "e": 45.32
+    },
+    {
+     "w": "wollen",
+     "s": 45.32,
+     "e": 45.6
+    },
+    {
+     "w": "euch",
+     "s": 45.6,
+     "e": 45.76
+    },
+    {
+     "w": "zeigen,",
+     "s": 45.76,
+     "e": 46.1
+    },
+    {
+     "w": "wie",
+     "s": 46.18,
+     "e": 46.26
+    },
+    {
+     "w": "wir",
+     "s": 46.26,
+     "e": 46.36
+    },
+    {
+     "w": "diese",
+     "s": 46.36,
+     "e": 46.6
+    },
+    {
+     "w": "Halle",
+     "s": 46.6,
+     "e": 46.94
+    },
+    {
+     "w": "umbauen",
+     "s": 46.94,
+     "e": 47.52
+    },
+    {
+     "w": "werden.",
+     "s": 47.52,
+     "e": 47.84
+    },
+    {
+     "w": "Wir",
+     "s": 48.06,
+     "e": 48.14
+    },
+    {
+     "w": "wollen",
+     "s": 48.14,
+     "e": 48.32
+    },
+    {
+     "w": "euch",
+     "s": 48.32,
+     "e": 48.48
+    },
+    {
+     "w": "zeigen,",
+     "s": 48.48,
+     "e": 48.88
+    },
+    {
+     "w": "welche",
+     "s": 48.94,
+     "e": 49.26
+    },
+    {
+     "w": "Fahrzeuge",
+     "s": 49.26,
+     "e": 49.88
+    },
+    {
+     "w": "wir",
+     "s": 49.88,
+     "e": 50.08
+    },
+    {
+     "w": "hier",
+     "s": 50.08,
+     "e": 50.28
+    },
+    {
+     "w": "täglich",
+     "s": 50.28,
+     "e": 50.76
+    },
+    {
+     "w": "aufbereiten.",
+     "s": 50.76,
+     "e": 51.56
+    },
+    {
+     "w": "Wir",
+     "s": 51.8,
+     "e": 52.3
+    },
+    {
+     "w": "wollen",
+     "s": 52.3,
+     "e": 52.54
+    },
+    {
+     "w": "euch",
+     "s": 52.54,
+     "e": 52.7
+    },
+    {
+     "w": "zeigen,",
+     "s": 52.7,
+     "e": 53.12
+    },
+    {
+     "w": "auf",
+     "s": 53.48,
+     "e": 53.6
+    },
+    {
+     "w": "welche",
+     "s": 53.6,
+     "e": 53.92
+    },
+    {
+     "w": "Produkte",
+     "s": 53.92,
+     "e": 54.44
+    },
+    {
+     "w": "wir",
+     "s": 54.44,
+     "e": 54.76
+    },
+    {
+     "w": "besonders",
+     "s": 54.76,
+     "e": 55.2
+    },
+    {
+     "w": "vertrauen.",
+     "s": 55.2,
+     "e": 55.7
+    },
+    {
+     "w": "Wenn",
+     "s": 55.7,
+     "e": 56.18
+    },
+    {
+     "w": "ihr",
+     "s": 56.18,
+     "e": 56.36
+    },
+    {
+     "w": "sehen",
+     "s": 56.36,
+     "e": 56.64
+    },
+    {
+     "w": "wollt,",
+     "s": 56.64,
+     "e": 56.92
+    },
+    {
+     "w": "wie",
+     "s": 57.04,
+     "e": 57.12
+    },
+    {
+     "w": "wir",
+     "s": 57.12,
+     "e": 57.32
+    },
+    {
+     "w": "hier",
+     "s": 57.32,
+     "e": 57.5
+    },
+    {
+     "w": "alles",
+     "s": 57.5,
+     "e": 57.8
+    },
+    {
+     "w": "umbauen",
+     "s": 57.8,
+     "e": 58.26
+    },
+    {
+     "w": "und",
+     "s": 58.26,
+     "e": 58.38
+    },
+    {
+     "w": "welche",
+     "s": 58.38,
+     "e": 58.6
+    },
+    {
+     "w": "Fahrzeuge",
+     "s": 58.6,
+     "e": 59.08
+    },
+    {
+     "w": "wir",
+     "s": 59.08,
+     "e": 59.22
+    },
+    {
+     "w": "hier",
+     "s": 59.22,
+     "e": 59.38
+    },
+    {
+     "w": "drin",
+     "s": 59.38,
+     "e": 59.5
+    },
+    {
+     "w": "machen,",
+     "s": 59.5,
+     "e": 59.78
+    }
+   ]
+  },
+  "A7": {
+   "src": "projekte/carcura-story/a_tag1.mp4",
+   "from": 60.24,
+   "to": 63.05,
+   "kind": "aroll",
+   "words": [
+    {
+     "w": "liked",
+     "s": 60.34,
+     "e": 60.56
+    },
+    {
+     "w": "gerne",
+     "s": 60.56,
+     "e": 60.8
+    },
+    {
+     "w": "dieses",
+     "s": 60.8,
+     "e": 61.08
+    },
+    {
+     "w": "Video",
+     "s": 61.08,
+     "e": 61.42
+    },
+    {
+     "w": "und",
+     "s": 61.42,
+     "e": 61.78
+    },
+    {
+     "w": "folgt",
+     "s": 61.78,
+     "e": 62.14
+    },
+    {
+     "w": "uns.",
+     "s": 62.14,
+     "e": 62.36
+    },
+    {
+     "w": "Haut",
+     "s": 62.5,
+     "e": 62.68
+    },
+    {
+     "w": "rein!",
+     "s": 62.68,
+     "e": 62.9
+    }
+   ]
+  }
+ },
+ "broll": {
+  "B1": {
+   "src": "projekte/carcura-story/b01_licht.mp4",
+   "duration": 6.11,
+   "fps": 60.07,
+   "scenes": []
+  },
+  "B2": {
+   "src": "projekte/carcura-story/b02_boden.mp4",
+   "duration": 3.518333,
+   "fps": 59.94,
+   "scenes": []
+  },
+  "B3": {
+   "src": "projekte/carcura-story/b03_beschichtung.mp4",
+   "duration": 7.7017,
+   "fps": 59.97,
+   "scenes": []
+  },
+  "B4": {
+   "src": "projekte/carcura-story/b04_treppe.mp4",
+   "duration": 8.241859,
+   "fps": 30.0,
+   "scenes": []
+  },
+  "B5": {
+   "src": "projekte/carcura-story/b05_treppe2.mp4",
+   "duration": 2.704558,
+   "fps": 30.0,
+   "scenes": []
+  },
+  "B6": {
+   "src": "projekte/carcura-story/b06_geruest.mp4",
+   "duration": 2.935011,
+   "fps": 29.98,
+   "scenes": []
+  },
+  "B7": {
+   "src": "projekte/carcura-story/b07_audi.mp4",
+   "duration": 53.568,
+   "fps": 29.97,
+   "scenes": []
+  },
+  "B8": {
+   "src": "projekte/carcura-story/b08_audi2.mp4",
+   "duration": 23.425,
+   "fps": 29.84,
+   "scenes": []
+  },
+  "B9": {
+   "src": "projekte/carcura-story/b09_felge.mp4",
+   "duration": 13.3,
+   "fps": 30.0,
+   "scenes": [
+    0.03,
+    0.07,
+    0.1,
+    0.17,
+    0.27
+   ]
+  },
+  "B10": {
+   "src": "projekte/carcura-story/b10_tropfen.mp4",
+   "duration": 15.0217,
+   "fps": 59.97,
+   "scenes": []
+  },
+  "B11": {
+   "src": "projekte/carcura-story/b11_polieren.mp4",
+   "duration": 13.8,
+   "fps": 30.0,
+   "scenes": []
+  },
+  "B12": {
+   "src": "projekte/carcura-story/b12_spiegel.mp4",
+   "duration": 6.87,
+   "fps": 59.97,
+   "scenes": []
+  },
+  "B13": {
+   "src": "projekte/carcura-story/b13_glanz.mp4",
+   "duration": 12.767355,
+   "fps": 30.0,
+   "scenes": []
+  },
+  "B14": {
+   "src": "projekte/carcura-story/b14_abperlen.mp4",
+   "duration": 8.091667,
+   "fps": 59.94,
+   "scenes": []
+  },
+  "B15": {
+   "src": "projekte/carcura-story/b15_abperlen2.mp4",
+   "duration": 3.815,
+   "fps": 60.0,
+   "scenes": []
+  },
+  "B16": {
+   "src": "projekte/carcura-story/b16_scheibe.mp4",
+   "duration": 6.868333,
+   "fps": 59.97,
+   "scenes": []
+  },
+  "B17": {
+   "src": "projekte/carcura-story/b17_m2.mp4",
+   "duration": 36.252896,
+   "fps": 59.94,
+   "scenes": [
+    1.35,
+    2.62,
+    4.12,
+    4.54,
+    5.37,
+    6.19,
+    7.02,
+    7.87,
+    9.54,
+    10.34,
+    11.21,
+    12.05,
+    12.86,
+    13.68,
+    14.51,
+    15.37,
+    16.2,
+    17.03,
+    17.87,
+    18.7,
+    19.54,
+    20.37,
+    21.17,
+    22.01,
+    22.86,
+    23.67,
+    24.54,
+    25.38,
+    27.03,
+    27.86,
+    28.68,
+    29.53,
+    31.23,
+    32.02
+   ]
+  },
+  "B18": {
+   "src": "projekte/carcura-story/b18_wischen.mp4",
+   "duration": 11.842154,
+   "fps": 30.0,
+   "scenes": []
+  },
+  "B19": {
+   "src": "projekte/carcura-story/b19_bts.mp4",
+   "duration": 4.9017,
+   "fps": 59.98,
+   "scenes": []
+  },
+  "B20": {
+   "src": "projekte/carcura-story/b20_innen.mp4",
+   "duration": 12.505,
+   "fps": 29.99,
+   "scenes": []
+  }
+ },
+ "files": {
+  "a_tag1.mov": {
+   "duration": 63.6,
+   "width": 2160,
+   "height": 3840,
+   "fps": 60.0,
+   "video": true,
+   "audio": true,
+   "hdr": false,
+   "kind": "aroll",
+   "scenes": [
+    0.1,
+    0.17,
+    0.2,
+    0.27,
+    0.3,
+    0.33,
+    0.37,
+    0.4,
+    0.43,
+    0.47,
+    0.5,
+    0.53,
+    0.6,
+    0.63,
+    0.7,
+    0.73,
+    4.27,
+    4.33,
+    4.37,
+    4.43,
+    5.67,
+    8.67,
+    9.47,
+    9.53,
+    9.6,
+    9.63,
+    9.67,
+    9.73,
+    9.75,
+    9.78,
+    9.8,
+    9.82,
+    9.87,
+    9.88,
+    14.63,
+    24.57,
+    24.62,
+    32.12,
+    32.35,
+    32.4,
+    32.48,
+    32.52,
+    41.78
+   ],
+   "lufs": -15.3
+  },
+  "b01_licht.mp4": {
+   "duration": 6.11,
+   "width": 720,
+   "height": 1280,
+   "fps": 60.07,
+   "video": true,
+   "audio": true,
+   "hdr": false,
+   "kind": "broll",
+   "scenes": [],
+   "lufs": -70.0
+  },
+  "b02_boden.mov": {
+   "duration": 3.518333,
+   "width": 2160,
+   "height": 3840,
+   "fps": 59.94,
+   "video": true,
+   "audio": true,
+   "hdr": true,
+   "kind": "broll",
+   "scenes": [],
+   "lufs": -33.8
+  },
+  "b03_beschichtung.mov": {
+   "duration": 7.7017,
+   "width": 2160,
+   "height": 3840,
+   "fps": 59.97,
+   "video": true,
+   "audio": true,
+   "hdr": true,
+   "kind": "broll",
+   "scenes": [],
+   "lufs": -27.8
+  },
+  "b04_treppe.mp4": {
+   "duration": 8.241859,
+   "width": 720,
+   "height": 1280,
+   "fps": 30.0,
+   "video": true,
+   "audio": true,
+   "hdr": false,
+   "kind": "broll",
+   "scenes": [],
+   "lufs": -32.3
+  },
+  "b05_treppe2.mp4": {
+   "duration": 2.704558,
+   "width": 720,
+   "height": 1280,
+   "fps": 30.0,
+   "video": true,
+   "audio": true,
+   "hdr": false,
+   "kind": "broll",
+   "scenes": [],
+   "lufs": -31.1
+  },
+  "b06_geruest.mov": {
+   "duration": 2.935011,
+   "width": 720,
+   "height": 1280,
+   "fps": 29.98,
+   "video": true,
+   "audio": true,
+   "hdr": false,
+   "kind": "broll",
+   "scenes": [],
+   "lufs": -17.2
+  },
+  "b07_audi.mp4": {
+   "duration": 53.568,
+   "width": 2160,
+   "height": 3840,
+   "fps": 29.97,
+   "video": true,
+   "audio": true,
+   "hdr": false,
+   "kind": "broll",
+   "scenes": [],
+   "lufs": -6.8
+  },
+  "b08_audi2.mov": {
+   "duration": 23.425,
+   "width": 2160,
+   "height": 3840,
+   "fps": 29.84,
+   "video": true,
+   "audio": true,
+   "hdr": false,
+   "kind": "broll",
+   "scenes": [],
+   "lufs": -6.7
+  },
+  "b09_felge.mov": {
+   "duration": 13.3,
+   "width": 1080,
+   "height": 1920,
+   "fps": 30.0,
+   "video": true,
+   "audio": true,
+   "hdr": false,
+   "kind": "broll",
+   "scenes": [
+    0.03,
+    0.07,
+    0.1,
+    0.17,
+    0.27
+   ],
+   "lufs": -70.0
+  },
+  "b10_tropfen.mov": {
+   "duration": 15.0217,
+   "width": 2160,
+   "height": 3840,
+   "fps": 59.97,
+   "video": true,
+   "audio": true,
+   "hdr": true,
+   "kind": "broll",
+   "scenes": [],
+   "lufs": -38.6
+  },
+  "b11_polieren.mp4": {
+   "duration": 13.8,
+   "width": 2160,
+   "height": 3840,
+   "fps": 30.0,
+   "video": true,
+   "audio": true,
+   "hdr": false,
+   "kind": "broll",
+   "scenes": [],
+   "lufs": -70.0
+  },
+  "b12_spiegel.mov": {
+   "duration": 6.87,
+   "width": 2160,
+   "height": 3840,
+   "fps": 59.97,
+   "video": true,
+   "audio": true,
+   "hdr": true,
+   "kind": "broll",
+   "scenes": [],
+   "lufs": -18.3
+  },
+  "b13_glanz.mp4": {
+   "duration": 12.767355,
+   "width": 1080,
+   "height": 1920,
+   "fps": 30.0,
+   "video": true,
+   "audio": true,
+   "hdr": false,
+   "kind": "broll",
+   "scenes": [],
+   "lufs": -66.7
+  },
+  "b14_abperlen.mov": {
+   "duration": 8.091667,
+   "width": 2160,
+   "height": 3840,
+   "fps": 59.94,
+   "video": true,
+   "audio": true,
+   "hdr": true,
+   "kind": "broll",
+   "scenes": [],
+   "lufs": -55.2
+  },
+  "b15_abperlen2.mov": {
+   "duration": 3.815,
+   "width": 2160,
+   "height": 3840,
+   "fps": 60.0,
+   "video": true,
+   "audio": true,
+   "hdr": true,
+   "kind": "broll",
+   "scenes": [],
+   "lufs": -29.2
+  },
+  "b16_scheibe.mov": {
+   "duration": 6.868333,
+   "width": 2160,
+   "height": 3840,
+   "fps": 59.97,
+   "video": true,
+   "audio": true,
+   "hdr": true,
+   "kind": "broll",
+   "scenes": [],
+   "lufs": -36.8
+  },
+  "b17_m2.mov": {
+   "duration": 36.252896,
+   "width": 1080,
+   "height": 1920,
+   "fps": 59.94,
+   "video": true,
+   "audio": true,
+   "hdr": false,
+   "kind": "broll",
+   "scenes": [
+    1.35,
+    2.62,
+    4.12,
+    4.54,
+    5.37,
+    6.19,
+    7.02,
+    7.87,
+    9.54,
+    10.34,
+    11.21,
+    12.05,
+    12.86,
+    13.68,
+    14.51,
+    15.37,
+    16.2,
+    17.03,
+    17.87,
+    18.7,
+    19.54,
+    20.37,
+    21.17,
+    22.01,
+    22.86,
+    23.67,
+    24.54,
+    25.38,
+    27.03,
+    27.86,
+    28.68,
+    29.53,
+    31.23,
+    32.02
+   ],
+   "lufs": -6.8
+  },
+  "b18_wischen.mp4": {
+   "duration": 11.842154,
+   "width": 2160,
+   "height": 3840,
+   "fps": 30.0,
+   "video": true,
+   "audio": true,
+   "hdr": false,
+   "kind": "broll",
+   "scenes": [],
+   "lufs": -70.0
+  },
+  "b19_bts.mov": {
+   "duration": 4.9017,
+   "width": 2160,
+   "height": 3840,
+   "fps": 59.98,
+   "video": true,
+   "audio": true,
+   "hdr": true,
+   "kind": "broll",
+   "scenes": [],
+   "lufs": -44.6
+  },
+  "b20_innen.mov": {
+   "duration": 12.505,
+   "width": 2160,
+   "height": 3840,
+   "fps": 29.99,
+   "video": true,
+   "audio": true,
+   "hdr": true,
+   "kind": "broll",
+   "scenes": [],
+   "lufs": -44.3
+  }
+ }
+}

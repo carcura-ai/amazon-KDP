@@ -29,6 +29,10 @@ eine Warnung vor dem Umgehen von Einreichungslimits.
 | nikmcfly/kindle-cover-skill | `954eb8e` (2026-03-27) | **keine** | **Nicht installiert** |
 | MarketplaceAdPros/skill-amazon-ads | `47d7d78` (2026-03-10) | MIT | **Nicht installiert** |
 | mcpmarket.com amazon-kdp-category-researcher | — | unbekannt | **Nicht installiert** |
+| JuliusBrussee/caveman | `bad48a0` (2026-10-17) | Apache 2.0 | **Teilweise installiert** (1 von 22 Skills) |
+| alirezarezvani/claude-skills | `27cfcd0` (2026-10-21) | MIT | **Teilweise installiert** (6 von 398 Skills) |
+| bergside/awesome-design-skills | `f631a09` (2026-06-28) | MIT | **Teilweise installiert** (3 von 67 Stilvorlagen) |
+| Design-Runde: impeccable, ui-ux-pro-max, emilkowalski, wshobson, vercel-labs | siehe Abschnitt 9 | MIT / Apache 2.0 | **Teilweise installiert** (6 Skills) |
 
 ---
 
@@ -195,6 +199,93 @@ Er deckt die beschriebene Funktion ab (Kategorieanalyse, BSR-Einordnung,
 Wettbewerbsauswertung) und geht darüber hinaus mit einem 100-Punkte-Schema,
 der 70-Punkte-Grenze, einer Mindestzahl von zehn geprüften Wettbewerbstiteln
 und dem Verbot, BSR als Verkaufszahl darzustellen.
+
+---
+
+## 6 JuliusBrussee/caveman — teilweise installiert
+
+**Prüfdatum** 2026-10-22 · **Commit** `bad48a0e1df55e05e3f52249afa35ecc1909ee76`,
+2026-10-17 · **Apache 2.0** · Anfrage: `npx skills add JuliusBrussee/caveman`
+
+`npx` wurde nicht ausgeführt. Das Repo wurde in den Prüfbereich geklont und
+gelesen; der gewählte Skill wurde von Hand kopiert.
+
+**Umfang:** 1.791 Dateien, 27 MB — ein ganzes Ökosystem (CLI, SDKs, Proxy, MCP-Server,
+Go-Engine) mit 22 Skills. `npx skills add` hätte nur Skill-Ordner kopiert.
+
+**Sicherheitsbefund: unbedenklich, aber mit Datenschutzhaken.**
+- Kern-Skill `caveman`: reiner Text, keine Skripte, kein Netzwerk.
+- Sieben Skills bedienen den kommerziellen Dienst „Caveman Cloud".
+  `caveman-setup` leitet die KI-Anfragen einer App über ein fremdes Gateway
+  (`gateway.caveman.so`) — Kundendaten in Prompts gingen dann an Dritte
+  (Auftragsverarbeitung nach DSGVO nötig).
+- `caveman-compress` startet `claude` bzw. `opencode` als Unterprozess, schickt
+  die Zieldatei an ein Sprachmodell und überschreibt sie. Dokumentiert und ohne
+  Shell-Interpolation, aber für dieses Projekt schädlich.
+- Keine Prompt-Injection-Muster in den Skill-Texten gefunden.
+
+**Installiert:** `SKILL.md`, `LICENSE`, `NOTICE` → `.claude/skills/caveman/`.
+Details und Gründe je ausgelassenem Skill: `.claude/skills/caveman/HERKUNFT.md`.
+
+---
+
+## 7 alirezarezvani/claude-skills — teilweise installiert
+
+**Prüfdatum** 2026-10-22 · **Commit** `27cfcd0fb0a41f60adffcbd5271fdf8839f86ed2` · **MIT**
+
+**Umfang:** 4.132 Dateien, 55 MB, 398 Skills (plus 468 Gemini-Kopien), 786 Python-Skripte.
+
+**Verfahren:** Katalog aller 398 Beschreibungen → Vorauswahl nach Geschäftsbezug
+(Carcura, Webdesign, Vertrieb, KDP) → 24 Kandidaten auf Skripte, Netzwerkzugriffe und
+Querverweise geprüft → Finalisten vollständig gelesen → Gegenprobe mit
+`skill-security-auditor` (alle sechs PASS; Kontrolltest auf `caveman-compress` = FAIL,
+das Werkzeug schlägt also an).
+
+**Installiert:** `local-seo-manager`, `business-investment-advisor`, `a11y-audit`
+(alle drei mit Abschnitt „Deutschland"), `challenge`, `weekly-review`,
+`skill-security-auditor`. Herkunft und Änderungen je Skill in dessen `HERKUNFT.md`.
+
+**Bewusst nicht installiert (Auswahl):**
+
+| Skill | Grund |
+|---|---|
+| `contract-and-proposal-writer` | Rechtlich riskant für Deutschland: überträgt „Urheberrecht" (§ 29 UrhG: nicht übertragbar), Haftungsausschluss „as is" (in AGB unwirksam, § 309 Nr. 7 BGB), Schiedsgericht für Kleinaufträge, keine Werkvertrags-Abnahme |
+| `page-cro`, `seo-audit`, `schema-markup`, `copywriting`, `analytics-tracking`, `site-architecture` | Solide, aber deckungsgleich mit `agency-website-builder` und `ghost` — doppelte Auslöser, US-Rechtsrahmen |
+| `content-humanizer`, `behuman`, `caveman` (Kopie) | Durch `ghost` bzw. den geprüften `caveman` abgedeckt |
+| `roast` | Startet fünf parallele Agenten je Idee — hoher Tokenverbrauch; `challenge` leistet das Wesentliche in einem Durchgang |
+| `referral-program`, `pricing-strategist`, `email-sequence`, `paid-ads`, `churn-prevention` | SaaS-lastig oder ohne Mehrwert gegenüber `l99` |
+| `cold-email` | B2B-Kaltakquise per E-Mail ist in Deutschland nur mit mutmaßlicher Einwilligung zulässig (§ 7 UWG) |
+| `aeo`, `free-tool-strategy`, `marketing-psychology` | Kein Mehrwert gegenüber vorhandenem Wissen |
+| C-Level-, Engineering-, Compliance-, Medizintechnik-, Jira-, Cloud-Skills (~350) | Kein Bezug zu den Geschäftsfeldern |
+
+---
+
+## 8 bergside/awesome-design-skills — teilweise installiert
+
+**Commit** `f631a09` (2026-06-28) · **MIT** · 67 Stilvorlagen des Generators typeui.sh, nur Markdown und Bilder.
+Die Vorlagen unterscheiden sich nur in rund 16 Zeilen (Name, Farbwerte; Tailwind-Standardfarben).
+**Installiert:** `dramatic`, `premium`, `refined` als Stilreferenz. Auditor: WARN nur wegen `.DS_Store`.
+
+---
+
+## 9 Design-Runde — teilweise installiert
+
+**Prüfdatum** 2026-10-22. Angefragt als `npx skills add …` für acht Pakete; `npx` nicht ausgeführt.
+
+| Angefragt | Tatsächliche Quelle | Entscheidung |
+|---|---|---|
+| pbakaus/impeccable | dto., Apache 2.0 | **installiert ohne `scripts/`** — Startskript lädt ungeprüfte Binärdatei |
+| nextlevelbuilder/ui-ux-pro-max | `ui-ux-pro-max-skill`, MIT | **`ui-ux-pro-max` installiert**; `design` (Logo-Generierung über externe KI-APIs mit Schlüsseln), `ui-styling` (shadcn/Tailwind), `brand`, `banner-design`, `slides` nicht |
+| emilkowalski/skill | dto., MIT | **`emil-design-eng`, `review-animations`**; Swift, Expo, React-Toasts, `break-ui` (React-Komponenten mit Datenquellen) nicht |
+| shadcn/ui | dto., MIT | **nicht installiert** — nur React/Tailwind-Projekte mit `components.json`, passt nicht zu WordPress/Kubio |
+| ui-skills/interaction-design | existiert nicht; Quelle `wshobson/agents`, MIT | **installiert** |
+| ui-skills/interface-design | existiert nicht; Quelle `Dammyjay93/interface-design`, MIT | **nicht installiert** — schließt Marketing-Seiten laut eigener Beschreibung aus |
+| ui-skills/web-design-guidelines | existiert nicht; Quelle `vercel-labs/agent-skills`, MIT | **installiert mit lokaler Regelkopie** — Original lädt Anweisungen live nach |
+| vercel/skills-hub | existiert nicht; `vercel-labs/skills` ist das `npx skills`-Installationsprogramm | **nicht installiert** — kein Skill |
+
+**Auditor-Befunde und Bewertung:** impeccable FAIL (Regex-`.exec()` in gebündeltem JS = Fehlalarm;
+echter Befund ist der Binär-Download), break-ui FAIL (Schutzregel gegen Prompt-Injection und
+Emoji-Testdaten = Fehlalarm), ui-ux-pro-max WARN (atomares Schreiben = unbedenklich).
 
 ---
 
