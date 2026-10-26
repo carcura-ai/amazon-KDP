@@ -22,6 +22,20 @@ Der digitale Kollege für Alex und Richy. Er läuft auf einem eigenen kleinen Se
 
 ---
 
+## Variante Firmennummer (Koexistenz) – empfohlen
+Der Bot läuft auf der Firmennummer **+49 170 6669516**, die WhatsApp-Business-App auf dem Handy bleibt unverändert.
+- Der Bot schreibt Alex und Richy **auf ihre privaten Nummern**. Diese stehen in `OWNERS`, niemals die Firmennummer.
+- Mit `KUNDEN_CHATS=melden` gilt: Schreibt ein Kunde, bekommt er **nichts** vom Bot. Ihr beide werdet benachrichtigt und antwortet selbst in der App.
+- `WA_BOT_NUMBER=+49 170 6669516` eintragen. Der Bot startet nicht, wenn diese Nummer versehentlich als Inhaber eingetragen ist.
+
+**Anmeldung:**
+- Die Anmeldung läuft nicht über Schritt 1–2 unten, sondern über die **Koexistenz-Anmeldung (Embedded Signup)** eines Meta-Partners, z. B. Dualhook oder 360dialog.
+- Voraussetzung ist die WhatsApp-Business-App ab Version 2.24.17.
+
+**Wichtig:**
+- Nach der Anmeldung werden **verknüpfte Geräte** (WhatsApp Web/Desktop) getrennt. Unterstützte Geräte lassen sich neu verknüpfen, WhatsApp für Windows wird nicht unterstützt.
+- Die Business-App muss **mindestens alle 13 Tage** geöffnet werden.
+
 ## Einrichtung – Schritt für Schritt (ca. 1–2 Stunden)
 
 ### 1. Nummer für den Assistenten
