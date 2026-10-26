@@ -279,3 +279,23 @@ test("Hilfsfunktionen für Vorlagen und lange Texte", () => {
   const parts = splitText("x".repeat(9000));
   assert.ok(parts.length === 3 && parts.every((p) => p.length <= 4000));
 });
+
+test("Firmennummer-Modus: Kunde bekommt nichts, beide werden gemeldet (max. alle 2 h)", async () => {
+  const { app, cfg, sent } = setup();
+  cfg.customerChats = "melden";
+  await sendWhatsApp(app, "4917699999999", "Was kostet Innenreinigung beim Golf?");
+  await sendWhatsApp(app, "4917699999999", "Und habt ihr Samstag Zeit?");
+  assert.equal(sent.filter((m) => m.to === "4917699999999").length, 0);
+  assert.equal(sent.length, 2);
+  assert.deepEqual(sent.map((m) => m.to).sort(), [ALEX, RICHY].sort());
+  assert.match(JSON.stringify(sent[0]), /Innenreinigung/);
+  // Folgenachricht landet als Kontext für die KI
+  const events = app.notifier.takeEvents(ALEX);
+  assert.equal(events.length, 2);
+});
+
+test("Bot-Nummer als Inhaber wird abgelehnt", async () => {
+  const { checkConfig } = await import("../src/config.js");
+  const cfg = loadConfig({ OWNERS: "Alex:0170 6669516", WA_BOT_NUMBER: "+49 170 6669516", WA_TOKEN: "t", WA_PHONE_NUMBER_ID: "1", WA_VERIFY_TOKEN: "v", WA_APP_SECRET: "a", LEAD_SECRET: "l" });
+  assert.match(checkConfig(cfg).join(), /Bot-Nummer/);
+});

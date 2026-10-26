@@ -44,6 +44,9 @@ export function loadConfig(env = process.env) {
     },
 
     leadSecret: env.LEAD_SECRET || "",
+    // hinweis | melden | still – siehe handleStranger in app.js
+    customerChats: ["hinweis", "melden", "still"].includes(env.KUNDEN_CHATS) ? env.KUNDEN_CHATS : "hinweis",
+    botNumber: normalizeNumber(env.WA_BOT_NUMBER || ""),
 
     wp: {
       url: (env.WP_URL || "https://carcura.info").replace(/\/+$/, ""),
@@ -86,5 +89,8 @@ export function checkConfig(cfg) {
   if (!cfg.wa.verifyToken) missing.push("WA_VERIFY_TOKEN");
   if (!cfg.wa.appSecret) missing.push("WA_APP_SECRET");
   if (!cfg.leadSecret) missing.push("LEAD_SECRET");
+  if (cfg.botNumber && cfg.owners.some((o) => o.number === cfg.botNumber)) {
+    missing.push("OWNERS (die Bot-Nummer darf nicht als Inhaber eingetragen sein – private Handynummern nehmen)");
+  }
   return missing;
 }

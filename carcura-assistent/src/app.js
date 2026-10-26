@@ -47,10 +47,12 @@ export class App {
     for (const entry of payload.entry || []) {
       for (const change of entry.changes || []) {
         const value = change.value || {};
+        const names = {};
+        for (const c of value.contacts || []) names[c.wa_id] = c.profile?.name || "";
         for (const msg of value.messages || []) {
           if (this.seen.has(msg.id)) continue; // Meta liefert gelegentlich doppelt
           this.remember(msg.id);
-          jobs.push(this.handleMessage(msg).catch((err) => this.log.error("[webhook]", err)));
+          jobs.push(this.handleMessage(msg, names[msg.from] || "").catch((err) => this.log.error("[webhook]", err)));
         }
       }
     }
@@ -63,9 +65,9 @@ export class App {
     this.store.set("seen", [...this.seen].slice(-300));
   }
 
-  async handleMessage(msg) {
+  async handleMessage(msg, profileName = "") {
     const owner = this.ownerByNumber(msg.from);
-    if (!owner) return this.handleStranger(msg);
+    if (!owner) return this.handleStranger(msg, profileName);
 
     this.wa.markRead(msg.id);
     await this.notifier.onInbound(owner);
@@ -143,9 +145,31 @@ export class App {
     return [{ type: "text", text: `${note} (Dateityp ${mime || "unbekannt"} kann ich nicht lesen, nur ablegen.)` }];
   }
 
-  async handleStranger(msg) {
-    // Kunden sollen nicht hier landen: einmal pro Tag freundlich weiterleiten.
+  // Nachrichten von Nummern, die nicht Alex oder Richy gehören. Je nach KUNDEN_CHATS:
+  //   hinweis – eigene Assistenten-Nummer: einmal am Tag auf die Firmennummer verweisen
+  //   melden  – Firmennummer (Koexistenz mit der Business-App): Kunde bekommt nichts vom Bot,
+  //             Alex und Richy werden benachrichtigt und antworten selbst in der App
+  //   still   – nichts tun
+  async handleStranger(msg, profileName = "") {
+    const mode = this.cfg.customerChats;
+    if (mode === "still") return;
     const last = this.strangers.get(msg.from) || 0;
+
+    if (mode === "melden") {
+      const preview = customerPreview(msg);
+      const who = profileName ? `${profileName} (+${msg.from})` : `+${msg.from}`;
+      for (const owner of this.cfg.owners) {
+        this.notifier.addEvent(owner.number, `WhatsApp von Kunde ${who}: ${preview}`);
+      }
+      // Pro Kunde höchstens alle 2 Stunden melden, sonst nervt jede Folgenachricht.
+      if (Date.now() - last < 2 * 60 * 60 * 1000) return;
+      this.strangers.set(msg.from, Date.now());
+      const text = `📲 Neue WhatsApp an die Firmennummer von *${who}*:\n„${preview}“\n\nAntwortet direkt in der WhatsApp-Business-App. Sagt mir kurz, wer's übernimmt – dann trag ich's als Anfrage ein.`;
+      await this.notifier.sendAll(text, `WhatsApp von ${profileName || "einem Kunden"}: ${preview.slice(0, 80)}`);
+      return;
+    }
+
+    // Kunden sollen nicht hier landen: einmal pro Tag freundlich weiterleiten.
     if (Date.now() - last < 24 * 60 * 60 * 1000) return;
     this.strangers.set(msg.from, Date.now());
     await this.wa.sendText(msg.from,
@@ -270,6 +294,13 @@ export class App {
     await this.notifier.sendAll(text, `Wochenrückblick: ${stats.neue_anfragen} neue Anfragen`);
     return true;
   }
+}
+
+function customerPreview(msg) {
+  if (msg.type === "text") return clean(msg.text?.body, 300);
+  const labels = { image: "Foto", video: "Video", audio: "Sprachnachricht", document: "Datei", location: "Standort", sticker: "Sticker" };
+  const caption = clean(msg[msg.type]?.caption, 200);
+  return `[${labels[msg.type] || msg.type}]${caption ? " " + caption : ""}`;
 }
 
 function clean(value, max) {
