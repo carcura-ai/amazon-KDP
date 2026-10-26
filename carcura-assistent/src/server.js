@@ -15,6 +15,8 @@ import { WordPress } from "./wordpress.js";
 import { createMailer } from "./mailer.js";
 import { Agent } from "./agent.js";
 import { App } from "./app.js";
+import { Insights } from "./insights.js";
+import { GoogleProfile } from "./gbp.js";
 
 const MAX_BODY = 2 * 1024 * 1024;
 
@@ -24,8 +26,10 @@ export function buildApp(cfg, overrides = {}) {
   const notifier = new Notifier({ store, wa, owners: cfg.owners });
   const wp = overrides.wp || new WordPress(cfg.wp);
   const mailer = overrides.mailer !== undefined ? overrides.mailer : createMailer(cfg.mail);
-  const agent = Agent.create({ cfg, store, client: overrides.client, notifier, owners: cfg.owners, wp, mailer });
-  return new App({ cfg, store, wa, notifier, agent, fetchImpl: overrides.fetchImpl });
+  const insights = overrides.insights || new Insights({ windsor: cfg.windsor, timezone: cfg.timezone });
+  const gbp = overrides.gbp || new GoogleProfile(cfg.gbp);
+  const agent = Agent.create({ cfg, store, client: overrides.client, notifier, owners: cfg.owners, wp, mailer, insights, gbp });
+  return new App({ cfg, store, wa, notifier, agent, insights, gbp, fetchImpl: overrides.fetchImpl });
 }
 
 function readBody(req) {
@@ -98,4 +102,8 @@ if (import.meta.url === `file://${process.argv[1]}`) {
   });
   // Alle 10 Minuten prüfen, ob die Wochenübersicht fällig ist.
   setInterval(() => app.weeklyTick().catch((err) => console.error("[weekly]", err)), 10 * 60 * 1000);
+  // Alle 30 Minuten nach neuen Google-Bewertungen schauen (erster Lauf nach 1 Minute).
+  const reviews = () => app.reviewTick().catch((err) => console.error("[reviews]", err.message));
+  setTimeout(reviews, 60 * 1000);
+  setInterval(reviews, 30 * 60 * 1000);
 }

@@ -13,7 +13,7 @@ import { templateSafe, splitText } from "../src/whatsapp.js";
 const ALEX = "4917066695160";
 const RICHY = "4915100000000";
 
-function setup({ responses = [], pageRaw = "<p>Innenreinigung ab 90 €</p>" } = {}) {
+function setup({ responses = [], pageRaw = "<p>Innenreinigung ab 90 €</p>", insights, gbp } = {}) {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), "carcura-"));
   const cfg = loadConfig({
     OWNERS: `Alex:+49 170 66695160,Richy:0151 00000000`,
@@ -48,7 +48,7 @@ function setup({ responses = [], pageRaw = "<p>Innenreinigung ab 90 €</p>" } =
   const mailer = { send: async (m) => { mails.push(m); } };
   const fetchImpl = async () => ({ ok: false, status: 500, json: async () => ({}) }); // kein Wetter im Test
   const store = new Store(dir);
-  const app = buildApp(cfg, { store, wa, client, wp, mailer, fetchImpl });
+  const app = buildApp(cfg, { store, wa, client, wp, mailer, fetchImpl, insights, gbp });
   app.log = { error: () => {} };
   app.notifier.log = { error: () => {} };
   return { app, cfg, sent, calls, page, mails, store, dir };
@@ -298,4 +298,106 @@ test("Bot-Nummer als Inhaber wird abgelehnt", async () => {
   const { checkConfig } = await import("../src/config.js");
   const cfg = loadConfig({ OWNERS: "Alex:0170 6669516", WA_BOT_NUMBER: "+49 170 6669516", WA_TOKEN: "t", WA_PHONE_NUMBER_ID: "1", WA_VERIFY_TOKEN: "v", WA_APP_SECRET: "a", LEAD_SECRET: "l" });
   assert.match(checkConfig(cfg).join(), /Bot-Nummer/);
+});
+
+// ---------- Zahlen und Bewertungen ----------
+
+import { Insights, originalText } from "../src/insights.js";
+
+function windsorFake(routes) {
+  const calls = [];
+  const fetchImpl = async (url) => {
+    calls.push(url);
+    const u = new URL(url);
+    const connector = u.pathname.slice(1);
+    const fields = u.searchParams.get("fields");
+    const data = routes(connector, fields, u.searchParams) ?? [];
+    return { ok: true, status: 200, json: async () => ({ data }) };
+  };
+  return { fetchImpl, calls };
+}
+
+test("Windsor: Zahlen werden richtig zusammengefasst", async () => {
+  const { fetchImpl, calls } = windsorFake((c, f) => {
+    if (c === "google_ads") return [{ campaign: "Suche", spend: 33.69, clicks: 50, impressions: 994, conversions: 3 }];
+    if (c === "googleanalytics4" && f.startsWith("session")) return [{ session_default_channel_group: "Paid Search", sessions: 37, totalusers: 29, engaged_sessions: 22 }, { session_default_channel_group: "Direct", sessions: 42, totalusers: 38, engaged_sessions: 11 }];
+    if (c === "googleanalytics4") return [{ event_name: "form_start", event_count: 6 }, { event_name: "cc_anfrage", event_count: 2 }, { event_name: "cc_whatsapp", event_count: 3 }];
+    if (c === "google_my_business" && f.includes("review_id")) return [{ review_id: "r1", review_create_time: "2026-10-20T10:00:00Z", review_reviewer: "Uwe", review_star_rating: "FIVE", review_comment: "(Translated by Google) Great\n\n(Original)\nSuper Arbeit", review_average_rating_total: 4.8, review_total_count: 15 }];
+    if (c === "google_my_business") return [{ impressions: 400, website_clicks: 9, call_clicks: 1, direction_requests: 12 }];
+  });
+  const ins = new Insights({ windsor: { apiKey: "k", adsAccount: "919-151-5213", ga4Account: "548650753", gbpLocation: "locations/1" }, fetchImpl, log: { error: () => {} } });
+  const p = await ins.period(7, Date.parse("2026-10-26T08:00:00Z"));
+  assert.equal(p.zeitraum, "2026-10-19 bis 2026-10-25");
+  assert.equal(p.vergleich, "2026-10-12 bis 2026-10-18");
+  assert.equal(p.google_ads.aktuell.ausgaben_eur, 33.69);
+  assert.equal(p.google_ads.aktuell.kosten_pro_klick_eur, 0.67);
+  assert.equal(p.website.aktuell.besuche, 79);
+  assert.equal(p.website.aktuell.fast_anfragen, 4);
+  assert.equal(p.google_profil.routen, 12);
+  assert.equal(p.bewertungen.neu[0].text, "Super Arbeit");
+  assert.equal(p.bewertungen.neu[0].sterne, 5);
+  assert.ok(calls.every((u) => u.includes("api_key=k")));
+  assert.ok(calls.some((u) => u.includes("select_accounts=locations%2F1")));
+});
+
+test("Windsor: eine ausgefallene Quelle bricht den Bericht nicht ab", async () => {
+  const fetchImpl = async (url) => (url.includes("google_ads")
+    ? { ok: false, status: 500, json: async () => ({ error: { message: "kaputt" } }) }
+    : { ok: true, status: 200, json: async () => ({ data: [] }) });
+  const ins = new Insights({ windsor: { apiKey: "k" }, fetchImpl, log: { error: () => {} } });
+  const p = await ins.period(7);
+  assert.match(p.google_ads.aktuell.fehler, /kaputt/);
+  assert.equal(p.website.aktuell.besuche, 0);
+});
+
+test("Original-Text aus Google-Übersetzung", () => {
+  assert.equal(originalText("(Translated by Google) Nice\n\n(Original)\nSchön"), "Schön");
+  assert.equal(originalText("Nur deutsch"), "Nur deutsch");
+  assert.equal(originalText(null), "");
+});
+
+function reviewSetup({ list, gbpConfigured, responses }) {
+  const posted = [];
+  const insights = { configured: true, recentReviews: async () => list.current, period: async () => ({}) };
+  const gbp = { configured: gbpConfigured, reply: async (id, text) => { posted.push({ id, text }); } };
+  const ctx = setup({ insights, gbp, responses });
+  // Beide haben heute schon geschrieben → 24-h-Fenster offen, Text geht direkt raus.
+  for (const o of ctx.cfg.owners) ctx.store.update("owners", {}, (all) => ({ ...all, [o.number]: { lastInbound: Date.now(), pending: [], events: [] } }));
+  return { ...ctx, posted };
+}
+
+test("Bewertungen: erster Lauf merkt nur, neue 5 Sterne werden automatisch beantwortet und gemeldet", async () => {
+  const list = { current: [{ id: "a", name: "Alt", sterne: 5, text: "alt", antwort: "" }] };
+  const { app, sent, posted } = reviewSetup({ list, gbpConfigured: true, responses: [say("Danke dir, Uwe! Freut uns, dass der Golf wieder glänzt.\n\nDein Carcura-Team")] });
+  assert.equal(await app.reviewTick(), 0);
+  assert.equal(sent.length, 0);
+  list.current = [...list.current, { id: "b", name: "Uwe Lettery", sterne: 5, text: "Super Arbeit am Golf", antwort: "" }];
+  assert.equal(await app.reviewTick(), 1);
+  assert.deepEqual(posted.map((p) => p.id), ["b"]);
+  assert.equal(sent.length, 2);
+  assert.match(sent[0].text, /Hab direkt geantwortet/);
+  assert.equal(await app.reviewTick(), 0); // nicht doppelt
+});
+
+test("Bewertungen: kritische Bewertung wird nicht automatisch beantwortet, OK postet den Vorschlag", async () => {
+  const list = { current: [] };
+  const { app, sent, posted, store } = reviewSetup({ list, gbpConfigured: true, responses: [say("Schade, dass es nicht gepasst hat. Ruf uns gern an.\n\nDein Carcura-Team")] });
+  await app.reviewTick();
+  list.current = [{ id: "c", name: "Kritiker", sterne: 2, text: "War nicht zufrieden", antwort: "" }];
+  await app.reviewTick();
+  assert.equal(posted.length, 0);
+  const draft = store.get("review_drafts", [])[0];
+  assert.match(sent[0].text, new RegExp(draft.id));
+  // Inhaber sagt ok → KI postet den Vorschlag
+  const handlers = app.agent.handlers;
+  await handlers.bewertung_antwort_posten({ vorschlag_id: draft.id }, { owner: { number: ALEX, name: "Alex" }, session: { turn: 3 } });
+  assert.deepEqual(posted.map((p) => p.id), ["c"]);
+});
+
+test("Wochenbericht nimmt Werbe- und Website-Zahlen mit", async () => {
+  const insights = { configured: true, recentReviews: async () => [], period: async () => ({ google_ads: { aktuell: { ausgaben_eur: 33.69, klicks: 50 } }, website: { aktuell: { besuche: 79 } } }) };
+  const { app, sent, calls } = setup({ insights, responses: [say("Jo Jungs, *33,69 €* Werbung …")] });
+  assert.equal(await app.weeklyTick(new Date("2026-10-26T08:10:00Z")), true);
+  assert.match(JSON.stringify(calls[0].messages), /33\.69/);
+  assert.equal(sent.length, 2);
 });

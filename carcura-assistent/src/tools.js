@@ -156,6 +156,44 @@ export const TOOL_DEFINITIONS = [
     },
   },
   {
+    name: "zahlen_abrufen",
+    description: "Aktuelle Zahlen von außen für die letzten N abgeschlossenen Tage plus Vergleich zum Zeitraum davor: Google-Ads-Ausgaben/Klicks/Conversions, Website-Besuche nach Kanal, gesendete und fast gesendete Anfragen, WhatsApp-/Anruf-Klicks, Google-Profil (Aufrufe, Anrufe, Routen), neue Bewertungen.",
+    input_schema: {
+      type: "object",
+      properties: { tage: { type: "integer", minimum: 1, maximum: 90 } },
+    },
+  },
+  {
+    name: "bewertungen_liste",
+    description: "Google-Bewertungen der letzten N Tage mit Sternen, Text und vorhandener Antwort.",
+    input_schema: {
+      type: "object",
+      properties: { tage: { type: "integer", minimum: 1, maximum: 365 } },
+    },
+  },
+  {
+    name: "bewertung_antwort_vorschlagen",
+    description: "Legt einen Antwortvorschlag für eine Google-Bewertung an. Danach den Text zeigen und auf OK warten.",
+    input_schema: {
+      type: "object",
+      properties: {
+        review_id: { type: "string" },
+        name: { type: "string", description: "Name der Person, die bewertet hat" },
+        text: { type: "string", description: "Antwort an den Kunden: per Du, herzlich, konkret, kurz, Gruß 'Dein Carcura-Team'" },
+      },
+      required: ["review_id", "text"],
+    },
+  },
+  {
+    name: "bewertung_antwort_posten",
+    description: "Postet einen Antwortvorschlag (R-…) öffentlich bei Google. NUR nach ausdrücklichem OK in einer neuen Nachricht.",
+    input_schema: {
+      type: "object",
+      properties: { vorschlag_id: { type: "string" } },
+      required: ["vorschlag_id"],
+    },
+  },
+  {
     name: "wochen_zahlen",
     description: "Kennzahlen der Anfragen für die letzten N Tage (Anzahl, Status, Leistungen, Quellen).",
     input_schema: {
@@ -166,14 +204,14 @@ export const TOOL_DEFINITIONS = [
 ];
 
 export function createToolHandlers(deps) {
-  const { store, notifier, owners, wp, mailer } = deps;
+  const { store, notifier, owners, wp, mailer, insights, gbp } = deps;
 
   const leads = () => store.get("leads", []);
   const findLead = (id) => leads().find((l) => l.id.toLowerCase() === String(id || "").trim().toLowerCase());
 
   function gate(item, session, owner) {
     if (!item) return "Unbekannte ID.";
-    if (item.owner !== owner.number) return "Dieser Vorschlag wurde von jemand anderem erstellt.";
+    if (item.owner !== "*" && item.owner !== owner.number) return "Dieser Vorschlag wurde von jemand anderem erstellt.";
     if (item.done) return "Schon erledigt.";
     if (Date.now() - item.at > PROPOSAL_TTL_MS) return "Vorschlag ist älter als 24 Stunden – bitte neu erstellen.";
     if (session.turn <= item.turn) {
@@ -325,10 +363,50 @@ export function createToolHandlers(deps) {
       return { gespeichert: beleg.id, hinweis: "Für die Buchhaltung bitte zusätzlich ans Buchhaltungsprogramm bzw. den Steuerberater geben." };
     },
 
+    async zahlen_abrufen({ tage = 7 }) {
+      if (!insights?.configured) throw new Error("Zahlen sind noch nicht eingerichtet (WINDSOR_API_KEY in der .env).");
+      return { ...(await insights.period(tage)), eigene_anfragen: leadStats(leads(), tage), whatsapp_kontakte: waContacts(store, tage) };
+    },
+
+    async bewertungen_liste({ tage = 30 }) {
+      if (!insights?.configured) throw new Error("Bewertungen sind noch nicht eingerichtet (WINDSOR_API_KEY in der .env).");
+      return insights.recentReviews(tage);
+    },
+
+    bewertung_antwort_vorschlagen({ review_id, name = "", text }, { owner, session }) {
+      const draft = reviewDraft(store, { review_id, name, text, owner: owner.number, turn: session.turn });
+      return { vorschlag_id: draft.id, text, hinweis: "Noch nicht gepostet. Zeig den Text und frag nach dem OK." };
+    },
+
+    async bewertung_antwort_posten({ vorschlag_id }, { owner, session }) {
+      const draft = store.get("review_drafts", []).find((d) => d.id === vorschlag_id);
+      const blocked = gate(draft, session, owner);
+      if (blocked) throw new Error(blocked);
+      if (!gbp?.configured) {
+        throw new Error("Posten bei Google ist nicht eingerichtet. Gib dem Inhaber den Text zum Kopieren: Google-Profil → Rezensionen → Antworten.");
+      }
+      await gbp.reply(draft.review_id, draft.text);
+      store.update("review_drafts", [], (all) => all.map((d) => (d.id === draft.id ? { ...d, done: true, gepostet: new Date().toISOString(), von: owner.name } : d)));
+      return { gepostet: true };
+    },
+
     wochen_zahlen({ tage = 7 }) {
       return leadStats(leads(), tage);
     },
   };
+}
+
+export function reviewDraft(store, { review_id, name, text, owner, turn }) {
+  const draft = { id: nextId(store, "R"), at: Date.now(), turn, owner, review_id, name, text, done: false };
+  store.update("review_drafts", [], (all) => [...all.slice(-49), draft]);
+  return draft;
+}
+
+// Kunden, die in den letzten N Tagen per WhatsApp an die Firmennummer geschrieben haben.
+export function waContacts(store, tage, now = Date.now()) {
+  const since = now - tage * 24 * 60 * 60 * 1000;
+  const recent = store.get("wa_contacts", []).filter((c) => Date.parse(c.at) >= since);
+  return { anzahl_kunden: new Set(recent.map((c) => c.from)).size, namen: [...new Set(recent.map((c) => c.name).filter(Boolean))] };
 }
 
 export function shortLead(l) {

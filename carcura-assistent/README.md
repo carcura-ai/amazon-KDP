@@ -13,6 +13,11 @@ Der digitale Kollege für Alex und Richy. Er läuft auf einem eigenen kleinen Se
 - **Montags 9 Uhr Wochenrückblick** über die Anfragen.
 - **Fertige Auswertungen weiterleiten**, zum Beispiel die bisherige Wochenauswertung (`POST /report`).
 
+- **Kunden-WhatsApps an die Firmennummer** sofort melden (Variante Firmennummer).
+- **Neue Google-Bewertungen sofort melden**, mit Antwort: 5 Sterne beantwortet er automatisch und sagt euch, was er geschrieben hat. Bei schlechteren Bewertungen kommt ein Vorschlag, gepostet wird erst nach eurem OK.
+- **Montags 9 Uhr Wochenbericht** mit allem: Werbeausgaben und was dabei rauskam, Website-Besucher und woher, gesendete und fast gesendete Anfragen, WhatsApp- und Anruf-Klicks, Google-Profil (Aufrufe, Anrufe, Routen), Bewertungen, offene Anfragen und ein konkreter Vorschlag.
+- **Zahlen jederzeit im Chat:** „Wie lief die Werbung diese Woche?“, „Wie viele waren gestern auf der Seite?“
+
 **Noch nicht drin, kommt als Nächstes:** Google-Kalender und Sprachnachrichten.
 
 **Sicherheit:**
@@ -111,6 +116,18 @@ Wann WhatsApp was kostet: Antwortet der Assistent innerhalb von 24 Stunden nach 
   - „E-Mails über externe Programme senden und empfangen“ aktivieren.
   - Das Passwort eintragen in `SMTP_PASS`. Wenn bei web.de eine Zwei-Faktor-Anmeldung aktiv ist, stattdessen ein App-Passwort erstellen und eintragen.
 - Danach: `docker compose up -d` (lädt die Einstellungen neu).
+
+### 6b. Zahlen und Bewertungen
+1. **Windsor.ai:**
+   - Auf windsor.ai den **API-Schlüssel** kopieren und in `WINDSOR_API_KEY` eintragen.
+   - Google Ads, Analytics und das Unternehmensprofil sind dort schon verbunden. Die Konto-IDs stehen bereits in der `.env.example`.
+   - Prüfen, ob euer Windsor-Tarif API-Zugriff enthält.
+2. **Meta-Werbung:** in Windsor „Facebook Ads“ verbinden und die Werbekonto-ID in `WINDSOR_META_ACCOUNT` eintragen.
+3. **Antworten auf Bewertungen selbst posten (optional):**
+   - Google Cloud-Projekt anlegen.
+   - Zugang zur **Business Profile API** beantragen. Google prüft das, das dauert meist einige Tage.
+   - OAuth-Client anlegen, einmalig ein Refresh-Token erzeugen und `GBP_*` ausfüllen.
+   - Bis das steht, schickt der Assistent die fertige Antwort zum Kopieren.
 
 ### 7. Testen
 - **Chat:** Von deinem Handy an die Assistenten-Nummer „Moin“ schreiben. Er antwortet locker.

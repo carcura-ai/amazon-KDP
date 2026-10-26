@@ -6,14 +6,14 @@ import { normalizeNumber } from "./config.js";
 import { verifySignature } from "./whatsapp.js";
 import { dateTimeText, weatherText, localParts } from "./context.js";
 import { nextId } from "./store.js";
-import { leadStats } from "./tools.js";
+import { leadStats, reviewDraft, waContacts } from "./tools.js";
 
 const CLAUDE_IMAGE_TYPES = ["image/jpeg", "image/png", "image/gif", "image/webp"];
 const EXT = { "image/jpeg": "jpg", "image/png": "png", "image/webp": "webp", "image/gif": "gif", "application/pdf": "pdf" };
 
 export class App {
-  constructor({ cfg, store, wa, notifier, agent, fetchImpl = globalThis.fetch, log = console }) {
-    Object.assign(this, { cfg, store, wa, notifier, agent, fetchImpl, log });
+  constructor({ cfg, store, wa, notifier, agent, insights = null, gbp = null, fetchImpl = globalThis.fetch, log = console }) {
+    Object.assign(this, { cfg, store, wa, notifier, agent, insights, gbp, fetchImpl, log });
     this.seen = new Set(store.get("seen", []));
     this.strangers = new Map();
   }
@@ -164,6 +164,7 @@ export class App {
       // Pro Kunde höchstens alle 2 Stunden melden, sonst nervt jede Folgenachricht.
       if (Date.now() - last < 2 * 60 * 60 * 1000) return;
       this.strangers.set(msg.from, Date.now());
+      this.store.update("wa_contacts", [], (all) => [...all.slice(-999), { at: new Date().toISOString(), from: msg.from, name: profileName }]);
       const text = `📲 Neue WhatsApp an die Firmennummer von *${who}*:\n„${preview}“\n\nAntwortet direkt in der WhatsApp-Business-App. Sagt mir kurz, wer's übernimmt – dann trag ich's als Anfrage ein.`;
       await this.notifier.sendAll(text, `WhatsApp von ${profileName || "einem Kunden"}: ${preview.slice(0, 80)}`);
       return;
@@ -279,20 +280,124 @@ export class App {
     this.store.set("weekly_last", t.day);
 
     const stats = leadStats(this.store.get("leads", []), 7, now.getTime());
+    const whatsapp = waContacts(this.store, 7, now.getTime());
+    let zahlen = null;
+    if (this.insights?.configured) {
+      try {
+        zahlen = await this.insights.period(7, now.getTime());
+      } catch (err) {
+        this.log.error("[weekly] Zahlen:", err.message);
+      }
+    }
     let text = "";
     try {
       text = await this.agent.write(
-        `Schreib Alex und Richy eine kurze, lockere Wochenübersicht ihrer Anfragen für WhatsApp (Montagmorgen). ` +
-        `Nenne Anzahl, was angefragt wurde und welche Anfragen noch offen sind (mit ID). Nur diese Zahlen verwenden:\n${JSON.stringify(stats)}`,
+        `Schreib Alex und Richy den Wochenbericht für WhatsApp (Montagmorgen), locker wie unter Kumpels, z. B. "Jo Jungs, jo Richy, jo Alex …". ` +
+        `Aufbau, jeweils kurz: 1) Werbung: was ausgegeben, Klicks und was dabei rauskam (echte Anfragen, WhatsApp-Kontakte), Vergleich zur Vorwoche. ` +
+        `2) Website: Besucher und woher, gesendete Anfragen, fast gesendete Anfragen, WhatsApp- und Anruf-Klicks. ` +
+        `3) Google-Profil: Aufrufe, Anrufe, Routen. 4) Neue Bewertungen und Schnitt. 5) Offene Anfragen mit ID. ` +
+        `6) Ein konkreter Vorschlag für diese Woche, der sich direkt aus den Zahlen ergibt. ` +
+        `Nur diese Zahlen verwenden, nichts erfinden oder hochrechnen. Fehlt eine Quelle (Feld fehler oder null), sag das in einem Halbsatz. ` +
+        `Kernzahlen *fett*, Aufzählungen mit •, höchstens etwa 25 Zeilen.\n\n` +
+        JSON.stringify({ eigene_anfragen: stats, whatsapp_kontakte: whatsapp, zahlen }),
       );
     } catch (err) {
       this.log.error("[weekly]", err.message);
     }
     if (!text) {
-      text = `Moin Jungs, Wochenrückblick: *${stats.neue_anfragen}* neue Anfragen in den letzten 7 Tagen. Noch offen: ${stats.noch_offen.map((l) => l.id).join(", ") || "nichts"}.`;
+      const ads = zahlen?.google_ads?.aktuell;
+      const web = zahlen?.website?.aktuell;
+      text = [
+        `Jo Jungs, Wochenrückblick 📊`,
+        ads && !ads.fehler ? `• Google Ads: *${ads.ausgaben_eur} €* für ${ads.klicks} Klicks` : "",
+        web && !web.fehler ? `• Website: ${web.besuche} Besuche, ${web.anfragen_gesendet} Anfragen gesendet, ${web.fast_anfragen} fast` : "",
+        `• Anfragen: *${stats.neue_anfragen}* neu, WhatsApp-Kontakte: ${whatsapp.anzahl_kunden}`,
+        `• Offen: ${stats.noch_offen.map((l) => l.id).join(", ") || "nichts"}`,
+      ].filter(Boolean).join("\n");
     }
     await this.notifier.sendAll(text, `Wochenrückblick: ${stats.neue_anfragen} neue Anfragen`);
     return true;
+  }
+
+  // ---------- Google-Bewertungen ----------
+
+  // Wird alle 30 Minuten aufgerufen. Beim allerersten Lauf werden vorhandene Bewertungen nur gemerkt.
+  async reviewTick() {
+    if (!this.insights?.configured || !this.cfg.reviews.watch) return 0;
+    const list = await this.insights.recentReviews(14);
+    const seen = this.store.get("reviews_seen", null);
+    if (seen === null) {
+      this.store.set("reviews_seen", list.map((r) => r.id));
+      return 0;
+    }
+    const fresh = list.filter((r) => !seen.includes(r.id));
+    if (!fresh.length) return 0;
+    this.store.set("reviews_seen", [...seen, ...fresh.map((r) => r.id)].slice(-500));
+    for (const r of fresh) {
+      try {
+        await this.announceReview(r);
+      } catch (err) {
+        this.log.error("[reviews]", err.message);
+      }
+    }
+    return fresh.length;
+  }
+
+  async announceReview(r) {
+    const stars = r.sterne || 0;
+    const head = `${"⭐".repeat(Math.max(1, Math.min(5, stars)))} Neue Google-Bewertung von *${r.name}* (${stars}/5):\n` +
+      (r.text ? `„${r.text.slice(0, 700)}“` : "(nur Sterne, kein Text)");
+    let body;
+    let event;
+    if (r.antwort) {
+      body = `Ist schon beantwortet: „${r.antwort.slice(0, 400)}“`;
+      event = `Neue Bewertung von ${r.name} (${stars}/5), war schon beantwortet.`;
+    } else {
+      const reply = await this.draftReviewReply(r);
+      let posted = false;
+      if (reply && this.gbp?.configured && stars >= this.cfg.reviews.autoReplyMin) {
+        try {
+          await this.gbp.reply(r.id, reply);
+          posted = true;
+        } catch (err) {
+          this.log.error("[reviews] Antwort posten:", err.message);
+        }
+      }
+      if (posted) {
+        body = `Hab direkt geantwortet ✅\n„${reply}“`;
+        event = `Neue Bewertung von ${r.name} (${stars}/5), automatisch beantwortet: "${reply}"`;
+      } else if (reply) {
+        const draft = reviewDraft(this.store, { review_id: r.id, name: r.name, text: reply, owner: "*", turn: -1 });
+        body = `Mein Vorschlag für die Antwort (${draft.id}):\n„${reply}“\n\n` + (this.gbp?.configured
+          ? `Passt? Schreib mir „ok“, dann poste ich sie. Oder sag, was anders soll.`
+          : `Zum Kopieren: Google-Profil → Rezensionen → Antworten. (Selbst posten kann ich, sobald die Google-Freigabe eingerichtet ist.)`);
+        event = `Neue Bewertung von ${r.name} (${stars}/5): "${r.text.slice(0, 300)}". Antwortvorschlag ${draft.id}: "${reply}" – wartet auf OK.`;
+      } else {
+        body = `Die Antwort schreiben wir besser zusammen – sag mir kurz, wie ihr reagieren wollt.`;
+        event = `Neue Bewertung von ${r.name} (${stars}/5): "${r.text.slice(0, 300)}" – noch ohne Antwort.`;
+      }
+    }
+    await this.notifier.sendAll(`${head}\n\n${body}`, `Neue ${stars}-Sterne-Bewertung von ${r.name}`);
+    for (const owner of this.cfg.owners) this.notifier.addEvent(owner.number, event);
+  }
+
+  async draftReviewReply(r) {
+    const vorname = String(r.name).split(/\s+/)[0];
+    try {
+      const text = await this.agent.write(
+        `Schreib die öffentliche Antwort von Carcura auf diese Google-Bewertung. Per Du, herzlich und konkret auf das Geschriebene eingehen ` +
+        `(Fahrzeug, Leistung, Lob), 2–3 kurze Sätze, kein Werbesprech, keine Floskel-Kette, höchstens ein Emoji, Gruß "Dein Carcura-Team". ` +
+        (r.sterne && r.sterne <= 3
+          ? `Es ist eine kritische Bewertung: sachlich, nicht rechtfertigen, nichts zugeben oder bestreiten, was nicht feststeht, Klärung per Telefon unter +49 170 6669516 anbieten. `
+          : "") +
+        `Gib NUR den Antworttext aus.\n\nBewertung von ${r.name} (${r.sterne}/5):\n${r.text || "(kein Text, nur Sterne)"}`,
+      );
+      if (text) return text.trim();
+    } catch (err) {
+      this.log.error("[reviews] Entwurf:", err.message);
+    }
+    if (r.sterne >= 4) return `Vielen Dank, ${vorname}! Schön, dass du zufrieden bist – bis zum nächsten Mal in Walterschen.\n\nDein Carcura-Team`;
+    return "";
   }
 }
 

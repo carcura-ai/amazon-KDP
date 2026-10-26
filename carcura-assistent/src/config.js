@@ -75,6 +75,30 @@ export function loadConfig(env = process.env) {
       hour: Number(env.WEEKLY_SUMMARY_HOUR || 9),
     },
 
+    // Zahlen über Windsor.ai (Google Ads, GA4, Unternehmensprofil, optional Meta Ads)
+    windsor: {
+      apiKey: env.WINDSOR_API_KEY || "",
+      adsAccount: env.WINDSOR_ADS_ACCOUNT || "919-151-5213",
+      ga4Account: env.WINDSOR_GA4_ACCOUNT || "548650753",
+      gbpLocation: env.WINDSOR_GBP_LOCATION || "locations/3129400474567791595",
+      metaAccount: env.WINDSOR_META_ACCOUNT || "",
+    },
+
+    // Antworten auf Google-Bewertungen posten (optional)
+    gbp: {
+      clientId: env.GBP_CLIENT_ID || "",
+      clientSecret: env.GBP_CLIENT_SECRET || "",
+      refreshToken: env.GBP_REFRESH_TOKEN || "",
+      account: env.GBP_ACCOUNT || "",
+      location: env.GBP_LOCATION || env.WINDSOR_GBP_LOCATION || "locations/3129400474567791595",
+    },
+
+    reviews: {
+      watch: (env.BEWERTUNGEN_MELDEN || "on") !== "off",
+      // ab wie vielen Sternen automatisch geantwortet wird: 5, 4 oder aus
+      autoReplyMin: { aus: 99, off: 99, "4": 4, "5": 5 }[env.BEWERTUNG_AUTO_ANTWORT || "5"] ?? 5,
+    },
+
     sessionIdleHours: Number(env.SESSION_IDLE_HOURS || 12),
     sessionMaxMessages: Number(env.SESSION_MAX_MESSAGES || 80),
   };
