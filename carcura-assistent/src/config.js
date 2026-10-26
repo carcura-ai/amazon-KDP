@@ -12,11 +12,13 @@ export function normalizeNumber(raw) {
   return n;
 }
 
-// OWNERS="Alex:4917012345678,Richy:4915112345678"
+// OWNERS="Alex:4917012345678,Richy:4915112345678:Rich|Richy" – drittes Feld optional: Spitznamen für die Anrede
 function parseOwners(value) {
   return list(value).map((entry) => {
-    const [name, number] = entry.split(":");
-    return { name: name.trim(), number: normalizeNumber(number) };
+    const [name, number, nicks] = entry.split(":");
+    const n = (name || "").trim();
+    const spitznamen = (nicks || "").split("|").map((s) => s.trim()).filter(Boolean);
+    return { name: n, number: normalizeNumber(number), spitznamen: spitznamen.length ? spitznamen : [n] };
   }).filter((o) => o.name && o.number);
 }
 

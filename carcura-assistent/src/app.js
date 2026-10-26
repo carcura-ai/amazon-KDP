@@ -165,8 +165,13 @@ export class App {
       if (Date.now() - last < 2 * 60 * 60 * 1000) return;
       this.strangers.set(msg.from, Date.now());
       this.store.update("wa_contacts", [], (all) => [...all.slice(-999), { at: new Date().toISOString(), from: msg.from, name: profileName }]);
-      const text = `📲 Neue WhatsApp an die Firmennummer von *${who}*:\n„${preview}“\n\nAntwortet direkt in der WhatsApp-Business-App. Sagt mir kurz, wer's übernimmt – dann trag ich's als Anfrage ein.`;
-      await this.notifier.sendAll(text, `WhatsApp von ${profileName || "einem Kunden"}: ${preview.slice(0, 80)}`);
+      await this.tell({
+        task: `Ein Kunde (${who}) hat gerade per WhatsApp an die Firmennummer geschrieben. Sag in 1–2 Sätzen Bescheid und frag, wer übernimmt – ` +
+          `die Antwort an den Kunden kommt von euch direkt in der WhatsApp-Business-App, du trägst es danach als Anfrage ein, wenn gewünscht.`,
+        facts: `📲 *${who}*:\n„${preview}“`,
+        preview: `WhatsApp von ${profileName || "einem Kunden"}: ${preview.slice(0, 80)}`,
+        fallback: (o) => `Ey ${o.spitznamen[0]}, neue WhatsApp an die Firmennummer – wer übernimmt?`,
+      });
       return;
     }
 
@@ -212,43 +217,58 @@ export class App {
     };
     this.store.update("leads", [], (all) => [...all, lead]);
 
-    const text = await this.leadMessage(lead);
-    const preview = `Neue Anfrage ${lead.id}: ${lead.leistung || "Anfrage"} von ${lead.name || "Kunde"}`;
-    const delivered = await this.notifier.sendAll(text, preview);
+    const facts = leadFacts(lead);
+    const delivered = await this.tell({
+      task: `Neue Anfrage über die Website. 1–3 lockere Sätze: Gruß passend zur Tageszeit, vielleicht ein Halbsatz zum Wetter, ` +
+        `die Anfrage in einem Satz nennen, dann fragen, ob du per Mail nach einem Termin fragen sollst oder ob er bzw. der andere anruft – ` +
+        `und ob du den Termin einträgst, sobald Datum und Uhrzeit feststehen. Keine Kontaktdaten wiederholen, die folgen darunter.\n\n${facts}`,
+      facts,
+      preview: `Neue Anfrage ${lead.id}: ${lead.leistung || "Anfrage"} von ${lead.name || "Kunde"}`,
+      fallback: (o) => `Ey ${o.spitznamen[0]}, neue Anfrage: *${lead.leistung || "Anfrage"}*. Mail mit Terminfrage oder ruft ihr an?`,
+    });
     for (const owner of this.cfg.owners) {
       this.notifier.addEvent(owner.number, `Neue Website-Anfrage ${lead.id} wurde euch gemeldet: ${lead.leistung} – ${lead.name}, ${lead.fahrzeug}. Status: neu.`);
     }
     return { status: 200, body: { ok: true, id: lead.id, delivered } };
   }
 
-  async leadMessage(lead) {
-    const facts = [
-      `Anfrage ${lead.id} (${lead.kundentyp})`,
-      `Leistung: ${lead.leistung || "–"}`,
-      `Name: ${lead.name || "–"}`,
-      `Fahrzeug: ${lead.fahrzeug || "–"}`,
-      `Telefon: ${lead.telefon || "–"}`,
-      `E-Mail: ${lead.email || "–"}`,
-      lead.nachricht ? `Details:\n${lead.nachricht}` : "",
-    ].filter(Boolean).join("\n");
-
-    let intro = "";
+  // Schickt jedem Inhaber eine eigene, frisch formulierte Nachricht. Feste Fakten (Kontaktdaten,
+  // Bewertungstext, IDs) stehen unverändert darunter, damit die KI daran nichts verdreht.
+  async tell({ task, facts = "", preview, fallback, maxTokens }) {
+    let weather = "";
     try {
-      const weather = await weatherText(this.cfg.weather, this.fetchImpl);
-      intro = await this.agent.write(
-        `[Kontext: ${dateTimeText(this.cfg.timezone)}${weather ? ` · Wetter ${weather}` : ""}]\n` +
-        `Schreib Alex und Richy 1–3 lockere Sätze für WhatsApp zu dieser neuen Anfrage: kurzer Gruß passend zur Tageszeit, ` +
-        `vielleicht ein Satz zum Wetter, dann die Anfrage in einem Satz nennen und fragen, ob du per Mail nach einem Termin fragen sollst ` +
-        `oder ob einer von ihnen anruft – und ob du den Termin eintragen sollst, sobald sie Datum und Uhrzeit nennen. ` +
-        `Keine Kontaktdaten wiederholen, die folgen darunter.\n\n${facts}`,
-      );
-    } catch (err) {
-      this.log.error("[lead] Formulierung fehlgeschlagen:", err.message);
+      weather = await weatherText(this.cfg.weather, this.fetchImpl);
+    } catch {
+      weather = "";
     }
-    if (!intro) {
-      intro = `Ey Jungs, neue Anfrage reingekommen: *${lead.leistung || "Anfrage"}*. Soll ich per Mail nach einem Termin fragen oder ruft einer von euch an?`;
+    const context = `[Kontext: ${dateTimeText(this.cfg.timezone)}${weather ? ` · Wetter ${weather}` : ""}]`;
+    const results = {};
+    for (const owner of this.cfg.owners) {
+      const other = this.cfg.owners.filter((o) => o.number !== owner.number).map((o) => o.name).join(" und ") || "niemand";
+      const recent = this.store.get(`openers-${owner.number}`, []);
+      let intro = "";
+      try {
+        intro = await this.agent.write(
+          `${context}\nDu schreibst jetzt NUR an ${owner.name} (der andere Inhaber ist ${other}). ` +
+          `Sprich ihn direkt an, z. B. mit ${owner.spitznamen.join(" oder ")} – Anrede, Einstieg und Satzbau jedes Mal anders, wie ein Kumpel, nicht wie eine Vorlage. ` +
+          (recent.length ? `So hast du zuletzt angefangen, das NICHT wiederholen: ${recent.map((r) => `"${r}"`).join(", ")}. ` : "") +
+          `Gib nur die Nachricht aus.\n\n${task}`,
+          maxTokens,
+        );
+      } catch (err) {
+        this.log.error("[tell] Formulierung fehlgeschlagen:", err.message);
+      }
+      if (!intro) intro = fallback(owner);
+      this.store.set(`openers-${owner.number}`, [...recent, intro.slice(0, 45)].slice(-6));
+      const text = facts ? `${intro}\n\n${facts}` : intro;
+      try {
+        results[owner.name] = await this.notifier.send(owner, text, preview);
+      } catch (err) {
+        results[owner.name] = `fehler: ${err.message}`;
+        this.log.error(`[tell] an ${owner.name} fehlgeschlagen:`, err.message);
+      }
     }
-    return `${intro}\n\n${facts}`;
+    return results;
   }
 
   // ---------- Auswertungen ----------
@@ -263,7 +283,12 @@ export class App {
     }
     const text = clean(p.text, 12000);
     if (!text) return { status: 400, body: { ok: false, error: "text fehlt" } };
-    const delivered = await this.notifier.sendAll(text, p.preview || "Die Wochenauswertung ist da");
+    const delivered = await this.tell({
+      task: `Eine fertige Auswertung ist reingekommen (steht darunter). Schreib nur einen kurzen, lockeren Einleitungssatz dazu, keine Zahlen wiederholen.`,
+      facts: text,
+      preview: p.preview || "Die Wochenauswertung ist da",
+      fallback: (o) => `Ey ${o.spitznamen[0]}, die Auswertung ist da:`,
+    });
     for (const owner of this.cfg.owners) {
       this.notifier.addEvent(owner.number, `Auswertung wurde geschickt: ${text.slice(0, 600)}`);
     }
@@ -289,33 +314,27 @@ export class App {
         this.log.error("[weekly] Zahlen:", err.message);
       }
     }
-    let text = "";
-    try {
-      text = await this.agent.write(
-        `Schreib Alex und Richy den Wochenbericht für WhatsApp (Montagmorgen), locker wie unter Kumpels, z. B. "Jo Jungs, jo Richy, jo Alex …". ` +
-        `Aufbau, jeweils kurz: 1) Werbung: was ausgegeben, Klicks und was dabei rauskam (echte Anfragen, WhatsApp-Kontakte), Vergleich zur Vorwoche. ` +
+    const daten = JSON.stringify({ eigene_anfragen: stats, whatsapp_kontakte: whatsapp, zahlen });
+    const ads = zahlen?.google_ads?.aktuell;
+    const web = zahlen?.website?.aktuell;
+    const fallbackBody = [
+      ads && !ads.fehler ? `• Google Ads: *${ads.ausgaben_eur} €* für ${ads.klicks} Klicks` : "",
+      web && !web.fehler ? `• Website: ${web.besuche} Besuche, ${web.anfragen_gesendet} Anfragen gesendet, ${web.fast_anfragen} fast` : "",
+      `• Anfragen: *${stats.neue_anfragen}* neu, WhatsApp-Kontakte: ${whatsapp.anzahl_kunden}`,
+      `• Offen: ${stats.noch_offen.map((l) => l.id).join(", ") || "nichts"}`,
+    ].filter(Boolean).join("\n");
+    await this.tell({
+      task: `Schreib ihm den Wochenbericht für WhatsApp (Montagmorgen), locker wie unter Kumpels. ` +
+        `Aufbau, jeweils kurz: 1) Werbung: was ausgegeben (Google, ggf. Meta), Klicks und was dabei rauskam (echte Anfragen, WhatsApp-Kontakte), Vergleich zur Vorwoche. ` +
         `2) Website: Besucher und woher, gesendete Anfragen, fast gesendete Anfragen, WhatsApp- und Anruf-Klicks. ` +
         `3) Google-Profil: Aufrufe, Anrufe, Routen. 4) Neue Bewertungen und Schnitt. 5) Offene Anfragen mit ID. ` +
         `6) Ein konkreter Vorschlag für diese Woche, der sich direkt aus den Zahlen ergibt. ` +
         `Nur diese Zahlen verwenden, nichts erfinden oder hochrechnen. Fehlt eine Quelle (Feld fehler oder null), sag das in einem Halbsatz. ` +
-        `Kernzahlen *fett*, Aufzählungen mit •, höchstens etwa 25 Zeilen.\n\n` +
-        JSON.stringify({ eigene_anfragen: stats, whatsapp_kontakte: whatsapp, zahlen }),
-      );
-    } catch (err) {
-      this.log.error("[weekly]", err.message);
-    }
-    if (!text) {
-      const ads = zahlen?.google_ads?.aktuell;
-      const web = zahlen?.website?.aktuell;
-      text = [
-        `Jo Jungs, Wochenrückblick 📊`,
-        ads && !ads.fehler ? `• Google Ads: *${ads.ausgaben_eur} €* für ${ads.klicks} Klicks` : "",
-        web && !web.fehler ? `• Website: ${web.besuche} Besuche, ${web.anfragen_gesendet} Anfragen gesendet, ${web.fast_anfragen} fast` : "",
-        `• Anfragen: *${stats.neue_anfragen}* neu, WhatsApp-Kontakte: ${whatsapp.anzahl_kunden}`,
-        `• Offen: ${stats.noch_offen.map((l) => l.id).join(", ") || "nichts"}`,
-      ].filter(Boolean).join("\n");
-    }
-    await this.notifier.sendAll(text, `Wochenrückblick: ${stats.neue_anfragen} neue Anfragen`);
+        `Kernzahlen *fett*, Aufzählungen mit •, höchstens etwa 25 Zeilen.\n\n${daten}`,
+      preview: `Wochenrückblick: ${stats.neue_anfragen} neue Anfragen`,
+      fallback: (o) => `Jo ${o.spitznamen[0]}, Wochenrückblick 📊\n${fallbackBody}`,
+      maxTokens: 6000,
+    });
     return true;
   }
 
@@ -377,7 +396,13 @@ export class App {
         event = `Neue Bewertung von ${r.name} (${stars}/5): "${r.text.slice(0, 300)}" – noch ohne Antwort.`;
       }
     }
-    await this.notifier.sendAll(`${head}\n\n${body}`, `Neue ${stars}-Sterne-Bewertung von ${r.name}`);
+    await this.tell({
+      task: `Neue Google-Bewertung (${stars}/5 von ${r.name}). Sag in 1–2 lockeren Sätzen Bescheid` +
+        (stars >= 4 ? `, gern mit kurzer Freude darüber.` : `, sachlich und ohne Panik.`) + ` Was mit der Antwort passiert ist, steht darunter – nicht wiederholen.`,
+      facts: `${head}\n\n${body}`,
+      preview: `Neue ${stars}-Sterne-Bewertung von ${r.name}`,
+      fallback: (o) => `Ey ${o.spitznamen[0]}, neue Bewertung!`,
+    });
     for (const owner of this.cfg.owners) this.notifier.addEvent(owner.number, event);
   }
 
@@ -399,6 +424,18 @@ export class App {
     if (r.sterne >= 4) return `Vielen Dank, ${vorname}! Schön, dass du zufrieden bist – bis zum nächsten Mal in Walterschen.\n\nDein Carcura-Team`;
     return "";
   }
+}
+
+function leadFacts(lead) {
+  return [
+    `Anfrage ${lead.id} (${lead.kundentyp})`,
+    `Leistung: ${lead.leistung || "–"}`,
+    `Name: ${lead.name || "–"}`,
+    `Fahrzeug: ${lead.fahrzeug || "–"}`,
+    `Telefon: ${lead.telefon || "–"}`,
+    `E-Mail: ${lead.email || "–"}`,
+    lead.nachricht ? `Details:\n${lead.nachricht}` : "",
+  ].filter(Boolean).join("\n");
 }
 
 function customerPreview(msg) {

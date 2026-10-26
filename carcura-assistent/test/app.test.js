@@ -401,3 +401,19 @@ test("Wochenbericht nimmt Werbe- und Website-Zahlen mit", async () => {
   assert.match(JSON.stringify(calls[0].messages), /33\.69/);
   assert.equal(sent.length, 2);
 });
+
+test("Jeder Inhaber bekommt seine eigene, persönlich formulierte Nachricht", async () => {
+  const { app, sent, calls, cfg } = setup({ responses: [say("Ey Alex, Mahlzeit! Neue Anfrage für Keramik."), say("Moin Rich, guck mal, Keramik-Anfrage!")] });
+  cfg.owners[1].spitznamen = ["Rich", "Richy"];
+  for (const o of cfg.owners) app.store.update("owners", {}, (all) => ({ ...all, [o.number]: { lastInbound: Date.now(), pending: [], events: [] } }));
+  const body = Buffer.from(JSON.stringify({ name: "Max", email: "max@example.com", phone: "0170 1", service: "Keramikversiegelung", source: "anfrage_formular" }));
+  await app.receiveLead(body, { "x-carcura-secret": "leadsecret" });
+  assert.equal(sent.length, 2);
+  assert.match(sent.find((m) => m.to === ALEX).text, /^Ey Alex/);
+  assert.match(sent.find((m) => m.to === RICHY).text, /^Moin Rich/);
+  assert.ok(sent.every((m) => m.text.includes("max@example.com"))); // Fakten unverändert darunter
+  assert.match(JSON.stringify(calls[1].messages), /Rich oder Richy/);
+  // zweite Meldung: letzte Anrede wird als "nicht wiederholen" mitgegeben
+  await app.receiveLead(body, { "x-carcura-secret": "leadsecret" });
+  assert.match(JSON.stringify(calls[2].messages), /NICHT wiederholen.*Ey Alex/);
+});

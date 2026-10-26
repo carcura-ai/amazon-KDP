@@ -162,10 +162,10 @@ export class Agent {
   }
 
   // Einzelner Aufruf ohne Werkzeuge, z. B. für die lockere Formulierung einer Meldung.
-  async write(instruction) {
+  async write(instruction, maxTokens = 4000) {
     const response = await this.client.messages.create({
       model: this.cfg.anthropic.model,
-      max_tokens: 4000,
+      max_tokens: maxTokens,
       system: SYSTEM_PROMPT,
       output_config: { effort: "low" },
       messages: [{ role: "user", content: instruction }],
