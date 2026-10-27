@@ -2,12 +2,14 @@
 /**
  * Plugin Name: Carcura Mail-Relay
  * Description: Lässt den Carcura-Assistenten (Claude) E-Mails über euren normalen WordPress-Mailversand (FluentSMTP → carcura@web.de) verschicken. Nur für angemeldete Administratoren per Anwendungspasswort, mit Tageslimit und Protokoll.
- * Version: 1.0.0
+ * Version: 1.1.0
  * Author: Carcura GbR
  * Requires PHP: 7.4
  *
  * Endpunkt: POST /wp-json/carcura-mail/v1/send
- *   { "to": "kunde@example.com", "subject": "…", "text": "…", "reply_to": "carcura@web.de", "bcc_self": true }
+ *   { "to": "…", "subject": "…", "text": "Klartext", "html": "<optional>", "art": "kunde|b2b_einwilligung|intern",
+ *     "einwilligung": "bei b2b Pflicht: wer, wann, wie zugestimmt", "reply_to": "carcura@web.de", "bcc_self": true }
+ * Werbung an Firmen ohne vorherige Zustimmung (§ 7 Abs. 2 Nr. 2 UWG) lehnt der Endpunkt ab.
  * Protokoll: Werkzeuge → Carcura Mail-Relay
  */
 
@@ -31,6 +33,9 @@ add_action('rest_api_init', function () {
             'to'       => array('required' => true, 'type' => 'string'),
             'subject'  => array('required' => true, 'type' => 'string'),
             'text'     => array('required' => true, 'type' => 'string'),
+            'html'     => array('type' => 'string'),
+            'art'      => array('required' => true, 'type' => 'string', 'enum' => array('kunde', 'b2b_einwilligung', 'intern')),
+            'einwilligung' => array('type' => 'string'),
             'reply_to' => array('type' => 'string'),
             'bcc_self' => array('type' => 'boolean', 'default' => true),
         ),
@@ -63,6 +68,16 @@ function ccmr_send(WP_REST_Request $req) {
     $subject = trim(wp_strip_all_tags((string) $req->get_param('subject')));
     $text    = trim((string) $req->get_param('text'));
     $reply   = sanitize_email((string) $req->get_param('reply_to'));
+    $html    = trim((string) $req->get_param('html'));
+    $art     = (string) $req->get_param('art');
+    $consent = trim(wp_strip_all_tags((string) $req->get_param('einwilligung')));
+
+    if ($art === 'b2b_einwilligung' && mb_strlen($consent) < 15) {
+        return new WP_Error('ccmr_consent', 'Firmen-Mail ohne dokumentierte Zustimmung abgelehnt (§ 7 UWG). Feld "einwilligung": wer hat wann wie zugestimmt?', array('status' => 422));
+    }
+    if ($html !== '' && mb_strlen($html) > 200000) {
+        return new WP_Error('ccmr_html', 'HTML zu groß.', array('status' => 400));
+    }
 
     if (!is_email($to)) {
         return new WP_Error('ccmr_to', 'Ungültige Empfängeradresse.', array('status' => 400));
@@ -79,7 +94,7 @@ function ccmr_send(WP_REST_Request $req) {
     }
     update_option('ccmr_last', time(), false);
 
-    $headers = array('Content-Type: text/plain; charset=UTF-8');
+    $headers = array('Content-Type: ' . ($html !== '' ? 'text/html' : 'text/plain') . '; charset=UTF-8');
     $headers[] = 'Reply-To: Carcura <' . (is_email($reply) ? $reply : CCMR_SELF) . '>';
     if ($req->get_param('bcc_self') !== false && strtolower($to) !== CCMR_SELF) {
         $headers[] = 'Bcc: ' . CCMR_SELF;
@@ -89,9 +104,17 @@ function ccmr_send(WP_REST_Request $req) {
     $catch = function ($e) use (&$error) {
         $error = $e->get_error_message();
     };
+    // Bei HTML den Klartext als Alternative mitschicken (bessere Zustellbarkeit, lesbar ohne HTML).
+    $alt = function ($phpmailer) use ($text) {
+        $phpmailer->AltBody = $text;
+    };
+    if ($html !== '') {
+        add_action('phpmailer_init', $alt);
+    }
     add_action('wp_mail_failed', $catch);
-    $ok = wp_mail($to, $subject, $text, $headers);
+    $ok = wp_mail($to, $subject, $html !== '' ? $html : $text, $headers);
     remove_action('wp_mail_failed', $catch);
+    remove_action('phpmailer_init', $alt);
 
     $log = get_option(CCMR_LOG, array());
     if (!is_array($log)) {
@@ -104,6 +127,9 @@ function ccmr_send(WP_REST_Request $req) {
         'subject' => $subject,
         'ok'      => (bool) $ok,
         'error'   => $error,
+        'art'     => $art,
+        'consent' => $consent,
+        'html'    => $html !== '',
         'user'    => wp_get_current_user()->user_login,
     ));
     update_option(CCMR_LOG, array_slice($log, 0, 300), false);
@@ -124,9 +150,9 @@ add_action('admin_menu', function () {
             echo '<p>Noch keine Mails.</p></div>';
             return;
         }
-        echo '<table class="widefat striped" style="max-width:1000px"><thead><tr><th>Zeit</th><th>An</th><th>Betreff</th><th>Ergebnis</th><th>Von</th></tr></thead><tbody>';
+        echo '<table class="widefat striped" style="max-width:1000px"><thead><tr><th>Zeit</th><th>An</th><th>Betreff</th><th>Art</th><th>Zustimmung</th><th>Ergebnis</th><th>Von</th></tr></thead><tbody>';
         foreach ($log as $r) {
-            echo '<tr><td>' . esc_html($r['time']) . '</td><td>' . esc_html($r['to']) . '</td><td>' . esc_html($r['subject']) . '</td><td>' . ($r['ok'] ? '✅' : '❌ ' . esc_html($r['error'])) . '</td><td>' . esc_html($r['user']) . '</td></tr>';
+            echo '<tr><td>' . esc_html($r['time']) . '</td><td>' . esc_html($r['to']) . '</td><td>' . esc_html($r['subject']) . '</td><td>' . esc_html(isset($r['art']) ? $r['art'] : '') . '</td><td>' . esc_html(isset($r['consent']) ? $r['consent'] : '') . '</td><td>' . ($r['ok'] ? '✅' : '❌ ' . esc_html($r['error'])) . '</td><td>' . esc_html($r['user']) . '</td></tr>';
         }
         echo '</tbody></table></div>';
     });
