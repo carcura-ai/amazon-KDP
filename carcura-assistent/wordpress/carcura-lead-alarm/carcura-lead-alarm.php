@@ -2,11 +2,12 @@
 /**
  * Plugin Name: Carcura Lead-Alarm
  * Description: Schickt jede neue Website-Anfrage sofort in eure Telegram-Gruppe (Alex + Richy), mit allen Kundendaten, gewählten Leistungen, Richtwert und WhatsApp-Knopf. Optional zusätzlich per E-Mail. Unabhängig davon, was das Revenue-Plugin speichert.
- * Version: 1.0.0
+ * Version: 1.1.0
  * Author: Carcura GbR
  * Requires PHP: 7.4
  *
  * Einrichtung: Werkzeuge → Carcura Lead-Alarm.
+ * Ab 1.1: zählt Klicks auf die WhatsApp-Knöpfe der Website (anonym, ohne IP oder Cookie) – pro Leistung und Seite.
  */
 
 if (!defined('ABSPATH')) {
@@ -23,6 +24,7 @@ function ccla_settings() {
         'token'   => '',
         'chat_id' => '',
         'emails'  => '',
+        'wa_ping' => 0,
     ));
 }
 
@@ -294,6 +296,97 @@ function ccla_log($channel, $result, array $lead) {
 }
 
 /* ---------------------------------------------------------------------
+ * 2b. WhatsApp-Klicks zählen (anonym: nur Tag, Leistung, Seite – keine IP, kein Cookie)
+ * ------------------------------------------------------------------- */
+
+const CCLA_WA = 'ccla_wa_clicks';
+
+add_action('rest_api_init', function () {
+    register_rest_route('carcura-lead-alarm/v1', '/wa-klick', array(
+        'methods'             => 'POST',
+        'permission_callback' => '__return_true',
+        'callback'            => 'ccla_wa_track',
+    ));
+    register_rest_route('carcura-lead-alarm/v1', '/wa-klicks', array(
+        'methods'             => 'GET',
+        'permission_callback' => function () {
+            return current_user_can('manage_options');
+        },
+        'callback'            => function (WP_REST_Request $req) {
+            $tage = max(1, min(120, (int) ($req->get_param('tage') ?: 7)));
+            return ccla_wa_summary($tage);
+        },
+    ));
+});
+
+function ccla_wa_track(WP_REST_Request $req) {
+    // Nur Klicks von der eigenen Website annehmen.
+    $origin = (string) $req->get_header('origin');
+    $ref    = (string) $req->get_header('referer');
+    $host   = wp_parse_url(home_url(), PHP_URL_HOST);
+    $from   = wp_parse_url($origin !== '' ? $origin : $ref, PHP_URL_HOST);
+    if (!$from || strtolower($from) !== strtolower($host)) {
+        return new WP_REST_Response(array('ok' => false), 403);
+    }
+    // Grober Schutz gegen Massenaufrufe: höchstens 30 Klicks pro Stunde und Absender (Kennung nur 1 h im Zwischenspeicher).
+    $ip  = isset($_SERVER['REMOTE_ADDR']) ? (string) $_SERVER['REMOTE_ADDR'] : '';
+    $key = 'ccla_wa_' . substr(hash('sha256', $ip . wp_salt('nonce') . gmdate('YmdH')), 0, 20);
+    $n   = (int) get_transient($key);
+    if ($n >= 30) {
+        return new WP_REST_Response(array('ok' => false), 429);
+    }
+    set_transient($key, $n + 1, HOUR_IN_SECONDS);
+
+    $p       = $req->get_json_params();
+    $p       = is_array($p) ? $p : $req->get_params();
+    $service = mb_substr(trim(wp_strip_all_tags((string) ($p['s'] ?? ''))), 0, 80);
+    $page    = mb_substr(trim(wp_strip_all_tags((string) ($p['p'] ?? ''))), 0, 80);
+    $where   = mb_substr(trim(wp_strip_all_tags((string) ($p['l'] ?? ''))), 0, 40);
+    $service = $service !== '' ? $service : 'allgemein';
+    $page    = preg_replace('~[^a-z0-9/_-]~i', '', $page) ?: '/';
+
+    $data = get_option(CCLA_WA, array());
+    $data = is_array($data) ? $data : array();
+    $day  = wp_date('Y-m-d');
+    $k    = $service . '|' . $page . '|' . $where;
+    $data[$day][$k] = (int) ($data[$day][$k] ?? 0) + 1;
+    // nur 120 Tage aufbewahren
+    ksort($data);
+    while (count($data) > 120) {
+        array_shift($data);
+    }
+    update_option(CCLA_WA, $data, false);
+
+    $s = ccla_settings();
+    if (!empty($s['wa_ping']) && $s['token'] !== '' && $s['chat_id'] !== '') {
+        ccla_telegram_send($s['token'], $s['chat_id'], '👆 WhatsApp-Klick: <b>' . ccla_h($service) . '</b> auf ' . ccla_h($page) . ' – kommt gleich eine Nachricht?');
+    }
+    return array('ok' => true);
+}
+
+function ccla_wa_summary($tage) {
+    $data  = get_option(CCLA_WA, array());
+    $since = wp_date('Y-m-d', time() - ($tage - 1) * DAY_IN_SECONDS);
+    $by    = array();
+    $pages = array();
+    $total = 0;
+    foreach ((array) $data as $day => $rows) {
+        if ($day < $since) {
+            continue;
+        }
+        foreach ((array) $rows as $k => $n) {
+            list($service, $page) = array_pad(explode('|', $k), 2, '');
+            $by[$service]  = ($by[$service] ?? 0) + (int) $n;
+            $pages[$page]  = ($pages[$page] ?? 0) + (int) $n;
+            $total        += (int) $n;
+        }
+    }
+    arsort($by);
+    arsort($pages);
+    return array('tage' => $tage, 'gesamt' => $total, 'nach_leistung' => $by, 'nach_seite' => $pages);
+}
+
+/* ---------------------------------------------------------------------
  * 3. Einstellungsseite: Werkzeuge → Carcura Lead-Alarm
  * ------------------------------------------------------------------- */
 
@@ -319,6 +412,7 @@ function ccla_admin_page() {
         $s['token']   = isset($_POST['token']) ? trim(sanitize_text_field(wp_unslash($_POST['token']))) : $s['token'];
         $s['chat_id'] = isset($_POST['chat_id']) ? trim(sanitize_text_field(wp_unslash($_POST['chat_id']))) : $s['chat_id'];
         $s['emails']  = isset($_POST['emails']) ? implode(', ', ccla_email_list(wp_unslash($_POST['emails']))) : $s['emails'];
+        $s['wa_ping'] = ($action === 'save' || $action === '') ? (empty($_POST['wa_ping']) ? 0 : 1) : $s['wa_ping'];
         update_option(CCLA_OPTION, $s, false);
         $notice = 'Gespeichert.';
 
@@ -379,6 +473,11 @@ function ccla_admin_page() {
                     <td><input name="emails" id="ccla_emails" type="text" class="regular-text" value="<?php echo esc_attr($s['emails']); ?>">
                         <p class="description">Optional, mehrere mit Komma trennen. Läuft über euer FluentSMTP.</p></td>
                 </tr>
+                <tr>
+                    <th scope="row">WhatsApp-Klicks</th>
+                    <td><label><input name="wa_ping" type="checkbox" value="1" <?php checked(!empty($s['wa_ping'])); ?>> Jeden Klick auf einen WhatsApp-Knopf sofort in Telegram melden</label>
+                        <p class="description">Gezählt wird immer (unten in der Tabelle). Die Sofortmeldung hilft, Klick und eingehende Nachricht zuzuordnen.</p></td>
+                </tr>
             </table>
             <p>
                 <button class="button button-primary" name="ccla_action" value="save">Speichern</button>
@@ -398,6 +497,22 @@ function ccla_admin_page() {
                 </tbody>
             </table>
         <?php endif; ?>
+
+        <h2>WhatsApp-Klicks auf der Website</h2>
+        <p>Wie oft jemand auf einen WhatsApp-Knopf getippt hat. Vergleicht das mit den Chats, die mit „Hallo Carcura, ich habe Interesse an …“ beginnen – die Differenz sind Leute, die WhatsApp geöffnet, aber nicht geschrieben haben.</p>
+        <?php $w7 = ccla_wa_summary(7); $w30 = ccla_wa_summary(30); ?>
+        <table class="widefat striped" style="max-width:700px">
+            <thead><tr><th>Leistung</th><th>7 Tage</th><th>30 Tage</th></tr></thead>
+            <tbody>
+            <?php if (!$w30['nach_leistung']) : ?>
+                <tr><td colspan="3">Noch keine Klicks.</td></tr>
+            <?php endif; ?>
+            <?php foreach ($w30['nach_leistung'] as $name => $n) : ?>
+                <tr><td><?php echo esc_html($name); ?></td><td><?php echo esc_html((string) ($w7['nach_leistung'][$name] ?? 0)); ?></td><td><?php echo esc_html((string) $n); ?></td></tr>
+            <?php endforeach; ?>
+            </tbody>
+            <tfoot><tr><th>Gesamt</th><th><?php echo esc_html((string) $w7['gesamt']); ?></th><th><?php echo esc_html((string) $w30['gesamt']); ?></th></tr></tfoot>
+        </table>
 
         <h2>Letzte Zustellungen</h2>
         <?php if (!$log) : ?>

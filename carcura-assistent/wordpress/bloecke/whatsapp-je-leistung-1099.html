@@ -1,0 +1,119 @@
+<!-- wp:html -->
+<!-- CARCURA · WHATSAPP JE LEISTUNG · v1.0 (28.10.2026) · Skript ohne Und-Zeichen (WordPress wandelt sie im Block um) · Setzt neben jede Leistung einen WhatsApp-Knopf mit vorausgefülltem Text und zählt jeden WhatsApp-Klick (GA4-Ereignis cc_whatsapp_klick + anonymer Zähler im Lead-Alarm-Plugin ab v1.1). -->
+<style>
+.cc-wa-mini{display:inline-flex;align-items:center;justify-content:center;gap:7px;min-height:40px;padding:8px 14px;border-radius:999px;border:1px solid rgba(37,211,102,.6);background:rgba(37,211,102,.12);color:#fff!important;-webkit-text-fill-color:#fff!important;font:700 13px/1.2 Poppins,Inter,system-ui,sans-serif!important;letter-spacing:0!important;text-transform:none!important;text-decoration:none!important;white-space:nowrap;transition:background .2s,color .2s,transform .2s;box-sizing:border-box}
+.cc-wa-mini:hover{background:#25d366;color:#07140c!important;-webkit-text-fill-color:#07140c!important;transform:translateY(-1px)}
+.cc-wa-mini:focus-visible{outline:2px solid #fff;outline-offset:2px}
+.cc-wa-mini svg{width:18px;height:18px;flex:0 0 auto}
+.cc-wa-col{display:flex!important;flex-direction:column;align-items:flex-end;gap:8px}
+.cc-wa-acts{display:flex;flex-wrap:wrap;gap:8px;justify-content:flex-end;align-items:center}
+.cc-wa-line{margin:10px 0 0}
+.cc-wa-line .cc-wa-mini{min-height:36px;font-size:12.5px!important}
+@media (max-width:680px){.cc-lp__row .cc-wa-acts{grid-column:1/-1;justify-content:flex-start}.cc-wa-col{align-items:stretch}}
+</style>
+<script>
+(function () {
+  if (window.__ccWaSvc) { return; }
+  window.__ccWaSvc = true;
+  var NR = "491706669516";
+  var path = location.pathname;
+  var PAGE = [["keramik", "Keramikversiegelung"], ["innenreinigung", "Auto-Innenreinigung"], ["scheinwerfer", "Scheinwerfer-Aufbereitung"], ["hol-und-bring", "Hol- und Bringservice"]];
+  var pageSvc = "";
+  for (var i = 0; i < PAGE.length; i++) { if (path.indexOf(PAGE[i][0]) !== -1) { pageSvc = PAGE[i][1]; } }
+  var ICON = '<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="#25d366" d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2Z"/><path fill="#fff" d="M17.2 14.4c-.3-.1-1.7-.8-1.9-.9-.3-.1-.5-.1-.7.1l-.9 1.1c-.2.2-.3.2-.6.1a7.6 7.6 0 0 1-3.8-3.3c-.3-.5.3-.5.8-1.6.1-.2 0-.4 0-.5l-.9-2c-.2-.5-.5-.5-.7-.5h-.6c-.2 0-.5.1-.8.4-.3.3-1 1-1 2.4s1 2.8 1.2 3c.1.2 2 3.1 4.9 4.3 1.8.8 2.5.8 3.4.7.6-.1 1.7-.7 1.9-1.4.2-.7.2-1.2.2-1.4-.1-.2-.3-.3-.5-.4Z"/></svg>';
+
+  function clean(t) { return String(t || "").replace(/\s+/g, " ").trim(); }
+  function priceOf(el) {
+    if (!el) { return ""; }
+    var m = clean(el.textContent).match(/ab\s*[0-9.]+(,[0-9]+)?\s*€/i);
+    return m ? m[0].replace(/^ab\s*/i, "ab ").replace(/\s*€$/, " €") : "";
+  }
+  function nameFrom(el) {
+    if (!el) { return ""; }
+    var c = el.cloneNode(true);
+    var x = c.querySelectorAll("span, em, small, i");
+    for (var j = 0; j < x.length; j++) { x[j].parentNode.removeChild(x[j]); }
+    return clean(c.textContent);
+  }
+  function waText(svc, price) {
+    if (!svc) { return "Hallo Carcura, ich hätte gern ein Angebot für mein Auto.\nMein Auto: "; }
+    return "Hallo Carcura, ich habe Interesse an: " + svc + (price ? " (" + price + ")" : "") + ".\nMein Auto: ";
+  }
+  function waHref(svc, price) { return "https://wa.me/" + NR + "?text=" + encodeURIComponent(waText(svc, price)); }
+  function button(svc, price, where, label) {
+    var a = document.createElement("a");
+    a.className = "cc-wa-mini";
+    a.href = waHref(svc, price);
+    a.target = "_blank";
+    a.rel = "noopener";
+    a.setAttribute("data-wa-service", svc);
+    a.setAttribute("data-wa-where", where);
+    a.setAttribute("aria-label", svc + " per WhatsApp anfragen");
+    a.innerHTML = ICON + "<span>" + (label || "WhatsApp") + "</span>";
+    return a;
+  }
+
+  // 1. Leistungen-Seite: Preis-Spalte jeder Leistung
+  var sv = document.querySelectorAll(".cc-sv__item");
+  for (var a1 = 0; a1 < sv.length; a1++) {
+    var col = sv[a1].querySelector(".cc-sv__pricecol");
+    var n1 = nameFrom(sv[a1].querySelector("b"));
+    if (!col || !n1 || col.querySelector(".cc-wa-mini")) { continue; }
+    col.classList.add("cc-wa-col");
+    col.appendChild(button(n1, priceOf(col), "leistungen-liste"));
+  }
+  // 2. Leistungsseiten: Preiszeilen
+  var rows = document.querySelectorAll(".cc-lp__row");
+  for (var a2 = 0; a2 < rows.length; a2++) {
+    var r = rows[a2];
+    var n2 = nameFrom(r.querySelector("b"));
+    var link = null;
+    for (var c2 = 0; c2 < r.children.length; c2++) { if (r.children[c2].tagName === "A") { link = r.children[c2]; } }
+    if (!n2 || !link) { continue; }
+    var wrap = document.createElement("div");
+    wrap.className = "cc-wa-acts";
+    r.insertBefore(wrap, link);
+    wrap.appendChild(link);
+    wrap.appendChild(button(n2, priceOf(r.querySelector(".cc-lp__row-p")), "preiszeile"));
+  }
+  // 3. Anfrage-Seite: unter jeder Leistung
+  var rq = document.querySelectorAll(".cc-rq__item");
+  for (var a3 = 0; a3 < rq.length; a3++) {
+    var inp = rq[a3].querySelector("input[name='leistung']");
+    var lab = rq[a3].querySelector("label");
+    if (!inp || !lab || rq[a3].querySelector(".cc-wa-line")) { continue; }
+    var line = document.createElement("div");
+    line.className = "cc-wa-line";
+    line.appendChild(button(clean(inp.value), priceOf(rq[a3].querySelector(".cc-rq__price")), "anfrage-liste", "Direkt per WhatsApp fragen"));
+    lab.parentNode.insertBefore(line, lab.nextSibling);
+  }
+  // 4. Allgemeine WhatsApp-Knöpfe auf Leistungsseiten bekommen den Text der Seite
+  if (pageSvc) {
+    var gen = document.querySelectorAll("a[href*='wa.me/" + NR + "']");
+    for (var a4 = 0; a4 < gen.length; a4++) {
+      if (gen[a4].getAttribute("data-wa-service")) { continue; }
+      gen[a4].href = waHref(pageSvc, "");
+      gen[a4].setAttribute("data-wa-service", pageSvc);
+    }
+  }
+  // 5. Jeden Klick auf einen WhatsApp-Knopf zählen
+  document.addEventListener("click", function (ev) {
+    var t = ev.target;
+    var el = t ? (t.closest ? t.closest("a[href*='wa.me/']") : null) : null;
+    if (!el) { return; }
+    var svc = el.getAttribute("data-wa-service") || pageSvc || "allgemein";
+    var where = el.getAttribute("data-wa-where") || el.getAttribute("data-cc-location") || String(el.className || "link").split(" ")[0];
+    try {
+      if (typeof window.gtag === "function") { window.gtag("event", "cc_whatsapp_klick", { cc_service: svc, cc_page: path, cc_location: where }); }
+      else { (window.dataLayer = window.dataLayer || []).push({ event: "cc_whatsapp_klick", cc_service: svc, cc_page: path, cc_location: where }); }
+    } catch (e) {}
+    try {
+      var body = JSON.stringify({ s: svc, p: path, l: where });
+      var url = "/wp-json/carcura-lead-alarm/v1/wa-klick";
+      if (navigator.sendBeacon) { navigator.sendBeacon(url, new Blob([body], { type: "application/json" })); }
+      else { fetch(url, { method: "POST", keepalive: true, headers: { "Content-Type": "application/json" }, body: body }); }
+    } catch (e2) {}
+  }, true);
+})();
+</script>
+<!-- /wp:html -->

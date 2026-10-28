@@ -1,0 +1,139 @@
+<!-- wp:html -->
+<!-- CARCURA · SCHNELLANFRAGE · v1.3 (28.10.2026) · Skript ohne Und-Zeichen, weil WordPress sie im Block umwandelt · Wiederverwendbarer Block, steht am ENDE der Leistungsseiten; das Skript setzt ihn direkt unter den Hero (ohne JS bleibt er unten). Postet an /wp-json/ccrr/v1/lead (source: schnellanfrage). -->
+<style>
+.cc-qf,.cc-qf *{box-sizing:border-box}
+.cc-qf{--qf-bg:#0d0d0f;--qf-card:#17171a;--qf-ink:#ffffff;--qf-muted:#c5c8ce;--qf-acc:#e8f320;--qf-line:rgba(255,255,255,.16);background:var(--qf-bg);color:var(--qf-ink);font-family:Poppins,Inter,system-ui,-apple-system,"Segoe UI",sans-serif;padding:22px max(16px,env(safe-area-inset-left,0px));border-bottom:3px solid var(--qf-acc);position:relative;z-index:2;width:100vw!important;max-width:none!important;margin:0 0 0 calc(50% - 50vw)!important;border-top:1px solid rgba(255,255,255,.08)}
+.cc-qf.is-moved{width:auto!important;margin:0!important}
+.cc-qf .cc-qf__t{margin:0!important;font:700 clamp(19px,2vw,24px)/1.15 Poppins,Inter,system-ui,sans-serif!important;letter-spacing:-.01em!important;color:#fff!important;-webkit-text-fill-color:#fff!important;text-transform:none!important}
+.cc-qf .cc-qf__s{margin:6px 0 0!important;font-size:14px!important;line-height:1.45!important;color:#c5c8ce!important;-webkit-text-fill-color:#c5c8ce!important}
+.cc-qf .cc-qf__msg{margin:0!important}
+.cc-qf .cc-qf__in{text-align:left!important}
+.cc-qf .cc-qf__f input,.cc-qf .cc-qf__f select{background-color:#17171a!important;color:#fff!important;-webkit-text-fill-color:#fff!important;border:1px solid rgba(255,255,255,.16)!important;border-radius:10px!important;min-height:50px!important;height:auto!important;font:500 16px/1.2 Poppins,Inter,system-ui,sans-serif!important;padding:0 14px!important;margin:0!important;box-shadow:none!important;width:100%!important;text-align:left!important}
+.cc-qf .cc-qf__f select{padding-right:34px!important}
+.cc-qf .cc-qf__f input::placeholder{color:#8f939b!important;-webkit-text-fill-color:#8f939b!important;opacity:1}
+.cc-qf .cc-qf__f input:focus,.cc-qf .cc-qf__f select:focus{outline:2px solid #e8f320!important;outline-offset:1px;border-color:transparent!important}
+.cc-qf .cc-qf__btn{background:#e8f320!important;color:#0d0d0f!important;-webkit-text-fill-color:#0d0d0f!important;border:0!important;border-radius:10px!important;min-height:50px!important;font:700 16px/1.2 Poppins,Inter,system-ui,sans-serif!important;padding:0 22px!important;margin:0!important;box-shadow:none!important;text-transform:none!important;letter-spacing:normal!important}
+.cc-qf .cc-qf__row{text-align:left!important}
+.cc-qf__in{max-width:1180px;margin:0 auto;display:grid;grid-template-columns:minmax(0,.8fr) minmax(0,2fr);gap:18px 28px;align-items:center}
+.cc-qf__t{margin:0;font-size:clamp(19px,2vw,24px);line-height:1.15;font-weight:700;color:var(--qf-ink)}
+.cc-qf__s{margin:6px 0 0;font-size:14px;line-height:1.45;color:var(--qf-muted)}
+.cc-qf__f{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr) minmax(0,1fr) auto;gap:10px;margin:0}
+.cc-qf__f input,.cc-qf__f select{width:100%;min-height:50px;border-radius:10px;border:1px solid var(--qf-line);background:var(--qf-card);color:var(--qf-ink);font:500 16px/1.2 Poppins,Inter,system-ui,sans-serif;padding:0 14px;-webkit-appearance:none;appearance:none}
+.cc-qf__f select{background-image:linear-gradient(45deg,transparent 50%,#c5c8ce 50%),linear-gradient(135deg,#c5c8ce 50%,transparent 50%);background-position:calc(100% - 18px) 22px,calc(100% - 13px) 22px;background-size:5px 5px;background-repeat:no-repeat;padding-right:34px}
+.cc-qf__f select option{color:#0d0d0f;background:#fff}
+.cc-qf__f input::placeholder{color:#8f939b}
+.cc-qf__f input:focus,.cc-qf__f select:focus{outline:2px solid var(--qf-acc);outline-offset:1px;border-color:transparent}
+.cc-qf__btn{min-height:50px;border:0;border-radius:10px;background:var(--qf-acc);color:#0d0d0f;font:700 16px Poppins,Inter,system-ui,sans-serif;padding:0 22px;cursor:pointer;white-space:nowrap}
+.cc-qf__btn:focus-visible,.cc-qf__wa:focus-visible{outline:2px solid #fff;outline-offset:2px}
+.cc-qf__btn[disabled]{opacity:.7;cursor:wait}
+.cc-qf__row{grid-column:2;display:flex;flex-wrap:wrap;align-items:center;gap:8px 18px;font-size:13px;color:var(--qf-muted)}
+.cc-qf__wa{display:inline-flex;align-items:center;gap:8px;min-height:40px;padding:0 14px;border-radius:999px;border:1px solid var(--qf-line);color:var(--qf-ink)!important;text-decoration:none;font-weight:600;font-size:14px}
+.cc-qf__wa svg{width:18px;height:18px;flex:0 0 auto}
+.cc-qf__row a.cc-qf__ds{color:var(--qf-muted)!important;text-decoration:underline}
+.cc-qf__msg{grid-column:1/-1;margin:0;font-size:15px;line-height:1.45;min-height:0}
+.cc-qf__msg.is-ok{background:var(--qf-acc);color:#0d0d0f;border-radius:10px;padding:14px 16px;font-weight:600}
+.cc-qf__msg.is-err{color:#ffb4a0}
+.cc-qf__hp{position:absolute!important;left:-9999px!important;width:1px;height:1px;overflow:hidden}
+.cc-qf__sr{position:absolute!important;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+@media (max-width:900px){.cc-qf__in{grid-template-columns:1fr}.cc-qf__row{grid-column:1}.cc-qf__f{grid-template-columns:1fr 1fr}.cc-qf__f .cc-qf__btn{grid-column:1/-1}.cc-qf__f .cc-qf__name{grid-column:1/-1}}
+@media (max-width:420px){.cc-qf__f{grid-template-columns:1fr}.cc-qf__f .cc-qf__name{grid-column:auto}}
+</style>
+<section class="cc-qf" id="schnellanfrage" aria-labelledby="ccQfT">
+  <div class="cc-qf__in">
+    <div>
+      <h2 class="cc-qf__t" id="ccQfT">Schnell anfragen – wir rufen zurück</h2>
+      <p class="cc-qf__s">Name und Nummer reichen. Meist melden wir uns noch am selben Tag.</p>
+    </div>
+    <form class="cc-qf__f" id="ccQfForm" novalidate>
+      <label class="cc-qf__sr" for="ccQfName">Name</label>
+      <input class="cc-qf__name" id="ccQfName" name="name" type="text" autocomplete="name" placeholder="Dein Name" required>
+      <label class="cc-qf__sr" for="ccQfTel">Telefon oder WhatsApp</label>
+      <input id="ccQfTel" name="phone" type="tel" inputmode="tel" autocomplete="tel" placeholder="Telefon / WhatsApp" required>
+      <label class="cc-qf__sr" for="ccQfSvc">Leistung</label>
+      <select id="ccQfSvc" name="service">
+        <option>Innenreinigung</option>
+        <option>Basic Innen und Außen</option>
+        <option>Außenwäsche / Wachs</option>
+        <option>Politur</option>
+        <option>Keramikversiegelung</option>
+        <option>Scheinwerfer</option>
+        <option>Leasingrückgabe</option>
+        <option>Hol- und Bringservice</option>
+        <option>Etwas anderes</option>
+      </select>
+      <div class="cc-qf__hp" aria-hidden="true"><label for="ccQfWeb">Website</label><input id="ccQfWeb" name="website" type="text" tabindex="-1" autocomplete="off"></div>
+      <button class="cc-qf__btn" type="submit" id="ccQfBtn">Rückruf anfordern</button>
+      <p class="cc-qf__msg" id="ccQfMsg" role="status" aria-live="polite"></p>
+    </form>
+    <div class="cc-qf__row">
+      <a class="cc-qf__wa" href="https://wa.me/491706669516?text=Hi%20Carcura%2C%20ich%20h%C3%A4tte%20gern%20ein%20Angebot%20f%C3%BCr%20mein%20Auto." target="_blank" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="#25d366" d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2Z"/><path fill="#fff" d="M17.2 14.4c-.3-.1-1.7-.8-1.9-.9-.3-.1-.5-.1-.7.1l-.9 1.1c-.2.2-.3.2-.6.1a7.6 7.6 0 0 1-3.8-3.3c-.3-.5.3-.5.8-1.6.1-.2 0-.4 0-.5l-.9-2c-.2-.5-.5-.5-.7-.5h-.6c-.2 0-.5.1-.8.4-.3.3-1 1-1 2.4s1 2.8 1.2 3c.1.2 2 3.1 4.9 4.3 1.8.8 2.5.8 3.4.7.6-.1 1.7-.7 1.9-1.4.2-.7.2-1.2.2-1.4-.1-.2-.3-.3-.5-.4Z"/></svg>Lieber per WhatsApp</a>
+      <span>Mit dem Absenden nutzen wir deine Angaben nur für diese Anfrage. <a class="cc-qf__ds" href="/datenschutz/">Datenschutz</a></span>
+    </div>
+  </div>
+</section>
+<script>
+(function () {
+  var form = document.getElementById("ccQfForm");
+  if (!form || form.getAttribute("data-ready") === "1") { return; }
+  form.setAttribute("data-ready", "1");
+  window.__ccrrBridge = true;
+  var sec = document.getElementById("schnellanfrage");
+  var secs = document.querySelectorAll("[class*='__hero'], [class*='-hero'], .cc-hero");
+  if (!secs.length) { secs = document.querySelectorAll(".entry-content section, main section"); }
+  for (var k = 0; k < secs.length; k++) {
+    var s = secs[k];
+    if (s === sec || sec.contains(s) || s.contains(sec)) { continue; }
+    if (s.parentNode) { s.parentNode.insertBefore(sec, s.nextSibling); sec.classList.add("is-moved"); }
+    break;
+  }
+  var svc = document.getElementById("ccQfSvc"), btn = document.getElementById("ccQfBtn"), msg = document.getElementById("ccQfMsg");
+  var path = location.pathname;
+  var pre = [["keramik", "Keramikversiegelung"], ["scheinwerfer", "Scheinwerfer"], ["innenreinigung", "Innenreinigung"], ["hol-und-bring", "Hol- und Bringservice"], ["politur", "Politur"]];
+  for (var i = 0; i < pre.length; i++) { if (path.indexOf(pre[i][0]) !== -1) { svc.value = pre[i][1]; } }
+  if (path.indexOf("westerwald") !== -1 || path.indexOf("leistungen") !== -1 || path.indexOf("anfragen") !== -1) { svc.value = "Basic Innen und Außen"; }
+  function track(name, params) {
+    try {
+      if (typeof window.gtag === "function") { window.gtag("event", name, params); }
+      else { (window.dataLayer = window.dataLayer || []).push({ event: name, cc_page: params.cc_page, cc_form: params.cc_form }); }
+    } catch (e) {}
+  }
+  function gclid() {
+    try { var d = JSON.parse(localStorage.getItem("ccrr_gclid") || "null"); if (!d) { return ""; } return d.v ? String(d.v) : ""; } catch (e) { return ""; }
+  }
+  var started = false;
+  form.addEventListener("input", function () { if (!started) { started = true; track("cc_schnell_start", { cc_page: path, cc_form: "schnell" }); } });
+  form.addEventListener("submit", function (ev) {
+    ev.preventDefault();
+    var name = document.getElementById("ccQfName").value.trim();
+    var tel = document.getElementById("ccQfTel").value.trim();
+    msg.className = "cc-qf__msg"; msg.textContent = "";
+    if (!name) { msg.className = "cc-qf__msg is-err"; msg.textContent = "Bitte gib deinen Namen ein."; document.getElementById("ccQfName").focus(); return; }
+    if (tel.replace(/[^0-9]/g, "").length < 6) { msg.className = "cc-qf__msg is-err"; msg.textContent = "Bitte gib eine Telefon- oder WhatsApp-Nummer ein."; document.getElementById("ccQfTel").focus(); return; }
+    btn.disabled = true; btn.textContent = "Wird gesendet …";
+    var payload = {
+      name: name, phone: tel, email: "", vehicle: "", service: svc.value,
+      message: "Rückruf gewünscht (Schnellanfrage auf " + path + ") · Leistung: " + svc.value,
+      customer_type: "privat", source: "schnellanfrage", channel: "web", gclid: gclid(),
+      website: document.getElementById("ccQfWeb").value
+    };
+    fetch("/wp-json/ccrr/v1/lead", { method: "POST", credentials: "same-origin", headers: { "Content-Type": "application/json", "Accept": "application/json" }, body: JSON.stringify(payload) })
+      .then(function (r) { if (!r.ok) { throw new Error("http"); } return r.json().catch(function () { return {}; }); })
+      .then(function (d) {
+        if (d) { if (d.ok === false) { throw new Error("rejected"); } }
+        track("cc_anfrage", { cc_page: path, cc_form: "schnell", cc_services: svc.value });
+        form.reset(); svc.value = payload.service;
+        msg.className = "cc-qf__msg is-ok";
+        msg.textContent = "Danke, " + name.split(" ")[0] + "! Deine Anfrage ist da. Wir rufen dich zurück, meist noch heute.";
+        btn.textContent = "Gesendet ✓";
+      })
+      .catch(function () {
+        track("cc_anfrage_fehler", { cc_page: path, cc_form: "schnell" });
+        msg.className = "cc-qf__msg is-err";
+        msg.innerHTML = 'Das hat gerade nicht geklappt. Ruf uns direkt an: <a href="tel:+491706669516" style="color:#fff">0170 6669516</a> oder schreib per WhatsApp.';
+        btn.disabled = false; btn.textContent = "Rückruf anfordern";
+      });
+  });
+})();
+</script>
+
+<!-- /wp:html -->
