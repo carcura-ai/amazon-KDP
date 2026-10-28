@@ -303,3 +303,22 @@ Emoji-Testdaten = Fehlalarm), ui-ux-pro-max WARN (atomares Schreiben = unbedenkl
 Die Klone liegen außerhalb des Projekts im Scratchpad dieser Sitzung und wurden
 nicht ins Repository übernommen. Sie verfallen mit dem Container. Die Prüfung ist
 über die oben genannten Commit-Hashes jederzeit reproduzierbar.
+
+---
+
+## pipes-bot/claude-plugins (WhatsApp-Kanal über PipesBot) – Prüfung 28.10.2026
+
+**Quelle:** https://github.com/pipes-bot/claude-plugins · Commit `a47a159` (2026-07-21) · Lizenz MIT · 8 Commits, ein Autor, Version 0.0.x („experimentell“)
+**Geprüft:** alle 11 Dateien vollständig gelesen (`server.ts` 635 Zeilen, `.mcp.json`, `package.json`, Skill `configure`, Marketplace-Dateien). `skill_security_auditor.py`: WARN (nur Strukturhinweis, scannt kein TypeScript) – daher manuelle Prüfung.
+
+**Was es ist:** MCP-Server (Bun) für eine **laufende Claude-Code-Sitzung**. Er hält eine WebSocket-Verbindung zu `wss://api.pipes.bot/ws` und liefert WhatsApp-Nachrichten, die an eine **PipesBot-Nummer** geschickt werden, als Kanal-Nachricht in die Sitzung; Werkzeuge `reply` und `react`.
+
+**Befunde**
+- Kein `eval`, keine Shell-Befehle, kein Nachladen von Code zur Laufzeit; Netzwerk nur zu `api.pipes.bot` (+ vorsignierte Medien-URLs). API-Schlüssel steht im WebSocket-URL-Parameter.
+- **Keine Absender-Freigabeliste** (Commit `996c304` „remove allowlist“). Jede Nachricht, die PipesBot zustellt, landet als Anweisung in der Claude-Sitzung → **Prompt-Injection-Risiko**, sobald die Sitzung Zugriff auf WordPress, Google/Meta Ads oder den Mailversand hat.
+- `reply` kann **beliebige lokale Dateien** (bis 50 MB) verschicken; gesperrt ist nur der eigene Kanal-Ordner.
+- `bun install` bei **jedem Start** mit `^`-Versionsbereichen → Abhängigkeiten können sich unbemerkt ändern.
+- Alle Nachrichteninhalte (bei Anfragen: Kundendaten) laufen über **PipesBot** – Firmensitz, Hosting und Auftragsverarbeitungsvertrag nicht dokumentiert.
+- Funktioniert nur, solange eine Claude-Code-Sitzung auf einem Rechner läuft; kein 24/7-Betrieb, keine von sich aus gesendeten Benachrichtigungen (nur Antworten auf eingehende Nachrichten, WhatsApp-24-Stunden-Fenster).
+
+**Entscheidung: Nicht installiert.** Für Lead-Benachrichtigungen und Kundendaten ungeeignet (Datenschutz, kein Dauerbetrieb, kein Push). Höchstens als privater Versuch in einer Sitzung **ohne** Zugriff auf Website, Werbekonten oder Mailversand.
