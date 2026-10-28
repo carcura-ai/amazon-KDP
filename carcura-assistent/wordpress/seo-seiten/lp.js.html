@@ -1,0 +1,54 @@
+<script>(function () {
+"use strict";
+var root = document.querySelector(".cc-lp");
+if (!root) { return; }
+if (root.getAttribute("data-ready") === "1") { return; }
+root.setAttribute("data-ready", "1");
+var seite = root.getAttribute("data-page") || "";
+var ruhig = window.matchMedia ? window.matchMedia("(prefers-reduced-motion: reduce)").matches : false;
+var hatIO = "IntersectionObserver" in window;
+function track(name, params) {
+try {
+if (typeof window.gtag === "function") { window.gtag("event", name, params || {}); }
+else if (Array.isArray(window.dataLayer)) { window.dataLayer.push(Object.assign({ event: name }, params || {})); }
+} catch (e) {}
+}
+Array.prototype.forEach.call(root.querySelectorAll("[data-cc-track]"), function (el) {
+el.addEventListener("click", function () {
+var art = el.getAttribute("data-cc-track");
+track(art === "anfrage" ? "cc_cta_anfrage" : "cc_" + art, { cc_page: seite, cc_location: el.getAttribute("data-cc-location") || "" });
+});
+});
+Array.prototype.forEach.call(root.querySelectorAll(".cc-lp__ba"), function (ba) {
+var r = ba.querySelector("input");
+if (!r) { return; }
+function setze(v) { ba.style.setProperty("--pos", v + "%"); }
+r.addEventListener("input", function () { setze(r.value); });
+setze(r.value);
+});
+Array.prototype.forEach.call(root.querySelectorAll("video[data-loop]"), function (v) {
+if (ruhig || !hatIO) { v.setAttribute("controls", ""); return; }
+var io = new IntersectionObserver(function (e) {
+if (e[0].isIntersecting) {
+v.muted = true;
+var p = v.play();
+if (p) { if (p.catch) { p.catch(function () { v.setAttribute("controls", ""); }); } }
+} else { v.pause(); }
+}, { threshold: 0.3 });
+io.observe(v);
+});
+if (!ruhig) {
+if (hatIO) {
+root.classList.add("cc-js");
+var ziele = Array.prototype.slice.call(root.querySelectorAll(".cc-rv"));
+var io2 = new IntersectionObserver(function (entries) {
+entries.forEach(function (en) { if (en.isIntersecting) { en.target.classList.add("is-in"); io2.unobserve(en.target); } });
+}, { threshold: 0.12 });
+ziele.forEach(function (el, i) {
+el.style.transitionDelay = (i % 4) * 70 + "ms";
+if (el.getBoundingClientRect().top < window.innerHeight * 0.92) { el.classList.add("is-in"); } else { io2.observe(el); }
+});
+window.setTimeout(function () { ziele.forEach(function (el) { el.classList.add("is-in"); }); }, 2500);
+}
+}
+})();</script>
