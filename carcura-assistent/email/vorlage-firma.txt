@@ -1,6 +1,6 @@
 {{anrede}}
 
-danke für das Gespräch {{gespraech_wann}}. Wie versprochen, hier kurz, was wir für Ihre Fahrzeuge tun können.
+wir sind Carcura, eine Fahrzeugaufbereitung aus Walterschen – Alexander Fuchs und Richy Schumacher. Wir pflegen Firmenfahrzeuge in der Region und holen sie dafür direkt an Ihrem Standort ab.
 
 Ihre Firmenwagen stehen jeden Tag beim Kunden vor der Tür – sie sind Ihr Aushängeschild. Und bei der Leasingrückgabe wird genau hingeschaut: Kratzer im Lack, Flecken im Innenraum oder Gerüche können dann als Nachforderung auf der Rechnung landen.
 
@@ -20,4 +20,4 @@ Carcura Fahrzeugaufbereitung
 
 Carcura GbR · Alexander Fuchs & Richy Schumacher · Hauptstr. 7 · 57632 Walterschen
 Tel. 0170 6669516 · carcura@web.de · carcura.info · Impressum: https://carcura.info/impressum/
-Sie erhalten diese Nachricht, weil Sie uns am {{einwilligung_datum}} um Informationen gebeten haben. Keine weiteren Mails gewünscht? Kurz antworten, dann melden wir uns nicht mehr.
+Sie erhalten diese Nachricht, weil Ihr Unternehmen am {{einwilligung_datum}} zugestimmt hat, Informationen von uns per E-Mail zu bekommen. Keine weiteren Mails gewünscht? Kurz antworten, dann melden wir uns nicht mehr.
