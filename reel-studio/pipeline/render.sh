@@ -10,6 +10,7 @@ mkdir -p "$PUB" "$P/export"
 mkdir -p "$ROOT/remotion/public/brand" && cp -u "$ROOT"/brand/*.png "$ROOT/remotion/public/brand/"
 for d in assets musik; do [ -d "$P/$d" ] && mkdir -p "$PUB/$d" && cp -u "$P/$d"/* "$PUB/$d"/; done
 python3 -I "$ROOT/pipeline/props.py" "$P"
+python3 -I "$ROOT/pipeline/qc.py" "$P" || true  # Anti-Slop-Budget, nur Hinweis
 
 CHROME=$(ls -d /opt/pw-browsers/chromium_headless_shell-*/chrome-linux/headless_shell 2>/dev/null | head -1 || true)
 FLAGS=(--props="$P/export/props.json" --gl=swangle ${CHROME:+--browser-executable="$CHROME"})

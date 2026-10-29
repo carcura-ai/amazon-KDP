@@ -36,6 +36,29 @@ Werkzeug: `reel-studio/` (Remotion + ffmpeg + faster-whisper + rembg). Bedienung
 8. **Lieferung**: MP4 + SRT + `BESCHREIBUNG.md` nach `references/lieferung-vorlage.md` inkl. Werbeplan aus `references/werbung.md`. Dateien per SendUserFile senden.
 9. `edit.json`, `notes.md`, `BESCHREIBUNG.md`, `assets/LIZENZEN.md` committen (keine Videos).
 
+## Anti-Slop-Arbeitsweise (immer – nach XDA „A-Roll Studio“, Regeln in `references/anti-slop.md`)
+
+1. **Entscheidungen zuerst lesen:** `projekte/<n>/ENTSCHEIDUNGEN.md`, wenn vorhanden. Was dort steht, nie erneut fragen. Jede neue Wahl des Nutzers sofort eintragen.
+2. **Drei Richtungen auf echtem Material, vor dem ersten Render:**
+   - Für den Hook drei Fassungen als Standbild rendern: `render.sh projekte/<n> --still <s>` mit `ruhig`, `ausgewogen` und `energisch`, je mit anderem Hook-Text bzw. Grafikstil.
+   - Als ein Vergleichsbild senden. Der Nutzer wählt per Nummer.
+   - Das Gleiche gilt für Look/Grade und Musik: je 2–3 Optionen, keine offenen Fragen.
+   - Sagt der Nutzer „keine Fragen“: selbst wählen, die Wahl begründen und in `ENTSCHEIDUNGEN.md` notieren.
+3. **Messen statt schätzen:** Claude sieht kein Video und hört keinen Ton.
+   - Timing über Wort-Zeitstempel (`t:Wort`).
+   - Bewegungsmomente (Pad setzt auf, Hand hebt ab, Tür geht auf) über Pegel bzw. Bewegung im Kontaktbogen bestimmen.
+   - Ton nur über die Messung (−14 LUFS, Ton-Check).
+4. **`"richtung"` in edit.json setzen.** `render.sh` ruft `pipeline/qc.py` auf. Jeder Verstoß wird behoben oder mit `"note"` begründet.
+   - Bei neuen Projekten `auto.sfx` nur noch gezielt nutzen: Sounds auf Bedeutungsmomente statt auf jedes Element.
+   - `auto.zoom` aus, wenn qc.py gleichförmige Zooms meldet.
+5. **Selbstkritik vor dem Zeigen:**
+   - Kontaktbogen gegen Abschnitt 7 von `anti-slop.md` prüfen und die gefundenen KI-Merkmale in `REGIE.md` benennen (z. B. „Milchglas-Karte bei 4 s“, „gleiches Easing überall“).
+   - Erst nach dem Beheben senden.
+6. **Zäune bei Korrekturen:**
+   - „Genau diese 3 Änderungen, nicht mehr und nicht weniger“ heißt wörtlich: exakt die genannten Änderungen, nichts nebenbei.
+   - Bei „mach es lebendiger“ ausdrücklich nicht den kürzesten Weg nehmen (mehr Effekte), sondern Rhythmus, Stille, Layout-Wechsel und echte Beweise.
+7. **Menschliche Textur statt Glätte** (wo es zur Richtung passt): ausgeschnittene Sticker mit weißem Rand, Papier- oder Klebeband-Notizen, handschriftliche Labels, Grafiken mit 12 fps, ein Ton-Effekt auf dem Wort, das kippt.
+
 ## Regie-Modus (immer – nach der Referenz „Skill = Regisseur“)
 
 Sieben Stationen, jede mit Ergebnis, in dieser Reihenfolge:
@@ -45,7 +68,7 @@ Sieben Stationen, jede mit Ergebnis, in dieser Reihenfolge:
 | 1 Drehbuch | Hook (≤ 2 s), Story-Beats, ein CTA; Saetze ≤ 8 Woerter |
 | 2 Storyboard | `projekte/<n>/STORYBOARD.md`: Zeit · Bild (Baustein-ID) · Text/Grafik · Sound · Musik-Moment – **vor** edit.json |
 | 3 Animation | Overlays in edit.json (Grafik nur, wo sie die Aussage traegt) |
-| 4 Untertitel | Stil waehlen: `standard` (Wort-Highlight) oder `kinetik` (Satz baut sich auf, betonte Woerter kursiv/Serif/Akzent) |
+| 4 Untertitel | Stil waehlen: `standard` (Wort-Highlight) oder `kinetik` (Satz baut sich auf, **ein** Betonungsmittel pro Satz: Gewicht oder Akzentfarbe; kursive Serife nur bewusst, gilt als KI-Standard) |
 | 5 Voiceover | A-Roll/Sprachmemo; Musik automatisch geduckt |
 | 6 Sounddesign | Sound-Paare, Glitch/Whip/Whoosh, echte Sounds (Freesound) |
 | 7 Endmischung | −14 LUFS, „Ton-Check ok“, Stimme klar vor Musik |
@@ -114,6 +137,7 @@ Positionen: x/y als Anteil der Bildbreite/-hoehe. Sichere Zone: wichtige Inhalte
 
 ## QA-Checkliste (vor Lieferung, alles muss passen)
 
+- [ ] `qc.py`: keine unbegruendeten Budget-Verstoesse; Selbstkritik-Runde gegen `anti-slop.md` §7 in `REGIE.md` dokumentiert
 - [ ] Hook in 0–2 s: Bild, Text und Stimme versprechen dasselbe
 - [ ] Untertitel fehlerfrei (neue Hoerfehler in `pipeline/glossar.json` eintragen), nichts verdeckt Gesichter
 - [ ] Alle 2–3 s ein visueller Wechsel; keine toten Pausen > 0,5 s
