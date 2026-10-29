@@ -50,3 +50,6 @@ reel-studio/projekte/*/quelle/
 reel-studio/projekte/*/quelle_links/
 reel-studio/projekte/*/musik/*.mp3
 reel-studio/remotion/public/fonts/fontshare/
+
+# Modelle werden bei Bedarf geladen (pipeline/hand.py)
+reel-studio/pipeline/daten/*.task

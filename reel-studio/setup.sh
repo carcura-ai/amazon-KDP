@@ -4,7 +4,7 @@
 set -euo pipefail
 ROOT="$(cd "$(dirname "$0")" && pwd)"
 command -v ffmpeg >/dev/null || { sudo apt-get update && sudo apt-get install -y ffmpeg; }
-pip3 install -q faster-whisper numpy "rembg[cpu]" gdown yt-dlp
+pip3 install -q faster-whisper numpy "rembg[cpu]" gdown yt-dlp mediapipe python-dateutil
 (cd "$ROOT/remotion" && npm ci)
 
 "$ROOT/pipeline/sfx.sh"
