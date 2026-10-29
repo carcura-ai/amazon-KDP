@@ -76,8 +76,24 @@ Alternative für Nicht-Erreichte: einen personalisierten **Brief** als PDF erzeu
    - `{{einwilligung_datum}}`
 3. Den Fließtext auf höchstens 150 Wörter halten. Sie-Form, kein Werbesprech, nichts Erfundenes.
 4. Eine **Klartext-Fassung** mit demselben Inhalt erstellen.
-5. Zuerst **Alex bzw. Richy den Entwurf zeigen**, erst nach „ok“ senden.
-6. Senden, **eine Mail nach der anderen**, mindestens 20 s Abstand, höchstens 40 pro Tag:
+5. **Als Entwurf in den Mail-Ausgang legen** (Mail-Relay ab 1.2, kein Passwort nötig, läuft über die WordPress-Verbindung):
+   - `wp_create_cpt_item` mit `rest_base: "carcura-mails"`, `title` = Betreff, `content` = fertiges HTML, `status: "draft"`.
+   - Danach `wp_update_cpt_item` mit `meta`:
+     - `cc_to`: Empfänger
+     - `cc_art`: `b2b_einwilligung`
+     - `cc_einwilligung`: wörtlich, wer wann wie zugestimmt hat
+     - `cc_text`: die Klartext-Fassung
+   - Alex bzw. Richy den Entwurf im Chat zeigen (Betreff, Empfänger, Text). Die Vorschau gibt es auch unter WordPress → Mail-Ausgang.
+6. **Erst nach „ok“ senden:** `wp_update_cpt_item` mit `status: "publish"`. Alternativ klickt Alex im Mail-Ausgang auf „Senden“.
+   - Das Plugin prüft Zustimmung, Sperrliste und Tageslimit (40). Es verhindert eine zweite Firmen-Mail an dieselbe Adresse innerhalb von 60 Tagen und sendet mit 20 s Abstand, mit Blindkopie an carcura@web.de.
+   - Mehrere Mails: nacheinander freigeben. Die Warteschlange läuft über WP-Cron. Damit sie bei wenig Besuchern weiterläuft, alle ~25 s `curl -sS https://carcura.info/wp-cron.php` aufrufen, bis alles raus ist.
+   - Ergebnis prüfen: `wp_get_post_meta` (post_type `carcura-mails`, key `cc_ergebnis`). Erwartet wird `✅ gesendet …`.
+   - Bei `❌` ist die Mail zurück im Entwurf, mit Grund. Nicht umgehen, sondern melden.
+7. Status `mail_gesendet` in der Akquise-Liste setzen und das Ergebnis melden.
+
+**Eigene HTML-Vorlage des Nutzers:** als Eintrag im Mail-Ausgang mit `cc_art: "vorlage"` ablegen (wird nie gesendet). Vor jedem Einsatz mit `wp_get_cpt_item` lesen und Platzhalter wie `{{anrede}}` füllen.
+
+**Alternativer Weg (nur mit Anwendungspasswort in den Umgebungs-Secrets `CARCURA_WP_USER`/`CARCURA_WP_APP_PASSWORD`):** sofort senden per POST an `https://carcura.info/wp-json/carcura-mail/v1/send`:
 
 ```bash
 python3 - <<'PY'
@@ -92,16 +108,16 @@ payload = {
   "reply_to": "carcura@web.de"
 }
 open("payload.json", "w").write(json.dumps(payload))
-cmd = ["curl", "-sS", "-X", "POST", "https://carcura.info/wp-json/carcura-mail/v1/send",
+cmd = ["curl", "-sS", "-u", os.environ["CARCURA_WP_USER"] + ":" + os.environ["CARCURA_WP_APP_PASSWORD"],
+       "-X", "POST", "https://carcura.info/wp-json/carcura-mail/v1/send",
        "-H", "Content-Type: application/json", "--data-binary", "@payload.json"]
-u, p = os.environ.get("CARCURA_WP_USER"), os.environ.get("CARCURA_WP_APP_PASSWORD")
-if u and p:
-    cmd[1:1] = ["-u", f"{u}:{p}"]  # sonst setzt der Umgebungs-Proxy die Anmeldung für carcura.info
 print(subprocess.run(cmd, capture_output=True, text=True).stdout)
 PY
 ```
 
-7. Status `mail_gesendet` setzen und das Ergebnis melden. Bei HTTP 502 einmal neu versuchen. Bei 422 fehlt die Zustimmung: nicht senden.
+Antwortcodes: 422 = Zustimmung fehlt, 403 = Sperrliste, 409 = schon angeschrieben, 429 = Limit/Abstand. Bei 422, 403 und 409 nicht senden. Bei 502 einmal neu versuchen.
+
+**„Kein Interesse“** → zusätzlich zur Akquise-Liste die Adresse oder `@domain` unter Werkzeuge → Carcura Mail-Relay → Sperrliste eintragen lassen. Das muss Alex machen, ich habe dort keinen Schreibzugriff.
 
 ### 5. Nachfassen
 - Nach 5–7 Werktagen ohne Antwort: **anrufen**, nicht erneut mailen.
@@ -109,6 +125,7 @@ PY
 
 ## Was der Nutzer sagt → was du tust
 - „Akquise: 15 Betriebe um Walterschen“ → Schritte 1–3, am Ende die Anrufliste plus Link zur privaten Seite.
+- „Schreib alle Autohändler in X an“ / „schreib Firmen an“ → Schritte 1–3 für X. Dazu für jeden Betrieb schon den **personalisierten Mail-Entwurf** als `draft` in den Mail-Ausgang legen (ohne `cc_to`-Freigabe). Gesendet wird ein Entwurf erst, wenn Zustimmung und „ok“ vorliegen. So geht nach dem Telefonat jede Mail in Sekunden raus. Nie ohne Zustimmung senden, auch nicht auf Anweisung.
 - „Zustimmung: …“ → Schritt 4.
 - „Kein Interesse: …“ → Status `sperre`.
 - „Stand Akquise?“ → Zahlen pro Status aus der privaten Seite.
