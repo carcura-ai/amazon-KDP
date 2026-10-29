@@ -73,7 +73,6 @@ Alternative für Nicht-Erreichte: einen personalisierten **Brief** als PDF erzeu
    - `{{cta_url}}`: https://carcura.info/firmenkunde/
    - `{{cta_text}}`
    - `{{absender}}`: wer angerufen hat
-   - `{{einwilligung_datum}}`
 3. Den Fließtext auf höchstens 150 Wörter halten. Sie-Form, kein Werbesprech, nichts Erfundenes.
 4. Eine **Klartext-Fassung** mit demselben Inhalt erstellen.
 5. **Als Entwurf in den Mail-Ausgang legen** (Mail-Relay ab 1.2, kein Passwort nötig, läuft über die WordPress-Verbindung):
