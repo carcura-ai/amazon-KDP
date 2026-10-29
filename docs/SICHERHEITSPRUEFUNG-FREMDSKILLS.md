@@ -337,3 +337,19 @@ nicht ins Repository übernommen. Sie verfallen mit dem Container. Die Prüfung 
 - Ebenfalls auf Repo-Ebene meldet er HIGH für den `.cursor`-Ordner und das fehlende Root-`SKILL.md`. Auch das ist ein Fehlalarm, es handelt sich nur um Struktur-Hinweise.
 
 **Entscheidung: Installiert.** Übernommen wurde nur `SKILL.md`, unverändert und mit Quellenhinweis, nach `.claude/skills/karpathy-guidelines/`. Die vier Regeln stehen auf Deutsch in `CLAUDE.md`. Dabei wurde „bei Unklarheit fragen" an die Nutzervorgabe angepasst: Rückfrage nur, wenn sie das Ergebnis wesentlich ändert. `EXAMPLES.md`, `.cursor/` und die Plugin-Dateien wurden nicht übernommen.
+
+## local-search-ads (localseoskills, über singhmuric/emjmedia-sites) – Prüfung 29.10.2026
+
+**Quelle:** `npx skillfish add singhmuric/emjmedia-sites local-search-ads`. Der Befehl wurde **nicht** ausgeführt, weil er ein unbekanntes npm-Paket mit Schreibzugriff auf den Rechner starten würde. Stattdessen wurde das Repo per `git clone` geholt (Commit `7da44248eabbdb065c8fded88391e965c1928201`, 08.05.2026). Der Skill liegt dort unter `.claude/skills/local-seo-skills/skills/local-search-ads/` und ist eine Kopie von garrettjsmith/localseoskills, Version 1.0.0, MIT-Lizenz.
+
+**Geprüft:**
+- `skill-security-auditor` auf den Skill-Ordner: **PASS** (0 Befunde, 1 Markdown-Datei, keine Skripte).
+- `SKILL.md` (199 Zeilen) vollständig gelesen.
+- Keine HTML-Kommentare, keine Anweisungen außerhalb des Themas.
+- `SECURITY.md` und `LICENSE` des Pakets gelesen.
+
+**Was es ist:** Anleitung für Google-Ads-Anzeigen in der Kartenansicht: Standort-Assets, Verknüpfung mit dem Unternehmensprofil, Ausschlusskeywords und Messung.
+
+**Befunde:** Keine sicherheitsrelevanten. Der Inhalt ist allgemein und auf die USA ausgerichtet, verweist auf nicht installierte Schwester-Skills und auf LSA (gibt es für Fahrzeugaufbereitung in Deutschland nicht).
+
+**Entscheidung: Installiert.** Nur `SKILL.md`, mit Quellenhinweis, nach `.claude/skills/local-search-ads/`. `install.sh`/`install.ps1` und die restlichen 38 Skills des Pakets wurden **nicht** übernommen.
