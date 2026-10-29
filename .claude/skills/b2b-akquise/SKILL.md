@@ -62,18 +62,13 @@ Alternative für Nicht-Erreichte: einen personalisierten **Brief** als PDF erzeu
 
 ### 4. Mail nach Zustimmung („Zustimmung: Autohaus X, Herr Y, Telefonat 28.10., Alex“)
 1. In der Liste Status `zustimmung` setzen und die Zustimmung wörtlich eintragen.
-2. Die Vorlage `carcura-assistent/email/partner-vorlage.html` füllen:
-   - `{{betreff}}`: max. 50 Zeichen, konkret, ohne Ausrufezeichen
-   - `{{vorschau}}`: ein Satz
-   - `{{anrede}}`: „Hallo Herr Y,“
-   - `{{einstieg}}`: auf das Telefonat beziehen
-   - `{{problem}}`: die belegte Beobachtung bzw. das, was im Gespräch gesagt wurde
-   - `{{loesung_titel}}` und `{{loesung_punkte}}`: 2–3 `<p style="margin:0 0 6px;">• …</p>`
-   - `{{angebot}}`: Kennenlernangebot
-   - `{{cta_url}}`: https://carcura.info/firmenkunde/
-   - `{{cta_text}}`
-   - `{{absender}}`: wer angerufen hat
-3. Den Fließtext auf höchstens 150 Wörter halten. Sie-Form, kein Werbesprech, nichts Erfundenes.
+2. **Standardablauf (vom Nutzer festgelegt, 29.10.2026) – immer so durchführen:**
+   1. **Abgleich:** Empfänger gegen alle bisher gesendeten Mails prüfen (`wp_list_cpt_items` rest_base `carcura-mails`, status publish, `cc_to` lesen) und gegen die Liste auf Seite 1145. Schon angeschrieben → nicht senden, melden.
+   2. **Branchenvorlage wählen** aus `carcura-assistent/email/`: `vorlage-haendler`, `vorlage-firma` (Fahrschule, Taxi, Pflegedienst, Fuhrpark), `vorlage-bestatter`, `vorlage-bus`, `vorlage-landmaschinen`. Für andere Branchen eine neue Vorlage nach demselben Muster aus `segmente-texte.md` bauen (HTML + Klartext) und committen.
+   3. **Anrede mit Ansprechpartner** aus dem Impressum oder dem Telefonat: „Sehr geehrte Frau X,“ / „Sehr geehrter Herr Y,“. Bei zwei Inhabern beide nennen. Kein Name bekannt → „Guten Tag,“.
+   4. **Inhalt:** Einstieg immer „wir sind Carcura, eine Fahrzeugaufbereitung aus Walterschen – Alexander Fuchs und Richy Schumacher. …“. **Kein Bezug auf ein Telefonat oder Gespräch**, kein Satz zur Zustimmung. Teamfoto `carcura-team-mail.jpg` und HD-Logo bleiben drin. Höchstens 150 Wörter, Sie-Form, nichts Erfundenes, keine Preise außer denen auf carcura.info.
+   5. **Prüfen vor dem Anlegen:** kein `{{` übrig, kein „Telefonat“, „Gespräch“, „besprochen“; Teamfoto-URL enthalten; Empfänger-Adresse aus öffentlicher Quelle oder vom Nutzer genannt.
+3. Nach dem Anlegen die Bytelänge live gegen lokal prüfen (`wp_replace_in_post` mit identischem Suchtext liefert `content_length_before`).
 4. Eine **Klartext-Fassung** mit demselben Inhalt erstellen.
 5. **Als Entwurf in den Mail-Ausgang legen** (Mail-Relay ab 1.2, kein Passwort nötig, läuft über die WordPress-Verbindung):
    - `wp_create_cpt_item` mit `rest_base: "carcura-mails"`, `title` = Betreff, `content` = fertiges HTML, `status: "draft"`.
@@ -83,12 +78,12 @@ Alternative für Nicht-Erreichte: einen personalisierten **Brief** als PDF erzeu
      - `cc_einwilligung`: wörtlich, wer wann wie zugestimmt hat
      - `cc_text`: die Klartext-Fassung
    - Alex bzw. Richy den Entwurf im Chat zeigen (Betreff, Empfänger, Text). Die Vorschau gibt es auch unter WordPress → Mail-Ausgang.
-6. **Erst nach „ok“ senden:** `wp_update_cpt_item` mit `status: "publish"`. Alternativ klickt Alex im Mail-Ausgang auf „Senden“.
+6. **Erst nach „ok“ senden.** Meldet der Nutzer Zustimmungen gesammelt mit Auftrag zum Senden („alle haben zugestimmt, nach und nach senden“), gilt das als ok für genau diese Betriebe. Vorher `cc_to` zurücklesen und mit der Liste abgleichen. Senden: `wp_update_cpt_item` mit `status: "publish"`. Alternativ klickt Alex im Mail-Ausgang auf „Senden“.
    - Das Plugin prüft Zustimmung, Sperrliste und Tageslimit (40). Es verhindert eine zweite Firmen-Mail an dieselbe Adresse innerhalb von 60 Tagen und sendet mit 20 s Abstand, mit Blindkopie an carcura@web.de.
    - Mehrere Mails: nacheinander freigeben. Die Warteschlange läuft über WP-Cron. Damit sie bei wenig Besuchern weiterläuft, alle ~25 s `curl -sS https://carcura.info/wp-cron.php` aufrufen, bis alles raus ist.
    - Ergebnis prüfen: `wp_get_post_meta` (post_type `carcura-mails`, key `cc_ergebnis`). Erwartet wird `✅ gesendet …`.
    - Bei `❌` ist die Mail zurück im Entwurf, mit Grund. Nicht umgehen, sondern melden.
-7. Status `mail_gesendet` in der Akquise-Liste setzen und das Ergebnis melden.
+7. Status `mail_gesendet` auf Seite 1145 setzen und melden: gesendet (Betrieb, Ansprechpartner, Adresse) und wo eine E-Mail-Adresse fehlt – die liefert der Nutzer aus dem Telefonat.
 
 **Eigene HTML-Vorlage des Nutzers:** als Eintrag im Mail-Ausgang mit `cc_art: "vorlage"` ablegen (wird nie gesendet). Vor jedem Einsatz mit `wp_get_cpt_item` lesen und Platzhalter wie `{{anrede}}` füllen.
 
