@@ -322,3 +322,18 @@ nicht ins Repository übernommen. Sie verfallen mit dem Container. Die Prüfung 
 - Funktioniert nur, solange eine Claude-Code-Sitzung auf einem Rechner läuft; kein 24/7-Betrieb, keine von sich aus gesendeten Benachrichtigungen (nur Antworten auf eingehende Nachrichten, WhatsApp-24-Stunden-Fenster).
 
 **Entscheidung: Nicht installiert.** Für Lead-Benachrichtigungen und Kundendaten ungeeignet (Datenschutz, kein Dauerbetrieb, kein Push). Höchstens als privater Versuch in einer Sitzung **ohne** Zugriff auf Website, Werbekonten oder Mailversand.
+
+## forrestchang/andrej-karpathy-skills (karpathy-guidelines) – Prüfung 29.10.2026
+
+**Quelle:** github.com/forrestchang/andrej-karpathy-skills (gespiegelt als multica-ai/andrej-karpathy-skills), Commit `2c606141936f1eeef17fa3043a72095b4765b9c2` vom 20.04.2026, Lizenz MIT. Gefunden über ein Instagram-Reel von tecturtle.ai.
+
+**Geprüft:** `skill-security-auditor` auf Repo und Skill-Ordner. Vollständig gelesen: `CLAUDE.md`, `skills/karpathy-guidelines/SKILL.md`, `.claude-plugin/plugin.json`, `.claude-plugin/marketplace.json`. Nach unsichtbaren Zeichen und HTML-Kommentaren gesucht: keine gefunden.
+
+**Was es ist:** Reine Verhaltensregeln in Markdown für das Programmieren: erst denken, einfach zuerst, chirurgisch ändern, zielgeführt arbeiten. Enthält keine Skripte, keine Abhängigkeiten und keine Netzwerkzugriffe.
+
+**Befunde:**
+- Skill-Ordner: **PASS**.
+- Auf Repo-Ebene meldet der Scanner CRITICAL für `EXAMPLES.md:302`. Das ist ein Fehlalarm: Dort steht der Docstring „Upload file to destination" in einem Codebeispiel, keine Anweisung.
+- Ebenfalls auf Repo-Ebene meldet er HIGH für den `.cursor`-Ordner und das fehlende Root-`SKILL.md`. Auch das ist ein Fehlalarm, es handelt sich nur um Struktur-Hinweise.
+
+**Entscheidung: Installiert.** Übernommen wurde nur `SKILL.md`, unverändert und mit Quellenhinweis, nach `.claude/skills/karpathy-guidelines/`. Die vier Regeln stehen auf Deutsch in `CLAUDE.md`. Dabei wurde „bei Unklarheit fragen" an die Nutzervorgabe angepasst: Rückfrage nur, wenn sie das Ergebnis wesentlich ändert. `EXAMPLES.md`, `.cursor/` und die Plugin-Dateien wurden nicht übernommen.
