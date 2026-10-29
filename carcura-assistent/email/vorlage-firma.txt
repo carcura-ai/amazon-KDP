@@ -1,0 +1,23 @@
+{{anrede}}
+
+danke für das Gespräch {{gespraech_wann}}. Wie versprochen, hier kurz, was wir für Ihre Fahrzeuge tun können.
+
+Ihre Firmenwagen stehen jeden Tag beim Kunden vor der Tür – sie sind Ihr Aushängeschild. Und bei der Leasingrückgabe wird genau hingeschaut: Kratzer im Lack, Flecken im Innenraum oder Gerüche können dann als Nachforderung auf der Rechnung landen.
+
+So halten wir Ihre Fahrzeuge in Form:
+- Regelmäßige Innen- und Außenpflege im festen Rhythmus. Wir holen am Firmenstandort ab und bringen zum vereinbarten Termin zurück.
+          - Aufbereitung vor der Leasingrückgabe: Politur, Innenraum, Geruch – damit der Gutachter keine vermeidbaren Posten findet.
+          - Konditionen nach Fahrzeugzahl und Rhythmus, ein fester Ansprechpartner: wir selbst.
+
+Mein Vorschlag: Wir nehmen uns zuerst ein Fahrzeug zur Probe vor, Sie sehen das Ergebnis, bevor Sie sich festlegen. Steht bald eine Leasingrückgabe an, schauen wir uns das Auto vorher gern an: so läuft die Rückgabe-Aufbereitung. https://carcura.info/leasingrueckgabe-aufbereitung/
+
+Firmenkonditionen ansehen: https://carcura.info/firmenkunde/
+Oder einfach anrufen: 0170 6669516
+
+Viele Grüße
+{{absender}}
+Carcura Fahrzeugaufbereitung
+
+Carcura GbR · Alexander Fuchs & Richy Schumacher · Hauptstr. 7 · 57632 Walterschen
+Tel. 0170 6669516 · carcura@web.de · carcura.info · Impressum: https://carcura.info/impressum/
+Sie erhalten diese Nachricht, weil Sie uns am {{einwilligung_datum}} um Informationen gebeten haben. Keine weiteren Mails gewünscht? Kurz antworten, dann melden wir uns nicht mehr.

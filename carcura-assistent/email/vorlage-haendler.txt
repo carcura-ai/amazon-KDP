@@ -1,0 +1,23 @@
+{{anrede}}
+
+danke für das Gespräch {{gespraech_wann}}. Wie versprochen, hier kurz, wie wir mit Autohäusern arbeiten.
+
+Im Inserat entscheidet das erste Foto, auf dem Hof der erste Eindruck. Gerade bei Inzahlungnahmen hängt es oft an Kleinigkeiten: Geruch, Tierhaare, matter Lack, vergilbte Scheinwerfer. Das kostet Ihr Team Zeit – oder das Auto steht länger.
+
+So entlasten wir Ihren Hof:
+- Wir holen die Fahrzeuge bei Ihnen ab und bringen sie verkaufsfertig zurück. Keine eigene Waschbox, kein Mitarbeiter, der fahren muss.
+          - Innen und außen, Politur, Scheinwerfer, Geruch und Tierhaare: Umfang pro Fahrzeug oder als feste Stufe.
+          - Händlerkonditionen nach Ihrem Volumen, abgestimmte Terminfenster, fester Ansprechpartner: wir selbst.
+
+Mein Vorschlag: Wir holen ein Fahrzeug Ihrer Wahl zur Probe ab. Sie sehen das Ergebnis, bevor Sie sich festlegen. Danach stimmen wir Konditionen und Ablauf ab.
+
+Händlerkonditionen ansehen: https://carcura.info/firmenkunde/
+Oder einfach anrufen: 0170 6669516
+
+Viele Grüße
+{{absender}}
+Carcura Fahrzeugaufbereitung
+
+Carcura GbR · Alexander Fuchs & Richy Schumacher · Hauptstr. 7 · 57632 Walterschen
+Tel. 0170 6669516 · carcura@web.de · carcura.info · Impressum: https://carcura.info/impressum/
+Sie erhalten diese Nachricht, weil Sie uns am {{einwilligung_datum}} um Informationen gebeten haben. Keine weiteren Mails gewünscht? Kurz antworten, dann melden wir uns nicht mehr.
