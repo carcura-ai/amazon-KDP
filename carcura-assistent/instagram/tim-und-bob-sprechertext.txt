@@ -1,0 +1,9 @@
+T1|tim|0.7|0.5|Oh Mann. Ich hab echt keine Zeit, mein Auto sauber zu machen.
+T2|tim|0.75|0.5|Es ist immer dreckig. Kein Wunder, dass keiner bei mir mitfahren will.
+B1|bob|0.65|0.45|Ey! Gib dein Auto doch einfach bei Karkura ab.
+B2|bob|0.6|0.45|Eine Innenreinigung gibt's schon ab neunzig Euro. Danach steigt jeder wieder gern bei dir ein.
+B3|bob|0.6|0.45|Noch besser ist das Monatsabo. Feste Termine, du sparst Geld und musst dich um nichts kümmern.
+B4|bob|0.6|0.45|Und du wohnst doch in Altenkirchen. Die holen dein Auto sogar kostenlos bei dir ab.
+B5|bob|0.7|0.45|Also, worauf wartest du?
+T3|tim|0.85|0.5|Ey, cool! Danke dir, Bob. Wo finde ich die denn?
+B6|bob|0.8|0.45|Hier!
