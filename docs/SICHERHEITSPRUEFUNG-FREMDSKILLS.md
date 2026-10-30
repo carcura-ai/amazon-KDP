@@ -353,3 +353,17 @@ nicht ins Repository übernommen. Sie verfallen mit dem Container. Die Prüfung 
 **Befunde:** Keine sicherheitsrelevanten. Der Inhalt ist allgemein und auf die USA ausgerichtet, verweist auf nicht installierte Schwester-Skills und auf LSA (gibt es für Fahrzeugaufbereitung in Deutschland nicht).
 
 **Entscheidung: Installiert.** Nur `SKILL.md`, mit Quellenhinweis, nach `.claude/skills/local-search-ads/`. `install.sh`/`install.ps1` und die restlichen 38 Skills des Pakets wurden **nicht** übernommen.
+
+## zhuyansen/awesome-claude-video-skills – Prüfung 30.10.2026
+
+**Quelle:** github.com/zhuyansen/awesome-claude-video-skills, Commit `b4b7c04` („Daily update 2026-10-29"), vom Nutzer genannt.
+
+**Geprüft:** Repo in einen isolierten Ordner geklont. Inhalt: `README.md`, `README.zh-CN.md`, `LICENSE`, `data/skills.json`, ein Issue-Template und 230 Vorschaubilder. **Keine Skripte, kein `SKILL.md`, nichts Ausführbares.**
+
+**Was es ist:** Kein Skill, sondern eine Linkliste mit 379 Video-Skills fremder Anbieter, jeweils mit Sicherheitsnote von agentskillshub.top.
+
+**Befund für Carcura:**
+- Realistisch aussehende Videos mit menschlichen Stimmen erzeugen alle Einträge über **kostenpflichtige Cloud-Dienste** (HeyGen-Avatare, ElevenLabs-Stimmen, Google Veo/Flow, fal.ai).
+- Die kostenlosen, lokalen Einträge machen Grafik- und Zeichentrick-Animationen, wie wir sie schon selbst bauen.
+
+**Entscheidung: Nichts installiert.** Ein konkreter Skill wird erst geprüft und übernommen, wenn der Nutzer den Weg (Dienst und Kosten) freigibt.
