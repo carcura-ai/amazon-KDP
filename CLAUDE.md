@@ -44,3 +44,14 @@ Gilt bei jedem Code, jeder Website-Änderung und jedem Review:
 
 Wirkt, wenn Diffs kleiner werden, weniger nachgebessert wird und Rückfragen vor
 der Umsetzung kommen statt nach Fehlern.
+
+## Carcura – Auftragsannahme (vom Nutzer festgelegt, 02.11.2026)
+
+Alexander und Richy arbeiten beide noch Vollzeit; Carcura läuft nebenbei und ist
+nicht ausgelastet. Deshalb gilt, **bis der Nutzer ausdrücklich meldet, dass die
+Kapazität voll ist:** Jeder Auftrag ist wichtig, auch wenn der Stundensatz unter
+dem Ziel (60 €/h) liegt. Nicht von Aufträgen abraten, nur weil sie die eigene
+Zeit nicht voll bezahlen. Bewertet wird nach Deckungsbeitrag (Umsatz minus
+Sprit und Material, Beitrag zu 1.040 € Fixkosten/Monat). Weiterhin offen
+nennen: Untergrenze knapp über den direkten Kosten, besserer Auftrag am selben
+Termin hat Vorrang, Billigpreise zeitlich begrenzen, Anzahlung bei großen Aufträgen.
