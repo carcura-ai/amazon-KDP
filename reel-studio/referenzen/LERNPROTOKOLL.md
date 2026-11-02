@@ -91,3 +91,14 @@ lohnt sich erst, wenn Claude lokal auf dem Laptop des Nutzers laeuft (Studio bra
 Uebernommen fuers Format: Kommentar-CTA „Was soll ich als Naechstes machen? Top-Kommentar setze ich um“ (1,5 % Kommentarquote)
 → fuer Carcura: „Welches Auto sollen wir als Naechstes zeigen? Top-Kommentar drehen wir“ (ohne Gewinn = kein Gewinnspielrecht noetig);
 witziger Folgen-CTA („Early-Investor-Zertifikat“), Notizzettel-Moodboard als Uebergang.
+
+## Runde 6 (01.11.2026): yourlastcall.tv – interaktive Horror-Serie (6 Reels, 378 Tsd. Aufrufe, 4.546 Follower in ~1 Woche)
+
+Gezeigt/gesagt: „Du“-Erzaehlung im Praesens (Flug 717, alle schlafen, 3:12), zwei Regeln, jede Folge endet mit Wahl A/B,
+„Comment one word. Most votes decide Part N.“; Ergebnis-Karte am Anfang („51 % / 49 %, by four votes“); Dauer-HUD mit
+Weltzustand; Ein-Wort-Untertitel mit roter Betonung; flache 2D-Animation, nur 0–7 harte Schnitte, Bewegung in der Animation;
+77–112 s, 114–144 Woerter/Minute, −14,1 LUFS, taeglich 11–13 Uhr UTC.
+Befund: Kommentare steigen von 116 auf 347 je Folge, waehrend die Aufrufe juenger Folgen kleiner sind → Abstimmung baut Community.
+Uebernommen (Mechanik): Kommentar-Abstimmung mit ehrlicher Ergebnis-Karte, Hook „You chose X.“, sichtbarer Zustand im HUD,
+Laenge > 60 s fuer TikTok Rewards. Projekt: `projekte/horror-serie/` (ANALYSE.md, KONZEPT.md).
+Fuer Carcura: „Welche Leistung zeigen wir morgen? Top-Kommentar entscheidet“ + Ergebnis-Karte im naechsten Reel.
