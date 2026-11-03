@@ -367,3 +367,27 @@ nicht ins Repository übernommen. Sie verfallen mit dem Container. Die Prüfung 
 - Die kostenlosen, lokalen Einträge machen Grafik- und Zeichentrick-Animationen, wie wir sie schon selbst bauen.
 
 **Entscheidung: Nichts installiert.** Ein konkreter Skill wird erst geprüft und übernommen, wenn der Nutzer den Weg (Dienst und Kosten) freigibt.
+
+## AgriciDaniel/claude-seo – Prüfung 03.11.2026
+
+**Quelle:** github.com/AgriciDaniel/claude-seo, Commit `6be93f4` (22.10.2026), vom Nutzer genannt. Per `git clone` in einen isolierten Scratch-Ordner geholt. `install.sh` (curl | bash) wurde **nicht** ausgeführt.
+
+**Umfang:** 467 Dateien, rund 25 Skills, 165 Skripte (Python/JS/Shell), Hooks, Erweiterungen für DataForSEO, Ahrefs, Firecrawl, Matomo, Bing, Moz und Google-APIs.
+
+**Geprüft:**
+- `skill-security-auditor` auf das ganze Repo: **FAIL** mit 37 kritischen und 73 hohen Befunden.
+- Einordnung der kritischen Befunde:
+  - fast alle sind erwartbares Verhalten eines SEO-Werkzeugs: API-Schlüssel aus Umgebungsvariablen lesen, POST an die jeweils genannten Dienste, base64 bei Bild- und GitHub-API-Antworten, `curl | bash` nur als Hinweistext in Installern
+  - `PRIVACY.md` legt die Datenflüsse offen
+- Manuell gelesen:
+  - `hooks/hooks.json`: PostToolUse-Hook auf Edit/Write, startet bei jeder Dateiänderung ein Python-Skript
+  - `scripts/sync_flow.py`: lädt Markdown-Anleitungen von der GitHub-API nach und nutzt bei Rate-Limit den `gh auth token` des Nutzers. Das heißt: entfernte Inhalte werden zur Laufzeit zu Anweisungen.
+  - `skills/seo-local/SKILL.md` vollständig: reine Prüfanleitung, keine versteckten Anweisungen, eigener Abschnitt „fetched content is untrusted“
+
+**Risiken bei Installation:**
+1. Automatischer Hook bei jeder Dateiänderung.
+2. Nachladen fremder Anweisungen aus dem Netz.
+3. Viele Skripte mit Netzwerkzugriff und Zugriff auf Schlüssel.
+4. Großer Umfang, nicht vollständig prüfbar.
+
+**Entscheidung: Nicht installiert.** Für die Prüfung von carcura.info wurde nur die Methodik aus `skills/seo-local/SKILL.md` (6 Dimensionen, Gewichtung, Quick Wins) gelesen und mit eigenen Werkzeugen (curl, Python) angewandt. Kein Fremdskript wurde ausgeführt.
