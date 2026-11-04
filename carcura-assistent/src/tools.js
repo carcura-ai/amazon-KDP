@@ -204,7 +204,7 @@ export const TOOL_DEFINITIONS = [
 ];
 
 export function createToolHandlers(deps) {
-  const { store, notifier, owners, wp, mailer, insights, gbp } = deps;
+  const { store, notifier, owners, wp, mailer, insights, gbp, manager } = deps;
 
   const leads = () => store.get("leads", []);
   const findLead = (id) => leads().find((l) => l.id.toLowerCase() === String(id || "").trim().toLowerCase());
@@ -233,7 +233,7 @@ export function createToolHandlers(deps) {
       return lead;
     },
 
-    anfrage_eintragen(input, { owner }) {
+    async anfrage_eintragen(input, { owner }) {
       const lead = {
         id: nextId(store, "L"),
         eingang: new Date().toISOString(),
@@ -249,6 +249,10 @@ export function createToolHandlers(deps) {
         eingetragen_von: owner.name,
       };
       store.update("leads", [], (all) => [...all, lead]);
+      if (manager) {
+        const r = await manager.pushLead(lead, { channel: "assistent", externalId: `assistent:${lead.id}:${lead.eingang}` });
+        return { gespeichert: lead.id, carcura_manager: r.skipped ? "nicht eingerichtet" : r.ok ? "eingetragen" : "fehlgeschlagen" };
+      }
       return { gespeichert: lead.id };
     },
 

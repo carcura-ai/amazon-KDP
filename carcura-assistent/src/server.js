@@ -17,6 +17,7 @@ import { Agent } from "./agent.js";
 import { App } from "./app.js";
 import { Insights } from "./insights.js";
 import { GoogleProfile } from "./gbp.js";
+import { ManagerClient } from "./manager.js";
 
 const MAX_BODY = 2 * 1024 * 1024;
 
@@ -28,8 +29,9 @@ export function buildApp(cfg, overrides = {}) {
   const mailer = overrides.mailer !== undefined ? overrides.mailer : createMailer(cfg.mail);
   const insights = overrides.insights || new Insights({ windsor: cfg.windsor, timezone: cfg.timezone });
   const gbp = overrides.gbp || new GoogleProfile(cfg.gbp);
-  const agent = Agent.create({ cfg, store, client: overrides.client, notifier, owners: cfg.owners, wp, mailer, insights, gbp });
-  return new App({ cfg, store, wa, notifier, agent, insights, gbp, fetchImpl: overrides.fetchImpl });
+  const manager = overrides.manager || new ManagerClient(cfg.manager, overrides.fetchImpl);
+  const agent = Agent.create({ cfg, store, client: overrides.client, notifier, owners: cfg.owners, wp, mailer, insights, gbp, manager });
+  return new App({ cfg, store, wa, notifier, agent, insights, gbp, manager, fetchImpl: overrides.fetchImpl });
 }
 
 function readBody(req) {

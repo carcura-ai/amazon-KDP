@@ -429,3 +429,69 @@ test("WhatsApp nutzt WA_API_BASE, wenn gesetzt", async () => {
   assert.equal(calls[0], "https://graph.facebook.com/v23.0/1/messages");
   assert.equal(calls[1], "https://relay.example/v23.0/1/messages");
 });
+
+// ---------- Carcura Manager ----------
+
+import { ManagerClient } from "../src/manager.js";
+import { createToolHandlers } from "../src/tools.js";
+
+function fakeManager() {
+  const pushed = [];
+  return { pushed, pushLead: async (lead, opts) => { pushed.push({ lead, ...opts }); return { ok: true, id: "m1" }; } };
+}
+
+test("ManagerClient: sendet Lead mit Token an den Lead-Eingang, ohne Einrichtung nichts", async () => {
+  const calls = [];
+  const fetchImpl = async (url, init) => { calls.push({ url, init }); return { ok: true, json: async () => ({ ok: true, id: "abc" }) }; };
+  const off = new ManagerClient({}, fetchImpl);
+  assert.deepEqual(await off.pushLead({ name: "X" }), { skipped: true });
+  assert.equal(calls.length, 0);
+  const m = new ManagerClient({ url: "https://app.example", token: "tok" }, fetchImpl);
+  const r = await m.pushLead({ name: "Max", telefon: "+49170", leistung: "Keramik", quelle: "WhatsApp", kundentyp: "firma", notizen: ["Alex: ruft an"] }, { channel: "whatsapp", externalId: "wa:1" });
+  assert.deepEqual(r, { ok: true, id: "abc", duplicate: false });
+  assert.equal(calls[0].url, "https://app.example/api/public/leads/website");
+  assert.equal(calls[0].init.headers["X-Lead-Token"], "tok");
+  const body = JSON.parse(calls[0].init.body);
+  assert.equal(body.phone, "+49170");
+  assert.equal(body.customer_type, "firma");
+  assert.equal(body.channel, "whatsapp");
+  assert.equal(body.external_id, "wa:1");
+  assert.match(body.message, /ruft an/);
+});
+
+test("ManagerClient: Fehler des Managers werfen nicht", async () => {
+  const m = new ManagerClient({ url: "https://app.example", token: "tok" }, async () => { throw new Error("offline"); }, { error: () => {} });
+  assert.equal((await m.pushLead({ name: "X" })).ok, false);
+  const m2 = new ManagerClient({ url: "https://app.example", token: "tok" }, async () => ({ ok: false, status: 401, json: async () => ({ error: "token_invalid" }) }), { error: () => {} });
+  assert.deepEqual(await m2.pushLead({ name: "X" }), { ok: false, status: 401 });
+});
+
+test("Website-Anfrage und Kunden-WhatsApp landen im Manager, WhatsApp nur einmal je Nummer und Monat", async () => {
+  const { app, cfg } = setup({ responses: [say("Neue Anfrage!")] });
+  const mgr = fakeManager();
+  app.manager = mgr;
+  const body = Buffer.from(JSON.stringify({ name: "Max Muster", phone: "0170 1", service: "Keramik", customer_type: "privat", website: "" }));
+  await app.receiveLead(body, { "x-carcura-secret": "leadsecret" });
+  assert.equal(mgr.pushed.length, 1);
+  assert.equal(mgr.pushed[0].channel, "web");
+  assert.equal(mgr.pushed[0].lead.name, "Max Muster");
+
+  cfg.customerChats = "melden";
+  await sendWhatsApp(app, "4917699999999", "Was kostet Keramik?");
+  await sendWhatsApp(app, "4917699999999", "Und Samstag?");
+  assert.equal(mgr.pushed.length, 2);
+  assert.equal(mgr.pushed[1].channel, "whatsapp");
+  assert.equal(mgr.pushed[1].lead.telefon, "+4917699999999");
+  assert.match(mgr.pushed[1].externalId, /^wa:4917699999999:\d{4}-\d{2}$/);
+});
+
+test("anfrage_eintragen trägt auch im Manager ein", async () => {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), "cc-mgr-"));
+  const store = new Store(dir);
+  const mgr = fakeManager();
+  const h = createToolHandlers({ store, owners: [], manager: mgr });
+  const r = await h.anfrage_eintragen({ name: "Herr X", quelle: "Instagram", leistung: "Politur" }, { owner: { name: "Alex", number: ALEX } });
+  assert.equal(r.carcura_manager, "eingetragen");
+  assert.equal(mgr.pushed[0].lead.quelle, "Instagram");
+  assert.equal(store.get("leads", []).length, 1);
+});

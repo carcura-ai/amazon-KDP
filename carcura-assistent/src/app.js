@@ -12,8 +12,8 @@ const CLAUDE_IMAGE_TYPES = ["image/jpeg", "image/png", "image/gif", "image/webp"
 const EXT = { "image/jpeg": "jpg", "image/png": "png", "image/webp": "webp", "image/gif": "gif", "application/pdf": "pdf" };
 
 export class App {
-  constructor({ cfg, store, wa, notifier, agent, insights = null, gbp = null, fetchImpl = globalThis.fetch, log = console }) {
-    Object.assign(this, { cfg, store, wa, notifier, agent, insights, gbp, fetchImpl, log });
+  constructor({ cfg, store, wa, notifier, agent, insights = null, gbp = null, manager = null, fetchImpl = globalThis.fetch, log = console }) {
+    Object.assign(this, { cfg, store, wa, notifier, agent, insights, gbp, manager, fetchImpl, log });
     this.seen = new Set(store.get("seen", []));
     this.strangers = new Map();
   }
@@ -165,13 +165,22 @@ export class App {
       if (Date.now() - last < 2 * 60 * 60 * 1000) return;
       this.strangers.set(msg.from, Date.now());
       this.store.update("wa_contacts", [], (all) => [...all.slice(-999), { at: new Date().toISOString(), from: msg.from, name: profileName }]);
+      // Parallel zur Meldung in den Carcura Manager eintragen (je Nummer höchstens ein Lead pro Monat)
+      const sync = this.manager?.pushLead(
+        { name: profileName, telefon: `+${msg.from}`, nachricht: preview, quelle: "WhatsApp" },
+        { channel: "whatsapp", externalId: `wa:${msg.from}:${new Date().toISOString().slice(0, 7)}` },
+      );
       await this.tell({
         task: `Ein Kunde (${who}) hat gerade per WhatsApp an die Firmennummer geschrieben. Sag in 1–2 Sätzen Bescheid und frag, wer übernimmt – ` +
-          `die Antwort an den Kunden kommt von euch direkt in der WhatsApp-Business-App, du trägst es danach als Anfrage ein, wenn gewünscht.`,
+          `die Antwort an den Kunden kommt von euch direkt in der WhatsApp-Business-App` +
+          (this.manager?.enabled
+            ? ". Der Kontakt steht schon automatisch als Lead im Carcura Manager – nicht noch einmal eintragen."
+            : ", du trägst es danach als Anfrage ein, wenn gewünscht."),
         facts: `📲 *${who}*:\n„${preview}“`,
         preview: `WhatsApp von ${profileName || "einem Kunden"}: ${preview.slice(0, 80)}`,
         fallback: (o) => `Ey ${o.spitznamen[0]}, neue WhatsApp an die Firmennummer – wer übernimmt?`,
       });
+      await sync;
       return;
     }
 
@@ -216,6 +225,7 @@ export class App {
       notizen: [],
     };
     this.store.update("leads", [], (all) => [...all, lead]);
+    const sync = this.manager?.pushLead(lead, { channel: "web", externalId: `assistent:${lead.id}:${lead.eingang}` });
 
     const facts = leadFacts(lead);
     const delivered = await this.tell({
@@ -229,6 +239,7 @@ export class App {
     for (const owner of this.cfg.owners) {
       this.notifier.addEvent(owner.number, `Neue Website-Anfrage ${lead.id} wurde euch gemeldet: ${lead.leistung} – ${lead.name}, ${lead.fahrzeug}. Status: neu.`);
     }
+    await sync;
     return { status: 200, body: { ok: true, id: lead.id, delivered } };
   }
 

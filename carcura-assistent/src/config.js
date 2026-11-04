@@ -88,6 +88,12 @@ export function loadConfig(env = process.env) {
       metaAccount: env.WINDSOR_META_ACCOUNT || "",
     },
 
+    // Carcura Manager: neue Anfragen automatisch als Lead eintragen (optional)
+    manager: {
+      url: (env.MANAGER_URL || "").replace(/\/+$/, ""),
+      token: env.MANAGER_LEAD_TOKEN || "",
+    },
+
     // Antworten auf Google-Bewertungen posten (optional)
     gbp: {
       clientId: env.GBP_CLIENT_ID || "",
