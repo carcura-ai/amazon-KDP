@@ -417,3 +417,15 @@ test("Jeder Inhaber bekommt seine eigene, persönlich formulierte Nachricht", as
   await app.receiveLead(body, { "x-carcura-secret": "leadsecret" });
   assert.match(JSON.stringify(calls[2].messages), /NICHT wiederholen.*Ey Alex/);
 });
+
+test("WhatsApp nutzt WA_API_BASE, wenn gesetzt", async () => {
+  const { WhatsApp } = await import("../src/whatsapp.js");
+  const calls = [];
+  const fake = async (url) => { calls.push(url); return { ok: true, json: async () => ({}) }; };
+  const direct = new WhatsApp({ graphVersion: "v23.0", token: "t", phoneNumberId: "1" }, fake);
+  const relay = new WhatsApp({ graphVersion: "v23.0", apiBase: "https://relay.example/v23.0", token: "t", phoneNumberId: "1" }, fake);
+  await direct.sendText("49", "hi");
+  await relay.sendText("49", "hi");
+  assert.equal(calls[0], "https://graph.facebook.com/v23.0/1/messages");
+  assert.equal(calls[1], "https://relay.example/v23.0/1/messages");
+});

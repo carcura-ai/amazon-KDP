@@ -8,7 +8,7 @@ export class WhatsApp {
   constructor(cfg, fetchImpl = globalThis.fetch) {
     this.cfg = cfg;
     this.fetch = fetchImpl;
-    this.base = `https://graph.facebook.com/${cfg.graphVersion}`;
+    this.base = cfg.apiBase || `https://graph.facebook.com/${cfg.graphVersion}`;
   }
 
   async call(path, body) {

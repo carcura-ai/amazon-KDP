@@ -35,6 +35,8 @@ export function loadConfig(env = process.env) {
       verifyToken: env.WA_VERIFY_TOKEN || "",
       appSecret: env.WA_APP_SECRET || "",
       graphVersion: env.WA_GRAPH_VERSION || "v23.0",
+      // Abweichende API-Adresse, z. B. Relay eines Koexistenz-Partners (Dualhook); leer = Meta direkt
+      apiBase: (env.WA_API_BASE || "").replace(/\/+$/, ""),
       templateName: env.WA_TEMPLATE_NAME || "carcura_hinweis",
       templateLang: env.WA_TEMPLATE_LANG || "de",
     },
