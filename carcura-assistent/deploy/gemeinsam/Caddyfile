@@ -1,0 +1,29 @@
+# Carcura Manager (gleiche Einstellungen wie carcura-manager/deploy/Caddyfile)
+{$APP_DOMAIN} {
+	encode zstd gzip
+	request_body {
+		max_size 30MB
+	}
+	reverse_proxy app:4800
+	header -Server
+	log {
+		output stdout
+		format filter {
+			wrap json
+			fields {
+				request>uri regexp [?].* ?[entfernt]
+				request>headers>Cookie delete
+				request>headers>Authorization delete
+				request>headers>X-Lead-Token delete
+				resp_headers>Set-Cookie delete
+			}
+		}
+	}
+}
+
+# WhatsApp-Assistent
+{$BOT_DOMAIN} {
+	encode gzip
+	reverse_proxy assistent:3000
+	header -Server
+}

@@ -1,0 +1,40 @@
+# Gemeinsamer HTTPS-Eingang fuer Carcura Manager (app.carcura.info) und Assistent (bot.carcura.info).
+# Ersetzt die einzelnen Caddy-Dienste beider Projekte (die dann NICHT gestartet werden).
+# Reihenfolge: erst Manager (deploy) und Assistent anlegen, dann hier: docker compose up -d
+x-logging: &logging
+  driver: json-file
+  options:
+    max-size: "10m"
+    max-file: "5"
+
+services:
+  caddy:
+    image: caddy:2
+    restart: unless-stopped
+    environment:
+      APP_DOMAIN: app.carcura.info
+      BOT_DOMAIN: bot.carcura.info
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy-data:/data
+      - caddy-config:/config
+    networks:
+      - manager
+      - assistent
+    logging: *logging
+
+networks:
+  manager:
+    external: true
+    name: deploy_default
+  assistent:
+    external: true
+    name: carcura-assistent_default
+
+volumes:
+  caddy-data:
+  caddy-config:
