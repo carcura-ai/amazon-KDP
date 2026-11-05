@@ -180,7 +180,7 @@ def anfragen_extra(h):
     i = h.index('<div class="cc-rq__item" data-item="polster">')
     h = h[:i] + rq_item('sitz', 'Einzelner Sitz', 'Einzelner Sitz / Fleck', 'Ein Sitz oder eine Fleckenstelle, Sprühextraktion.', '49 €', ['Fleck vorbehandelt', 'Sitz tief gereinigt, trocknet vollständig'], 'Foto vom Fleck hilft für den festen Preis.') \
           + rq_item('fleckgeruch', 'Fleck + Geruch', 'Fleck + Geruch', 'Alle Polster tiefengereinigt plus Ozon.', '119 €', ['Polster- und Sitzreinigung komplett', 'Ozonbehandlung gegen den Geruch'], 'Günstiger als einzeln (79 € + 59 €).') \
-          + rq_item('notfall', 'Notfall: Erbrochenes', 'Notfall: Erbrochenes', 'Betroffene Sitze, Kindersitz und Gurt, Desinfektion, Ozon.', '179 €', ['Betroffene Sitze und Teppiche', 'Kindersitz und Gurt', 'Desinfektion und Ozon'], 'Ruf am besten direkt an: 0170 6669516.') + h[i:]
+          + rq_item('notfall', 'Notfall: Erbrochenes', 'Notfall: Erbrochenes', 'Betroffene Sitze und Teppiche, Desinfektion, Ozon.', '179 €', ['Betroffene Sitze und Teppiche', 'Desinfektion und Ozon'], 'Ruf am besten direkt an: 0170 6669516.') + h[i:]
     # Keramik: Spray + Pflege nach Scheiben
     i = h.index('<div class="cc-rq__item" data-item="scheiben">')
     nxt = h.find('<div class="cc-rq__item"', i + 10)

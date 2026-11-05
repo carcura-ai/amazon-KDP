@@ -112,3 +112,10 @@ verteilt nicht weiter, (3) auf den Unterseiten fehlen Beweise (Keramik) bzw. gan
 - Vor Go-live der Startseite: AutomotiveBusiness-JSON-LD (`@id #business`) übernehmen, sonst brechen die
   Verweise der Leistungsseiten.
 - Offen beim Nutzer: Pflegehinweis „waschen nach Keramik“ (Wartezeit bis zur ersten Wäsche).
+- 05.11. abends: **Go-live** nach Freigabe des Nutzers. Tests: 5/15 → 6/15 → 11/15 → 13/15 Anfragen, kein Abbruch im ersten Bildschirm.
+  - Startseite steckt in der Kubio-Vorlage `kubio//front-page` (Eintrag 28), nicht in Seite 11. Neuer Inhalt in beiden.
+  - Neue Seiten: /tierhaare-auto-entfernen/ (1334), /autositz-reinigen-flecken/ (1335). Keramik (777) komplett neu.
+  - Geändert per Austauschbefehl: 311, 382, 780, 1113, 1114, 1115, 1116, 843, Block 1062 (Schnellformular).
+  - Google-Profil: 32 Leistungen, Wohnmobil 800 €, 8 neue Pakete.
+  - Sicherung der alten Seiten: `carcura-assistent/website-rebuild/sicherung/` und WordPress-Revisionen.
+  - Offen beim Nutzer: Sitemap-Cache leeren, `llms.txt` per Plesk hochladen, Zahlungsarten, Leder in „detailliert“ ja/nein.
