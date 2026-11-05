@@ -102,3 +102,12 @@ Befund: Kommentare steigen von 116 auf 347 je Folge, waehrend die Aufrufe juenge
 Uebernommen (Mechanik): Kommentar-Abstimmung mit ehrlicher Ergebnis-Karte, Hook „You chose X.“, sichtbarer Zustand im HUD,
 Laenge > 60 s fuer TikTok Rewards. Projekt: `projekte/horror-serie/` (ANALYSE.md, KONZEPT.md).
 Fuer Carcura: „Welche Leistung zeigen wir morgen? Top-Kommentar entscheidet“ + Ergebnis-Karte im naechsten Reel.
+
+## Runde 7 (05.11.2026): ai.nxtlvl – „Stop paying for these apps“ (52 s, **2.142 Kommentare** bei 7.947 Followern)
+
+Gezeigt/gesagt: 9 Bezahl-Apps → kostenlose GitHub-Alternative je Karte (Name, Repo, Sterne, Funktions-Pills, „FREE“-Stempel),
+Fortschrittsbalken „3/9“ oben links ueber das ganze Video, kleines Maskottchen, ein Wort pro Satz kursiv hervorgehoben,
+Kommentar-CTA „REPO“ → DM mit allen Links (Lead-Magnet).
+Uebernommen: **Zaehler „n/9“ als Halte-Mechanik bei Listen-Reels** (Zuschauer wartet auf 9/9); Karten-Layout mit
+durchgestrichenem Bezahl-Original. Fuer Carcura: „5 Fehler bei der Autowaesche“ mit Zaehler 1/5 … 5/5 + Kommentar-Stichwort.
+Vorsicht: „kostenlos“ stimmt nur teilweise (eigene API-Schluessel, Server, Wartung) – so nicht ungeprueft uebernehmen.
