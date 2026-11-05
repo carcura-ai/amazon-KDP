@@ -10,5 +10,5 @@ Plan und Preise: `docs/WEBSITE-REBUILD-MASTERPLAN.md`.
   gegen das Anfrageformular. `check.js` – Handy-Prüfung (390 px), JavaScript-Fehler, Textauszug für die Tests.
 - `tests/` – Berichte der Simulationsrunden (Personas, Abbrüche, Widersprüche).
 
-Ergebnis Anfragen von 15 Personas: Ausgangsmessung 5 · Runde 1 6 · Runde 2 11 · Runde 3 siehe `tests/`.
+Ergebnis Anfragen von 15 Personas: Ausgangsmessung 5 · Runde 1 6 · Runde 2 11 · Runde 3 13 (kein Abbruch im ersten Bildschirm). Kontrollpersonas Runde 3: 4/5 bekannte, 1/3 neue (danach Budget, Leder, Geruch ergänzt).
 Live geht nichts ohne Freigabe; vor dem Go-live die Regeln gegen den Roh-Inhalt in WordPress prüfen (Trefferzahl), danach live nachlesen.

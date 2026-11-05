@@ -77,14 +77,14 @@ LEISTUNGEN = [
  # Innen: Einzelner Sitz + Fleck & Geruch vor Polster
  ('        <div class="cc-sv__item"><div><b>Polster- &amp; Sitzreinigung (Tiefenreinigung)</b>',
   '        ' + sv_item('Einzelner Sitz / Fleck', 'Ein Sitz oder eine Fleckenstelle, mit Sprühextraktion.', ['Fleck vorbehandelt', 'Sitz im Sprühextraktionsverfahren gereinigt', 'Trocknet vollständig, bevor du das Auto zurückbekommst'], 'Notfall wie Erbrochenes: ab 179 € mit Desinfektion und Ozon. <a href="/autositz-reinigen-flecken/">Flecken im Autositz</a>', '/anfragen/?leistung=Einzelner%20Sitz', 'pill-sitz', 'ab 49 €')
-  + '\n        ' + sv_item('Fleck + Geruch', 'Alle Polster tiefengereinigt plus Ozon gegen Gerüche.', ['Polster- und Sitzreinigung komplett', 'Ozonbehandlung im geschlossenen Fahrzeug', 'Gegen Milch-, Kakao-, Rauch- oder Hundegeruch'], 'Einzeln gebucht 79 € + 59 € – im Paket ab 119 €.', '/anfragen/?leistung=Fleck%20%2B%20Geruch', 'pill-fleckgeruch', 'ab 119 €')
+  + '\n        ' + sv_item('Fleck + Geruch', 'Alle Polster tiefengereinigt plus Ozon gegen Gerüche.', ['Polster- und Sitzreinigung komplett', 'Ozonbehandlung im geschlossenen Fahrzeug', 'Gegen Geruch aus den Sitzen, z. B. nach Milch, Kakao oder Hund'], 'Einzeln gebucht 79 € + 59 € – im Paket ab 119 €.', '/anfragen/?leistung=Fleck%20%2B%20Geruch', 'pill-fleckgeruch', 'ab 119 €')
   + '\n        <div class="cc-sv__item"><div><b>Polster- &amp; Sitzreinigung (Tiefenreinigung)</b>', 1),
  ('<span>Zum Beispiel ein einzelner Sitz, der Kofferraum oder Motorrad.</span>', '<span>Zum Beispiel nur der Kofferraum, ein Motorrad oder ein Wohnwagen.</span>', 1),
  ('<li>Einzelne Sitze, Kofferraum oder Fleckenstellen</li>', '<li>Nur der Kofferraum oder einzelne Bereiche</li>', 1),
  # Van-Regel
  ('Alle Preise sind Ab-Preise für PKW und Kombi bei normaler Verschmutzung.', 'Alle Preise sind Ab-Preise für PKW, Kombi und Van bei normaler Verschmutzung; Politur und Keramik für SUV und Van nach Fotos.', 1),
  (re.compile(r'Preise gelten für PKW und Kombi bei normaler Verschmutzung – Fahrzeuggröße,'), 'Preise gelten für PKW, Kombi und Van bei normaler Verschmutzung – Fahrzeuggröße,', 1),
- ('Sie gelten für PKW und Kombi bei normaler Verschmutzung; Fahrzeuggröße', 'Sie gelten für PKW, Kombi und Van bei normaler Verschmutzung; Fahrzeuggröße', 2),
+ ('Sie gelten für PKW und Kombi bei normaler Verschmutzung; Fahrzeuggröße', 'Sie gelten für PKW und Kombi, bei der Reinigung auch für Vans, bei normaler Verschmutzung; Fahrzeuggröße', 2),
  # Keramik-FAQ (HTML + JSON-LD)
  ('Wir arbeiten mit Nanolex und nennen dir vor der Beauftragung die Standzeit, die der Hersteller für das gewählte Produkt angibt.',
   'Wir versiegeln mit XPERTCOAT HYBRID – laut Hersteller bis zu 5 Jahre oder 70.000 km, je nach Pflege. Nach 6 Monaten prüfen wir die Versiegelung kostenlos nach.', 2),
@@ -286,3 +286,16 @@ GERUCH += [
   '<details><summary>Mein Auto riecht muffig. Hilft Ozon?</summary><p>Oft steckt Feuchtigkeit dahinter. Schreib uns, seit wann es so riecht und ob der Teppich nass ist – wir sagen dir ehrlich, ob Reinigung und Ozon helfen oder ob zuerst eine Werkstatt die Ursache finden muss.</p></details>\n<details><summary>Holt ihr das Auto ab?</summary>', 1),
 ]
 SCHNELL[0] = (SCHNELL[0][0], SCHNELL[0][1] + '\n        <option>Leder reinigen / versiegeln</option>', 1)
+
+# ---------------------------------------------------------------- v5 (Original-Personas Runde 3)
+LEISTUNGEN += [
+ (re.compile(r'<p class="cc-sv__lead">.*?</p>', re.S),
+  '''<p class="cc-sv__lead">
+        Jede Leistung mit Inhalt und Ab-Preis, Zusätze in Kombination günstiger. Termin meist in 1–2 Wochen, auch abends
+        und samstags. Eilig, z.&nbsp;B. Leasingrückgabe? Schick Fotos per WhatsApp – wir sagen dir meist am selben Tag, ob es klappt.
+        Transporter oder Firmenwagen: fester Preis nach Fotos (<a href="/firmenkunde/">Firmenkunden</a>). In unserer Halle in
+        Walterschen bei <a href="/fahrzeugaufbereitung-altenkirchen/">Altenkirchen</a> – für Kunden aus dem ganzen <a href="/fahrzeugaufbereitung-westerwald/">Westerwald</a>, auf Wunsch mit <a href="/hol-und-bringservice/">Hol- und Bringservice</a>.
+      </p>''', 1),
+ ('<p>Langanhaltender Lackschutz mit starkem Abperleffekt – Handwäsche, Kneten und 1-stufige Politur sind im Preis enthalten. Felgen und Scheiben günstig dazubuchbar.</p>',
+  '<p>XPERTCOAT HYBRID, laut Hersteller bis 5 Jahre. Handwäsche, Kneten, 1-stufige Politur und Pflegeset inklusive, Nachkontrolle nach 6 Monaten gratis. SUV oder Neuwagen: fester Preis nach Fotos.</p>', 1),
+]
