@@ -111,3 +111,11 @@ Kommentar-CTA „REPO“ → DM mit allen Links (Lead-Magnet).
 Uebernommen: **Zaehler „n/9“ als Halte-Mechanik bei Listen-Reels** (Zuschauer wartet auf 9/9); Karten-Layout mit
 durchgestrichenem Bezahl-Original. Fuer Carcura: „5 Fehler bei der Autowaesche“ mit Zaehler 1/5 … 5/5 + Kommentar-Stichwort.
 Vorsicht: „kostenlos“ stimmt nur teilweise (eigene API-Schluessel, Server, Wartung) – so nicht ungeprueft uebernehmen.
+
+## Runde 8 (05.11.2026): memo.baut.ki – „3D mit Claude Code + Blender“ (65 s, 8,2 Tsd. Aufrufe, 217 Kommentare)
+
+Gezeigt/gesagt: Claude als „Regisseur“ verteilt Form, Material, Licht, Kamera; drei Produkte aus drei Woertern
+(Bremsscheibe mit Sattel, Getriebe, Kugellager in Explosionsansicht), „0 gekaufte Modelle“, „fuer deine Webseite“;
+Pixel-Maskottchen, Serien-Zaehler „Tag 15/30“, Kommentar-CTA „3D“ fuer ein Skill-Paket.
+Umgesetzt: eigener Skill `blender-3d` + `3d-studio/` (Explosionsansicht Lackschichten fuer /keramikversiegelung/).
+Fuers Format: Serien-Zaehler „Tag x/30“ + Halbzeit-Moment als Community-Anker.
