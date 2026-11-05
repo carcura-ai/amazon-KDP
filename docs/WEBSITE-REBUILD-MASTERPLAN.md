@@ -118,4 +118,5 @@ verteilt nicht weiter, (3) auf den Unterseiten fehlen Beweise (Keramik) bzw. gan
   - Geändert per Austauschbefehl: 311, 382, 780, 1113, 1114, 1115, 1116, 843, Block 1062 (Schnellformular).
   - Google-Profil: 32 Leistungen, Wohnmobil 800 €, 8 neue Pakete.
   - Sicherung der alten Seiten: `carcura-assistent/website-rebuild/sicherung/` und WordPress-Revisionen.
-  - Offen beim Nutzer: Sitemap-Cache leeren, `llms.txt` per Plesk hochladen, Zahlungsarten, Leder in „detailliert“ ja/nein.
+  - Zahlungsarten (Nutzer, 05.11.): alle gängigen Karten, Rechnung, Vorkasse – auf Startseite (FAQ + Schema) und in `llms.txt`.
+  - Offen beim Nutzer: Sitemap-Cache leeren, `llms.txt` per Plesk hochladen, Leder in „detailliert“ ja/nein.
