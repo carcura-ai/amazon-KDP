@@ -119,4 +119,6 @@ verteilt nicht weiter, (3) auf den Unterseiten fehlen Beweise (Keramik) bzw. gan
   - Google-Profil: 32 Leistungen, Wohnmobil 800 €, 8 neue Pakete.
   - Sicherung der alten Seiten: `carcura-assistent/website-rebuild/sicherung/` und WordPress-Revisionen.
   - Zahlungsarten (Nutzer, 05.11.): alle gängigen Karten, Rechnung, Vorkasse – auf Startseite (FAQ + Schema) und in `llms.txt`.
-  - Offen beim Nutzer: Sitemap-Cache leeren, `llms.txt` per Plesk hochladen, Leder in „detailliert“ ja/nein.
+  - Leder (Nutzer, 05.11.): Lederreinigung in „detailliert“ enthalten, Versiegelung +40 € extra; +39 € nur zur Innenreinigung Normal.
+  - „Bessern wir nach“ ersetzt durch „Kostenlos dazu: Nachkontrolle“ + „gesetzliche Gewährleistung“ (UWG Anhang Nr. 10: gesetzliche Rechte nicht als Besonderheit bewerben).
+  - Offen beim Nutzer: Sitemap-Cache leeren, `llms.txt` per Plesk hochladen.
