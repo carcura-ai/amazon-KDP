@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lackschichten 3D</title>
+<style>
+  :root { --seite: #09090A; --text: #F2F3F5; --leise: #AEB2B9; color-scheme: dark; }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --seite: #09090A; } }
+  :root[data-theme="dark"] { --seite: #09090A; }
+  html, body { margin: 0; background: var(--seite); color: var(--text);
+    font-family: "Satoshi", "Inter", system-ui, -apple-system, "Segoe UI", sans-serif; }
+  .demo-hinweis { max-width: 720px; margin: 0 auto; padding: 18vh 16px; color: var(--leise); text-align: center; }
+  .demo-hinweis b { color: var(--text); }
+</style>
+</head>
+<body>
+<p class="demo-hinweis"><b>Vorschau für carcura.info/keramikversiegelung/</b><br>Langsam nach unten scrollen.</p>
+
+<!-- ===== CARCURA-3D START: ab hier in einen WordPress-Block „Individuelles HTML“ kopieren ===== -->
+<!-- Vor dem Einbau: SCRUB und POSTER unten durch die Mediathek-URLs von scrub.mp4 und poster.webp ersetzen. -->
+<section class="cc3d" aria-labelledby="cc3d-titel">
+  <style>
+    .cc3d { --cc-gelb: #E8F320; --cc-grund: #09090A; --cc-text: #F2F3F5; --cc-leise: #AEB2B9; --cc-linie: rgba(255,255,255,.12);
+      position: relative; height: 340vh; background: var(--cc-grund); color: var(--cc-text); font-family: inherit; }
+    .cc3d * { box-sizing: border-box; }
+    .cc3d-sticky { position: sticky; top: 0; height: 100vh; height: 100svh; display: grid;
+      grid-template-columns: minmax(0, 1.15fr) minmax(0, .85fr); align-items: center; gap: clamp(16px, 4vw, 64px);
+      max-width: 1240px; margin: 0 auto; padding: 0 clamp(16px, 4vw, 48px); overflow: hidden; }
+    .cc3d-bild { position: relative; aspect-ratio: 1; width: 100%; max-height: 88svh; justify-self: center;
+      -webkit-mask-image: radial-gradient(closest-side, #000 72%, transparent 100%);
+              mask-image: radial-gradient(closest-side, #000 72%, transparent 100%); }
+    .cc3d-bild video, .cc3d-bild img { width: 100%; height: 100%; object-fit: contain; display: block; }
+    .cc3d-kicker { color: var(--cc-gelb); font-size: 13px; letter-spacing: .14em; text-transform: uppercase; font-weight: 600; margin: 0 0 10px; }
+    .cc3d h2 { font-size: clamp(28px, 3.4vw, 46px); line-height: 1.08; margin: 0 0 22px; font-weight: 700; letter-spacing: -.01em; }
+    .cc3d-liste { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--cc-linie); }
+    .cc3d-liste li { padding: 14px 0 14px 18px; border-bottom: 1px solid var(--cc-linie); position: relative;
+      opacity: .38; transition: opacity .35s ease; }
+    .cc3d-liste li::before { content: ""; position: absolute; left: 0; top: 19px; width: 6px; height: 6px; border-radius: 50%;
+      background: var(--cc-leise); transition: background .35s ease, box-shadow .35s ease; }
+    .cc3d-liste li.ist-aktiv { opacity: 1; }
+    .cc3d-liste li.ist-aktiv::before { background: var(--cc-gelb); box-shadow: 0 0 12px var(--cc-gelb); }
+    .cc3d-liste strong { display: block; font-size: 17px; margin-bottom: 4px; }
+    .cc3d-liste span { display: block; color: var(--cc-leise); font-size: 15px; line-height: 1.5; }
+    .cc3d-liste li[data-schicht="5"] strong { color: var(--cc-gelb); }
+    .cc3d-cta { margin-top: 22px; display: flex; flex-wrap: wrap; gap: 10px 14px; align-items: center;
+      opacity: 0; transform: translateY(8px); transition: opacity .4s ease, transform .4s ease; }
+    .cc3d-cta.ist-sichtbar { opacity: 1; transform: none; }
+    .cc3d-cta p { width: 100%; margin: 0 0 4px; color: var(--cc-leise); font-size: 15px; }
+    .cc3d-cta p b { color: var(--cc-text); }
+    .cc3d-knopf { display: inline-block; padding: 13px 22px; border-radius: 999px; background: var(--cc-gelb); color: #09090A;
+      font-weight: 700; text-decoration: none; font-size: 15px; }
+    .cc3d-knopf:focus-visible, .cc3d-link:focus-visible { outline: 2px solid var(--cc-gelb); outline-offset: 3px; }
+    .cc3d-link { color: var(--cc-text); font-size: 15px; text-underline-offset: 4px; }
+
+    @media (max-width: 820px) {
+      .cc3d { height: 420vh; }
+      .cc3d-sticky { grid-template-columns: 1fr; grid-template-rows: auto 1fr; align-items: start; gap: 0; padding-top: 12px; }
+      .cc3d-bild { width: min(100%, 52svh); }
+      .cc3d h2 { font-size: 26px; margin-bottom: 12px; }
+      .cc3d-liste { border-top: 0; }
+      .cc3d-liste li { display: none; border: 0; padding-top: 4px; }
+      .cc3d-liste li.ist-aktiv { display: block; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .cc3d { height: auto; }
+      .cc3d-sticky { position: static; height: auto; padding-block: 48px; }
+      .cc3d-liste li, .cc3d-liste li.ist-aktiv { display: block; opacity: 1; }
+      .cc3d-cta { opacity: 1; transform: none; }
+    }
+  </style>
+
+  <div class="cc3d-sticky">
+    <div class="cc3d-bild">
+      <video class="cc3d-video" muted playsinline preload="none" poster="poster.webp" data-src="scrub.mp4"
+             aria-label="3D-Animation: Die Lackschichten eines Autos fahren auseinander, oben die Keramik mit Wasserperlen"></video>
+    </div>
+    <div>
+      <p class="cc3d-kicker">Keramikversiegelung</p>
+      <h2 id="cc3d-titel">Fünf Schichten Lack. Eine schützt alle.</h2>
+      <ol class="cc3d-liste">
+        <li data-schicht="5"><strong>Keramik</strong><span>Hauchdünn und widerstandsfähig. Wasser perlt ab und nimmt Schmutz mit, Waschen geht schneller.</span></li>
+        <li data-schicht="4"><strong>Klarlack</strong><span>Hier entsteht der Glanz, und hier sitzen Kratzer und Swirls. Deshalb polieren wir ihn, bevor die Keramik draufkommt.</span></li>
+        <li data-schicht="3"><strong>Basislack</strong><span>Die Farbe deines Autos. Glanz und Schutz bekommt sie erst vom Klarlack darüber.</span></li>
+        <li data-schicht="2"><strong>Grundierung</strong><span>KTL und Füller ab Werk: Haftgrund und Rostschutz.</span></li>
+        <li data-schicht="1"><strong>Blech</strong><span>Stahl oder Aluminium. Das, was am Ende geschützt werden soll.</span></li>
+      </ol>
+      <div class="cc3d-cta">
+        <p>Keramikversiegelung inklusive Wäsche, Kneten und Politur: <b>ab 650 €</b></p>
+        <a class="cc3d-knopf" href="https://carcura.info/anfragen/">Termin anfragen</a>
+        <a class="cc3d-link" href="https://wa.me/491706669516?text=Hallo%20Carcura%2C%20ich%20interessiere%20mich%20f%C3%BCr%20die%20Keramikversiegelung">Per WhatsApp fragen</a>
+      </div>
+    </div>
+  </div>
+
+  <script>
+  (function () {
+    var sek = document.currentScript.closest(".cc3d");
+    var vid = sek.querySelector(".cc3d-video");
+    var punkte = [].slice.call(sek.querySelectorAll(".cc3d-liste li"));
+    var cta = sek.querySelector(".cc3d-cta");
+    var ruhig = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (ruhig) return;                               // Poster + volle Liste, keine Bewegung
+
+    var bereit = false, letzte = -1, geplant = false;
+    function laden() {                               // ganzes Video als Blob → Springen ohne Nachladen
+      var src = vid.getAttribute("data-src");
+      fetch(src).then(function (r) { return r.blob(); })
+        .then(function (b) { vid.src = URL.createObjectURL(b); })
+        .catch(function () { vid.src = src; });
+      vid.addEventListener("loadeddata", function () {
+        var p = vid.play();                          // iOS zeigt Bilder erst nach einmal Abspielen
+        if (p && p.then) p.then(function () { vid.pause(); bereit = true; zeichnen(); }).catch(function () { bereit = true; });
+        else bereit = true;
+      }, { once: true });
+    }
+    new IntersectionObserver(function (e, io) {
+      if (e[0].isIntersecting) { laden(); io.disconnect(); }
+    }, { rootMargin: "100% 0px" }).observe(sek);
+
+    function fortschritt() {
+      var r = sek.getBoundingClientRect(), h = sek.offsetHeight - window.innerHeight;
+      return Math.min(1, Math.max(0, -r.top / h));
+    }
+    function zeichnen() {
+      geplant = false;
+      var p = fortschritt();
+      if (bereit && vid.duration) {
+        var t = Math.min(1, p / 0.7) * (vid.duration - 0.01);        // 0–70 % Scrollweg = Animation
+        if (Math.abs(t - letzte) > 0.02) { vid.currentTime = t; letzte = t; }
+      }
+      var n = Math.min(5, Math.max(1, Math.ceil((p - 0.12) / 0.7 * 5)));   // von unten (Blech) nach oben (Keramik)
+      punkte.forEach(function (li) { li.classList.toggle("ist-aktiv", +li.getAttribute("data-schicht") === n); });
+      cta.classList.toggle("ist-sichtbar", p > 0.8);
+    }
+    window.addEventListener("scroll", function () { if (!geplant) { geplant = true; requestAnimationFrame(zeichnen); } }, { passive: true });
+    window.addEventListener("resize", zeichnen);
+    zeichnen();
+  })();
+  </script>
+</section>
+<!-- ===== CARCURA-3D ENDE ===== -->
+
+<p class="demo-hinweis">Ende der Vorschau.</p>
+</body>
+</html>
