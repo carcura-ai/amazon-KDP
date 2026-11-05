@@ -274,3 +274,15 @@ HOLBRING = [
  ('<p>„Ich war mit meinem M2 G87 bei Carcura für eine Keramikversiegelung und bin mit dem Ergebnis wirklich super zufrieden!“</p>\n          <footer>Echte Google-Bewertung · Keramikversiegelung</footer>',
   '<p>„Nach Terminabsprache wurde das Fahrzeug pünktlich geholt und sogar schneller gebracht als abgesprochen. Gerne wieder“</p>\n          <footer>Tobias · Echte Google-Bewertung · Hol- &amp; Bringservice</footer>', 1),
 ]
+
+# ---------------------------------------------------------------- v4 (Kontrollpersonas Runde 3)
+INNEN += [
+ ('<span>Tierhaare +29&nbsp;€ · Innen + außen ab 145&nbsp;€ · Familienpaket ab 169&nbsp;€</span></p>',
+  '<span>Tierhaare +29&nbsp;€ · Leder &amp; Lenkrad +39&nbsp;€ · Innen + außen ab 145&nbsp;€</span></p>', 1),
+ ('<li>Tierhaare und Gerüche</li><li>Van zum PKW-Preis</li></ul>', '<li>Tierhaare und Gerüche</li><li>Leder &amp; Lenkrad</li><li>Van zum PKW-Preis</li></ul>', 1),
+]
+GERUCH += [
+ ('<details><summary>Holt ihr das Auto ab?</summary>',
+  '<details><summary>Mein Auto riecht muffig. Hilft Ozon?</summary><p>Oft steckt Feuchtigkeit dahinter. Schreib uns, seit wann es so riecht und ob der Teppich nass ist – wir sagen dir ehrlich, ob Reinigung und Ozon helfen oder ob zuerst eine Werkstatt die Ursache finden muss.</p></details>\n<details><summary>Holt ihr das Auto ab?</summary>', 1),
+]
+SCHNELL[0] = (SCHNELL[0][0], SCHNELL[0][1] + '\n        <option>Leder reinigen / versiegeln</option>', 1)
