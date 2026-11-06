@@ -5,7 +5,7 @@ Arbeitsweise und Regeln: `.claude/skills/blender-3d/SKILL.md`.
 ## Einrichtung (einmal pro Container)
 
 ```bash
-sudo apt-get update && sudo apt-get install -y blender ffmpeg   # Ubuntu 24.04: Blender 4.0.2
+sudo apt-get update && sudo apt-get install -y blender ffmpeg libegl1 libegl-mesa0 libgl1-mesa-dri   # Blender 4.0.2 + Workbench headless
 ```
 
 ## Bedienung

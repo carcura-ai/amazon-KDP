@@ -14,7 +14,7 @@ from mathutils import Vector
 
 def args():
     a = sys.argv[sys.argv.index("--") + 1:] if "--" in sys.argv else []
-    out = {"out": "out", "vorschau": False, "frames": None, "still": None}
+    out = {"out": "out", "vorschau": False, "frames": None, "still": None, "schritt": 1}
     i = 0
     while i < len(a):
         if a[i] == "--out":
@@ -25,6 +25,8 @@ def args():
             s, e = a[i + 1].split("-"); out["frames"] = (int(s), int(e)); i += 1
         elif a[i] == "--still":
             out["still"] = int(a[i + 1]); i += 1
+        elif a[i] == "--schritt":                 # nur jedes n-te Bild (Bewegungsprobe)
+            out["schritt"] = int(a[i + 1]); i += 1
         i += 1
     return out
 
@@ -73,6 +75,9 @@ def material(name, **werte):
         if k in ("base", "emission") and len(v) == 3:
             v = (*v, 1)
         p.inputs[namen[k]].default_value = v
+    if "base" in werte:                       # Vorschaufarbe fuer Workbench (Formkontrolle)
+        m.diffuse_color = p.inputs["Base Color"].default_value
+    m.metallic, m.roughness = werte.get("metallic", 0.0), werte.get("roughness", 0.5)
     return m
 
 
@@ -177,6 +182,8 @@ def rendern(a, aufloesung=1080, samples=96):
     s.render.resolution_x = s.render.resolution_y = aufloesung
     s.render.resolution_percentage = 50 if a["vorschau"] else 100
     s.cycles.samples = 24 if a["vorschau"] else samples
+    if a["schritt"] > 1:                         # Bewegungsprobe: klein und schnell
+        s.render.resolution_percentage, s.cycles.samples = 30, 12
     s.cycles.use_adaptive_sampling = True
     s.cycles.adaptive_threshold = 0.02
     s.cycles.use_denoising = False          # Ubuntu-Blender hat kein OpenImageDenoise
@@ -197,5 +204,6 @@ def rendern(a, aufloesung=1080, samples=96):
         return
     if a["frames"]:
         s.frame_start, s.frame_end = a["frames"]
+    s.frame_step = a["schritt"]
     s.render.filepath = os.path.join(out, "frames", "f_")
     bpy.ops.render.render(animation=True)

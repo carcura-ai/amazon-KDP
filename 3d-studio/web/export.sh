@@ -28,15 +28,20 @@ N=$(ls "$DN" | wc -l)
 q -framerate "$FPS" -i "$DN/d_%04d.png" -c:v libx264 -preset slow -crf 22 -g 1 -pix_fmt yuv420p \
   -movflags +faststart -an "$W/scrub.mp4"
 
-# 3) Schleife: vor – halten – zurueck – halten
+# 3) Schleife: vor – halten – zurueck – halten (MODUS=vor: nur vorwaerts, Ende halten, weich ab- und einblenden –
+#    fuer Ablaeufe, die rueckwaerts keinen Sinn ergeben, z. B. eine Waesche)
 PP="[0]split[a][b];[a]tpad=stop_mode=clone:stop_duration=1.2[f];[b]reverse,tpad=stop_mode=clone:stop_duration=0.8[r];[f][r]concat=n=2:v=1"
+if [ "${MODUS:-pingpong}" = "vor" ]; then
+  D=$(awk "BEGIN{print $N/$FPS + 1.2}")
+  PP="[0]tpad=stop_mode=clone:stop_duration=1.2,fade=t=in:st=0:d=0.35:color=0x09090A,fade=t=out:st=$(awk "BEGIN{print $D-0.45}"):d=0.45:color=0x09090A"
+fi
 q -framerate "$FPS" -i "$DN/d_%04d.png" -filter_complex "$PP" -c:v libx264 -preset slow -crf 24 -pix_fmt yuv420p \
   -movflags +faststart -an "$W/loop.mp4"
-q -framerate "$FPS" -i "$DN/d_%04d.png" -filter_complex "$PP" -c:v libvpx-vp9 -crf 36 -b:v 0 -row-mt 1 -an "$W/loop.webm"
+q -framerate "$FPS" -i "$DN/d_%04d.png" -filter_complex "$PP" -c:v libvpx-vp9 -crf 40 -b:v 0 -row-mt 1 -an "$W/loop.webm"
 
-# 4) Standbild + Kontaktbogen
-q -i "$DN/$(printf 'd_%04d.png' "$N")" -c:v libwebp -quality 82 "$W/poster.webp"
-q -framerate "$FPS" -i "$DN/d_%04d.png" -vf "select='not(mod(n\,4))',scale=240:-1,tile=6x2:padding=4" -frames:v 1 "$W/kontakt.jpg"
+# 4) Standbild + Kontaktbogen (POSTER=<bildnummer> waehlt ein anderes Standbild als das letzte)
+q -i "$DN/$(printf 'd_%04d.png' "${POSTER:-$N}")" -c:v libwebp -quality 82 "$W/poster.webp"
+q -framerate "$FPS" -i "$DN/d_%04d.png" -vf "select='not(mod(n\,$(( (N + 11) / 12 ))))',scale=240:-1,tile=6x2:padding=4" -frames:v 1 "$W/kontakt.jpg"
 
 echo "Web-Dateien ($N Bilder):"
 ls -l "$W" | awk 'NR>1 {printf "  %-12s %6.0f KB\n", $9, $5/1024}'

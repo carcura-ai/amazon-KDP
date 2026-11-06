@@ -9,7 +9,7 @@ ROOT="$(cd "$(dirname "$0")" && pwd)"
 M="$1"; shift
 OUT="$ROOT/out/$M"
 BLENDER="${BLENDER:-blender}"
-command -v "$BLENDER" >/dev/null || { echo "Blender fehlt: sudo apt-get install -y blender"; exit 1; }
+command -v "$BLENDER" >/dev/null || { echo "Blender fehlt: sudo apt-get install -y blender libegl1 libegl-mesa0 libgl1-mesa-dri"; exit 1; }
 "$BLENDER" -b --factory-startup -noaudio --python "$ROOT/modelle/$M.py" -- --out "$OUT" "$@" \
   | grep -E "^Fra:.*(Sample [0-9]+/|Finished)|Saved|Error|Traceback" | grep -vE "Sample [0-9]*[1-9]/" || true
 case " $* " in *" --still "*) exit 0;; esac
