@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sportwagen Wäsche 3D</title>
+<style>
+  /* Nur fuer die Vorschau: Auszug aus dem Seitenstil cc-lp. Auf carcura.info kommt er von der Seite selbst. */
+  :root { --seite: #09090A; color-scheme: dark; }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --seite: #09090A; } }
+  :root[data-theme="dark"] { --seite: #09090A; }
+  html, body { margin: 0; background: var(--seite); }
+  .cc-lp{--y:#e8f320;--ink:#09090a;--muted:#b9bac0;--line:rgba(255,255,255,.13);--r:22px;position:relative;width:100%;margin:0;overflow:clip;background:var(--ink);color:#fff;font-family:Poppins,Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;font-size:16px;line-height:1.6}
+  .cc-lp p{margin:0}
+  .cc-lp__shell{width:min(calc(100% - 48px),1200px);margin-inline:auto}
+  .demo-hinweis { max-width: 720px; margin: 0 auto; padding: 10vh 16px; color: var(--muted); text-align: center; }
+  .demo-hinweis b { color: #fff; }
+</style>
+</head>
+<body>
+<div class="cc-lp">
+<p class="demo-hinweis"><b>Vorschau für carcura.info/keramikversiegelung/</b> – Bild im Abschnitt „Danach – Damit die Keramik lange hält“.</p>
+
+<!-- ===== CARCURA-3D START (Sportwagen-Wäsche, /keramikversiegelung/ Abschnitt „Danach“) – Block „Individuelles HTML“ in <div class="cc-lp"> =====
+     Medien: sportwagen-waesche/loop.mp4 (≤ 2 MB) + sportwagen-waesche/poster.webp (≤ 60 KB) hochladen, data-src und poster ersetzen.
+     Kein „Und“-Zeichen im Skript. Kein Preis (steht im Abschnitt). -->
+<figure class="cc3w" data-anim="sportwagen_waesche" style="margin:0">
+  <style>
+    .cc3w { width: min(100%, 720px); margin-inline: auto; }
+    .cc3w-video { display: block; width: 100%; height: auto; aspect-ratio: 1; border-radius: var(--r); background: #09090a; }
+    .cc3w figcaption { margin-top: 10px; color: var(--muted); font-size: 14px; line-height: 1.5; }
+    .cc3w figcaption b { color: #fff; font-weight: 600; }
+    .cc3w-klein { display: block; margin-top: 4px; font-size: 12px; }
+  </style>
+  <video class="cc3w-video" width="960" height="960" muted playsinline loop preload="none" poster="sportwagen-waesche/poster.webp"
+         data-src="sportwagen-waesche/loop.mp4"
+         aria-label="3D-Animation: Ein schwarzer Sportwagen wird eingeschäumt und abgespült, danach perlt Wasser vom sauberen Lack ab"></video>
+  <figcaption><b>Mit Keramik geht der Dreck leichter runter.</b> Die Pflegewäsche wird schneller, und Wasser perlt danach ab.
+    <span class="cc3w-klein">Animation, vereinfachte Darstellung</span></figcaption>
+  <script>
+  (function () {
+    var fig = document.currentScript.closest(".cc3w");
+    var anim = fig.getAttribute("data-anim");
+    var vid = fig.querySelector(".cc3w-video");
+    var gemeldet = {}, geladen = false, letzte = 0;
+    function melden(name) {
+      if (gemeldet[name]) return;
+      gemeldet[name] = true;
+      var p = { cc_page: location.pathname, cc_anim: anim };
+      if (typeof window.gtag === "function") { window.gtag("event", name, p); return; }
+      window.dataLayer = window.dataLayer || [];
+      window.dataLayer.push(Object.assign({ event: name }, p));
+    }
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;   // nur Poster
+    new IntersectionObserver(function (e) {
+      if (e[0].intersectionRatio >= 0.5) {
+        if (!geladen) { vid.src = vid.getAttribute("data-src"); geladen = true; }
+        var p = vid.play();
+        if (p) { if (p.then) p.then(function () { melden("cc_3d_start"); }).catch(function () {}); }
+      } else {
+        vid.pause();
+      }
+    }, { threshold: [0, 0.5] }).observe(vid);
+    vid.addEventListener("timeupdate", function () {
+      if (vid.currentTime < letzte) melden("cc_3d_ende");
+      letzte = vid.currentTime;
+    });
+  })();
+  </script>
+</figure>
+<!-- ===== CARCURA-3D ENDE ===== -->
+
+<p class="demo-hinweis">Ende der Vorschau.</p>
+</div>
+</body>
+</html>

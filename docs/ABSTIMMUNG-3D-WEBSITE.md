@@ -80,3 +80,26 @@ _06.11.2026, auch per Nachricht an die 3D-Session geschickt._
   - Leder-Versiegelung = +40 € zur Lederreinigung, die in „detailliert“ schon enthalten ist.
 - **„bessern wir nach“:** Alex hat entschieden: ersetzt durch „Für unsere Arbeit gilt die gesetzliche Gewährleistung“ plus die kostenlose Nachkontrolle nach 6 Monaten. Grund ist UWG Anhang Nr. 10: Gesetzliche Rechte darf man nicht als Besonderheit bewerben. Deshalb auch nicht in Reels verwenden.
 - **Handy-Review von Startseite und Keramik:** gern. Befunde bitte als Liste mit URL, Breite und Stelle.
+
+## 6. Umsetzung der Auflagen (3D-Session, 06.11.2026)
+
+- Lackschichten → `3d-studio/web/lackschichten-politur.html` (umbenannt): Überschrift „Vier Schichten über dem Blech. Kratzer sitzen im Klarlack.“,
+  keine µm-Angabe, Politur-CTA (`data-wa-service="Politur"`, `/anfragen/?leistung=Politur`, eigener WhatsApp-Text), Hinweis „Animation, vereinfachte Darstellung“.
+- Neu: `3d-studio/web/keramik-schutz.html` (Schleife startet bei 50 % Sichtbarkeit, Kapitel Wasser/UV/Schmutz laufen synchron mit, Klick springt ins Kapitel,
+  Labels „ohne“ / „mit Keramik“, Pflicht-Hinweis + „laut Hersteller“) und `3d-studio/web/sportwagen-waesche.html` (Schleife im Abschnitt „Danach“).
+- Alle drei: kein „&“ im Skript (geprüft), `preload="none"`, `muted playsinline`, IntersectionObserver, bei „Bewegung reduzieren“ nur Poster,
+  `width`/`height` am Video, GA4 `cc_3d_start` / `cc_3d_ende` mit `cc_page` + `cc_anim` (gtag, sonst dataLayer).
+- Medien liefere ich nach dem Render nach `3d-studio/lieferung/<animation>/` (mp4 ≤ 2 MB, Poster-WebP ≤ 60 KB). Einbau durch die Website-Session.
+- MARKE.md: „ab 800 €“/„ab 245 €“, Notfall nur Erbrochenes, Lederversiegelung +40 € zur Lederreinigung, Hinweis UWG Anhang Nr. 10 („bessern wir nach“ nicht bewerben).
+
+## 7. Handy-Prüfung live durch die 3D-Session (06.11.2026, ~23:00, Playwright, iPhone-Kennung, Cache umgangen mit `?v=`)
+
+| URL | Breite | Stelle | Befund | Schwere |
+|---|---|---|---|---|
+| / und /keramikversiegelung/ | 360 + 390 | erster Bildschirm | **Cookie-Banner verdeckt beim ersten Besuch ~57 % des Bildschirms** (ab y ≈ 330 bis unten): WhatsApp-Knopf, Anrufen, Preis-Kacheln unsichtbar, bis man klickt. Trifft genau die Meta-Besucher (77 % weg in 25 s). Vorschlag: Banner als kompakte Leiste unten (≤ 35 % Höhe), Text auf 2 Sätze kürzen, „Akzeptieren“ und „Ablehnen“ nebeneinander gleich groß (Ablehnen muss so leicht bleiben wie Akzeptieren). Bitte prüfen, ob die Persona-Tests den Banner gesehen haben. | **wichtig** |
+| / | 360 | erster Bildschirm | LCP 3,5 s (kalt), bei 390 px 2,3 s; Ziel < 2,5 s. Hero-Bild/Schrift prüfen (preload, Größe). | mittel |
+| / | 360 | erster Bildschirm | „Per WhatsApp fragen“ bei y = 668 von 780 sichtbar, „Anrufen“ angeschnitten (y = 732), „Schreib uns deinen Betrag“ darunter – ok, solange der Banner nicht darüber liegt. | klein |
+| beide | 360 + 390 | Menü-Knopf | „Mobilmenü“ 34–35 px (WCAG-AA-Minimum 24 px erfüllt; 44 px wäre bequemer). | klein |
+| beide | 360 + 390 | ganze Seite | kein seitliches Scrollen, keine JS-Fehler, keine kaputten Bilder. Keramik LCP 1,5–1,7 s. | ok |
+
+Hinweis: Fehlgeschlagene Aufrufe an google-analytics.com/googlesyndication.com kamen aus der Testumgebung (Netzsperre), kein Seitenfehler.

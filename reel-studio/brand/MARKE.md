@@ -38,12 +38,12 @@ Bei Preisaenderungen auf der Website diese Datei aktualisieren (oder Claude neu 
 |---|---|---|
 | **Basic Innen & Außen** (Innenraum + Handwaesche) | ab 145 € | |
 | Paket Innen & Außen mit Fleckenbehandlung, Kunststoffpflege, Schnellversiegelung [Name auf Website pruefen] | ab 249 € | |
-| Wohnmobil komplett (innen jeder Winkel + außen) | 800 € | |
-| Wohnmobil Basic innen + außen | 245 € | |
+| Wohnmobil komplett (innen jeder Winkel + außen) | ab 800 € | |
+| Wohnmobil Basic innen + außen | ab 245 € | |
 | **Familienpaket** innen + außen + Tierhaare | ab 169 € | |
 | Einzelner Sitz (Fleck/Polster) | ab 49 € | |
 | Fleck + Geruch (Polster + Ozon) | ab 119 € | |
-| Notfall-Reinigung (Erbrochenes, Getraenke, Essen) | ab 179 € | |
+| Notfall-Reinigung (Erbrochenes; Getraenke/Essen laufen ueber Fleck/Polster) | ab 179 € | |
 | Leasingrueckgabe-/Verkaufspaket | ab 229 € | |
 | Einstieg Handwaesche + Spruehversiegelung (XPERTCOAT GRAPHENE SPRAY) | ab 119 € | |
 | **Kombi Care** (Abo: 2× im Monat innen & außen) | 230 € / Monat | |
@@ -64,7 +64,7 @@ Bei Preisaenderungen auf der Website diese Datei aktualisieren (oder Claude neu 
 | **Keramikversiegelung XPERTCOAT HYBRID** (inkl. Handwaesche, Kneten, 1-stufige Politur, Nanolex-Pflegeset Wert 62 €) | ab 700 € | |
 | Keramikversiegelung mit 2-stufiger Politur | ab 900 € | |
 | Keramik-Pflege alle 2 Monate (Handwaesche mit Reactivating Shampoo) | 79 € pro Termin | |
-| Lederversiegelung (XPERTCOAT LEATHER) | ab 40 € | |
+| Lederversiegelung (XPERTCOAT LEATHER) | +40 € zur Lederreinigung (in „detailliert“ schon enthalten) | |
 | Hol- & Bringservice | bis 10 km gratis, darueber 2 €/km | |
 | Felgen-Keramik (alle vier) | ab 200 € | +170 € |
 | Scheiben-Keramik (alle Scheiben) | ab 100 € | +80 € |
@@ -72,6 +72,8 @@ Bei Preisaenderungen auf der Website diese Datei aktualisieren (oder Claude neu 
 Weitere Angebote: Treuekarte (5 Felder sammeln → Innen & Außen gratis), Gutscheine (Leistung oder Wertgutschein), Abo-Modelle, Autohaendler-Kooperation.
 
 ## Regeln fuer Preise in Videos und Anzeigen
+
+- **Nie „bessern wir nach“ o. ae. als Besonderheit bewerben** (UWG Anhang Nr. 10: gesetzliche Rechte sind keine Besonderheit). Website-Formulierung: „Fuer unsere Arbeit gilt die gesetzliche Gewaehrleistung“ + kostenlose Nachkontrolle nach 6 Monaten.
 
 - Immer „ab“-Preise wie auf der Website, Formulierung „Endpreis“; verbindlicher Preis „vor dem Termin bestaetigt“.
 - Statt-Preise nur mit dem tatsaechlichen Website-Preis (z. B. Keramik „statt ab 700 €“).
