@@ -103,3 +103,15 @@ _06.11.2026, auch per Nachricht an die 3D-Session geschickt._
 | beide | 360 + 390 | ganze Seite | kein seitliches Scrollen, keine JS-Fehler, keine kaputten Bilder. Keramik LCP 1,5–1,7 s. | ok |
 
 Hinweis: Fehlgeschlagene Aufrufe an google-analytics.com/googlesyndication.com kamen aus der Testumgebung (Netzsperre), kein Seitenfehler.
+
+## 8. Antwort Website-Session zu Abschnitt 6/7 (06.11.2026)
+
+- Abschnitt 6 passt. Den Einbau mache ich, sobald die Medien in `3d-studio/lieferung/` liegen und Alex freigibt.
+- **Cookie-Banner nachgemessen und bestätigt:** Beim ersten Besuch verdeckt er 58 % des Bildschirms bei 360 px und 53 % bei 390 px. Der WhatsApp-Knopf liegt darunter. Die Persona-Tests liefen auf Text-Exporten und haben den Banner **nicht** gesehen. Das war ein blinder Fleck.
+- **Lösung getestet** in `carcura-assistent/website-rebuild/cookie-banner/` (CSS mit Vorher/Nachher-Bild):
+  - Leiste unten, nur noch 28–30 % des Bildschirms
+  - „Akzeptieren“ und „Ablehnen“ nebeneinander und gleich groß (156×44 px)
+  - Einstellungen und die beiden Rechtslinks bleiben sichtbar
+  - kein seitliches Scrollen
+- Den Einbau macht Alex in Complianz unter „Benutzerdefiniertes CSS“. Die Farbe von „Ablehnen“ (bisher grau, „Akzeptieren“ gelb) entscheidet Alex.
+- **LCP Startseite:** Die Messung mit `?v=` umgeht den Cache und ist dadurch langsamer. Über den Cache antwortet der Server in 0,4–1,2 s (37 KB komprimiert). Bleibt bei „mittel“ und kommt später.

@@ -1,0 +1,13 @@
+/* Carcura: Complianz-Banner auf dem Handy kompakt (getestet 06.11.2026, 360/390 px: Anteil 58 % -> 30 %).
+   Einfuegen: WP-Admin -> Complianz -> Einstellungen -> Consent-Banner -> Benutzerdefiniertes CSS. Desktop bleibt unveraendert. */
+@media (max-width:600px){
+.cmplz-cookiebanner.cmplz-show{left:8px!important;right:8px!important;bottom:8px!important;width:auto!important;max-width:none!important;padding:10px 12px!important;row-gap:6px!important;grid-gap:6px!important}
+.cmplz-cookiebanner .cmplz-header{min-height:0!important}
+.cmplz-cookiebanner .cmplz-body{max-height:84px!important;overflow-y:auto!important;margin:0!important}
+.cmplz-cookiebanner .cmplz-message,.cmplz-cookiebanner .cmplz-message p{font-size:12.5px!important;line-height:1.4!important;margin:0!important}
+.cmplz-cookiebanner .cmplz-buttons{flex-direction:row!important;flex-wrap:wrap!important;gap:8px!important}
+.cmplz-cookiebanner .cmplz-buttons .cmplz-btn{flex:1 1 40%!important;width:auto!important;height:44px!important;min-height:44px!important;margin:0!important;padding:0 8px!important}
+.cmplz-cookiebanner .cmplz-buttons .cmplz-view-preferences,.cmplz-cookiebanner .cmplz-buttons .cmplz-save-preferences{flex-basis:100%!important;height:auto!important;min-height:0!important;background:none!important;border:0!important;text-decoration:underline!important;padding:2px 0!important}
+.cmplz-cookiebanner .cmplz-links.cmplz-information,.cmplz-cookiebanner .cmplz-divider{display:none!important}
+.cmplz-cookiebanner .cmplz-documents{margin:0!important}
+}
