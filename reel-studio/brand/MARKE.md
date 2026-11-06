@@ -1,6 +1,7 @@
 # Carcura – Markendaten fuer alle Videos
 
 Quelle: carcura.info (WordPress, Impressum, Leistungs- und Unterseiten), abgerufen am 20.10.2026.
+**Preise aktualisiert am 06.11.2026 nach `docs/WEBSITE-REBUILD-MASTERPLAN.md` §4 (vom Nutzer bestaetigt, Website-Umbau live seit 05.11.).** Bei Abweichung gilt der Masterplan.
 Bei Preisaenderungen auf der Website diese Datei aktualisieren (oder Claude neu abrufen lassen).
 
 ## Firma und Kontakt
@@ -37,13 +38,20 @@ Bei Preisaenderungen auf der Website diese Datei aktualisieren (oder Claude neu 
 |---|---|---|
 | **Basic Innen & Außen** (Innenraum + Handwaesche) | ab 145 € | |
 | Paket Innen & Außen mit Fleckenbehandlung, Kunststoffpflege, Schnellversiegelung [Name auf Website pruefen] | ab 249 € | |
-| Wohnmobil/Camper komplett innen & außen [Name pruefen] | ab 700 € | |
+| Wohnmobil komplett (innen jeder Winkel + außen) | 800 € | |
+| Wohnmobil Basic innen + außen | 245 € | |
+| **Familienpaket** innen + außen + Tierhaare | ab 169 € | |
+| Einzelner Sitz (Fleck/Polster) | ab 49 € | |
+| Fleck + Geruch (Polster + Ozon) | ab 119 € | |
+| Notfall-Reinigung (Erbrochenes, Getraenke, Essen) | ab 179 € | |
+| Leasingrueckgabe-/Verkaufspaket | ab 229 € | |
+| Einstieg Handwaesche + Spruehversiegelung (XPERTCOAT GRAPHENE SPRAY) | ab 119 € | |
 | **Kombi Care** (Abo: 2× im Monat innen & außen) | 230 € / Monat | |
 | Innenraumreinigung Normal | ab 90 € | |
 | Innenraumreinigung Detailliert | ab 150 € | |
 | Polster-/Sitzreinigung (Spruehextraktion) | ab 79 € | +59 € |
 | Tierhaarentfernung | ab 69 € | +29 € |
-| Ozonbehandlung (Geruch) | ab 50 € | +35 € |
+| Ozonbehandlung (Geruch) | ab 59 € | +39 € |
 | Lederreinigung & -pflege | ab 49 € | +39 € |
 | Lederversiegelung | – | +40 € |
 | Schonende Handwaesche | ab 60 € | |
@@ -53,8 +61,11 @@ Bei Preisaenderungen auf der Website diese Datei aktualisieren (oder Claude neu 
 | Spot-Repair einzelner Kratzer | nach Foto per WhatsApp | |
 | Scheinwerferaufbereitung (beide, inkl. UV-Schutz) | 59 € | |
 | Wachsversiegelung (bis ca. 6 Monate) | ab 179 € | +99 € nach Politur |
-| **Keramikversiegelung** (inkl. Handwaesche, Kneten, 1-stufige Politur) | ab 650 € | |
-| Keramikversiegelung mit 2-stufiger Politur | ab 850 € | |
+| **Keramikversiegelung XPERTCOAT HYBRID** (inkl. Handwaesche, Kneten, 1-stufige Politur, Nanolex-Pflegeset Wert 62 €) | ab 700 € | |
+| Keramikversiegelung mit 2-stufiger Politur | ab 900 € | |
+| Keramik-Pflege alle 2 Monate (Handwaesche mit Reactivating Shampoo) | 79 € pro Termin | |
+| Lederversiegelung (XPERTCOAT LEATHER) | ab 40 € | |
+| Hol- & Bringservice | bis 10 km gratis, darueber 2 €/km | |
 | Felgen-Keramik (alle vier) | ab 200 € | +170 € |
 | Scheiben-Keramik (alle Scheiben) | ab 100 € | +80 € |
 
@@ -63,5 +74,5 @@ Weitere Angebote: Treuekarte (5 Felder sammeln → Innen & Außen gratis), Gutsc
 ## Regeln fuer Preise in Videos und Anzeigen
 
 - Immer „ab“-Preise wie auf der Website, Formulierung „Endpreis“; verbindlicher Preis „vor dem Termin bestaetigt“.
-- Statt-Preise nur mit dem tatsaechlichen Website-Preis (z. B. Keramik „statt ab 650 €“).
+- Statt-Preise nur mit dem tatsaechlichen Website-Preis (z. B. Keramik „statt ab 700 €“).
 - Website-Belege: Vorher/Nachher BMW M2, Abperleffekt nach Keramik, Felgen-Keramik, Porsche (Nanolex) – vorhandenes Bildmaterial fuer Reels nutzbar.
