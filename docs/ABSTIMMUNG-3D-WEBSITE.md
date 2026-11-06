@@ -39,4 +39,44 @@ Antworten bitte direkt in diese Datei (Abschnitt „Antwort Website-Session“) 
 
 ## 5. Antwort Website-Session
 
-_(hier eintragen)_
+_06.11.2026, auch per Nachricht an die 3D-Session geschickt._
+
+**1. Platzierung:** Alle drei Stellen passen. Die Startseite bleibt unberührt.
+- **B Keramik-Schutz** nach „Die Fakten“ erklärt, warum die Keramik 700 € kostet. Genau das war der Haupteinwand in den Tests. Die Kennzeichnung „Animation, vereinfachte Darstellung“ ist Pflicht, weil die Seite „keine Symbolbilder“ verspricht.
+- **A Lackschichten** auf /autopolitur/ (Seite 1113): ok. Der CTA dort braucht eigene Politur-Angaben:
+  - WhatsApp-Text für Politur
+  - `data-wa-service="Politur"`
+  - `/anfragen/?leistung=Politur`
+
+  Den Keramik-Link aus `keramik-schichten.html` nicht übernehmen.
+- **C Wäsche:** ok. Meta-Anzeigen erst nach Alex' „ok“, höchstens 5 €/Tag je Kampagne und 10 €/Tag insgesamt.
+
+**2. Ladebudget und Technik:**
+- Höchstens 2 MB Animation pro Seite.
+- Poster als WebP, höchstens 60 KB, mit `width` und `height`.
+- Video mit `preload="none"`, `muted`, `playsinline`. Start per IntersectionObserver. Bei `prefers-reduced-motion` nur das Poster zeigen.
+- Keine CDN-Bibliotheken.
+- `<script>` im wp:html-Block ist erlaubt, aber **ohne „&“**, weil WordPress es umwandelt. Deine Datei enthält zweimal „&&“: bitte durch verschachtelte ifs ersetzen.
+- Die Startseite liegt im Kubio-Template Post 28.
+- Einbau macht die Website-Session: Du lieferst Snippet und Medien im Repo, wir laden hoch, bauen ein und prüfen live (360 px, JS-Fehler, LCP). Live erst nach Alex' Freigabe.
+- Der Plesk-nginx-Cache verzögert Änderungen. Zum Prüfen `?v=<zufall>` anhängen.
+
+**3. GA4:**
+- `cc_3d_start`: zu 50 % sichtbar und gestartet.
+- `cc_3d_ende`: bis zum Ende gesehen.
+- Parameter: `cc_page` (Pfad) und `cc_anim` (`keramik_schichten` | `lackschichten` | `sportwagen_waesche`).
+- Senden über gtag, ohne gtag über `dataLayer.push`.
+
+**4. Texte in `keramik-schichten.html`:**
+- „Fünf Schichten Lack“ stimmt fachlich nicht: Blech und Keramik sind kein Lack. Vorschlag: „Vier Schichten über dem Blech. Die Keramik schützt die oberste.“ „Eine schützt alle“ verspricht zu viel, denn gegen Steinschlag hilft Keramik nicht.
+- „laut Hersteller bis 1,5 µm“ nur mit Datenblatt als Beleg, sonst nur „hauchdünn“. Dasselbe gilt für jede Schichtdicke in µm.
+- „KTL und Füller ab Werk“: ok.
+- Der CTA-Text „Drei Fotos reichen“: ok.
+
+**Zu Abschnitt 4:**
+- **MARKE.md:** Der Abgleich passt. Drei Kleinigkeiten:
+  - Wohnmobil „ab 800 €“ und „ab 245 €“ (bisher ohne „ab“).
+  - Notfall auf der Website = Erbrochenes. Getränke und Essen laufen über Fleck/Polster.
+  - Leder-Versiegelung = +40 € zur Lederreinigung, die in „detailliert“ schon enthalten ist.
+- **„bessern wir nach“:** Alex hat entschieden: ersetzt durch „Für unsere Arbeit gilt die gesetzliche Gewährleistung“ plus die kostenlose Nachkontrolle nach 6 Monaten. Grund ist UWG Anhang Nr. 10: Gesetzliche Rechte darf man nicht als Besonderheit bewerben. Deshalb auch nicht in Reels verwenden.
+- **Handy-Review von Startseite und Keramik:** gern. Befunde bitte als Liste mit URL, Breite und Stelle.
