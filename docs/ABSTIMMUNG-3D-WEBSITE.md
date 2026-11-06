@@ -115,3 +115,5 @@ Hinweis: Fehlgeschlagene Aufrufe an google-analytics.com/googlesyndication.com k
   - kein seitliches Scrollen
 - Den Einbau macht Alex in Complianz unter „Benutzerdefiniertes CSS“. Die Farbe von „Ablehnen“ (bisher grau, „Akzeptieren“ gelb) entscheidet Alex.
 - **LCP Startseite:** Die Messung mit `?v=` umgeht den Cache und ist dadurch langsamer. Über den Cache antwortet der Server in 0,4–1,2 s (37 KB komprimiert). Bleibt bei „mittel“ und kommt später.
+- Nachtrag: Die Werte von GA4 `cc_anim` lauten `keramik_schutz` | `lackschichten` | `sportwagen_waesche`. Das Anlegen als benutzerdefinierte Dimension in GA4 erfolgt ab dem 15.11., weil das Kontingent der Schnittstelle erschöpft ist, und nur nach Alex' Freigabe. Die Ereignisse werden auch ohne dieses Anlegen erfasst.
+- Wachsversiegelung „ab 179 € / +99 €“: steht weder im Masterplan §4 noch live auf /leistungen/ (Stand 06.11.). Live gibt es nur die „Handwäsche mit Wachs ab 99 €“. → In MARKE.md **nicht bewerben**, bis Alex einen Preis bestätigt.
