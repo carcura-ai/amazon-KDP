@@ -61,7 +61,7 @@ Bei Preisaenderungen auf der Website diese Datei aktualisieren (oder Claude neu 
 | Politur 2-stufig (Schleif- + Hochglanzpolitur) | ab 549 € | |
 | Spot-Repair einzelner Kratzer | nach Foto per WhatsApp | |
 | Scheinwerferaufbereitung (beide, inkl. UV-Schutz) | 69 € | |
-| Wachsversiegelung (bis ca. 6 Monate) [Preis auf Website pruefen, live 06.11. unklar] | ab 179 € | +99 € nach Politur |
+| Wachsversiegelung – **NICHT bewerben**, weder im Masterplan noch live (06.11.); erst nach Preis-Bestaetigung durch Alex | – | – |
 | **Keramikversiegelung XPERTCOAT HYBRID** (inkl. Handwaesche, Kneten, 1-stufige Politur, Nanolex-Pflegeset Wert 62 €) | ab 700 € | |
 | Keramikversiegelung mit 2-stufiger Politur | ab 900 € | |
 | Keramik-Pflege alle 2 Monate (Handwaesche mit Reactivating Shampoo) | 79 € pro Termin | |
