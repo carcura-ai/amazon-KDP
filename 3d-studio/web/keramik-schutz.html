@@ -25,27 +25,31 @@
 </head>
 <body>
 <div class="cc-lp">
-<p class="demo-hinweis"><b>Vorschau für carcura.info/keramikversiegelung/</b> – Abschnitt direkt nach „XPERTCOAT HYBRID – die Fakten“.</p>
+<p class="demo-hinweis"><b>Vorschau für carcura.info/keramikversiegelung/</b> – Abschnitt nach „XPERTCOAT HYBRID – die Fakten“, unter dem echten Abperl-Video.</p>
 
-<!-- ===== CARCURA-3D START (Keramik-Schutz, /keramikversiegelung/ nach „Die Fakten“) – Block „Individuelles HTML“ in <div class="cc-lp"> =====
-     Medien: keramik-schutz/loop.mp4 (≤ 2 MB) + keramik-schutz/poster.webp (≤ 60 KB) hochladen, data-src und poster ersetzen.
-     Kein „Und“-Zeichen im Skript. Kennzeichnung „Animation, vereinfachte Darstellung“ ist Pflicht (Seite verspricht „keine Symbolbilder“). -->
+<!-- ===== CARCURA-3D START (Keramik-Schutz, /keramikversiegelung/) – Block „Individuelles HTML“ in <div class="cc-lp"> =====
+     Medien: keramik-schutz/einmal.mp4 (≤ 2 MB) + keramik-schutz/poster.webp (≤ 60 KB) hochladen, data-src und poster ersetzen.
+     Kein „Und“-Zeichen im Skript. Spielt einmal (mit Lesepausen je Kapitel), Pause-Knopf, danach „Nochmal ansehen“ (WCAG 2.2.2). -->
 <section class="cc-lp__sec cc3s" aria-labelledby="cc3s-titel" data-anim="keramik_schutz">
   <style>
     .cc3s * { box-sizing: border-box; }
     .cc3s-raster { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, .9fr); gap: clamp(20px, 4vw, 64px); align-items: center; }
-    .cc3s-bild { position: relative; border-radius: var(--r); overflow: hidden; background: #09090a; }
+    .cc3s-bild { position: relative; border-radius: var(--r); overflow: hidden; background: #09090a; margin: 0; }
     .cc3s-video { display: block; width: 100%; height: auto; aspect-ratio: 1; object-fit: cover; }
-    .cc3s-seite { position: absolute; top: 14px; padding: 6px 12px; border-radius: 999px; font-size: 12px; font-weight: 700;
-      letter-spacing: .06em; text-transform: uppercase; background: rgba(9,9,10,.72); color: #fff; }
-    .cc3s-seite--ohne { left: 14px; }
-    .cc3s-seite--mit { right: 14px; color: var(--y); border: 1px solid rgba(232,243,32,.45); }
-    .cc3s-hinweis { margin-top: 8px; color: var(--muted); font-size: 12px; }
+    .cc3s-marke { position: absolute; padding: 6px 12px; border-radius: 999px; font-size: 12px; font-weight: 700;
+      letter-spacing: .06em; text-transform: uppercase; background: rgba(9,9,10,.74); color: #fff; }
+    .cc3s-ohne { left: 14px; top: 14px; }
+    .cc3s-mit { right: 14px; top: 14px; color: var(--y); border: 1px solid rgba(232,243,32,.45); }
+    .cc3s-3d { left: 14px; bottom: 14px; font-weight: 600; text-transform: none; letter-spacing: 0; color: var(--muted); }
+    .cc3s-knopf { position: absolute; right: 14px; bottom: 14px; min-height: 44px; padding: 10px 16px; border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.35); background: rgba(9,9,10,.74); color: #fff;
+      font-family: inherit; font-size: 14px; font-weight: 700; line-height: 1; cursor: pointer; }
+    .cc3s-knopf:focus-visible { outline: 2px solid var(--y); outline-offset: 3px; }
     .cc3s h2 { margin-bottom: 22px; font-size: clamp(28px, 3.3vw, 46px); }
     .cc3s-akte { list-style: none; padding: 0; border-top: 1px solid var(--line); }
     .cc3s-akte li { border-bottom: 1px solid var(--line); }
     .cc3s-akte button { all: unset; box-sizing: border-box; display: block; width: 100%; padding: 14px 0 14px 22px; position: relative;
-      cursor: pointer; opacity: .4; transition: opacity .45s var(--ease); }
+      cursor: pointer; opacity: .7; transition: opacity .45s var(--ease); }
     .cc3s-akte button:focus-visible { outline: 2px solid var(--y); outline-offset: 2px; }
     .cc3s-akte button::before { content: ""; position: absolute; left: 0; top: 21px; width: 8px; height: 8px; border-radius: 50%;
       background: var(--muted); transition: background .45s var(--ease), box-shadow .45s var(--ease); }
@@ -66,22 +70,24 @@
   </style>
 
   <div class="cc-lp__shell cc3s-raster">
-    <figure class="cc3s-bild" style="margin:0">
-      <video class="cc3s-video" width="960" height="960" muted playsinline loop preload="none" poster="keramik-schutz/poster.webp"
-             data-src="keramik-schutz/loop.mp4"
-             aria-label="3D-Animation: Motorhaube, links ohne, rechts mit Keramik. Wasser bleibt links flach liegen und perlt rechts ab, UV-Licht bleicht links den Lack aus, Schmutz läuft rechts beim Spülen leichter ab"></video>
-      <span class="cc3s-seite cc3s-seite--ohne">ohne</span>
-      <span class="cc3s-seite cc3s-seite--mit">mit Keramik</span>
+    <figure class="cc3s-bild">
+      <video class="cc3s-video" width="960" height="960" muted playsinline preload="none" poster="keramik-schutz/poster.webp"
+             data-src="keramik-schutz/einmal.mp4"
+             aria-label="3D-Animation einer Motorhaube, links ohne, rechts mit Keramik: Wasser bleibt links flach liegen und perlt rechts ab, UV-Licht lässt links den Lack stumpf werden, Schmutz geht rechts beim Spülen leichter ab"></video>
+      <span class="cc3s-marke cc3s-ohne">ohne</span>
+      <span class="cc3s-marke cc3s-mit">mit Keramik</span>
+      <span class="cc3s-marke cc3s-3d">3D-Animation</span>
+      <button class="cc3s-knopf" type="button" hidden>Pause</button>
     </figure>
     <div>
       <p class="cc-lp__kicker">Was die Keramik macht</p>
-      <h2 id="cc3s-titel">Drei Dinge, <span>die du jeden Tag merkst.</span></h2>
+      <h2 id="cc3s-titel">Wasser, Sonne, Schmutz. <span>Was die Keramik besser macht.</span></h2>
       <ol class="cc3s-akte">
-        <li data-ab="0"><button type="button"><strong>Wasser</strong><span>Ohne Keramik bleiben Tropfen flach liegen. Mit Keramik ziehen sie sich zu Perlen zusammen und rollen ab. Kontaktwinkel bis 165° laut Hersteller.</span></button></li>
-        <li data-ab="2.75"><button type="button"><strong>UV</strong><span>Sonne bleicht ungeschützten Lack mit der Zeit aus. Die Keramik ist eine zusätzliche Schutzschicht mit UV-Schutz laut Hersteller.</span></button></li>
-        <li data-ab="5"><button type="button"><strong>Schmutz</strong><span>Auf der glatten Oberfläche haftet Dreck schlechter. Beim Waschen geht er leichter runter.</span></button></li>
+        <li data-ab="0"><button type="button"><strong>Wasser</strong><span>Auch ohne Keramik bilden sich Tropfen, aber flach, und sie bleiben eher liegen. Mit Keramik ziehen sie sich zu runden Perlen zusammen und rollen leichter ab. Kontaktwinkel bis 165° laut Hersteller.</span></button></li>
+        <li data-ab="2.75"><button type="button"><strong>UV</strong><span>Sonne lässt ungeschützten Klarlack mit der Zeit stumpf werden. Die Keramik ist eine zusätzliche Schicht mit UV-Schutz laut Hersteller. Sie bremst das, ganz aufhalten kann sie es nicht.</span></button></li>
+        <li data-ab="5"><button type="button"><strong>Schmutz</strong><span>Auf der glatten Oberfläche haftet Dreck schlechter. Beim Waschen geht er leichter runter. Waschen musst du trotzdem.</span></button></li>
       </ol>
-      <p class="cc3s-fuss">Animation, vereinfachte Darstellung. Wie lange der Schutz hält, hängt von Pflege und Nutzung ab.</p>
+      <p class="cc3s-fuss">3D-Animation, vereinfachte Darstellung. Wie lange der Schutz hält, hängt von Pflege und Nutzung ab.</p>
       <div class="cc3s-cta">
         <a class="cc-lp__btn" href="https://wa.me/491706669516?text=Hi%20Carcura%2C%20ich%20interessiere%20mich%20f%C3%BCr%20eine%20Keramikversiegelung%20%E2%80%93%20hier%20Fotos%20vom%20Lack." data-wa-service="Keramikversiegelung">3 Fotos vom Lack per WhatsApp</a>
       </div>
@@ -93,8 +99,10 @@
     var sek = document.currentScript.closest(".cc3s");
     var anim = sek.getAttribute("data-anim");
     var vid = sek.querySelector(".cc3s-video");
+    var knopf = sek.querySelector(".cc3s-knopf");
     var akte = [].slice.call(sek.querySelectorAll(".cc3s-akte li"));
-    var gemeldet = {};
+    var grenzen = akte.slice(1).map(function (li) { return +li.getAttribute("data-ab"); });
+    var gemeldet = {}, geladen = false, manuell = false, fertig = false, gehalten = {}, letzte = 0, halteUhr = 0;
     function melden(name) {                                   // GA4: cc_3d_start / cc_3d_ende, je einmal
       if (gemeldet[name]) return;
       gemeldet[name] = true;
@@ -105,35 +113,58 @@
     }
     function aktiv(t) {
       var n = 0;
-      akte.forEach(function (li, i) { if (t >= +li.getAttribute("data-ab")) n = i; });
+      akte.forEach(function (li, i) { if (t >= +li.getAttribute("data-ab") - 0.05) n = i; });
       akte.forEach(function (li, i) { li.classList.toggle("ist-aktiv", i === n); });
     }
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {         // Poster, alle Texte, keine Bewegung
       akte.forEach(function (li) { li.classList.add("ist-aktiv"); });
       return;
     }
+    if (navigator.connection) { if (navigator.connection.saveData) { akte.forEach(function (li) { li.classList.add("ist-aktiv"); }); return; } }
     aktiv(0);
-    var geladen = false, letzte = 0;
+    function spielen() {
+      if (!geladen) { vid.src = vid.getAttribute("data-src"); geladen = true; }
+      knopf.hidden = false;
+      knopf.textContent = "Pause";
+      var p = vid.play();
+      if (p) { if (p.then) p.then(function () { melden("cc_3d_start"); }).catch(function () {}); }
+    }
+    function anhalten() { vid.pause(); clearTimeout(halteUhr); knopf.textContent = "Abspielen"; }
     new IntersectionObserver(function (e) {
-      if (e[0].intersectionRatio >= 0.5) {
-        if (!geladen) { vid.src = vid.getAttribute("data-src"); geladen = true; }
-        var p = vid.play();
-        if (p) { if (p.then) p.then(function () { melden("cc_3d_start"); }).catch(function () {}); }
-      } else {
-        vid.pause();
-      }
+      if (e[0].intersectionRatio >= 0.5) { if (!manuell) { if (!fertig) spielen(); } }
+      else { if (!vid.paused) { vid.pause(); clearTimeout(halteUhr); } }
     }, { threshold: [0, 0.5] }).observe(vid);
     vid.addEventListener("timeupdate", function () {
-      aktiv(vid.currentTime);
-      if (vid.currentTime < letzte) melden("cc_3d_ende");    // Schleife ist einmal komplett durchgelaufen
-      letzte = vid.currentTime;
+      var t = vid.currentTime;
+      aktiv(t);
+      grenzen.forEach(function (g) {                           // Lesepause am Ende jedes Kapitels
+        if (letzte < g) { if (t >= g) { if (!gehalten[g]) {
+          gehalten[g] = true;
+          vid.pause();
+          halteUhr = setTimeout(function () { if (!manuell) vid.play(); }, 2600);
+        } } }
+      });
+      letzte = t;
+    });
+    vid.addEventListener("ended", function () {
+      fertig = true;
+      melden("cc_3d_ende");
+      knopf.textContent = "Nochmal ansehen";
+    });
+    knopf.addEventListener("click", function () {
+      if (fertig) { fertig = false; manuell = false; gehalten = {}; letzte = 0; vid.currentTime = 0; spielen(); return; }
+      if (vid.paused) { manuell = false; spielen(); } else { manuell = true; anhalten(); }
     });
     akte.forEach(function (li) {                              // Klick auf ein Kapitel springt dorthin
       li.querySelector("button").addEventListener("click", function () {
+        var ab = +li.getAttribute("data-ab");
         if (!geladen) { vid.src = vid.getAttribute("data-src"); geladen = true; }
-        vid.currentTime = +li.getAttribute("data-ab");
-        aktiv(vid.currentTime);
-        vid.play();
+        fertig = false; manuell = false;
+        grenzen.forEach(function (g) { gehalten[g] = g <= ab; });
+        letzte = ab;
+        vid.currentTime = ab;
+        aktiv(ab);
+        spielen();
       });
     });
   })();

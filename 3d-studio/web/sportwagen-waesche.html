@@ -22,27 +22,39 @@
 <p class="demo-hinweis"><b>Vorschau für carcura.info/keramikversiegelung/</b> – Bild im Abschnitt „Danach – Damit die Keramik lange hält“.</p>
 
 <!-- ===== CARCURA-3D START (Sportwagen-Wäsche, /keramikversiegelung/ Abschnitt „Danach“) – Block „Individuelles HTML“ in <div class="cc-lp"> =====
-     Medien: sportwagen-waesche/loop.mp4 (≤ 2 MB) + sportwagen-waesche/poster.webp (≤ 60 KB) hochladen, data-src und poster ersetzen.
-     Kein „Und“-Zeichen im Skript. Kein Preis (steht im Abschnitt). -->
+     Medien: sportwagen-waesche/einmal.mp4 (≤ 2 MB) + sportwagen-waesche/poster.webp (≤ 60 KB) hochladen, data-src und poster ersetzen.
+     Kein „Und“-Zeichen im Skript. Kein Preis. Spielt einmal, Pause-Knopf, danach „Nochmal ansehen“ (WCAG 2.2.2).
+     Empfehlung Kritiker: eher fuer Instagram/Reels als fuer die Keramikseite (dort steht „keine Symbolbilder“) – Entscheidung Alex. -->
 <figure class="cc3w" data-anim="sportwagen_waesche" style="margin:0">
   <style>
     .cc3w { width: min(100%, 720px); margin-inline: auto; }
+    .cc3w-bild { position: relative; }
     .cc3w-video { display: block; width: 100%; height: auto; aspect-ratio: 1; border-radius: var(--r); background: #09090a; }
+    .cc3w-3d { position: absolute; left: 14px; bottom: 14px; padding: 6px 12px; border-radius: 999px; font-size: 12px; font-weight: 600;
+      background: rgba(9,9,10,.74); color: var(--muted); }
+    .cc3w-knopf { position: absolute; right: 14px; bottom: 14px; min-height: 44px; padding: 10px 16px; border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.35); background: rgba(9,9,10,.74); color: #fff;
+      font-family: inherit; font-size: 14px; font-weight: 700; line-height: 1; cursor: pointer; }
+    .cc3w-knopf:focus-visible { outline: 2px solid var(--y); outline-offset: 3px; }
     .cc3w figcaption { margin-top: 10px; color: var(--muted); font-size: 14px; line-height: 1.5; }
     .cc3w figcaption b { color: #fff; font-weight: 600; }
-    .cc3w-klein { display: block; margin-top: 4px; font-size: 12px; }
   </style>
-  <video class="cc3w-video" width="960" height="960" muted playsinline loop preload="none" poster="sportwagen-waesche/poster.webp"
-         data-src="sportwagen-waesche/loop.mp4"
-         aria-label="3D-Animation: Ein schwarzer Sportwagen wird eingeschäumt und abgespült, danach perlt Wasser vom sauberen Lack ab"></video>
-  <figcaption><b>Mit Keramik geht der Dreck leichter runter.</b> Die Pflegewäsche wird schneller, und Wasser perlt danach ab.
-    <span class="cc3w-klein">Animation, vereinfachte Darstellung</span></figcaption>
+  <div class="cc3w-bild">
+    <video class="cc3w-video" width="960" height="960" muted playsinline preload="none" poster="sportwagen-waesche/poster.webp"
+           data-src="sportwagen-waesche/einmal.mp4"
+           aria-label="3D-Animation: Ein schwarzer Sportwagen wird eingeschäumt und abgespült, danach perlt Wasser vom Lack ab"></video>
+    <span class="cc3w-3d">3D-Animation</span>
+    <button class="cc3w-knopf" type="button" hidden>Pause</button>
+  </div>
+  <figcaption><b>Vorwäsche mit Schaum:</b> Mit Keramik löst sich der Dreck schon hier leichter. Danach waschen wir von Hand.
+    3D-Animation, vereinfachte Darstellung.</figcaption>
   <script>
   (function () {
     var fig = document.currentScript.closest(".cc3w");
     var anim = fig.getAttribute("data-anim");
     var vid = fig.querySelector(".cc3w-video");
-    var gemeldet = {}, geladen = false, letzte = 0;
+    var knopf = fig.querySelector(".cc3w-knopf");
+    var gemeldet = {}, geladen = false, manuell = false, fertig = false;
     function melden(name) {
       if (gemeldet[name]) return;
       gemeldet[name] = true;
@@ -52,18 +64,22 @@
       window.dataLayer.push(Object.assign({ event: name }, p));
     }
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;   // nur Poster
+    if (navigator.connection) { if (navigator.connection.saveData) return; }     // Datensparmodus: nur Poster
+    function spielen() {
+      if (!geladen) { vid.src = vid.getAttribute("data-src"); geladen = true; }
+      knopf.hidden = false;
+      knopf.textContent = "Pause";
+      var p = vid.play();
+      if (p) { if (p.then) p.then(function () { melden("cc_3d_start"); }).catch(function () {}); }
+    }
     new IntersectionObserver(function (e) {
-      if (e[0].intersectionRatio >= 0.5) {
-        if (!geladen) { vid.src = vid.getAttribute("data-src"); geladen = true; }
-        var p = vid.play();
-        if (p) { if (p.then) p.then(function () { melden("cc_3d_start"); }).catch(function () {}); }
-      } else {
-        vid.pause();
-      }
+      if (e[0].intersectionRatio >= 0.5) { if (!manuell) { if (!fertig) spielen(); } }
+      else { if (!vid.paused) vid.pause(); }
     }, { threshold: [0, 0.5] }).observe(vid);
-    vid.addEventListener("timeupdate", function () {
-      if (vid.currentTime < letzte) melden("cc_3d_ende");
-      letzte = vid.currentTime;
+    vid.addEventListener("ended", function () { fertig = true; melden("cc_3d_ende"); knopf.textContent = "Nochmal ansehen"; });
+    knopf.addEventListener("click", function () {
+      if (fertig) { fertig = false; manuell = false; vid.currentTime = 0; spielen(); return; }
+      if (vid.paused) { manuell = false; spielen(); } else { manuell = true; vid.pause(); knopf.textContent = "Abspielen"; }
     });
   })();
   </script>

@@ -50,6 +50,11 @@ def auto(m):
         for sy in (1, -1):
             teile += sw.rad(x, sy, m["gummi"], m["felge"], m["scheibe"], m["sattel"])
     teile += sw.details(body, m["vorn"], m["hinten"], m["schwarz"])
+    teile += sw.spiegel(m["lack"], m["schwarz"], m["glas"])
+    coll = bpy.data.collections.new("Auto")                     # fuer Licht-Verknuepfung (Kantenlichter nur aufs Auto)
+    bpy.context.scene.collection.children.link(coll)
+    for t in teile:
+        coll.objects.link(t)
     return body
 
 
@@ -59,11 +64,16 @@ def studio(m):
     ziel = (0, 0, 0.5)
     for i, y in enumerate((-1.2, 0.0, 1.2)):                       # drei Deckenstreifen = Lichtkanten auf Haube/Dach
         st.flaechenlicht(f"Decke{i}", (0.2, y, 4.6), (0.2, y, 0), 650, (5.5, 0.35))
-    st.flaechenlicht("Seite", (1.0, -7.5, 2.6), (0.3, 0, 0.7), 550, (7.0, 0.6))    # Lichtband auf der Schulterlinie
-    st.flaechenlicht("Kante L", (-5.5, -3.5, 1.8), ziel, 900, (1.2, 3.0), (0.85, 0.9, 1.0))
-    st.flaechenlicht("Kante R", (-5.0, 4.0, 2.2), ziel, 700, (1.2, 3.0), (0.85, 0.9, 1.0))
-    # gelbe Akzentlinie im Hintergrund (Markenfarbe), spiegelt sich im nassen Boden
-    bpy.ops.mesh.primitive_cube_add(size=1, location=(-6.0, 7.0, 2.6), rotation=(0, 0, math.radians(-49.5)))
-    leiste = bpy.context.object
-    leiste.scale = (0.03, 30.0, 0.03)
-    st.zuweisen(leiste, st.material("Akzent", base=(0, 0, 0), emission=GELB, emission_strength=5))
+    nur_auto = bpy.data.collections.get("Auto")
+    for licht in (st.flaechenlicht("Seite", (1.0, -7.5, 2.6), (0.3, 0, 0.7), 550, (7.0, 0.6)),   # Band auf der Schulter
+                  st.flaechenlicht("Kante L", (-5.5, -3.5, 1.8), ziel, 900, (1.2, 3.0), (0.85, 0.9, 1.0)),
+                  st.flaechenlicht("Kante R", (-5.0, 4.0, 2.2), ziel, 700, (1.2, 3.0), (0.85, 0.9, 1.0))):
+        if nur_auto:                                            # keine hellen Flecken im nassen Boden
+            licht.light_linking.receiver_collection = nur_auto
+    # dunkle Studiowand hinter dem Auto mit weichem Lichtverlauf (fuellt das obere Bilddrittel ruhig)
+    bpy.ops.mesh.primitive_plane_add(size=1, location=(-7.5, 7.5, 3.0), rotation=(math.radians(90), 0, math.radians(42)))   # quer zur Blickrichtung
+    wand = bpy.context.object
+    wand.name = "Wand"
+    wand.scale = (40, 8, 1)
+    st.zuweisen(wand, st.material("Wand", base=(0.035, 0.036, 0.04), roughness=0.95, specular=0.0))
+    st.flaechenlicht("Wandlicht", (-4.2, 4.2, 0.4), (-7.5, 7.5, 3.5), 900, (10.0, 0.8))

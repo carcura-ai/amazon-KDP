@@ -146,7 +146,7 @@ def _normal_z_groesser(ng, grenze):
     return cmp.outputs["Result"]
 
 
-def schaum_und_tropfen(body, schaum, spuel, mat_schaum, mat_wasser, dichte=5200, tropfen_dichte=150):
+def schaum_und_tropfen(body, schaum, spuel, mat_schaum, mat_wasser, dichte=5200, tropfen_dichte=900):
     ng = bpy.data.node_groups.new("Waesche", "GeometryNodeTree")
     ng.interface.new_socket("Geometry", in_out="INPUT", socket_type="NodeSocketGeometry")
     ng.interface.new_socket("Geometry", in_out="OUTPUT", socket_type="NodeSocketGeometry")
@@ -160,8 +160,15 @@ def schaum_und_tropfen(body, schaum, spuel, mat_schaum, mat_wasser, dichte=5200,
     vert.inputs["Seed"].default_value = 3
     ng.links.new(gin.outputs[0], vert.inputs["Mesh"])
     ng.links.new(_normal_z_groesser(ng, -0.25), vert.inputs["Selection"])
-    da = _feld_front(ng, schaum, None)
-    db = _feld_front(ng, spuel, None)
+    rausch = ng.nodes.new("ShaderNodeTexNoise")                  # Front nicht linealgerade, sondern wolkig
+    rausch.inputs["Scale"].default_value = 2.2
+    versatz_f = _bereich(ng, rausch.outputs["Fac"], 0.3, 0.7, -0.35, 0.35)
+    def plus(a_, b_):
+        n = ng.nodes.new("ShaderNodeMath"); n.operation = "ADD"
+        ng.links.new(a_, n.inputs[0]); ng.links.new(b_, n.inputs[1])
+        return n.outputs["Value"]
+    da = plus(_feld_front(ng, schaum, None), versatz_f)
+    db = plus(_feld_front(ng, spuel, None), versatz_f)
     wachsen = _bereich(ng, da, 0.0, 0.45)                 # hinter der Schaumfront waechst er
     bleiben = _bereich(ng, db, -0.08, 0.12, 1.0, 0.0)     # vor der Spuelfront ist er weg
     groesse = _mal(ng, wachsen, bleiben, _zufall(ng, 0.010, 0.026, 11))
@@ -191,7 +198,7 @@ def schaum_und_tropfen(body, schaum, spuel, mat_schaum, mat_wasser, dichte=5200,
     ng.links.new(_normal_z_groesser(ng, 0.55), tr.inputs["Selection"])
     db2 = _feld_front(ng, spuel, None)
     da_tr = _bereich(ng, db2, 0.15, 0.5)
-    tgr = _mal(ng, da_tr, _zufall(ng, 0.008, 0.021, 23))
+    tgr = _mal(ng, da_tr, _zufall(ng, 0.003, 0.0075, 23))
     tv = ng.nodes.new("ShaderNodeVectorMath"); tv.operation = "SCALE"
     ng.links.new(tr.outputs["Normal"], tv.inputs[0])
     ng.links.new(_mal(ng, tgr, 0.45), tv.inputs["Scale"])

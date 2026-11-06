@@ -248,12 +248,50 @@ def leiste(body, punkte_aussen, richtung, material, dicke=0.012, abstand=0.004, 
     return o
 
 
+def spiegel(lack, schwarz, glas):
+    """Aussenspiegel: tropfenfoermiges Gehaeuse in Wagenfarbe auf flachem Fuss, Glas nach hinten."""
+    teile = []
+    for sy in (1, -1):
+        bpy.ops.mesh.primitive_cube_add(size=1, location=(0.64, sy * 1.03, 0.975))
+        g = bpy.context.object
+        g.name = "Spiegelgehaeuse"
+        g.scale = (0.15, 0.07, 0.075)
+        g.rotation_euler = (0, 0, sy * math.radians(-6))
+        bv = g.modifiers.new("Rund", "BEVEL")
+        bv.width, bv.segments = 0.03, 3
+        sub = g.modifiers.new("Glatt", "SUBSURF")
+        sub.levels = sub.render_levels = 2
+        st.glatt(g)
+        st.zuweisen(g, lack)
+        bpy.ops.mesh.primitive_cube_add(size=1, location=(0.66, sy * 0.955, 0.93))
+        f = bpy.context.object
+        f.name = "Spiegelfuss"
+        f.scale = (0.07, 0.10, 0.018)
+        bf = f.modifiers.new("Rund", "BEVEL")
+        bf.width, bf.segments = 0.008, 2
+        st.zuweisen(f, schwarz)
+        bpy.ops.mesh.primitive_plane_add(size=1, location=(0.567, sy * 1.03, 0.975), rotation=(0, math.radians(90), 0))
+        sp = bpy.context.object
+        sp.name = "Spiegelglas"
+        sp.scale = (0.055, 0.052, 1)
+        st.zuweisen(sp, glas)
+        teile += [g, f, sp]
+    return teile
+
+
 def details(body, licht_vorn, licht_hinten, schwarz):
     teile = []
     for sy in (1, -1):
         # Scheinwerfer: schmaler LED-Strich, folgt der Front
         pts = [(2.6, sy * (0.58 + 0.30 * t), 0.56 + 0.05 * t) for t in [i / 12 for i in range(13)]]
         teile.append(leiste(body, pts, (-1, 0, 0), licht_vorn, dicke=0.011, name="Scheinwerfer"))
+    # Tuerfugen als feine dunkle Linien (auf die Karosserie projiziert)
+    for sy in (1, -1):
+        fuge = []
+        fuge += [(0.62, sy * 2.0, 0.30 + 0.56 * t / 10) for t in range(11)]           # vordere Kante
+        fuge += [(0.62 - 1.34 * t / 12, sy * 2.0, 0.30) for t in range(1, 13)]        # unten am Schweller
+        fuge += [(-0.72, sy * 2.0, 0.30 + 0.58 * t / 10) for t in range(1, 11)]       # hintere Kante
+        teile.append(leiste(body, fuge, (0, -sy, 0), schwarz, dicke=0.0025, abstand=0.0, name="Tuerfuge"))
     # Rueckleuchte: durchgehende Lichtleiste
     pts = [(-2.6, y / 20 * 0.86, 0.74) for y in range(-20, 21)]
     teile.append(leiste(body, pts, (1, 0, 0), licht_hinten, dicke=0.013, name="Rueckleuchte"))

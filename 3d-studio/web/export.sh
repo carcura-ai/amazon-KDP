@@ -39,6 +39,11 @@ q -framerate "$FPS" -i "$DN/d_%04d.png" -filter_complex "$PP" -c:v libx264 -pres
   -movflags +faststart -an "$W/loop.mp4"
 q -framerate "$FPS" -i "$DN/d_%04d.png" -filter_complex "$PP" -c:v libvpx-vp9 -crf 40 -b:v 0 -row-mt 1 -an "$W/loop.webm"
 
+# 3b) Einmal abspielen (Website mit Pause-/Nochmal-Knopf): kein Ausblenden, Ende 1,2 s halten.
+#     WEB_BREITE (z. B. 720) verkleinert fuer das 2-MB-Budget je Seite, WEB_CRF regelt die Qualitaet.
+q -framerate "$FPS" -i "$DN/d_%04d.png" -vf "tpad=stop_mode=clone:stop_duration=1.2,scale=${WEB_BREITE:-960}:-2:flags=lanczos" \
+  -c:v libx264 -preset slow -crf "${WEB_CRF:-25}" -pix_fmt yuv420p -movflags +faststart -an "$W/einmal.mp4"
+
 # 4) Standbild + Kontaktbogen (POSTER=<bildnummer> waehlt ein anderes Standbild als das letzte)
 q -i "$DN/$(printf 'd_%04d.png' "${POSTER:-$N}")" -c:v libwebp -quality 82 "$W/poster.webp"
 q -framerate "$FPS" -i "$DN/d_%04d.png" -vf "select='not(mod(n\,$(( (N + 11) / 12 ))))',scale=240:-1,tile=6x2:padding=4" -frames:v 1 "$W/kontakt.jpg"

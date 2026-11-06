@@ -57,32 +57,19 @@ rechts = haelfte("Mit", 0.004, B)
 st.zuweisen(links, lack_ohne)
 st.zuweisen(rechts, lack_mit)
 
-# UV-Schaden links: Farbe bleicht aus, Klarlack wird stumpf (Keyframes auf Material-Eingaengen)
-p = lack_ohne.node_tree.nodes["Principled BSDF"]
-for f, farbe, rau, coat in ((66, rot, 0.3, 1.0), (118, (0.26, 0.11, 0.10), 0.72, 0.15)):
-    p.inputs["Base Color"].default_value = (*farbe, 1)
-    p.inputs["Roughness"].default_value = rau
-    p.inputs["Coat Weight"].default_value = coat
-    for k in ("Base Color", "Roughness", "Coat Weight"):
-        p.inputs[k].keyframe_insert("default_value", frame=f)
+# UV-Schaden: links wird der Klarlack stumpf und die Farbe blasser; rechts altert er auch, nur deutlich weniger.
+# Bewusst kein 100:0-Bild (UWG: Gesamteindruck darf nicht „vollstaendiger Schutz“ versprechen).
+for mat, ende in ((lack_ohne, ((0.27, 0.05, 0.05), 0.45, 0.35)), (lack_mit, ((0.30, 0.016, 0.02), 0.34, 0.9))):
+    p = mat.node_tree.nodes["Principled BSDF"]
+    for f, (farbe, rau, coat) in ((66, (rot, 0.3, 1.0)), (118, ende)):
+        p.inputs["Base Color"].default_value = (*farbe, 1)
+        p.inputs["Roughness"].default_value = rau
+        p.inputs["Coat Weight"].default_value = coat
+        for k in ("Base Color", "Roughness", "Coat Weight"):
+            p.inputs[k].keyframe_insert("default_value", frame=f)
 
-# Keramikschicht rechts: hauchduenn, Kante in Markenfarbe, leuchtet beim UV-Treffer kurz auf
-bpy.ops.mesh.primitive_grid_add(x_subdivisions=24, y_subdivisions=4, size=1)
-schicht = bpy.context.object
-schicht.name = "Keramik"
-for v in schicht.data.vertices:
-    x = 0.004 + (v.co.x + 0.5) * (B - 0.004)
-    v.co = (x, v.co.y * T, flaeche_z(x) + 0.004)
-sol = schicht.modifiers.new("Dicke", "SOLIDIFY")
-sol.thickness = 0.003
-schicht.rotation_euler.x = NEIGUNG
-keramik = st.material("Keramik", base=(0.02, 0.025, 0.02), roughness=0.0, alpha=0.08, specular=1.0,
-                      emission=GELB, emission_strength=0.0)
-st.zuweisen(schicht, keramik)
-kp = keramik.node_tree.nodes["Principled BSDF"]
-for f, e in ((70, 0.0), (80, 0.1), (112, 0.1), (122, 0.0)):
-    kp.inputs["Emission Strength"].default_value = e
-    kp.inputs["Emission Strength"].keyframe_insert("default_value", frame=f)
+# Keramik rechts: dargestellt nur ueber den glatteren Klarlack (coat_roughness) und die gelbe Trennlinie –
+# keine transparente Extra-Platte (die rauscht ohne Denoiser und kippt sonst die Botschaft).
 kante = st.material("Kante", base=(0, 0, 0), emission=GELB, emission_strength=7.0)
 bpy.ops.mesh.primitive_cube_add(size=1)
 trenn = bpy.context.object
@@ -91,6 +78,14 @@ trenn.scale = (0.004, T, 0.012)
 trenn.location = (0, 0, 0.004)
 trenn.rotation_euler.x = NEIGUNG
 st.zuweisen(trenn, kante)
+fuge = st.material("Fuge", base=(0.002, 0.002, 0.002), roughness=1.0, specular=0.0)
+bpy.ops.mesh.primitive_cube_add(size=1)
+spalt = bpy.context.object
+spalt.name = "Spaltmass"
+spalt.scale = (2 * B, 0.005, 0.004)
+spalt.location = (0, (T / 2 - 0.16) * math.cos(NEIGUNG), (T / 2 - 0.16) * math.sin(NEIGUNG))
+spalt.rotation_euler.x = NEIGUNG
+st.zuweisen(spalt, fuge)
 
 
 def welt(x, y, z_ueber):
@@ -149,14 +144,14 @@ for seite in ("ohne", "mit"):
         st.weich(d)
 
 # ---------- Akt 2: UV ----------
-uv = st.material("UV", base=(0, 0, 0), emission=VIOLETT, emission_strength=3.5)
+uv = st.material("UV", base=(0, 0, 0), emission=VIOLETT, emission_strength=2.6)
 blitz = st.material("Blitz", base=(0, 0, 0), emission=GELB, emission_strength=14.0)
 for seite in ("ohne", "mit"):
-    for i in range(26):
+    for i in range(18):
         x = random.uniform(0.05, 0.55) * (-1 if seite == "ohne" else 1)
         y = random.uniform(-0.4, 0.6)
         f0 = random.randint(68, 108)
-        bpy.ops.mesh.primitive_cylinder_add(vertices=8, radius=0.0035, depth=0.32)
+        bpy.ops.mesh.primitive_cylinder_add(vertices=8, radius=0.002, depth=0.26)
         strahl = bpy.context.object
         strahl.name = f"UV_{seite}_{i}"
         st.zuweisen(strahl, uv)
@@ -164,7 +159,7 @@ for seite in ("ohne", "mit"):
         n = math.sqrt(sum(c * c for c in richt))
         richt = tuple(c / n for c in richt)
         strahl.rotation_euler = Vector(richt).to_track_quat("Z", "Y").to_euler()
-        ziel = welt(x, y, 0.0 if seite == "ohne" else 0.03)
+        ziel = welt(x, y, 0.0 if seite == "ohne" else 0.004)
         start = tuple(z + c * 1.4 for z, c in zip(ziel, richt))
         tief = tuple(z - c * (0.18 if seite == "ohne" else 0.0) for z, c in zip(ziel, richt))
         key(strahl, 1, start, (0, 0, 0))
@@ -198,7 +193,10 @@ for seite in ("ohne", "mit"):
         key(k, f0 + 3, welt(x, y, 0.002), (sx, sy, r * 0.12))
         vorbei = 150 + int((0.6 - y) / 1.05 * 20)       # Spuelfront laeuft von oben (hinten) nach unten (vorn)
         key(k, vorbei, welt(x, y, 0.002), (sx, sy, r * 0.12))
-        if seite == "mit" or random.random() < 0.3:
+        bleibt = random.random() < (0.12 if seite == "mit" else 0.7)
+        if bleibt and seite == "mit":
+            sx, sy = sx * 0.55, sy * 0.55                                  # kleiner Rest bleibt auch mit Keramik
+        if not bleibt:
             key(k, vorbei + 9, welt(x, -1.0, 0.004), (sx * 0.8, sy * 1.5, r * 0.2))   # rutscht mit dem Wasser ab
         else:
             key(k, vorbei + 6, welt(x, y - 0.03, 0.002), (sx, sy * 2.4, r * 0.22))           # bleibt, zieht Schliere
