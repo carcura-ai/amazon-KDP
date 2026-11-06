@@ -27,3 +27,24 @@ GBP Oktober: 30 Website-Klicks, 60 Routen, 4,8 ★ (16).
 
 Beobachtung: Für „westerwald“-Suchen konkurrieren Startseite, /leistungen/ und Unterseiten (Kannibalisierung).
 Die Westerwald-Seite selbst wird kaum gezeigt (Pos. 36). Prüfen, ob die neuen internen Links das ändern.
+
+## Maßnahmen 06.11.2026 (SEO-Neubewertung nach Reel-Playbook)
+
+- Schema: Service + FAQPage + BreadcrumbList auf /autositz-reinigen-flecken/ (1335) und /tierhaare-auto-entfernen/ (1334); FAQ-Text = sichtbarer Text.
+- Rank-Math-Titel auf ≤ 60 Zeichen gekürzt, meist nur Zusatz/Marke gestrichen, Hauptbegriff vorn unverändert:
+  Startseite (11) „Fahrzeugaufbereitung Westerwald mit Abholung | Carcura“, Flecken 1335, Geruch 1116, Keramik 777
+  („Keramikversiegelung Westerwald ab 700 € inkl. Pflegeset“), Politur 1113, Leasing 1114, Wohnmobil 1115,
+  Hol-&-Bring 843, Altenkirchen 1117, Wissen 1261, Gutschein 781.
+- Beschreibungen auf 139–155 Zeichen gekürzt (gleiche Preise/Fakten): 11, 311, 382, 1334, 1335, 1116, 1113, 1114, 1115, 843, 1048, 1117, 1259, 134, 781.
+- Nicht geändert: /leistungen/-Titel (seit 02.11. in Messung), Westerwald-Seite 1048 (Entscheidung nach GSC-Daten, s. u.).
+
+Technische Funde:
+- page-sitemap.xml veraltet (Stand 20.10.): 14 URLs, es fehlen 13 Leistungs- und Ortsseiten (Geruch, Politur, Leasing, Wohnmobil,
+  Hol-&-Bring, Westerwald, Altenkirchen, Hachenburg, Asbach, Wissen, Neuwied, Flecken, Tierhaare). Ursache: Rank-Math-Sitemap-Cache.
+- Plesk-nginx-Cache liefert Seiten verzögert aus (x-cache-status HIT); Änderungen erst nach Ablauf sichtbar.
+- Doppelter <title> im <head> (Rank Math + Theme), gleicher Inhalt – geringe Wirkung, später beheben.
+- robots.txt ohne Sitemap-Zeile; llms.txt noch 404.
+
+Offene Entscheidung (am 15.11. mit GSC-Daten): Startseite und 1048 zielen beide auf „Fahrzeugaufbereitung Westerwald“
+(Startseite Pos. 17,6; 1048 Pos. ~36). Steht 1048 weiter > 30 und die Startseite nicht besser: 1048 per 301 auf die Startseite
+umleiten und Links Startseite → 1048 auf die Ortsseiten umstellen.
