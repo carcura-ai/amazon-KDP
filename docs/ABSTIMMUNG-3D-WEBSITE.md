@@ -117,3 +117,13 @@ Hinweis: Fehlgeschlagene Aufrufe an google-analytics.com/googlesyndication.com k
 - **LCP Startseite:** Die Messung mit `?v=` umgeht den Cache und ist dadurch langsamer. Über den Cache antwortet der Server in 0,4–1,2 s (37 KB komprimiert). Bleibt bei „mittel“ und kommt später.
 - Nachtrag: Die Werte von GA4 `cc_anim` lauten `keramik_schutz` | `lackschichten` | `sportwagen_waesche`. Das Anlegen als benutzerdefinierte Dimension in GA4 erfolgt ab dem 15.11., weil das Kontingent der Schnittstelle erschöpft ist, und nur nach Alex' Freigabe. Die Ereignisse werden auch ohne dieses Anlegen erfasst.
 - Wachsversiegelung „ab 179 € / +99 €“: steht weder im Masterplan §4 noch live auf /leistungen/ (Stand 06.11.). Live gibt es nur die „Handwäsche mit Wachs ab 99 €“. → In MARKE.md **nicht bewerben**, bis Alex einen Preis bestätigt.
+
+## 9. Website-Session zu 3831ac1 (06.11.2026, 23:20)
+
+- **Platzierung des Prüfers übernommen:**
+  - (a) Keramik-Schutz unter dem echten Abperl-Video
+  - (b) Lackschichten auf /autopolitur/ nach der Preisliste
+  - (c) Die Wäsche kommt nicht auf die Keramikseite und nicht in die „Familienauto“-Werbung, sondern als Reel. Auf der Keramikseite bleibt damit nur Keramik-Schutz (≤ 2 MB).
+- **„Selbstreinigung“:** Das Wort stand live auf /keramikversiegelung/ im Absatz „die Fakten“ („selbstreinigenden Abperleffekt“). Es steht nicht in Masterplan §5 und ist jetzt durch „starken Abperleffekt“ ersetzt (live geprüft, lokale Datei nachgezogen).
+- **„Fester Preis nach Fotos“:** Das ist eine Preiszusage und kein Ergebnisversprechen, rechtlich also unproblematisch, solange wir den Preis halten. Offen ist das Risiko, wenn der Zustand vor Ort von den Fotos abweicht. Vorschlag an Alex: ein Satz unter den Preis-Hinweisen von Startseite und Keramik: „Der Preis gilt für den Zustand auf den Fotos. Sieht es vor Ort deutlich anders aus, sagen wir es dir vor dem Start – du entscheidest.“ Live geht der Satz nur nach Alex' OK. Die neue Politur-CTA („ehrliche Einschätzung, ob Polieren reicht“) passt.
+- **Einbau:** WCAG-Fassung mit `einmal.mp4`, Pause-Knopf und Etikett „3D-Animation“ ist notiert. Der Einbau folgt nach Lieferung und Alex' Freigabe.
