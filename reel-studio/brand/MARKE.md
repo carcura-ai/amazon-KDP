@@ -1,6 +1,7 @@
 # Carcura – Markendaten fuer alle Videos
 
 Quelle: carcura.info (WordPress, Impressum, Leistungs- und Unterseiten), abgerufen am 20.10.2026.
+Zahlung bei Uebergabe: Karte, Rechnung, auf Wunsch Vorkasse.
 **Preise aktualisiert am 06.11.2026 nach `docs/WEBSITE-REBUILD-MASTERPLAN.md` §4 (vom Nutzer bestaetigt, Website-Umbau live seit 05.11.).** Bei Abweichung gilt der Masterplan.
 Bei Preisaenderungen auf der Website diese Datei aktualisieren (oder Claude neu abrufen lassen).
 
@@ -54,13 +55,13 @@ Bei Preisaenderungen auf der Website diese Datei aktualisieren (oder Claude neu 
 | Ozonbehandlung (Geruch) | ab 59 € | +39 € |
 | Lederreinigung & -pflege | ab 49 € | +39 € |
 | Lederversiegelung | – | +40 € |
-| Schonende Handwaesche | ab 60 € | |
-| Handwaesche mit Wachs | ab 100 € | |
+| Schonende Handwaesche | ab 69 € | |
+| Handwaesche mit Wachs | ab 99 € | |
 | Politur 1-stufig (inkl. Waesche, Kneten) | ab 349 € | |
 | Politur 2-stufig (Schleif- + Hochglanzpolitur) | ab 549 € | |
 | Spot-Repair einzelner Kratzer | nach Foto per WhatsApp | |
-| Scheinwerferaufbereitung (beide, inkl. UV-Schutz) | 59 € | |
-| Wachsversiegelung (bis ca. 6 Monate) | ab 179 € | +99 € nach Politur |
+| Scheinwerferaufbereitung (beide, inkl. UV-Schutz) | 69 € | |
+| Wachsversiegelung (bis ca. 6 Monate) [Preis auf Website pruefen, live 06.11. unklar] | ab 179 € | +99 € nach Politur |
 | **Keramikversiegelung XPERTCOAT HYBRID** (inkl. Handwaesche, Kneten, 1-stufige Politur, Nanolex-Pflegeset Wert 62 €) | ab 700 € | |
 | Keramikversiegelung mit 2-stufiger Politur | ab 900 € | |
 | Keramik-Pflege alle 2 Monate (Handwaesche mit Reactivating Shampoo) | 79 € pro Termin | |
