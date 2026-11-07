@@ -100,6 +100,7 @@ def key(o, f, ort=None, skal=None):
         o.location = ort
         o.keyframe_insert("location", frame=f)
     if skal is not None:
+        skal = tuple(max(v, 1e-4) for v in skal)                 # nie exakt 0: Embree stuerzt sonst beim BVH-Bau ab
         o.scale = skal
         o.keyframe_insert("scale", frame=f)
 
