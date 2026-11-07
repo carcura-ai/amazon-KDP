@@ -14,7 +14,7 @@ from mathutils import Vector
 
 def args():
     a = sys.argv[sys.argv.index("--") + 1:] if "--" in sys.argv else []
-    out = {"out": "out", "vorschau": False, "frames": None, "still": None, "schritt": 1}
+    out = {"out": "out", "vorschau": False, "frames": None, "still": None, "schritt": 1, "entwurf": False}
     i = 0
     while i < len(a):
         if a[i] == "--out":
@@ -25,6 +25,8 @@ def args():
             s, e = a[i + 1].split("-"); out["frames"] = (int(s), int(e)); i += 1
         elif a[i] == "--still":
             out["still"] = int(a[i + 1]); i += 1
+        elif a[i] == "--entwurf":                 # ganzes Video klein + wenig Samples (Vorschau fuer den Nutzer)
+            out["entwurf"] = True
         elif a[i] == "--schritt":                 # nur jedes n-te Bild (Bewegungsprobe)
             out["schritt"] = int(a[i + 1]); i += 1
         i += 1
@@ -177,13 +179,16 @@ def weich(o):
 
 # ---------- Rendern ----------
 
-def rendern(a, aufloesung=1080, samples=96):
+def rendern(a, aufloesung=1080, samples=96, hoehe=None):
+    """aufloesung = Breite; hoehe fuer andere Formate als 1:1 (z. B. 1280 × 720)."""
     s = bpy.context.scene
-    s.render.resolution_x = s.render.resolution_y = aufloesung
+    s.render.resolution_x, s.render.resolution_y = aufloesung, hoehe or aufloesung
     s.render.resolution_percentage = 50 if a["vorschau"] else 100
     s.cycles.samples = 24 if a["vorschau"] else samples
     if a["schritt"] > 1:                         # Bewegungsprobe: klein und schnell
         s.render.resolution_percentage, s.cycles.samples = 30, 12
+    if a["entwurf"]:
+        s.render.resolution_percentage, s.cycles.samples = 50, 16
     s.cycles.use_adaptive_sampling = True
     s.cycles.adaptive_threshold = 0.02
     s.cycles.use_denoising = False          # Ubuntu-Blender hat kein OpenImageDenoise
