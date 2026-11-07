@@ -127,3 +127,32 @@ Hinweis: Fehlgeschlagene Aufrufe an google-analytics.com/googlesyndication.com k
 - **„Selbstreinigung“:** Das Wort stand live auf /keramikversiegelung/ im Absatz „die Fakten“ („selbstreinigenden Abperleffekt“). Es steht nicht in Masterplan §5 und ist jetzt durch „starken Abperleffekt“ ersetzt (live geprüft, lokale Datei nachgezogen).
 - **„Fester Preis nach Fotos“:** Das ist eine Preiszusage und kein Ergebnisversprechen, rechtlich also unproblematisch, solange wir den Preis halten. Offen ist das Risiko, wenn der Zustand vor Ort von den Fotos abweicht. Vorschlag an Alex: ein Satz unter den Preis-Hinweisen von Startseite und Keramik: „Der Preis gilt für den Zustand auf den Fotos. Sieht es vor Ort deutlich anders aus, sagen wir es dir vor dem Start – du entscheidest.“ Live geht der Satz nur nach Alex' OK. Die neue Politur-CTA („ehrliche Einschätzung, ob Polieren reicht“) passt.
 - **Einbau:** WCAG-Fassung mit `einmal.mp4`, Pause-Knopf und Etikett „3D-Animation“ ist notiert. Der Einbau folgt nach Lieferung und Alex' Freigabe.
+
+## 10. Zusammenfassung 3D-/Instagram-Session für den Website-Check (07.11.2026)
+
+Nur Belegtes aus der Session „Instagram profile analysis und story content“ (Commits auf diesem Branch, Dateien genannt).
+
+**Beschlüsse von Alex**
+1. 3D-Animationen für die Website gewünscht, „von Perfektionismus angetrieben“: Keramik-Schutz (Wasser, UV, Schmutz) und eine Sportwagen-Wäsche; mit dir abstimmen und gegenseitig prüfen (05./06.11.).
+2. Platzierung (in §9 von dir übernommen): Keramik-Schutz unter dem echten Abperl-Video auf /keramikversiegelung/; Lackschichten auf /autopolitur/ nach der Preisliste; Wäsche nur als Reel, nicht auf der Website.
+3. Selbstgebauter Sportwagen von Alex abgelehnt („kein Supersportwagen, Proportionen passen nicht“). **Entscheidung 07.11.: lizenziertes, markenloses 3D-Modell kaufen.** Vorschlag: „Generic Supercar v2 2018“ (SQUIR, Sketchfab, 129 $, Standard-Lizenz) oder gratis „Fictional supercar – V12 Goblin“ (CC BY, Namensnennung). Kauf und Download liegen bei Alex – noch offen.
+4. Alex schickte ein Tutorial („Make a Car Animation in Blender“, Tunnel aus Lichtbögen) → daraus Vorlage „Tunnelfahrt“ (Lichtringe, jeder vierte in Carcura-Gelb, nasser Boden). Gedacht als Reel/Hero-Clip; Website-Einsatz nicht beschlossen.
+
+**Offene Vorschläge, die die Website betreffen**
+5. Keramik-Schutz-Abschnitt (`web/keramik-schutz.html`): fertig gebaut, Medien in `3d-studio/lieferung/keramik-schutz/` (Final-Datei folgt in Kürze). Einbau nach Alex' Freigabe.
+6. Lackschichten-Abschnitt (`web/lackschichten-politur.html`) mit Politur-CTA: final, Medien in `lieferung/lackschichten/`.
+7. Echte Videos aus der Halle haben Vorrang vor Animationen, wo „keine Symbolbilder“ versprochen wird (Prüfer-Empfehlung, von dir übernommen).
+8. Prüfer-Hinweis „fester Preis nach Fotos“ bei Politur riskant → in meinem Schnipsel ersetzt durch „ehrliche Einschätzung, ob Polieren reicht“; für eure Seiten liegt dein Zusatzsatz bei Alex.
+9. Cookie-Banner (Handy-Befund §7): kompakte Fassung bei dir, Einbau/Entscheidung Alex.
+
+**Instagram/Reels (keine Website-Beschlüsse, nur Vorschläge)**
+10. Horror-Story-Serie nach Vorbild yourlastcall.tv analysiert (`reel-studio/projekte/horror-serie/`): eigene Marke, **nicht** Carcura; Start nicht beschlossen.
+11. Aus Referenz-Reels für Carcura vorgeschlagen (`reel-studio/referenzen/LERNPROTOKOLL.md`): Kommentar-Stichwort-CTA mit ehrlicher Ergebnis-Karte („Welche Leistung zeigen wir morgen? Top-Kommentar entscheidet“), Zähler „1/5 … 5/5“ bei Listen-Reels.
+12. Werkzeug-Empfehlung an Alex: OpenWhispr (Diktieren) ja; Chatwoot nicht nötig, weil Carcura-Assistent + Manager das abdecken; claude-seo-Plugin nicht installiert (Sicherheitsprüfung, nur Methodik genutzt).
+
+**Regeln, die beide Sessions betreffen**
+13. Keine erkennbaren Fremdmarken/-designs in Animationen (kein Ferrari-/Lamborghini-Nachbau, keine Logos); Etikett „3D-Animation, vereinfachte Darstellung“; Herstellerwerte nur „laut Hersteller“.
+14. „bessern wir nach“ nicht bewerben (UWG Anhang Nr. 10) – auch nicht in Reels; Wachsversiegelung nicht bewerben, bis Alex einen Preis bestätigt (`reel-studio/brand/MARKE.md`).
+15. Preise in Reels nur aus Masterplan §4 / MARKE.md (synchron seit 06.11.).
+
+**Prüfbare Vorschau:** `3d-studio/lieferung/` (Übersicht in `lieferung/LIESMICH.md`) – je Animation poster.webp, kontakt.jpg und Video bzw. Vorschau-MP4.
