@@ -29,7 +29,17 @@ Was du brauchst:
    ```
    Den Text hinter `APP_SECRET=` in deinen Passwortmanager kopieren, Eintrag „Carcura Manager APP_SECRET“. Ohne ihn sind gespeicherte Zugangsdaten nach einer Wiederherstellung nicht lesbar.
 
-## Teil B: Windows-App auf dem Laptop
+## Teil B: Als Programm auf dem Laptop (empfohlen, so läuft es seit 07.11.2026)
+
+1. **https://app.carcura.info** in Edge oder Chrome öffnen.
+2. Rechts in der Adresszeile auf das Symbol „App verfügbar“ klicken (drei Quadrate mit +) und **Installieren** wählen.
+   - Alternativ in Edge: **⋯ → Apps → „Manager installieren“**
+   - Alternativ in Chrome: **⋮ → Streamen, speichern und teilen → „Manager installieren …“**
+3. Der Manager läuft dann in einem eigenen Fenster mit eigenem Symbol. An die Taskleiste anheften: Rechtsklick auf das Symbol → „An Taskleiste anheften“.
+
+## Teil B2: Eigene Windows-App (nur wenn gewünscht)
+
+Hinweis: Der Installer ist nicht bei Microsoft signiert. Auf dem Laptop hat er sich am 07.11. nicht geöffnet; die App aus Teil B ist gleichwertig.
 
 1. Den Installer herunterladen (ca. 98 MB):
    https://github.com/carcura-ai/amazon-KDP/releases/download/desktop-v1.0.0/Carcura-Management-Setup-1.0.0.exe
