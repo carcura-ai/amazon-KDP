@@ -45,7 +45,7 @@ q -framerate "$FPS" -i "$DN/d_%04d.png" -vf "tpad=stop_mode=clone:stop_duration=
   -c:v libx264 -preset slow -crf "${WEB_CRF:-25}" -pix_fmt yuv420p -movflags +faststart -an "$W/einmal.mp4"
 
 # 4) Standbild + Kontaktbogen (POSTER=<bildnummer> waehlt ein anderes Standbild als das letzte)
-q -i "$DN/$(printf 'd_%04d.png' "${POSTER:-$N}")" -c:v libwebp -quality 82 "$W/poster.webp"
+q -i "$DN/$(printf 'd_%04d.png' "${POSTER:-$N}")" -c:v libwebp -quality "${POSTER_Q:-74}" "$W/poster.webp"
 q -framerate "$FPS" -i "$DN/d_%04d.png" -vf "select='not(mod(n\,$(( (N + 11) / 12 ))))',scale=240:-1,tile=6x2:padding=4" -frames:v 1 "$W/kontakt.jpg"
 
 echo "Web-Dateien ($N Bilder):"

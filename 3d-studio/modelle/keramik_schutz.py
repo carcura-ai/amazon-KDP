@@ -209,6 +209,7 @@ for i in range(26):
     f0 = random.randint(146, 156)
     d = kugel(f"Spuel_mit_{i}", r, wasser)
     key(d, 1, welt(x, 0.75, r * 0.86), (0, 0, 0))
+    key(d, f0 - 1, welt(x, 0.75, r * 0.86), (0, 0, 0))                 # erst beim Spuelen sichtbar
     key(d, f0, welt(x, 0.75, r * 0.86), (1, 1, 0.9))
     key(d, f0 + 22, welt(x + random.uniform(-0.03, 0.03), -1.0, r * 0.86), (1, 1, 0.9))
     st.weich(d)
