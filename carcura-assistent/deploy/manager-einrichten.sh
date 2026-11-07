@@ -18,6 +18,9 @@ schritt() { printf '\n\033[1;33m==> %s\033[0m\n' "$1"; }
 ok()      { printf '\033[1;32m    OK: %s\033[0m\n' "$1"; }
 warnung() { printf '\033[1;31m    ACHTUNG: %s\033[0m\n' "$1"; }
 abbruch() { printf '\n\033[1;31mABBRUCH: %s\033[0m\n' "$1"; exit 1; }
+# Flache Klone (depth 1) lassen sich nicht zuverlässig per pull vorspulen: neuesten Stand holen und übernehmen.
+# Nicht versionierte Dateien (.env, data/) bleiben dabei unberührt.
+aktualisieren() { git -C "$1" fetch -q --depth 1 origin "$2" && git -C "$1" reset -q --hard FETCH_HEAD; }
 
 [ "$(id -u)" = 0 ] || abbruch "Bitte als root ausführen."
 command -v docker >/dev/null || abbruch "Docker fehlt. Erst installieren: curl -fsSL https://get.docker.com | sh"
@@ -39,7 +42,7 @@ fi
 
 schritt "2/7 Manager-Programm holen bzw. aktualisieren"
 if [ -d "$MGR_ROOT/.git" ]; then
-  git -C "$MGR_ROOT" pull -q --ff-only && ok "aktualisiert"
+  aktualisieren "$MGR_ROOT" "$MGR_BRANCH" && ok "aktualisiert"
 else
   git clone -q --depth 1 --filter=blob:none --sparse -b "$MGR_BRANCH" "$REPO" "$MGR_ROOT"
   git -C "$MGR_ROOT" sparse-checkout set carcura-manager
@@ -81,7 +84,7 @@ done
 
 schritt "6/7 Gemeinsamen HTTPS-Eingang für app. und bot.carcura.info starten"
 if [ -d "$ASS_ROOT/.git" ]; then
-  git -C "$ASS_ROOT" pull -q --ff-only || warnung "Assistent-Ordner ließ sich nicht aktualisieren – nutze vorhandene Dateien."
+  aktualisieren "$ASS_ROOT" claude/amazon-kdp-kinderbuch-setup-374xk0 || warnung "Assistent-Ordner ließ sich nicht aktualisieren – nutze vorhandene Dateien."
 else
   git clone -q --depth 1 --filter=blob:none --sparse -b claude/amazon-kdp-kinderbuch-setup-374xk0 "$REPO" "$ASS_ROOT"
   git -C "$ASS_ROOT" sparse-checkout set carcura-assistent
