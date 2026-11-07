@@ -17,107 +17,120 @@ ACHSE_V, ACHSE_H = 1.31, -1.31
 RAD_R, SPUR = 0.335, 0.83
 FELGE_R = 0.262                       # 20 Zoll
 
-# Stationen (aus der Seitenansicht gemessen, d = Abstand zur Nasenspitze, x = 2,31 - 0,978·d):
-#   x, Boden, max. Breite, Hoehe Charakterlinie, Schulterhoehe, Schulterbreite, Mitte oben (Haube/Deck), Kabine 0..1
-STATIONEN = [
-    (2.310, 0.15, 0.84, 0.29, 0.42, 0.78, 0.40, 0.0),    # Front breit und stumpf (kein Keil in der Draufsicht)
-    (2.232, 0.13, 0.92, 0.30, 0.48, 0.87, 0.45, 0.0),
-    (2.017, 0.12, 0.95, 0.33, 0.58, 0.91, 0.52, 0.0),
-    (1.674, 0.12, 0.955, 0.39, 0.67, 0.92, 0.58, 0.0),
-    (1.332, 0.12, 0.962, 0.43, 0.75, 0.925, 0.655, 0.0),   # Vorderachse: Kotfluegel ueber der Haube
-    (1.088, 0.12, 0.95, 0.45, 0.78, 0.89, 0.735, 0.0),
-    (0.941, 0.12, 0.93, 0.46, 0.80, 0.86, 0.835, 0.22),    # Fuss A-Saeule, weit vorn (Cab-forward)
-    (0.598, 0.12, 0.905, 0.46, 0.80, 0.84, 0.86, 0.70),
-    (0.237, 0.12, 0.90, 0.46, 0.82, 0.835, 0.88, 0.93),
-    (-0.135, 0.12, 0.905, 0.47, 0.84, 0.845, 0.90, 1.0),  # Dachspitze 1,15 m
-    (-0.575, 0.12, 0.93, 0.48, 0.87, 0.88, 0.92, 0.75),
-    (-0.966, 0.125, 0.955, 0.50, 0.90, 0.93, 0.93, 0.36),  # Motorabdeckung
-    (-1.310, 0.13, 0.965, 0.51, 0.92, 0.95, 0.92, 0.15),  # Hinterachse: breite Haunches
-    (-1.600, 0.15, 0.955, 0.52, 0.91, 0.93, 0.90, 0.03),
-    (-1.850, 0.18, 0.92, 0.53, 0.88, 0.89, 0.875, 0.0),
-    (-1.950, 0.24, 0.88, 0.53, 0.84, 0.84, 0.84, 0.0),
-    (-2.010, 0.30, 0.80, 0.53, 0.78, 0.76, 0.78, 0.0),
-    (-2.040, 0.36, 0.74, 0.53, 0.70, 0.70, 0.70, 0.0),   # Heckabschluss
+# Unterbau (bis zur Guertellinie), Laengsmasse aus der Seitenansicht gemessen (x = 2,31 - 0,978·d).
+#   x, Boden, max. Breite, Hoehe Charakterlinie, Kotfluegel-Aussenkante (z), deren Breite,
+#   Kotfluegel-Hoecker (z), dessen Lage (y), Haube/Deck-Mitte (z)
+# Vorn wolben sich die Kotfluegel ueber die Raeder, die Haube liegt als Mulde dazwischen (wie bei echten Mittelmotor-
+# Sportwagen); hinten dasselbe mit den Haunches. Im Kabinenbereich ist das Deck flach (Basis der Glaskuppel).
+UNTERBAU = [
+    (2.250, 0.15, 0.80, 0.31, 0.49, 0.74, 0.55, 0.62, 0.45),   # Kotfluegelspitzen tragen die Scheinwerfer
+    (2.175, 0.13, 0.90, 0.32, 0.55, 0.86, 0.61, 0.70, 0.49),
+    (1.980, 0.12, 0.945, 0.35, 0.63, 0.91, 0.69, 0.74, 0.54),
+    (1.660, 0.12, 0.96, 0.40, 0.70, 0.93, 0.77, 0.75, 0.59),
+    (1.332, 0.12, 0.975, 0.44, 0.73, 0.94, 0.80, 0.75, 0.66),   # Vorderachse: Hoecker ueber dem Rad
+    (1.100, 0.12, 0.955, 0.45, 0.75, 0.90, 0.81, 0.74, 0.77),   # Windlauf: hier beginnt die Frontscheibe (cab-forward)
+    (0.980, 0.12, 0.935, 0.46, 0.765, 0.87, 0.812, 0.74, 0.79),
+    (0.598, 0.12, 0.905, 0.46, 0.80, 0.84, 0.815, 0.72, 0.815),
+    (0.237, 0.12, 0.90, 0.46, 0.82, 0.835, 0.83, 0.72, 0.835),
+    (-0.135, 0.12, 0.905, 0.47, 0.84, 0.845, 0.85, 0.73, 0.855),
+    (-0.575, 0.12, 0.93, 0.48, 0.87, 0.88, 0.88, 0.76, 0.885),
+    (-0.966, 0.125, 0.955, 0.50, 0.89, 0.93, 0.92, 0.80, 0.905),
+    (-1.310, 0.13, 0.975, 0.51, 0.90, 0.95, 0.945, 0.80, 0.905),  # Hinterachse: Haunches
+    (-1.600, 0.15, 0.96, 0.52, 0.89, 0.93, 0.93, 0.78, 0.89),
+    (-1.850, 0.18, 0.92, 0.53, 0.86, 0.89, 0.89, 0.74, 0.87),
+    (-1.950, 0.24, 0.88, 0.53, 0.83, 0.84, 0.845, 0.70, 0.84),
+    (-2.010, 0.30, 0.80, 0.53, 0.77, 0.76, 0.78, 0.62, 0.78),
+    (-2.040, 0.36, 0.74, 0.53, 0.70, 0.70, 0.705, 0.56, 0.70),   # Heckabschluss
 ]
-DACH = {"kante_b": 0.55, "kante_z": 1.10, "mitte_z": 1.15, "einzug": 0.07}
-# Punkt-Indizes je Halbschnitt: 0 Boden-Mitte · 1 Schweller unten · 2 Schweller oben · 3 Charakterlinie · 4 unter Schulter
-# 5 Schulter · 6 Guertel/Deck · 7 Fenster-Mitte · 8 Dachkante · 9 Dach-Mitte
-CREASES = {2: 0.85, 3: 0.92, 5: 0.9, 6: 0.85, 8: 0.7}
+# Glaskuppel: x, Dachkanten-Breite, Dach-Mitte (z). Basis = Guertellinie des Unterbaus an derselben Stelle.
+KABINE = [
+    (1.100, None, None),     # Fusslinie der Frontscheibe auf dem Windlauf
+    (0.700, 0.66, 0.99),
+    (0.250, 0.56, 1.12),     # Dachvorderkante
+    (-0.150, 0.55, 1.15),    # Dachspitze
+    (-0.550, 0.56, 1.10),
+    (-0.950, 0.62, 1.00),    # Uebergang in die flache Motorabdeckung
+    (-1.300, 0.76, 0.935),
+]
+# Unterbau-Punkte: 0 Boden-Mitte · 1 Schweller unten · 2 Schweller oben · 3 Charakterlinie · 4 unter Schulter · 5 Schulter
+# 5 Kotfluegel-Aussenkante · 6 Hoecker · 7–9 Mulde zur Mitte
+CREASES = {2: 0.85, 3: 0.92, 5: 0.55, 6: 0.3}
 
 
 def _querschnitt(s):
-    x, zb, w, zm, zsh, wsh, zc, c = s
-    deck = [                                   # Kotfluegel-Plateau aussen, dann Tal zur Haubenmitte
-        (wsh * 0.84, zsh - 0.012),
-        (wsh * 0.58, zc + (zsh - zc) * 0.30),
-        (wsh * 0.26, zc + 0.004),
-        (0.0, zc),
-    ]
-    zg = zsh + 0.03
-    kabine = [
-        (wsh - 0.05, zg),
-        ((wsh - 0.05 + DACH["kante_b"]) / 2 - DACH["einzug"], (zg + DACH["kante_z"]) / 2 + 0.02),
-        (DACH["kante_b"], DACH["kante_z"]),
-        (0.0, DACH["mitte_z"]),
-    ]
-    oben = [(dy + (ky - dy) * c, dz + (kz - dz) * c) for (dy, dz), (ky, kz) in zip(deck, kabine)]
-    # Flanke: Schweller deutlich eingezogen, scharfe Charakterlinie, darueber leicht eingezogene Flaeche (Schattenkante)
+    x, zb, w, zm, zsh, wsh, zpk, ypk, zc = s
+    # Flanke: Schweller eingezogen, scharfe Charakterlinie, eingezogene Flaeche darueber, Kotfluegel-Aussenkante
     unten = [(0.0, zb), (w * 0.88, zb), (w * 0.955, zb + 0.09), (w, zm), (w - 0.03, zm + (zsh - zm) * 0.45), (wsh, zsh)]
-    return x, unten + oben
+    # oben: Hoecker innen, dann Mulde zur Mitte
+    deck = [(ypk, zpk), (ypk * 0.66, zc + (zpk - zc) * 0.38), (ypk * 0.32, zc + 0.006), (0.0, zc)]
+    return x, unten + deck
 
 
-def _material_index(xa, xb, j, ca, cb):
-    """0 Lack · 1 Glas · 2 Schwarz glaenzend (Einlaesse, Schweller, Diffusor) · 3 Unterboden"""
+def _material_unterbau(xa, xb, j):
+    """0 Lack · 2 Schwarz glaenzend (Schweller, Frontlippe, Diffusor) · 3 Unterboden/tief"""
     xm = (xa + xb) / 2
     if j == 0:
         return 3
-    if j in (6, 7) and min(ca, cb) >= 0.5 and -0.66 < xm < 0.9:
-        return 1                                          # Seitenscheiben mit spitzem Ende hinten
-    if j == 8 and 0.24 < xm < 0.96 and min(ca, cb) > 0.04:
-        return 1                                          # Frontscheibe zwischen den A-Saeulen
-    if j == 8 and -1.12 < xm < -0.62:
-        return 2                                          # Motorabdeckung: dunkle Lamellen (nicht durchsichtig)
     if j == 1 and -0.98 < xm < 0.98:
         return 2                                          # schwarzer Seitenschweller
-    if j in (1, 2, 3) and xm > 2.06:
-        return 2                                          # grosse Front-Lufteinlaesse
-    if j in (0, 1, 2) and xm < -1.84:
+    if j == 1 and xm > 2.0:
+        return 2                                          # schwarze Frontlippe ganz unten
+    if j in (0, 1) and xm < -1.84:
         return 2                                          # Diffusor
     return 0
 
 
-def karosserie(lack, glas, schwarz, unterboden=None):
-    me = bpy.data.meshes.new("Karosserie")
+def _guertel(x):
+    """Guertellinie (Breite, Hoehe) an Stelle x: auf dem Kotfluegel-Hoecker des Unterbaus – Basis der Glaskuppel."""
+    for a, b in zip(UNTERBAU, UNTERBAU[1:]):
+        if b[0] <= x <= a[0]:
+            t = (a[0] - x) / (a[0] - b[0])
+            ypk = a[7] + (b[7] - a[7]) * t
+            zpk = a[6] + (b[6] - a[6]) * t
+            return ypk * 0.97, zpk + 0.002
+    raise ValueError(x)
+
+
+def _kuppel(lack, glas, schwarz):
+    """Glaskuppel: grosse Frontscheibe ab Windlauf, Seitenscheiben mit spitzem Ende, lackiertes Dach, dunkle Lamellen."""
+    me = bpy.data.meshes.new("Kabine")
     bm = bmesh.new()
-    reihen, cs = [], []
-    for s in STATIONEN:
-        x, pts = _querschnitt(s)
-        cs.append(s[7])
+    reihen = []
+    for x, wr, zr in KABINE:
+        wb, zb = _guertel(x)
+        if wr is None:                                        # Fusslinie: alle Punkte flach auf dem Windlauf
+            pts = [(wb, zb), (wb * 0.97, zb + 0.004), (wb * 0.93, zb + 0.008), (0.0, zb + 0.012)]
+        else:
+            ze = zr - 0.04
+            pts = [(wb, zb), ((wb + wr) / 2 - 0.05, (zb + ze) / 2 + 0.03), (wr, ze), (0.0, zr)]
         reihen.append([bm.verts.new((x, y, z)) for y, z in pts])
     for i in range(len(reihen) - 1):
-        for j in range(len(reihen[i]) - 1):
+        xm = (KABINE[i][0] + KABINE[i + 1][0]) / 2
+        for j in range(3):
             f = bm.faces.new((reihen[i][j], reihen[i + 1][j], reihen[i + 1][j + 1], reihen[i][j + 1]))
-            f.material_index = _material_index(STATIONEN[i][0], STATIONEN[i + 1][0], j, cs[i], cs[i + 1])
-    vorn = bm.faces.new(list(reversed(reihen[0])))
-    vorn.material_index = 2
-    hinten = bm.faces.new(reihen[-1])
-    hinten.material_index = 2
+            if j < 2:                                         # Seite: Glas bis zum spitzen Ende, dahinter Lack
+                f.material_index = 1 if xm > (-0.78 if j == 0 else -0.62) else 0
+            else:                                             # oben: Frontscheibe · Dach · Lamellen
+                f.material_index = 1 if xm > 0.2 else (0 if xm > -0.62 else 2)
     crease = bm.edges.layers.float.get("crease_edge") or bm.edges.layers.float.new("crease_edge")
     for i in range(len(reihen) - 1):
-        for j, staerke in CREASES.items():
-            if j in (6, 8) and min(cs[i], cs[i + 1]) < 0.3:
-                staerke = 0.5 if j == 6 else 0.0                # auf Haube/Deck weichere Kante
+        for j, staerke in ((0, 1.0), (2, 0.6)):
             e = bm.edges.get((reihen[i][j], reihen[i + 1][j]))
-            if e and staerke:
+            if e:
                 e[crease] = staerke
+    hinten = bm.faces.new(reihen[-1])
+    hinten.material_index = 0
     bmesh.ops.recalc_face_normals(bm, faces=bm.faces)
     bm.to_mesh(me)
     bm.free()
-    o = bpy.data.objects.new("Karosserie", me)
+    o = bpy.data.objects.new("Kabine", me)
     bpy.context.collection.objects.link(o)
-    tief = unterboden or st.material("Tiefschwarz", base=(0.0015, 0.0015, 0.0017), roughness=0.95, specular=0.03)
-    for m in (lack, glas, schwarz, tief):
-        me.materials.append(m)
+    return o
+
+
+def _schliessen_und_glaetten(o, materialien):
+    for m in materialien:
+        o.data.materials.append(m)
     spiegel_mod = o.modifiers.new("Spiegel", "MIRROR")
     spiegel_mod.use_axis = (False, True, False)
     spiegel_mod.use_clip = True
@@ -125,8 +138,47 @@ def karosserie(lack, glas, schwarz, unterboden=None):
     sub.levels = sub.render_levels = 3
     sub.use_creases = True
     _anwenden(o)
+
+
+def karosserie(lack, glas, schwarz, unterboden=None):
+    me = bpy.data.meshes.new("Karosserie")
+    bm = bmesh.new()
+    reihen = []
+    for s in UNTERBAU:
+        x, pts = _querschnitt(s)
+        reihen.append([bm.verts.new((x, y, z)) for y, z in pts])
+    for i in range(len(reihen) - 1):
+        for j in range(len(reihen[i]) - 1):
+            f = bm.faces.new((reihen[i][j], reihen[i + 1][j], reihen[i + 1][j + 1], reihen[i][j + 1]))
+            f.material_index = _material_unterbau(UNTERBAU[i][0], UNTERBAU[i + 1][0], j)
+    vorn = bm.faces.new(list(reversed(reihen[0])))
+    vorn.material_index = 0
+    hinten = bm.faces.new(reihen[-1])
+    hinten.material_index = 0                                 # Heck in Wagenfarbe, schwarz nur der Diffusor
+    crease = bm.edges.layers.float.get("crease_edge") or bm.edges.layers.float.new("crease_edge")
+    for i in range(len(reihen) - 1):
+        for j, staerke in CREASES.items():
+            e = bm.edges.get((reihen[i][j], reihen[i + 1][j]))
+            if e:
+                e[crease] = staerke
+    bmesh.ops.recalc_face_normals(bm, faces=bm.faces)
+    bm.to_mesh(me)
+    bm.free()
+    o = bpy.data.objects.new("Karosserie", me)
+    bpy.context.collection.objects.link(o)
+    tief = unterboden or st.material("Tiefschwarz", base=(0.0015, 0.0015, 0.0017), roughness=0.95, specular=0.03)
+    mats = (lack, glas, schwarz, tief)
+    _schliessen_und_glaetten(o, mats)
     _radhaeuser(o)
     _einlaesse(o, tief)
+    kab = _kuppel(lack, glas, schwarz)
+    _schliessen_und_glaetten(kab, mats)
+    st.glatt(kab)
+    bpy.ops.object.select_all(action="DESELECT")              # Kuppel und Unterbau zu einem Objekt (Schaum, Schmutz)
+    kab.select_set(True)
+    o.select_set(True)
+    bpy.context.view_layer.objects.active = o
+    bpy.ops.object.join()
     st.glatt(o)
     o.data.use_auto_smooth = True
     o.data.auto_smooth_angle = math.radians(45)
@@ -160,7 +212,16 @@ def _radhaeuser(body):
 
 
 def _einlaesse(body, schwarz):   # schwarz = tiefschwarzes Innenleben
-    """Echte Vertiefungen mit schwarzem Innenleben: Seiteneinlass hinter der Tuer, zwei Front-Einlaesse."""
+    """Echte Vertiefungen mit schwarzem Innenleben: Seiteneinlass hinter der Tuer, zwei seitliche + ein mittlerer Front-Einlass."""
+    bpy.ops.mesh.primitive_cube_add(size=1, location=(2.21, 0, 0.215))
+    c = bpy.context.object
+    c.scale = (0.22, 0.70, 0.11)
+    _schnitt(body, c, schwarz)
+    bpy.ops.mesh.primitive_cube_add(size=1, location=(1.86, 0, 0.60))       # Luftschlitz quer in der Haube
+    c = bpy.context.object
+    c.scale = (0.10, 0.62, 0.08)
+    c.rotation_euler = (0, math.radians(18), 0)
+    _schnitt(body, c, schwarz)
     for sy in (1, -1):
         # Seiteneinlass: keilfoermig, oben breiter, laeuft nach vorn spitz aus
         bpy.ops.mesh.primitive_cube_add(size=1, location=(-0.80, sy * 1.02, 0.66))
@@ -169,9 +230,9 @@ def _einlaesse(body, schwarz):   # schwarz = tiefschwarzes Innenleben
         c.rotation_euler = (sy * math.radians(8), math.radians(-12), 0)
         _schnitt(body, c, schwarz)
         # Front-Einlass unter dem Scheinwerfer
-        bpy.ops.mesh.primitive_cube_add(size=1, location=(2.22, sy * 0.62, 0.215))
+        bpy.ops.mesh.primitive_cube_add(size=1, location=(2.16, sy * 0.60, 0.26))
         c = bpy.context.object
-        c.scale = (0.30, 0.42, 0.11)
+        c.scale = (0.30, 0.40, 0.17)
         c.rotation_euler = (0, math.radians(-10), sy * math.radians(14))
         _schnitt(body, c, schwarz)
 
@@ -320,10 +381,11 @@ def details(body, licht_vorn, licht_hinten, schwarz):
     teile = []
     for sy in (1, -1):
         # Scheinwerfer: flacher, kantiger Pfeil an der Fahrzeugecke (Tagfahrlicht-Strich + Unterkante)
-        oben = [(3.0, sy * (0.40 + 0.50 * t), 0.455 + 0.07 * t) for t in [i / 14 for i in range(15)]]
-        unten = [(3.0, sy * (0.62 + 0.26 * t), 0.405 + 0.09 * t) for t in [i / 10 for i in range(11)]]
-        teile.append(leiste(body, oben, (-1, 0, -0.25), licht_vorn, dicke=0.009, name="Tagfahrlicht"))
-        teile.append(leiste(body, unten, (-1, 0, -0.25), licht_vorn, dicke=0.006, name="Scheinwerfer"))
+        # waagerecht projiziert, sonst rutschen sie an der Front nach unten (wirkten wie Nebelleuchten)
+        oben = [(3.0, sy * (0.40 + 0.40 * t), 0.455 + 0.04 * t) for t in [i / 14 for i in range(15)]]
+        unten = [(3.0, sy * (0.56 + 0.24 * t), 0.425 + 0.05 * t) for t in [i / 10 for i in range(11)]]
+        teile.append(leiste(body, oben, (-1, 0, 0), licht_vorn, dicke=0.009, name="Tagfahrlicht"))
+        teile.append(leiste(body, unten, (-1, 0, 0), licht_vorn, dicke=0.006, name="Scheinwerfer"))
         # Tuerfuge + Tuergriff-Kante
         fuge = []
         fuge += [(0.86, sy * 2.0, 0.24 + 0.55 * t / 10) for t in range(11)]
@@ -340,8 +402,19 @@ def details(body, licht_vorn, licht_hinten, schwarz):
         ar.name = "Endrohr"
         st.zuweisen(ar, st.material("Endrohr", base=(0.06, 0.06, 0.065), metallic=1.0, roughness=0.3))
         teile.append(ar)
+    # A-Saeulen: schmale schwarze Leiste an der Kante zwischen Frontscheibe und Seitenscheibe
+    for sy in (1, -1):
+        saeule = []
+        for k in range(13):
+            t = k / 12
+            x = 1.09 - 0.84 * t
+            wb, zb = _guertel(x)
+            wr = wb * 0.93 + (0.56 - wb * 0.93) * min(1, t * 1.3)
+            z = zb + 0.01 + (1.08 - zb) * t
+            saeule.append((x, sy * (wr + 0.6), z + 0.25))
+        teile.append(leiste(body, saeule, (0, -sy, -0.42), schwarz, dicke=0.013, abstand=0.002, name="A-Saeule"))
     # Frontsplitter: duenne schwarze Lippe unter der Nase
-    bpy.ops.mesh.primitive_cube_add(size=1, location=(2.17, 0, 0.115))
+    bpy.ops.mesh.primitive_cube_add(size=1, location=(2.11, 0, 0.115))
     sp = bpy.context.object
     sp.name = "Splitter"
     sp.scale = (0.24, 1.62, 0.018)
