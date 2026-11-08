@@ -15,11 +15,13 @@ Stand 08.11.2026 · private Visualisierung (keine Werbung) · erzeugt mit `3d-st
 
 ## Was gleich bleibt (aus den Fotos übernommen)
 
-Satteldach 45°, Kniestock rechts 1,05 m, flacher Deckenstreifen 2,35 m · gerade, raumhohe Wand vorne links ·
-Nische unter der Schräge · freistehender Pfosten mit zwei Kopfbändern · Gaube hinten links (Decke 2,20 m) mit Fenster
-in der hinteren Stirnwand und Badtür in der Außenwand · Dachfenster mit senkrechter unterer und waagerechter oberer
-Laibung · Revisionsklappe direkt hinter dem Dachfenster · Eingangstür (öffnet nach innen) mit schmalem Heizkörper
-und Fliesenspiegel zwischen Tür und Kratzbaum-Wand · Heizkörper unter dem Gaubenfenster · Laminat Eiche quer verlegt.
+Raum ca. 7,0 × 3,2 m (vorne), Satteldach 45°, Kniestock 1,05 m, flacher Deckenstreifen 2,35 m · gerade, raumhohe
+Wand vorne links (Kratzbaum) · freistehender Pfosten mit zwei Kopfbändern bei ca. 1,95 m · dahinter Nische unter der
+linken Schräge mit linkem Kniestock · Gaube hinten links (2,4 × 2,0 m, Decke 2,20 m) mit Fenster in der hinteren
+Stirnwand und Badtür in der Außenwand · Dachfenster vorne rechts über dem heutigen Essplatz, senkrechte untere und
+waagerechte obere Laibung · Revisionsklappe dahinter im rechten Kniestock · Eingangstür (öffnet nach innen) mit
+schmalem Heizkörper und Fliesenspiegel zwischen Tür und Kratzbaum-Wand · Heizkörper unter dem Gaubenfenster ·
+Deckenbretter längs, Laminat Eiche quer verlegt.
 
 ## Was neu ist
 
@@ -34,18 +36,19 @@ und Fliesenspiegel zwischen Tür und Kratzbaum-Wand · Heizkörper unter dem Gau
 - **Leseecke vorne rechts:** Sessel Cognac · schwarze Leseleuchte · Sideboard Eiche 110 cm mit Büchern, Vase,
   Kerze, zwei gelehnten Bildern · Plissee Greige im Dachfenster
 - **Kratzbaum:** bleibt, mittig an der geraden Wand vorne links
-- **Licht (2700 K):** LED-Profil auf einer schmalen Lichtvoute an der Kniestock-Oberkante (strahlt die Schräge an),
-  zusätzlich an der Nischen-Oberkante · Lamellen- und Lowboard-LED · schlichte Deckenleuchte (gedimmt) · Stehleuchten
+- **Licht (2700 K):** LED-Profil auf einer schmalen Lichtvoute an der Oberkante beider Kniestöcke (rechts ganze
+  Länge, links in der Nische), strahlt die Schrägen an · Lamellen- und Lowboard-LED · schlichte Deckenleuchte
+  (gedimmt) · Stehleuchten
 - **Deko:** drei Bilder (eigene, gemalte Motive in Erdtönen/Schwarz-Weiß), Keramikvasen, Kerzen, keine Pflanzen
 - **Weg:** Pflanzen, Ledercouch und -sessel, Esstisch mit Stühlen, TV-Lowboards, Spitzengardine, Sternleuchte,
   Katzenklo, Kleinkram. Den dunklen Schrank neben dem Kratzbaum habe ich ebenfalls weggelassen.
 
 ## Abweichungen und Annahmen (bitte prüfen)
 
-1. **Raumlänge 4,80 m statt 7,0 m.** Die Fotos passen nur zu einem kürzeren Raum (Gaube 2,4 m + Pfosten bei ca. 2,5 m,
-   Möbelkette rechts). Alle Maße sind aus Fotos geschätzt, nicht aufgemessen.
-2. **Zweiter Kniestock:** Im Raum gibt es links keinen sichtbaren Kniestock (gerade Wand, Nische, Gaube). Die zweite
-   LED-Linie sitzt deshalb an der Oberkante der Nischen-Rückwand.
+1. **Maße:** Raumlänge 7,0 m aus deiner Beschreibung, per Fotoperspektive (Foto 1, Deckenhöhe als Maßstab)
+   bestätigt. Alle übrigen Lagen sind aus Fotos geschätzt, nicht aufgemessen.
+2. **Gaubenfenster:** Laut Fotos sitzt es in der hinteren Stirnwand (nicht in der Seitenwand), die Badtür in der
+   Außenwand. Die Lamellen-/TV-Wand schaut dadurch direkt zur Couch.
 3. **Lichtvoute:** Ein Profil direkt in der Ecke Kniestock/Schräge leuchtet nur einen Streifen an. Ein 10 cm tiefes
    Brett mit Blende gibt Abstand, damit das Licht die ganze Schräge hochläuft.
 4. **Revisionsklappe** in Wandfarbe gestrichen, damit sie verschwindet (Empfehlung, kein Muss).

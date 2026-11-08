@@ -59,17 +59,17 @@ E = eigene_args()
 
 # Kamera: Handy-Weitwinkel (36-mm-Sensor), Augenhoehe 1,5 m stehend bzw. 1,15 m sitzend, Format 4:3
 ANSICHTEN = {
-    "1": dict(datei="1-eingang-tag", ort=(-0.30, -0.25, 1.50), ziel=(4.8, -0.05, 1.25), mm=22, hoch=True,
+    "1": dict(datei="1-eingang-tag", ort=(-0.30, -0.25, 1.50), ziel=(7.0, -0.05, 1.25), mm=22, hoch=True,
               licht="tag"),
-    "2": dict(datei="2-eingang-abend-led", ort=(-0.30, -0.25, 1.50), ziel=(4.8, -0.05, 1.25), mm=22, hoch=True,
+    "2": dict(datei="2-eingang-abend-led", ort=(-0.30, -0.25, 1.50), ziel=(7.0, -0.05, 1.25), mm=22, hoch=True,
               licht="abend_led"),
-    "3": dict(datei="3-couch-gaube", ort=(3.05, -1.58, 1.17), ziel=(3.55, 2.95, 1.15), mm=24, hoch=False,
+    "3": dict(datei="3-couch-gaube", ort=(4.05, -1.58, 1.17), ziel=(5.75, 2.95, 1.15), mm=22, hoch=False,
               licht="abend_voll"),
-    "4": dict(datei="4-gaube-eingang-tag", ort=(3.30, 0.55, 1.50), ziel=(0.0, -0.60, 1.10), mm=20, hoch=True,
+    "4": dict(datei="4-gaube-eingang-tag", ort=(4.50, 0.50, 1.50), ziel=(0.0, -0.40, 1.00), mm=24, hoch=True,
               licht="tag"),
-    "5": dict(datei="5-leseecke", ort=(2.65, 0.05, 1.32), ziel=(0.55, -1.75, 0.95), mm=22, hoch=False,
+    "5": dict(datei="5-leseecke", ort=(3.00, 0.05, 1.32), ziel=(0.95, -1.95, 1.05), mm=22, hoch=False,
               licht="daemmerung"),
-    "oben": dict(datei="0-draufsicht", ort=(2.35, 0.33, 12.0), ziel=(2.35, 0.33, 0.0), mm=0, hoch=False,
+    "oben": dict(datei="0-draufsicht", ort=(3.45, 0.33, 12.0), ziel=(3.45, 0.33, 0.0), mm=0, hoch=False,
                  licht="tag"),
 }
 V = ANSICHTEN[E["ansicht"]]
@@ -669,7 +669,7 @@ def flur():
     poly("Flur Stirn", [(x0, y0, 0), (x0, y1, 0), (x0, y1, h), (x0, y0, h)], MT["weiss_putz"], (1, 0, 0))
     quader("Flur Tuer gegenueber", x0 + 0.005, x0 + 0.04, -0.6, 0.25, 0, 2.0, MT["buche"], 0.002)
     d = bpy.data.lights.new("Flur Licht", "AREA")
-    d.shape, d.size, d.energy, d.color = "DISK", 0.3, 18, (1.0, 0.85, 0.65)
+    d.shape, d.size, d.energy, d.color = "DISK", 0.3, 18 if V["licht"] == "tag" else 4, (1.0, 0.85, 0.65)
     o = bpy.data.objects.new("Flur Licht", d)
     bpy.context.collection.objects.link(o)
     o.location = (x0 / 2, (y0 + y1) / 2, h - 0.02)
@@ -768,7 +768,7 @@ def ausstattung_bestand():
     p = M.PFOSTEN
     hs = p["s"] / 2
     quader("Pfosten", p["x"] - hs, p["x"] + hs, p["y"] - hs, p["y"] + hs, 0, M.GAUBE_H, MT["weiss_putz"], 0.006)
-    for nm, sx, ztop in (("Kopfband vorn", -1, M.DECKE), ("Kopfband hinten", 1, M.GAUBE_H)):
+    for nm, sx, ztop in (("Kopfband vorn", -1, M.DECKE), ("Kopfband hinten", 1, M.DECKE)):
         k = p["kopfband"]
         laenge = k * R2 + 0.08
         o = quader(nm, -laenge / 2, laenge / 2, -0.06, 0.06, -0.06, 0.06, MT["weiss_putz"], 0.006)
@@ -782,7 +782,7 @@ def ausstattung_bestand():
     quader("Ueberwurf", r["xm"] - 0.03, r["xm"] + 0.03, M.YR + 0.018, M.YR + 0.024, zm - 0.02, zm + 0.02, MT["griff"])
     quader("Vorhaengeschloss", r["xm"] - 0.02, r["xm"] + 0.02, M.YR + 0.024, M.YR + 0.042, zm - 0.07, zm - 0.02,
            MT["griff"], 0.004)
-    zylinder("Rauchmelder", 0.055, 0.035, MT["rauchmelder"], ort=(3.75, 1.95, M.GAUBE_H - 0.035))
+    zylinder("Rauchmelder", 0.055, 0.035, MT["rauchmelder"], ort=((M.GAUBE_X0 + M.L) / 2, 1.95, M.GAUBE_H - 0.035))
 
 
 def fliesen(y0, y1, z0, z1):
@@ -1363,19 +1363,18 @@ def welt(art):
     w = s.world
     n, l = w.node_tree.nodes, w.node_tree.links
     bg = n["Background"]
-    if art == "tag":
+    if art in ("tag", "daemmerung"):
+        horizont, zenit, staerke = {"tag": ((0.95, 0.96, 1.0), (0.42, 0.6, 0.95), 3.5),
+                                    "daemmerung": ((0.55, 0.42, 0.45), (0.07, 0.10, 0.24), 0.7)}[art]
         geo = n.new("ShaderNodeTexCoord")
         sep = n.new("ShaderNodeSeparateXYZ")
         l.new(geo.outputs["Generated"], sep.inputs[0])
         ramp = n.new("ShaderNodeValToRGB")
-        ramp.color_ramp.elements[0].position, ramp.color_ramp.elements[0].color = 0.5, (0.95, 0.96, 1.0, 1)
-        ramp.color_ramp.elements[1].position, ramp.color_ramp.elements[1].color = 0.95, (0.42, 0.6, 0.95, 1)
+        ramp.color_ramp.elements[0].position, ramp.color_ramp.elements[0].color = 0.5, (*horizont, 1)
+        ramp.color_ramp.elements[1].position, ramp.color_ramp.elements[1].color = 0.95, (*zenit, 1)
         l.new(sep.outputs["Z"], ramp.inputs["Fac"])
         l.new(ramp.outputs["Color"], bg.inputs["Color"])
-        bg.inputs["Strength"].default_value = 3.5
-    elif art == "daemmerung":
-        bg.inputs["Color"].default_value = (0.11, 0.15, 0.28, 1)
-        bg.inputs["Strength"].default_value = 0.45
+        bg.inputs["Strength"].default_value = staerke
     else:   # abend: tiefes Nachtblau
         bg.inputs["Color"].default_value = (0.05, 0.08, 0.2, 1)
         bg.inputs["Strength"].default_value = 0.04
@@ -1556,7 +1555,7 @@ if V["mm"]:
     kam.data.sensor_width = 36
 else:   # Draufsicht ohne Decke
     kam = st.kamera(V["ort"], V["ziel"], 50)
-    kam.data.type, kam.data.ortho_scale = "ORTHO", 7.4
+    kam.data.type, kam.data.ortho_scale = "ORTHO", 9.6
     for o in s.objects:
         if o.type == "MESH" and (o.name.startswith(("Decke", "Schraege", "Gaubendecke", "Gauben-Zierleiste",
                                                     "Deckenleuchte", "LED Lamelle Blende", "Vorhangschiene",

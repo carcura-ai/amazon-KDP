@@ -152,8 +152,8 @@ def baue():
     rechteck(p["x"] - p["s"] / 2, p["y"] - p["s"] / 2, p["x"] + p["s"] / 2, p["y"] + p["s"] / 2, "#FFFFFF",
              FARBE["wand"], 0.3)
     linie(GX, YF, L, YF, FARBE["wand"], 0.15, "2,1")
-    text(p["x"] - 0.14, YF - 0.05, "Pfosten", 1.8, FARBE["mass"], "end")
-    text((M.WAND_X + GX) / 2, (YF + M.NISCHE_Y) / 2 + 0.05, "Nische", 1.8, FARBE["mass"])
+    text(p["x"] + 0.14, YF - 0.05, "Pfosten", 1.8, FARBE["mass"], "start")
+    text((M.WAND_X + GX) / 2, (YF + M.NISCHE_Y) / 2 + 0.05, "Nische unter der Schräge", 1.8, FARBE["mass"])
     # LED-Linien
     linie(0.02, YR + 0.07, L - 0.02, YR + 0.07, FARBE["led"], 0.5, "1.6,0.6")
     linie(M.WAND_X + 0.02, M.NISCHE_Y - 0.07, GX - 0.02, M.NISCHE_Y - 0.07, FARBE["led"], 0.5, "1.6,0.6")
@@ -195,17 +195,17 @@ def baue():
     lb = M.LOWBOARD
     yf = GY - tief - 0.005
     rechteck(lb["x0"], yf - lb["t"], lb["x0"] + lb["b"], yf, "#3A3A3A", "#1E1E1E")
-    text(lb["x0"] + lb["b"] / 2, yf - lb["t"] + 0.08, "Lowboard", 1.7, "#FFFFFF")
+    text(lb["x0"] + 0.28, yf - lb["t"] + 0.08, "Lowboard", 1.7, "#FFFFFF")
     bw, _ = M.tv_masse()
     tv = M.TV
     zx, zy = ct["x"], YR + c["wand"] + c["t"] / 2
     n = math.atan2(zy - tv["y"], zx - tv["x"])
     tx, ty = -math.sin(n), math.cos(n)
     linie(tv["x"] - tx * bw / 2, tv["y"] - ty * bw / 2, tv["x"] + tx * bw / 2, tv["y"] + ty * bw / 2, "#111111", 0.8)
-    text(tv["x"], yf - lb["t"] - 0.22, 'TV 50" am Schwenkarm', 1.8)
+    text(tv["x"] - 0.35, yf - lb["t"] - 0.22, 'TV 50" am Schwenkarm', 1.8)
     text(GX + 0.55, GY - 0.25, "Lamellenwand Eiche", 1.8, FARBE["moebel"])
     text(GX + 0.55, GY - 0.42, "(über die Badtür)", 1.6, FARBE["moebel"])
-    text(GX + 0.62, YF + 0.70, "Gaube · Decke 2,20 m", 2.0, FARBE["mass"])
+    text(GX + 1.55, YF + 0.70, "Gaube · Decke 2,20 m", 2.0, FARBE["mass"])
     rg = M.REGAL_HINTEN
     rechteck(L - 0.01 - rg["t"], rg["y0"], L - 0.01, rg["y0"] + rg["b"], "#E3CDAE")
     text(L - 0.2, rg["y0"] + rg["b"] / 2, "Regal", 1.6, dreh=-90)
@@ -231,7 +231,7 @@ def baue():
 
 def blatt(ziel):
     baue()
-    r = 160.0
+    r = OX + M.L * S + 24.0
     leg = [
         ("Wand / Kniestock", FARBE["wand"], "line"),
         ("LED-Lichtleiste 2700 K (indirekt)", FARBE["led"], "dash"),
@@ -266,7 +266,7 @@ def blatt(ziel):
         "Neu: Tapete Mokka, Decke weiß gestrichen, Sockelleisten weiß,",
         "Lamellenwand über die Badtür (verdeckte Tür), Lichtvoute mit LED.",
         "Couch auf Gleitern: Revisionsklappe bleibt erreichbar.",
-        "Raumlänge 4,80 m aus den Fotos geschätzt (Beschreibung: ca. 7 m).",
+        "Raumlänge 7,0 m (Beschreibung, per Fotoperspektive geprüft).",
     ]
     y += 4
     lg.append(f'<text x="{r}" y="{y}" font-size="3" font-weight="600" fill="{FARBE["text"]}">Hinweise</text>')
@@ -274,7 +274,7 @@ def blatt(ziel):
         y += 4.6
         lg.append(f'<text x="{r}" y="{y}" font-size="2.3" fill="{FARBE["text"]}">{z}</text>')
     # Massstabsbalken 0-1-2 m
-    bx, by = r, 178.0
+    bx, by = r, 182.0
     for i in range(4):
         f = FARBE["wand"] if i % 2 == 0 else "#FFFFFF"
         lg.append(f'<rect x="{bx + i * S / 2}" y="{by}" width="{S / 2}" height="1.6" fill="{f}" '

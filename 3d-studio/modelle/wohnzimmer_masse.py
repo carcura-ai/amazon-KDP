@@ -16,20 +16,20 @@ DECKE = 2.35                 # flacher Deckenstreifen (Beschreibung)
 LAUF = DECKE - KNIE          # 45 Grad: Lauf = Steigung = 1,30
 YR = -2.25                   # rechte Kniestockflucht
 YF = YR + LAUF + 1.90        # 0,95: linke Kante flacher Deckenstreifen = Pfettenlinie (Streifen 1,90 breit, FOTO 13)
-YL = YF + LAUF               # 2,25: gedachte linke Kniestockflucht (nur hinter Bad/Nische, im Raum nicht sichtbar)
+YL = YF + LAUF               # 2,25: linker Kniestock (nur in der Nische zwischen Pfosten und Gaube sichtbar)
 S_MAX = LAUF * math.sqrt(2)  # Schraegenlaenge Kniestock bis Deckenstreifen (1,84)
 
 # ---------- Grundriss ----------
-L = 4.80                     # FOTO: Kette Essplatz-Dachfenster-Klappe-TV-Moebel + Gaube 2,2 m (Beschreibung: 7,0 geschaetzt)
-B = YF - YR                  # 3,20 Raumbreite vorne (Kniestock bis gerade Wand)
+L = 7.00                     # Beschreibung; FOTO 1 bestaetigt: Flachdecke 2,35 m auf 290 px -> Stirnwand ca. 7,3 m entfernt
+B = YF - YR                  # 3,20 Raumbreite vorne (Kniestock rechts bis gerade Wand)
 
 WAND_X = 1.75                # gerade raumhohe Wand links (y = YF) von x = 0 bis hier (Kratzbaum + Schrank, FOTO 10)
-NISCHE_Y = 1.55              # Rueckwand der Nische unter der Schraege (heute Katzenklo, FOTO 9)
-GAUBE_X0 = 2.40              # Gauben-Vorderwand (ab Nische), Gaube bis hintere Stirnwand
+NISCHE_Y = YL                # Nische unter der linken Schraege bis zum linken Kniestock (heute Katzenklo, FOTO 9)
+GAUBE_X0 = 4.60              # Gauben-Vorderwand, Gaube bis hintere Stirnwand (2,4 m: Badtuer + 1,4 m Wand, FOTO 6)
 GAUBE_Y1 = 2.95              # Gauben-Aussenwand mit Badtuer (2,0 tief ab Pfettenlinie, Beschreibung)
 GAUBE_H = 2.20               # flache Gaubendecke (Beschreibung)
-PFOSTEN = dict(x=2.47, y=YF, s=0.15, kopfband=0.38)
-BADTUER = dict(x0=2.52, b=0.80, h=2.00)                     # in der Gauben-Aussenwand; freie Wand bis Fensterecke 1,4 m
+PFOSTEN = dict(x=1.95, y=YF, s=0.15, kopfband=0.38)        # 1,5-2 m ab Eingang
+BADTUER = dict(x0=4.72, b=0.80, h=2.00)                     # in der Gauben-Aussenwand; freie Wand bis Fensterecke 1,4 m
 FENSTER_G = dict(ym=2.10, b=1.00, h=1.00, bruestung=1.00)   # in der hinteren Stirnwand (FOTO 7/8)
 GAUBE_LAIBUNG = 0.30
 
@@ -42,21 +42,21 @@ FLIESEN = dict(y0=0.42, b=0.46, z0=0.0, h=0.90)
 # ---------- Dachfenster rechte Schraege ----------
 # Glas parallel zur Dachflaeche, um 'tiefe' nach aussen versetzt; untere Laibung senkrecht (Kniestockebene),
 # obere Laibung waagerecht (FOTO 2/11/12).
-DF = dict(x0=1.55, b=0.80, tiefe=0.22, glas=1.10)
+DF = dict(x0=1.20, b=0.80, tiefe=0.22, glas=1.10)          # FOTO 1: Hinterkante ca. 2,0 m
 
-# ---------- Revisionsklappe rechter Kniestock (direkt hinter dem Dachfenster, FOTO 12) ----------
-REV = dict(xm=3.00, b=0.80, z0=0.18, h=0.70)
+# ---------- Revisionsklappe rechter Kniestock (hinter dem Essplatz, FOTO 1/12) ----------
+REV = dict(xm=3.40, b=0.80, z0=0.18, h=0.70)
 
 # ---------- Neue Einrichtung ----------
 LAMELLE = dict(breite=0.027, tiefe=0.021, raster=0.040, filz=0.009)
-LOWBOARD = dict(x0=3.40, b=1.10, t=0.40, z0=0.25, h=0.38)   # vor der Lamellenwand (Gauben-Aussenwand)
-TV = dict(diag_zoll=50, x=3.95, y=2.75, z=1.18)             # Schwenkarm, leicht zur Couch gedreht
-COUCH = dict(x0=1.80, b=2.60, t=0.95, wand=0.10, sitz=0.44, ruecken=0.75)
-TEPPICH = dict(x0=1.65, b=2.90, y0=-1.45, t=2.00)
-COUCHTISCH = dict(x=3.10, y=-0.40, d=0.80, h=0.43)
-BEISTELL = dict(x=4.60, y=-1.55, d=0.36, h=0.50)
-STEH_COUCH = dict(x=4.58, y=-1.10)
-SESSEL = dict(x=1.28, y=-1.12, b=0.78, t=0.80)
+LOWBOARD = dict(x0=5.65, b=1.10, t=0.40, z0=0.25, h=0.38)   # vor der Lamellenwand (Gauben-Aussenwand)
+TV = dict(diag_zoll=50, x=6.20, y=2.62, z=1.18)             # Schwenkarm, leicht zur Couch gedreht
+COUCH = dict(x0=2.80, b=2.60, t=0.95, wand=0.10, sitz=0.44, ruecken=0.75)
+TEPPICH = dict(x0=2.65, b=2.90, y0=-1.45, t=2.00)
+COUCHTISCH = dict(x=4.10, y=-0.40, d=0.80, h=0.43)
+BEISTELL = dict(x=5.65, y=-1.62, d=0.36, h=0.50)
+STEH_COUCH = dict(x=5.98, y=-1.18)
+SESSEL = dict(x=1.40, y=-1.15, b=0.78, t=0.80)
 STEH_LESE = dict(x=0.30, y=-1.12)
 SIDEBOARD = dict(x0=0.10, b=1.10, t=0.40, h=0.55)
 KRATZBAUM = dict(x0=0.85, b=0.90, y0=0.40, t=0.55, h=1.80)  # vorhandener grosser Kratzbaum, Wandmitte
