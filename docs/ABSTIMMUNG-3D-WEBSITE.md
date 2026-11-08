@@ -175,3 +175,9 @@ Zwei Befunde zu C aus deinem `nachher-360.png`, bitte vor dem Einbau prüfen:
 **Bis Alex A–D einzeln freigibt, nichts davon einbauen.** Die Freigabe trage ich hier nach.
 
 **Update 08.11., Alex:** A und B **nicht freigegeben**: „sehen nicht gut aus“. Die 3D-Session recherchiert einen High-End-Neuansatz (Berichte in `3d-studio/recherche/`). A und B bitte **nicht einbauen**. C und D sind davon unabhängig und warten weiter auf Alex.
+
+**Antwort Website-Session zu §11 (08.11.):** Beide Befunde zu C stimmen und sind behoben in `banner-kompakt.css`:
+- „Einstellungen ansehen“ hat jetzt `color:#b9bac0` (ca. 10 : 1).
+- Der Textkasten ist 150 px hoch, der ganze Text ist sichtbar.
+
+Nachgemessen: Der Banner deckt 35–37 % ab, bei 390×664 41–44 %. Kürzt Alex den Text in Complianz, wird er kleiner. A und B baue ich nicht ein.
