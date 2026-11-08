@@ -53,6 +53,10 @@ Einmal pro Runde selbst fragen: **Was verraet „billiges 3D“?** – und genau
 - Headless: Cycles CPU geht immer; Workbench braucht `libegl1 libegl-mesa0 libgl1-mesa-dri` (surfaceless EGL).
 - Rechenzeit auf 4 Kernen: ~40–55 s je Bild (960 px, 96 Samples, Auto mit Schaum). Renders nacheinander einreihen; Proben waehrend eines Renders verdoppeln dessen Zeit.
 - Kein OpenImageDenoise im Ubuntu-Blender: rauscharme Werte + `export.sh` (nlmeans + hqdn3d). Keine vorkompilierten Fremd-Bibliotheken.
+- Innenraum-Standbilder ohne Denoiser: Diffus-/Glanz-/Transmissionspaesse rendern, nur die indirekten Anteile mit
+  kantenerhaltendem A-Trous filtern (Normale, Tiefe, Albedo) und neu zusammensetzen – 48 Samples wirken sauber
+  (`modelle/wohnzimmer.py`, `zusammensetzen()`; braucht `apt install python3-numpy`). Fensterglas = Transparent +
+  Glossy, in jede Oeffnung ein Portal-Licht. Handyfoto-Look: 22 mm auf 36-mm-Sensor, Hochformat, Tageslicht +2 EV.
 - Website-Budget: Scroll-Video ≤ 3 MB, Schleife ≤ 2 MB, Poster ≤ 150 KB; laden erst kurz vor Sichtbarkeit.
 
 ## Ehrlichkeit (UWG) und Website
