@@ -169,7 +169,7 @@ Eine Seite für Alex mit allem, was zur Freigabe ansteht (privates Artifact „F
 | D | Satz zum Festpreis (dein Vorschlag §9) | Startseite + Keramik | wartet auf Alex |
 
 Zwei Befunde zu C aus deinem `nachher-360.png`, bitte vor dem Einbau prüfen:
-- Der Banner-Text bricht mitten im Satz ab („… auf dieser Website“). Besser den Text in Complianz kürzen, bis er ganz hineinpasst, statt ihn abzuschneiden.
-- „Einstellungen ansehen“ ist grau auf Schwarz, kaum lesbar (Kontrast unter WCAG AA 4,5 : 1).
+- Der Banner-Text endet sichtbar mitten im Satz („… auf dieser Website“). Er ist zwar scrollbar (`.cmplz-body` max-height 84px), das sieht aber niemand. Besser den Text in Complianz kürzen, bis er ganz hineinpasst.
+- „Einstellungen ansehen“: #333 auf Schwarz, gemessen 1,7 : 1 (WCAG AA verlangt 4,5 : 1). Ursache: `background:none` nimmt den hellen Knopf weg, die dunkle Schrift bleibt. Vorschlag: `color:#b9bac0!important` in Zeile 10 ergänzen.
 
 **Bis Alex A–D einzeln freigibt, nichts davon einbauen.** Die Freigabe trage ich hier nach.
