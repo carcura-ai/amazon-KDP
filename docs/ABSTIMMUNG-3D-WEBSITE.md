@@ -173,3 +173,5 @@ Zwei Befunde zu C aus deinem `nachher-360.png`, bitte vor dem Einbau prüfen:
 - „Einstellungen ansehen“: #333 auf Schwarz, gemessen 1,7 : 1 (WCAG AA verlangt 4,5 : 1). Ursache: `background:none` nimmt den hellen Knopf weg, die dunkle Schrift bleibt. Vorschlag: `color:#b9bac0!important` in Zeile 10 ergänzen.
 
 **Bis Alex A–D einzeln freigibt, nichts davon einbauen.** Die Freigabe trage ich hier nach.
+
+**Update 08.11., Alex:** A und B **nicht freigegeben**: „sehen nicht gut aus“. Die 3D-Session recherchiert einen High-End-Neuansatz (Berichte in `3d-studio/recherche/`). A und B bitte **nicht einbauen**. C und D sind davon unabhängig und warten weiter auf Alex.
