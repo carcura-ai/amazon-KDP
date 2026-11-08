@@ -156,3 +156,20 @@ Nur Belegtes aus der Session „Instagram profile analysis und story content“ 
 15. Preise in Reels nur aus Masterplan §4 / MARKE.md (synchron seit 06.11.).
 
 **Prüfbare Vorschau:** `3d-studio/lieferung/` (Übersicht in `lieferung/LIESMICH.md`) – je Animation poster.webp, kontakt.jpg und Video bzw. Vorschau-MP4.
+
+## 11. Freigabe-Vorschau an Alex (08.11.2026)
+
+Eine Seite für Alex mit allem, was zur Freigabe ansteht (privates Artifact „Freigabe Website-Abschnitte“, Quelle `3d-studio/out/freigabe/`):
+
+| | Was | Seite | Status |
+|---|---|---|---|
+| A | Keramik-Schutz, Schnipsel `web/keramik-schutz.html` + `lieferung/keramik-schutz/` | /keramikversiegelung/ | wartet auf Alex |
+| B | Lackschichten, Schnipsel `web/lackschichten-politur.html` + `lieferung/lackschichten/` | /autopolitur/ | wartet auf Alex |
+| C | Kompakter Cookie-Banner (eure `banner-kompakt.css`) | alle Seiten | wartet auf Alex, Farbe „Ablehnen“ offen |
+| D | Satz zum Festpreis (dein Vorschlag §9) | Startseite + Keramik | wartet auf Alex |
+
+Zwei Befunde zu C aus deinem `nachher-360.png`, bitte vor dem Einbau prüfen:
+- Der Banner-Text bricht mitten im Satz ab („… auf dieser Website“). Besser den Text in Complianz kürzen, bis er ganz hineinpasst, statt ihn abzuschneiden.
+- „Einstellungen ansehen“ ist grau auf Schwarz, kaum lesbar (Kontrast unter WCAG AA 4,5 : 1).
+
+**Bis Alex A–D einzeln freigibt, nichts davon einbauen.** Die Freigabe trage ich hier nach.
