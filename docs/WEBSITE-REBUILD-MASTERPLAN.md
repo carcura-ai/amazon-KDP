@@ -145,3 +145,7 @@ verteilt nicht weiter, (3) auf den Unterseiten fehlen Beweise (Keramik) bzw. gan
   - Ortsseiten bewusst unverändert (lokale Suche)
 - WP Consent API aktiviert (Alex): GA4 bekommt nach „Akzeptieren“ gcs=G111, geprüft.
 - Anzahlung/Absage (Freigabeseite Teil 5): wartet auf OK.
+- 09.11. Nachtrag:
+  - Teil 2b gekürzt: Leistungen 311, Gutschein 781, Über uns 134, Firmenkunde 415.
+  - Teil 5 live: Anzahlung 50 % ab 500 € und Absage 48 h / 50 % (mit Schadensnachweis und Widerrufsrecht) auf Startseite (Hero, Schritt 3, 2 FAQ), Keramik, Politur, Wohnmobil, Leistungen-Preishinweis und /anfragen/ über dem Absenden-Knopf.
+  - Noch zu tun durch Alex: Regel in AGB und Terminbestätigung aufnehmen, Anwalt prüft die 50 %.
