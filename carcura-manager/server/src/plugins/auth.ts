@@ -4,11 +4,14 @@ import type { Ctx } from '../core/context.js';
 import type { Permission } from '../core/permissions.js';
 import { forbidden, unauthorized } from '../core/errors.js';
 import { resolveSession } from '../core/session.js';
+import { isApiKeyToken, resolveApiKey } from '../core/apikeys.js';
 import { writeAudit } from '../core/audit.js';
 import { users } from '../db/schema.js';
 import { eq } from 'drizzle-orm';
 
 export const SESSION_COOKIE = 'cm_sid';
+/** Einzige Bereiche, die mit API-Schlüssel erreichbar sind. */
+const API_KEY_PATHS = ['/api/customers', '/api/vehicles', '/api/orders', '/api/leads', '/api/appointments', '/api/services'];
 
 declare module 'fastify' {
   interface FastifyRequest {
@@ -25,7 +28,18 @@ export default fp(async (app) => {
   app.decorateRequest('auth', null);
   app.decorateRequest('sessionId', null);
 
-  app.addHook('onRequest', async (req) => {
+  app.addHook('onRequest', async (req, reply) => {
+    // API-Schlüssel (Authorization: Bearer cm_…) – nur ohne Sitzungs-Cookie, nur für /api/, nie zum Löschen.
+    const authz = req.headers.authorization;
+    if (!req.cookies[SESSION_COOKIE] && typeof authz === 'string' && authz.startsWith('Bearer ')) {
+      const token = authz.slice(7).trim();
+      if (!isApiKeyToken(token) || !API_KEY_PATHS.some((pfx) => req.url.startsWith(pfx))) return reply.status(401).send({ error: 'unauthorized', message: 'Ungültiger API-Schlüssel.' });
+      const ctx = resolveApiKey(app.db, token, req.ip);
+      if (!ctx) return reply.status(401).send({ error: 'unauthorized', message: 'API-Schlüssel ungültig, gesperrt oder abgelaufen.' });
+      if (req.method === 'DELETE') return reply.status(403).send({ error: 'forbidden', message: 'Löschen ist mit API-Schlüsseln nicht erlaubt.' });
+      req.auth = { ...ctx, requestId: req.id };
+      return;
+    }
     const raw = req.cookies[SESSION_COOKIE];
     if (!raw) return;
     const unsigned = req.unsignCookie(raw);

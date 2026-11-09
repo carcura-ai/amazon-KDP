@@ -11,6 +11,8 @@ export interface Ctx {
   /** Gesetzt, wenn ein System-Admin über einen Supportzugriff im Mandanten arbeitet. */
   supportSessionId?: string | null;
   supportMode?: 'read' | 'write' | null;
+  /** Gesetzt, wenn die Anfrage mit einem API-Schlüssel statt einer Sitzung kommt. */
+  apiKeyId?: string | null;
   /** Request-ID für Audit und Logs. */
   requestId?: string;
 }
