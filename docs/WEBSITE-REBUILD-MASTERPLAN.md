@@ -134,3 +134,14 @@ verteilt nicht weiter, (3) auf den Unterseiten fehlen Beweise (Keramik) bzw. gan
 - 6 Ortsseiten: 17 statt 16 Bewertungen.
 - Animationen: nicht live; es wurde nichts eingebaut (geprüft 09.11.).
 - Offen: Text kürzen (Freigabeseite 4.1), Logo-Verkleinerung bewusst nicht umgesetzt.
+
+### Texte gekürzt 09.11.2026 (Freigabe Alex: „überall kürzen, Keywords behalten“)
+- Gekürzt wurden nur Fließtexte. Überschriften, SEO-Titel und -Beschreibungen, FAQ, Schema und interne Links blieben unverändert.
+- Startseite (Template 28): 21 Stellen, Abschnitte von ca. 1.000 auf 813 Wörter.
+- Teil 1: Keramik 777, Innenreinigung 780, Flecken 1335, Tierhaare 1334, zusammen 34 Stellen (965 → 580 Wörter).
+- Teil 2a: Geruch 1116, Politur 1113, Leasing 1114, Wohnmobil 1115, Scheinwerfer 779 (20 Stellen plus 3 Standardsätze je Seite).
+- Offen:
+  - Leistungen, Anfragen, Gutschein, Über uns, Firmenkunde
+  - Ortsseiten bewusst unverändert (lokale Suche)
+- WP Consent API aktiviert (Alex): GA4 bekommt nach „Akzeptieren“ gcs=G111, geprüft.
+- Anzahlung/Absage (Freigabeseite Teil 5): wartet auf OK.
