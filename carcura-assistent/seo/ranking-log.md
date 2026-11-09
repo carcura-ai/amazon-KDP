@@ -48,3 +48,12 @@ Technische Funde:
 Offene Entscheidung (am 15.11. mit GSC-Daten): Startseite und 1048 zielen beide auf „Fahrzeugaufbereitung Westerwald“
 (Startseite Pos. 17,6; 1048 Pos. ~36). Steht 1048 weiter > 30 und die Startseite nicht besser: 1048 per 301 auf die Startseite
 umleiten und Links Startseite → 1048 auf die Ortsseiten umstellen.
+
+## Woche 09.11.2026
+- Search Console: keine Daten, das NotFair-Kontingent ist bis 15.11. erschöpft. Positionsvergleich deshalb erst am 16.11.
+- GBP: 1 neue Bewertung (04.11., 5 ★, Audi TT 8n, Politur + Keramik), noch unbeantwortet.
+- GBP-Beitrag Woche 2 veröffentlicht: Keramik vor dem Winter, Foto Audi TT, Link /keramikversiegelung/ mit UTM gbp_post_w2.
+- Maßnahmen diese Woche (Details im Masterplan, Abschnitt 9):
+  - Texte auf allen Hauptseiten gekürzt; Titel, H1, FAQ und Schema blieben unverändert
+  - Schema-Preise korrigiert (Wohnmobil 800, Basic 145), 17 Bewertungen auf den Ortsseiten
+  - neue Fotos eingebaut, WP Consent API aktiv (GA4 zählt wieder)
