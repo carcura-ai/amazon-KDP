@@ -122,3 +122,15 @@ verteilt nicht weiter, (3) auf den Unterseiten fehlen Beweise (Keramik) bzw. gan
   - Leder (Nutzer, 05.11.): Lederreinigung in „detailliert“ enthalten, Versiegelung +40 € extra; +39 € nur zur Innenreinigung Normal.
   - „Bessern wir nach“ ersetzt durch „Kostenlos dazu: Nachkontrolle“ + „gesetzliche Gewährleistung“ (UWG Anhang Nr. 10: gesetzliche Rechte nicht als Besonderheit bewerben).
   - Offen beim Nutzer: Sitemap-Cache leeren, `llms.txt` per Plesk hochladen.
+
+### Fehlerkorrekturen 09.11.2026 (Freigabe Alex: „alle Fehler korrigieren“)
+- Footer (Template-Teil Post 27):
+  - Handyleiste erscheint, sobald oben kein Kontaktknopf ganz sichtbar ist (IntersectionObserver statt 320 px); auf /anfragen/ ausgeblendet.
+  - WhatsApp-Symbol verlinkt auf wa.me statt „http://+49 …“.
+  - Neuer Stil `cc-fix-css`: Preisliste auf hellem Grund lesbar, Telefonnummer im gelben Abschluss schwarz, Karte „Foto → Preis“ bricht um.
+- Block 1062: Vorauswahl „Leasingrückgabe“ auf der Leasingseite.
+- Gutschein (781): „ab 69 €“, Chip „3 Jahre gültig“ entfernt.
+- Schema: /leistungen/ Wohnmobil 800 €, Altenkirchen Basic 145 €.
+- 6 Ortsseiten: 17 statt 16 Bewertungen.
+- Animationen: nicht live; es wurde nichts eingebaut (geprüft 09.11.).
+- Offen: Text kürzen (Freigabeseite 4.1), Logo-Verkleinerung bewusst nicht umgesetzt.
