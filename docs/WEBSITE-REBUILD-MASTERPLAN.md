@@ -149,3 +149,21 @@ verteilt nicht weiter, (3) auf den Unterseiten fehlen Beweise (Keramik) bzw. gan
   - Teil 2b gekürzt: Leistungen 311, Gutschein 781, Über uns 134, Firmenkunde 415.
   - Teil 5 live: Anzahlung 50 % ab 500 € und Absage 48 h / 50 % (mit Schadensnachweis und Widerrufsrecht) auf Startseite (Hero, Schritt 3, 2 FAQ), Keramik, Politur, Wohnmobil, Leistungen-Preishinweis und /anfragen/ über dem Absenden-Knopf.
   - Noch zu tun durch Alex: Regel in AGB und Terminbestätigung aufnehmen, Anwalt prüft die 50 %.
+
+### Neue Fotos 09.11.2026 (von Alex)
+- Mediathek:
+  - 1587 BMW-M3-Innenraum
+  - 1588 Audi TT (Politur + Keramik)
+  - 1589 Felgenreinigung
+  - WebP 1080 px, ohne Metadaten. Quelle: `carcura-assistent/website-bilder/`
+- Eingebaut:
+  - Startseite: Hero-Bild BMW statt Mercedes-Cockpit
+  - Innenreinigung: Galerie BMW statt doppeltem Cockpit
+  - Politur: Titelbild Audi TT statt Polierbild
+  - Firmenkunden: Felge statt Lackspiegelung
+- Bildunterschriften entfernt (Wunsch Alex: „immer ohne Unterschrift“) auf Innenreinigung, Politur, Keramik, Geruch, Leasing, Hol-&-Bring, Firmenkunden und Über uns.
+- Bleiben stehen:
+  - Vorher/Nachher-Markierungen auf /leistungen/
+  - Namenszeile unter dem Teamfoto
+  - Angaben zu den Kundenbewertungen
+- Opel-Foto mit „Meta AI“-Kennzeichen nicht eingebaut: Original ohne KI-Bearbeitung angefragt (UWG, „keine Symbolbilder“).
