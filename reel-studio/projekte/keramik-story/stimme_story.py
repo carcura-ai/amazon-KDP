@@ -8,6 +8,7 @@ Die natürlichen Pausen bleiben erhalten; nach einzelnen Sätzen kommt etwas Luf
 """
 import difflib
 import json
+import os
 import re
 import subprocess
 import sys
@@ -41,6 +42,7 @@ SAETZE = [
 PAUSE_NACH = {"gefahr": 0.5, "problem": 0.4, "wende": 0.2, "loesung": 0.9, "uv": 1.4, "wasser": 1.9, "schmutz": 1.0,
               "ablauf": 0.3, "cta": 0.4, "schluss": 2.6}
 VORLAUF = 0.35
+ABSTAND = 0.22        # Lücke zwischen zwei Sätzen (die Pausen innerhalb eines Satzes bleiben natürlich)
 
 STIMME = ("Native German male voice-over artist in his early thirties, warm and slightly husky timbre, standard High German "
           "from Germany with no regional, Austrian or Swiss accent. He delivers a premium car-care commercial with real "
@@ -131,26 +133,31 @@ def schneiden(seed):
         if not idx:
             sys.exit(f"Satz {k} nicht gefunden: {SAETZE[k][1]}")
         grenzen.append([erk[min(idx)][1], erk[max(idx)][2]])
-    schnitte = [max(0.0, grenzen[0][0] - .06)]
-    for k in range(len(grenzen) - 1):
-        schnitte.append((grenzen[k][1] + grenzen[k + 1][0]) / 2)
-    schnitte.append(grenzen[-1][1] + .3)
+    # Satzstücke eng um die Wörter schneiden (lange Sprechpausen zwischen Sätzen fallen weg),
+    # dann mit fester Lücke ABSTAND + PAUSE_NACH neu anlegen
+    mitten = [(grenzen[k][1] + grenzen[k + 1][0]) / 2 for k in range(len(grenzen) - 1)]
+    stuecke = []
+    for k in range(len(grenzen)):
+        a = max(grenzen[k][0] - .08, mitten[k - 1] if k else 0.0)
+        b = min(grenzen[k][1] + .16, mitten[k] if k < len(mitten) else grenzen[k][1] + .3)
+        stuecke.append((a, b))
 
-    # Sprachspur: Satzstücke in Originalabständen, plus Luft nach einzelnen Sätzen
+    # Sprachspur: Satzstücke mit fester Lücke, plus Luft nach einzelnen Sätzen
+    tempo = float(os.environ.get("TEMPO", "1"))         # > 1 = etwas schneller (Tonhöhe bleibt)
     teile, plan, t = [], [], VORLAUF
     for k, (sid, satz) in enumerate(SAETZE):
-        a, b = schnitte[k], schnitte[k + 1]
+        a, b = stuecke[k]
         stueck = AUS / "saetze" / f"{k:02d}_{sid}.wav"
         stueck.parent.mkdir(parents=True, exist_ok=True)
         subprocess.run(["ffmpeg", "-v", "error", "-y", "-i", str(take), "-ss", f"{a:.3f}", "-to", f"{b:.3f}",
-                        "-af", "afade=t=in:d=0.015,afade=t=out:st=%.3f:d=0.03" % max(0, b - a - .03),
+                        "-af", "atempo=%.3f,afade=t=in:d=0.015,afade=t=out:st=%.3f:d=0.03" % (tempo, max(0, (b - a) / tempo - .03)),
                         "-ar", "48000", "-ac", "1", str(stueck)], check=True)
-        sprech_a = t + (grenzen[k][0] - a)                  # wann das erste Wort wirklich kommt
-        sprech_e = t + (grenzen[k][1] - a)
-        ww = [[w, round(t + (s0 - a), 3), round(t + (e0 - a), 3)] for w, s0, e0 in erk if a <= s0 < b]
+        sprech_a = t + (grenzen[k][0] - a) / tempo          # wann das erste Wort wirklich kommt
+        sprech_e = t + (grenzen[k][1] - a) / tempo
+        ww = [[w, round(t + (s0 - a) / tempo, 3), round(t + (e0 - a) / tempo, 3)] for w, s0, e0 in erk if a <= s0 < b]
         plan.append({"id": sid, "start": round(sprech_a, 3), "ende": round(sprech_e, 3), "text": satz, "woerter": ww})
         teile.append((stueck, t))
-        t += (b - a) + PAUSE_NACH.get(sid, 0.0)
+        t += (b - a) / tempo + ABSTAND + PAUSE_NACH.get(sid, 0.0)
     dauer = t
     eing, filt = [], []
     for i, (p, s) in enumerate(teile):
