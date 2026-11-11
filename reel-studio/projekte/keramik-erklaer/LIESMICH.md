@@ -49,6 +49,10 @@ Musik: in der Instagram-App eine lizenzierte, ruhige Spur wählen und leise unte
 - Geprüft per Spracherkennung (faster-whisper): Alle Sätze werden richtig erkannt. Für die Aussprache steht im Skript „Wotsäpp“ und „Hauchdünn, und glatt“.
 - Bessere Stimme: eigene Aufnahme (Handy, im Auto bei geschlossenen Türen) oder ElevenLabs (kostenpflichtig, kommerzielle Nutzung erst im bezahlten Tarif, Bedingungen vorher prüfen). Für beides die Sätze aus `SAETZE` in `stimme.py` einzeln sprechen bzw. erzeugen, dann die Dateien als `ausgabe/stimme/s_00.wav` … ablegen und den Zusammenbau neu starten.
 
+- **Besser klingende Alternative (getestet 11.11.):** Chatterbox Multilingual von Resemble AI (MIT-Lizenz, kommerziell nutzbar, Deutsch, Open Source, läuft lokal auf der CPU, etwa 5 s Rechenzeit pro 1 s Ton). Das Modell übernimmt die Stimme aus einer 10–20 s langen Referenzaufnahme. Erlaubt sind nur Stimmen mit Rechten: eigene Stimme, Richy, Thorsten-Voice (CC0) oder ein Sprecher mit schriftlicher Einwilligung. In jeder Ausgabe steckt ein unhörbares Wasserzeichen (Perth) als KI-Kennzeichen.
+  Proben: `stimmproben/` (0 = Piper bisher, 1 = Chatterbox mit Thorsten-Referenz, 2 = Chatterbox-Standardstimme). Bekannte Schwäche: Gelegentlich wird ein Wort verschluckt oder am Ende etwas dazuerfunden → jeden Satz 2–3× erzeugen und den besten Durchgang per Spracherkennung auswählen.
+  Installation nur im venv im Scratchpad (`torch==2.6.0` CPU von download.pytorch.org, `chatterbox-tts==0.1.7` von PyPI), nicht im Repo.
+
 Sprechertext (14 Sätze):
 Dein Handy hat eine Hülle. · Und dein Lack? · Keramik ist eine Schicht mehr. · Hauchdünn und glatt. · Sonne macht Klarlack mit der Zeit stumpf. · Die Keramik bremst das. · Ganz aufhalten kann sie es nicht. · Ohne Keramik bleibt Wasser flach liegen. · Mit Keramik perlt es ab. · Der Dreck haftet schlechter. · Beim Waschen geht er leichter runter. · Waschen musst du trotzdem. · Keramikversiegelung ab siebenhundert Euro. · Schick uns drei Fotos per WhatsApp.
 
