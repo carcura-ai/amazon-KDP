@@ -1,7 +1,7 @@
 # Story „Keramikversiegelung“ (11.11.2026)
 
 Verkaufs-Story für Instagram (9:16, 1080 × 1920, 30 fps, unter 60 s → ein Story-Segment).
-Video: `ausgabe/keramik-story.mp4`. Alles selbst erzeugt: Animation (Code), Stimme (KI), Musik und Effekte (Synthese).
+Video: `ausgabe/keramik-story.mp4` (57,9 s, 11 MB, -14,6 LUFS). Stimme: Take 33 von 3. Er hatte die beste Wortgenauigkeit (98,6 %), die meiste Betonung (Tonhöhe ±4,5 Halbtöne) und die wenigsten Leerpausen. Gekürzt durch 15 % schnelleres Sprechtempo bei gleicher Tonhöhe und engere Satzlücken. Der Pflegeset-Satz wird nur eingeblendet. Alles selbst erzeugt: Animation (Code), Stimme (KI), Musik und Effekte (Synthese).
 
 ## Dramaturgie (Problem → Ursache → Lösung → Beweis → Angebot → Termin)
 

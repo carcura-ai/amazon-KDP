@@ -39,10 +39,11 @@ SAETZE = [
     ("schluss", "Gönn deinem Lack die Hülle, die er verdient."),
 ]
 # Extra-Luft nach einem Satz (Sekunden), damit die Animation wirken kann
-PAUSE_NACH = {"gefahr": 0.5, "problem": 0.4, "wende": 0.2, "loesung": 0.9, "uv": 1.4, "wasser": 1.9, "schmutz": 1.0,
-              "ablauf": 0.3, "cta": 0.4, "schluss": 2.6}
+PAUSE_NACH = {"gefahr": 0.3, "loesung": 0.6, "uv": 0.8, "wasser": 1.2, "schmutz": 0.5, "schluss": 1.7}
+AUSLASSEN = {"set"}
+AB_WORT = {"loesung": "keramik"}   # Satz erst ab diesem Wort verwenden („Mit einer“ ist im Take genuschelt)   # nur eingeblendet, nicht gesprochen (Story bleibt unter 60 s)
 VORLAUF = 0.35
-ABSTAND = 0.22        # Lücke zwischen zwei Sätzen (die Pausen innerhalb eines Satzes bleiben natürlich)
+ABSTAND = 0.15        # Lücke zwischen zwei Sätzen (die Pausen innerhalb eines Satzes bleiben natürlich)
 
 STIMME = ("Native German male voice-over artist in his early thirties, warm and slightly husky timbre, standard High German "
           "from Germany with no regional, Austrian or Swiss accent. He delivers a premium car-care commercial with real "
@@ -119,7 +120,19 @@ def bewerten():
 
 def schneiden(seed):
     take = TAKES / f"take_{seed}.wav"
-    erk, _ = woerter(take)
+    erk, audio = woerter(take)
+    import numpy as np
+    fen = 320                                             # 20 ms bei 16 kHz
+    pegel = 20 * np.log10(np.sqrt(np.convolve(audio ** 2, np.ones(fen) / fen, "same")) + 1e-9)
+    still = pegel < np.max(pegel) - 42                    # Stille relativ zum lautesten Wort
+
+    def rand(t0, richtung, grenze):
+        """Vom Wort aus bis zur ersten Stille laufen (Whisper setzt Wortanfänge oft zu spät)."""
+        i = int(t0 * 16000)
+        stop = int(grenze * 16000)
+        while 0 < i < len(audio) - 1 and ((richtung < 0 and i > stop) or (richtung > 0 and i < stop)) and not still[i]:
+            i += richtung * 80
+        return i / 16000
     sk = skriptwoerter()
     zuord = {}
     sm = difflib.SequenceMatcher(a=[w for w, _ in sk], b=[w for w, _, _ in erk], autojunk=False)
@@ -132,25 +145,35 @@ def schneiden(seed):
         idx = [zuord[i] for i, (_, kk) in enumerate(sk) if kk == k and i in zuord]
         if not idx:
             sys.exit(f"Satz {k} nicht gefunden: {SAETZE[k][1]}")
-        grenzen.append([erk[min(idx)][1], erk[max(idx)][2]])
+        start = erk[min(idx)][1]
+        if SAETZE[k][0] in AB_WORT:
+            treffer = [erk[i][1] for i in idx if erk[i][0].startswith(AB_WORT[SAETZE[k][0]])]
+            start = treffer[0] if treffer else start
+        grenzen.append([start, erk[max(idx)][2]])
     # Satzstücke eng um die Wörter schneiden (lange Sprechpausen zwischen Sätzen fallen weg),
     # dann mit fester Lücke ABSTAND + PAUSE_NACH neu anlegen
     mitten = [(grenzen[k][1] + grenzen[k + 1][0]) / 2 for k in range(len(grenzen) - 1)]
     stuecke = []
     for k in range(len(grenzen)):
-        a = max(grenzen[k][0] - .08, mitten[k - 1] if k else 0.0)
-        b = min(grenzen[k][1] + .16, mitten[k] if k < len(mitten) else grenzen[k][1] + .3)
+        g_a = mitten[k - 1] if k else 0.0
+        g_b = mitten[k] if k < len(mitten) else grenzen[k][1] + .4
+        a = max((grenzen[k][0] - .03) if SAETZE[k][0] in AB_WORT else rand(grenzen[k][0], -1, g_a) - .06, g_a)
+        b = min(rand(grenzen[k][1], +1, g_b) + .08, g_b)
         stuecke.append((a, b))
 
     # Sprachspur: Satzstücke mit fester Lücke, plus Luft nach einzelnen Sätzen
-    tempo = float(os.environ.get("TEMPO", "1"))         # > 1 = etwas schneller (Tonhöhe bleibt)
+    tempo = float(os.environ.get("TEMPO", "1.15"))      # > 1 = etwas schneller (Tonhöhe bleibt)
     teile, plan, t = [], [], VORLAUF
     for k, (sid, satz) in enumerate(SAETZE):
+        if sid in AUSLASSEN:                               # Szene bekommt einen Zeitpunkt, aber keinen Ton
+            plan.append({"id": sid, "start": round(t - ABSTAND + .05, 3), "ende": round(t - ABSTAND + .05, 3), "text": satz, "woerter": []})
+            continue
         a, b = stuecke[k]
         stueck = AUS / "saetze" / f"{k:02d}_{sid}.wav"
         stueck.parent.mkdir(parents=True, exist_ok=True)
-        subprocess.run(["ffmpeg", "-v", "error", "-y", "-i", str(take), "-ss", f"{a:.3f}", "-to", f"{b:.3f}",
-                        "-af", "atempo=%.3f,afade=t=in:d=0.015,afade=t=out:st=%.3f:d=0.03" % (tempo, max(0, (b - a) / tempo - .03)),
+        subprocess.run(["ffmpeg", "-v", "error", "-y", "-i", str(take),        # erst ausschneiden, dann Tempo und Blenden
+                        "-af", "atrim=start=%.3f:end=%.3f,asetpts=PTS-STARTPTS,atempo=%.3f,afade=t=in:d=0.015,"
+                        "afade=t=out:st=%.3f:d=0.03" % (a, b, tempo, max(0, (b - a) / tempo - .03)),
                         "-ar", "48000", "-ac", "1", str(stueck)], check=True)
         sprech_a = t + (grenzen[k][0] - a) / tempo          # wann das erste Wort wirklich kommt
         sprech_e = t + (grenzen[k][1] - a) / tempo

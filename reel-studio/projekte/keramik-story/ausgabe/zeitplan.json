@@ -1,1 +1,836 @@
-{"dauer": 49.599999999999994, "saetze": [{"id": "haken", "start": 0.4, "ende": 2.6, "woerter": []}, {"id": "auto", "start": 3.1999999999999997, "ende": 5.4, "woerter": []}, {"id": "gefahr", "start": 6.0, "ende": 8.2, "woerter": []}, {"id": "merkst", "start": 8.799999999999999, "ende": 11.0, "woerter": []}, {"id": "problem", "start": 11.6, "ende": 13.8, "woerter": []}, {"id": "ursache", "start": 14.4, "ende": 16.6, "woerter": []}, {"id": "wende", "start": 17.199999999999996, "ende": 19.399999999999995, "woerter": []}, {"id": "loesung", "start": 19.999999999999996, "ende": 22.199999999999996, "woerter": []}, {"id": "schicht", "start": 22.799999999999997, "ende": 24.999999999999996, "woerter": []}, {"id": "uv", "start": 25.599999999999998, "ende": 27.799999999999997, "woerter": []}, {"id": "wasser", "start": 28.4, "ende": 30.599999999999998, "woerter": []}, {"id": "schmutz", "start": 31.199999999999996, "ende": 33.4, "woerter": []}, {"id": "ablauf", "start": 33.99999999999999, "ende": 36.199999999999996, "woerter": []}, {"id": "set", "start": 36.8, "ende": 39.0, "woerter": []}, {"id": "preis", "start": 39.599999999999994, "ende": 41.8, "woerter": []}, {"id": "cta", "start": 42.4, "ende": 44.6, "woerter": []}, {"id": "schluss", "start": 45.199999999999996, "ende": 47.4, "woerter": []}]}
+{
+ "dauer": 57.946,
+ "take": "33",
+ "saetze": [
+  {
+   "id": "haken",
+   "start": 0.35,
+   "ende": 1.724,
+   "text": "Dein Handy steckt in einer Hülle.",
+   "woerter": [
+    [
+     "dein",
+     0.35,
+     0.698
+    ],
+    [
+     "handy",
+     0.698,
+     0.907
+    ],
+    [
+     "steckt",
+     0.907,
+     1.202
+    ],
+    [
+     "in",
+     1.202,
+     1.289
+    ],
+    [
+     "einer",
+     1.289,
+     1.446
+    ],
+    [
+     "hülle",
+     1.446,
+     1.724
+    ]
+   ]
+  },
+  {
+   "id": "auto",
+   "start": 2.03,
+   "ende": 6.378,
+   "text": "Aber dein Auto? Das steht jeden Tag draußen. Ohne extra Schutz.",
+   "woerter": [
+    [
+     "aber",
+     2.03,
+     2.413
+    ],
+    [
+     "dein",
+     2.413,
+     2.709
+    ],
+    [
+     "auto",
+     2.709,
+     3.004
+    ],
+    [
+     "das",
+     3.752,
+     4.013
+    ],
+    [
+     "steht",
+     4.013,
+     4.17
+    ],
+    [
+     "jeden",
+     4.17,
+     4.413
+    ],
+    [
+     "tag",
+     4.413,
+     4.639
+    ],
+    [
+     "draußen",
+     4.639,
+     4.987
+    ],
+    [
+     "ohne",
+     5.457,
+     5.717
+    ],
+    [
+     "extra",
+     5.717,
+     5.996
+    ],
+    [
+     "schutz",
+     5.996,
+     6.378
+    ]
+   ]
+  },
+  {
+   "id": "gefahr",
+   "start": 6.667,
+   "ende": 10.65,
+   "text": "Sonne. Regen. Streusalz. Vogelkot.",
+   "woerter": [
+    [
+     "sonne",
+     6.667,
+     7.259
+    ],
+    [
+     "regen",
+     7.659,
+     8.111
+    ],
+    [
+     "streusalz",
+     9.154,
+     9.746
+    ],
+    [
+     "vogelkot",
+     10.128,
+     10.65
+    ]
+   ]
+  },
+  {
+   "id": "merkst",
+   "start": 11.222,
+   "ende": 13.17,
+   "text": "Und irgendwann siehst du es …",
+   "woerter": [
+    [
+     "und",
+     11.222,
+     11.535
+    ],
+    [
+     "irgendwann",
+     11.535,
+     12.074
+    ],
+    [
+     "siehst",
+     12.074,
+     12.77
+    ],
+    [
+     "du",
+     12.77,
+     12.909
+    ],
+    [
+     "es",
+     12.909,
+     13.17
+    ]
+   ]
+  },
+  {
+   "id": "problem",
+   "start": 13.672,
+   "ende": 18.35,
+   "text": "Der Lack wird stumpf. Wasser hinterlässt Flecken. Und der Dreck geht kaum noch runter.",
+   "woerter": [
+    [
+     "der",
+     13.672,
+     13.88
+    ],
+    [
+     "lack",
+     13.88,
+     14.02
+    ],
+    [
+     "wird",
+     14.02,
+     14.176
+    ],
+    [
+     "stumpf",
+     14.176,
+     14.628
+    ],
+    [
+     "wasser",
+     15.411,
+     15.689
+    ],
+    [
+     "hinterlässt",
+     15.689,
+     16.176
+    ],
+    [
+     "flecken",
+     16.176,
+     16.42
+    ],
+    [
+     "und",
+     17.046,
+     17.22
+    ],
+    [
+     "der",
+     17.22,
+     17.307
+    ],
+    [
+     "dreck",
+     17.307,
+     17.48
+    ],
+    [
+     "geht",
+     17.48,
+     17.672
+    ],
+    [
+     "kaum",
+     17.672,
+     17.915
+    ],
+    [
+     "noch",
+     17.915,
+     18.089
+    ],
+    [
+     "runter",
+     18.089,
+     18.35
+    ]
+   ]
+  },
+  {
+   "id": "ursache",
+   "start": 18.722,
+   "ende": 24.009,
+   "text": "Das Problem sitzt ganz oben, im Klarlack. Er schützt deine Farbe. Aber wer schützt ihn?",
+   "woerter": [
+    [
+     "das",
+     18.722,
+     18.809
+    ],
+    [
+     "problem",
+     18.809,
+     19.104
+    ],
+    [
+     "sitzt",
+     19.104,
+     19.348
+    ],
+    [
+     "ganz",
+     19.348,
+     19.661
+    ],
+    [
+     "oben",
+     19.661,
+     20.009
+    ],
+    [
+     "im",
+     20.009,
+     20.304
+    ],
+    [
+     "klarlack",
+     20.304,
+     20.722
+    ],
+    [
+     "er",
+     21.122,
+     21.261
+    ],
+    [
+     "schützt",
+     21.261,
+     21.522
+    ],
+    [
+     "deine",
+     21.522,
+     21.696
+    ],
+    [
+     "farbe",
+     21.696,
+     22.009
+    ],
+    [
+     "aber",
+     22.617,
+     22.878
+    ],
+    [
+     "wer",
+     22.878,
+     23.487
+    ],
+    [
+     "schützt",
+     23.487,
+     23.8
+    ],
+    [
+     "ihn",
+     23.8,
+     24.009
+    ],
+    [
+     "nein",
+     24.009,
+     24.043
+    ]
+   ]
+  },
+  {
+   "id": "wende",
+   "start": 24.354,
+   "ende": 25.728,
+   "text": "Genau da setzen wir an.",
+   "woerter": [
+    [
+     "genau",
+     24.354,
+     24.789
+    ],
+    [
+     "da",
+     24.789,
+     25.05
+    ],
+    [
+     "setzen",
+     25.05,
+     25.293
+    ],
+    [
+     "wir",
+     25.293,
+     25.502
+    ],
+    [
+     "an",
+     25.502,
+     25.728
+    ]
+   ]
+  },
+  {
+   "id": "loesung",
+   "start": 26.0,
+   "ende": 26.852,
+   "text": "Mit einer Keramikversiegelung.",
+   "woerter": [
+    [
+     "keramikversiegelung",
+     26.0,
+     26.852
+    ]
+   ]
+  },
+  {
+   "id": "schicht",
+   "start": 27.602,
+   "ende": 31.237,
+   "text": "Eine hauchdünne, glasklare Schutzschicht, die sich fest mit deinem Lack verbindet.",
+   "woerter": [
+    [
+     "eine",
+     27.602,
+     27.933
+    ],
+    [
+     "hauchdöne",
+     27.933,
+     28.559
+    ],
+    [
+     "glasklare",
+     28.559,
+     29.08
+    ],
+    [
+     "schutzschicht",
+     29.08,
+     29.567
+    ],
+    [
+     "die",
+     29.759,
+     29.933
+    ],
+    [
+     "sich",
+     29.933,
+     30.089
+    ],
+    [
+     "fest",
+     30.089,
+     30.315
+    ],
+    [
+     "mit",
+     30.315,
+     30.541
+    ],
+    [
+     "deinem",
+     30.541,
+     30.767
+    ],
+    [
+     "lack",
+     30.767,
+     30.872
+    ],
+    [
+     "verbindet",
+     30.872,
+     31.237
+    ]
+   ]
+  },
+  {
+   "id": "uv",
+   "start": 31.561,
+   "ende": 33.074,
+   "text": "Die Sonne bleicht ihn langsamer aus.",
+   "woerter": [
+    [
+     "die",
+     31.561,
+     31.752
+    ],
+    [
+     "sonne",
+     31.752,
+     31.996
+    ],
+    [
+     "bleicht",
+     31.996,
+     32.257
+    ],
+    [
+     "ihn",
+     32.257,
+     32.378
+    ],
+    [
+     "langsamer",
+     32.378,
+     32.83
+    ],
+    [
+     "aus",
+     32.83,
+     33.074
+    ]
+   ]
+  },
+  {
+   "id": "wasser",
+   "start": 34.259,
+   "ende": 35.546,
+   "text": "Wasser perlt einfach ab.",
+   "woerter": [
+    [
+     "wasser",
+     34.259,
+     34.589
+    ],
+    [
+     "perlt",
+     34.589,
+     34.989
+    ],
+    [
+     "einfach",
+     34.989,
+     35.25
+    ],
+    [
+     "ab",
+     35.25,
+     35.546
+    ]
+   ]
+  },
+  {
+   "id": "schmutz",
+   "start": 37.017,
+   "ende": 40.391,
+   "text": "Und Dreck findet weniger Halt. Die Wäsche geht viel leichter.",
+   "woerter": [
+    [
+     "und",
+     37.017,
+     37.226
+    ],
+    [
+     "dreck",
+     37.226,
+     37.383
+    ],
+    [
+     "findet",
+     37.383,
+     37.591
+    ],
+    [
+     "weniger",
+     37.591,
+     37.87
+    ],
+    [
+     "halt",
+     37.87,
+     38.183
+    ],
+    [
+     "die",
+     38.913,
+     39.087
+    ],
+    [
+     "wäsche",
+     39.087,
+     39.296
+    ],
+    [
+     "geht",
+     39.296,
+     39.539
+    ],
+    [
+     "viel",
+     39.539,
+     39.87
+    ],
+    [
+     "leichter",
+     39.87,
+     40.391
+    ]
+   ]
+  },
+  {
+   "id": "ablauf",
+   "start": 41.198,
+   "ende": 46.659,
+   "text": "Bei uns in Walterschen machen wir alles von Hand: waschen, kneten, polieren. Erst dann kommt die Keramik drauf.",
+   "woerter": [
+    [
+     "bei",
+     41.198,
+     41.424
+    ],
+    [
+     "uns",
+     41.424,
+     41.563
+    ],
+    [
+     "in",
+     41.563,
+     41.667
+    ],
+    [
+     "walterschen",
+     41.667,
+     42.05
+    ],
+    [
+     "machen",
+     42.05,
+     42.241
+    ],
+    [
+     "wir",
+     42.241,
+     42.38
+    ],
+    [
+     "alles",
+     42.38,
+     42.589
+    ],
+    [
+     "von",
+     42.589,
+     42.78
+    ],
+    [
+     "hand",
+     42.78,
+     42.989
+    ],
+    [
+     "waschen",
+     43.25,
+     43.546
+    ],
+    [
+     "kneten",
+     43.789,
+     43.963
+    ],
+    [
+     "polieren",
+     44.259,
+     44.607
+    ],
+    [
+     "erst",
+     45.233,
+     45.407
+    ],
+    [
+     "dann",
+     45.407,
+     45.65
+    ],
+    [
+     "kommt",
+     45.65,
+     45.893
+    ],
+    [
+     "die",
+     45.893,
+     46.033
+    ],
+    [
+     "keramik",
+     46.033,
+     46.467
+    ],
+    [
+     "drauf",
+     46.467,
+     46.659
+    ]
+   ]
+  },
+  {
+   "id": "set",
+   "start": 46.909,
+   "ende": 46.909,
+   "text": "Und ein Pflegeset für zu Hause gibt's dazu.",
+   "woerter": []
+  },
+  {
+   "id": "preis",
+   "start": 47.413,
+   "ende": 48.961,
+   "text": "Keramikversiegelung ab siebenhundert Euro.",
+   "woerter": [
+    [
+     "keramikversiegelung",
+     47.413,
+     47.917
+    ],
+    [
+     "ab",
+     47.917,
+     48.057
+    ],
+    [
+     "700",
+     48.057,
+     48.543
+    ],
+    [
+     "euro",
+     48.543,
+     48.961
+    ]
+   ]
+  },
+  {
+   "id": "cta",
+   "start": 49.35,
+   "ende": 53.837,
+   "text": "Schick uns einfach drei Fotos von deinem Lack per WhatsApp. Du weißt vorher, was es kostet.",
+   "woerter": [
+    [
+     "schick",
+     49.35,
+     49.75
+    ],
+    [
+     "uns",
+     49.75,
+     49.854
+    ],
+    [
+     "einfach",
+     49.854,
+     50.202
+    ],
+    [
+     "drei",
+     50.202,
+     50.48
+    ],
+    [
+     "fotos",
+     50.48,
+     50.933
+    ],
+    [
+     "von",
+     50.933,
+     51.037
+    ],
+    [
+     "deinem",
+     51.037,
+     51.28
+    ],
+    [
+     "lack",
+     51.28,
+     51.402
+    ],
+    [
+     "per",
+     51.402,
+     51.559
+    ],
+    [
+     "whatsapp",
+     51.559,
+     51.889
+    ],
+    [
+     "du",
+     52.55,
+     52.863
+    ],
+    [
+     "weißt",
+     52.863,
+     53.002
+    ],
+    [
+     "vorher",
+     53.002,
+     53.211
+    ],
+    [
+     "was",
+     53.298,
+     53.367
+    ],
+    [
+     "es",
+     53.367,
+     53.489
+    ],
+    [
+     "kostet",
+     53.489,
+     53.837
+    ]
+   ]
+  },
+  {
+   "id": "schluss",
+   "start": 54.161,
+   "ende": 55.987,
+   "text": "Gönn deinem Lack die Hülle, die er verdient.",
+   "woerter": [
+    [
+     "gönn",
+     54.161,
+     54.439
+    ],
+    [
+     "deinem",
+     54.439,
+     54.665
+    ],
+    [
+     "lack",
+     54.665,
+     54.857
+    ],
+    [
+     "die",
+     54.857,
+     55.065
+    ],
+    [
+     "hülle",
+     55.065,
+     55.326
+    ],
+    [
+     "die",
+     55.448,
+     55.57
+    ],
+    [
+     "er",
+     55.57,
+     55.657
+    ],
+    [
+     "verdient",
+     55.657,
+     55.987
+    ]
+   ]
+  }
+ ]
+}
