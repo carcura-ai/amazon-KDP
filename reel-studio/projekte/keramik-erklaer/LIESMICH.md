@@ -1,7 +1,7 @@
 # Reel „Keramik erklärt“ (11.11.2026)
 
-Erklär-Animation im Carcura-Design: 9:16, 1080 × 1920, 30 fps, 33 s, mit Sprecherstimme (-15 LUFS).
-Video: `ausgabe/keramik-erklaer.mp4` (5,8 MB). Titelbild-Vorschlag: `ausgabe/vorschau.jpg` (Bild bei 2,6 s).
+Erklär-Animation im Carcura-Design: 9:16, 1080 × 1920, 30 fps, 37 s, mit Sprecherstimme (-15,6 LUFS).
+Video: `ausgabe/keramik-erklaer.mp4` (6,4 MB). Titelbild-Vorschlag: `ausgabe/vorschau.jpg` (Bild bei 2,6 s).
 
 Idee: Vergleich mit der Handyhülle aus einem Reel von @happyvalleydetailing_925. Umsetzung, Texte und Design sind eigen.
 
@@ -42,6 +42,14 @@ Musik: in der Instagram-App eine lizenzierte, ruhige Spur wählen und leise unte
 **KI-Kennzeichnung:** Die Stimme ist computererzeugt. Beim Hochladen auf Instagram/Facebook „KI-Info“ einschalten (Meta verlangt das für realistisch klingenden, digital erzeugten Ton).
 
 ## Stimme
+
+**Aktuell (11.11., nach Kritik „klingt österreichisch, unbetont“): Qwen3-TTS VoiceDesign 1.7B** (Alibaba Qwen, Apache-2.0, kommerziell nutzbar).
+Die Stimme ist per Beschreibung entworfen („warmer, freundlicher Werbesprecher, Anfang 30, Hochdeutsch ohne Dialekt“, Text in `stimme_qwen.py`). Sie ist kein Klon einer echten Person. Der ganze Text wird in einem Durchgang gesprochen, das gibt eine gleiche Stimme und natürliche Betonung. Danach wird er per Spracherkennung in Sätze geschnitten.
+Prüfung: Die Spracherkennung erkennt zu 99,7 % Deutsch, und alle Wörter stimmen.
+Ablauf: `<qwen-venv>/bin/python stimme_qwen.py erzeugen` → `python3 stimme_qwen.py schneiden` → `QUELLE=fertig python3 stimme.py` → `node render.js video /tmp/bilder ausgabe/keramik-erklaer.mp4`.
+venv im Scratchpad: torch (CPU) von download.pytorch.org, `qwen-tts==0.1.1` von PyPI. Das Modell kommt von huggingface.co/Qwen. Rechenzeit etwa 2,5 Minuten für 30 s Ton.
+
+Frühere Versuche:
 
 - Erzeugt mit `stimme.py`: Piper (Open Source, lokal) mit der Stimme **„de_DE-thorsten-medium“**. Datensatz Thorsten-Voice (CC0) und Basismodell rdh (CC0), also kommerziell nutzbar.
   „thorsten-high“ klingt etwas besser, ist aber von einem Forschungs-Datensatz (Lessac/Blizzard 2013, nur Forschungslizenz) abgeleitet → **nicht für Werbung**.

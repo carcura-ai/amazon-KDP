@@ -49,15 +49,18 @@ def ff(*a):
 
 
 def main():
-    py, modell = os.environ["PIPER_PY"], os.environ["PIPER_MODELL"]
+    # QUELLE=fertig: Sätze liegen schon als ausgabe/stimme/s_XX.wav vor (z. B. aus stimme_qwen.py oder eigener Aufnahme)
+    fertig_da = os.environ.get("QUELLE") == "fertig"
     TMP.mkdir(parents=True, exist_ok=True)
     dauern = []
     for i, (_, satz) in enumerate(SAETZE):
         roh, fertig = TMP / f"roh_{i:02d}.wav", TMP / f"s_{i:02d}.wav"
-        subprocess.run([py, "-m", "piper", "-m", modell, "-f", str(roh), "--length-scale", str(TEMPO),
-                        "--sentence-silence", "0"], input=satz, text=True, check=True, capture_output=True)
-        ff("-i", str(roh), "-af", "silenceremove=start_periods=1:start_threshold=-45dB,areverse,"
-           "silenceremove=start_periods=1:start_threshold=-45dB,areverse", "-ar", "48000", "-ac", "1", str(fertig))
+        if not fertig_da:
+            py, modell = os.environ["PIPER_PY"], os.environ["PIPER_MODELL"]
+            subprocess.run([py, "-m", "piper", "-m", modell, "-f", str(roh), "--length-scale", str(TEMPO),
+                            "--sentence-silence", "0"], input=satz, text=True, check=True, capture_output=True)
+            ff("-i", str(roh), "-af", "silenceremove=start_periods=1:start_threshold=-45dB,areverse,"
+               "silenceremove=start_periods=1:start_threshold=-45dB,areverse", "-ar", "48000", "-ac", "1", str(fertig))
         with wave.open(str(fertig)) as w:
             dauern.append(w.getnframes() / w.getframerate())
 

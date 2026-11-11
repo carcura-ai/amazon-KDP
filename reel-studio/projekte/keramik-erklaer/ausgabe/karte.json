@@ -1,105 +1,105 @@
 {
- "dauer": 33.145,
+ "dauer": 37.252,
  "punkte": [
   [
    0.0,
    0.0
   ],
   [
-   3.5,
+   3.61,
    3.5
   ],
   [
-   7.462,
+   8.59,
    6.3
   ],
   [
-   14.682,
+   16.85,
    11.5
   ],
   [
-   19.982,
+   22.55,
    16.8
   ],
   [
-   25.399,
+   29.55,
    21.6
   ],
   [
-   33.145,
+   37.252,
    26.5
   ]
  ],
  "saetze": [
   {
    "text": "Dein Handy hat eine Hülle.",
-   "start": 0.25,
-   "dauer": 1.1
+   "start": 0.26,
+   "dauer": 1.37
   },
   {
    "text": "Und dein Lack?",
-   "start": 1.57,
-   "dauer": 0.62
+   "start": 1.85,
+   "dauer": 1.27
   },
   {
    "text": "Keramik ist eine Schicht mehr.",
-   "start": 3.85,
-   "dauer": 1.51
+   "start": 4.05,
+   "dauer": 2.3
   },
   {
    "text": "Hauchdünn, und glatt.",
-   "start": 5.58,
-   "dauer": 1.49
+   "start": 6.57,
+   "dauer": 1.71
   },
   {
    "text": "Sonne macht Klarlack mit der Zeit stumpf.",
-   "start": 7.95,
-   "dauer": 2.45
+   "start": 9.15,
+   "dauer": 2.78
   },
   {
    "text": "Die Keramik bremst das.",
-   "start": 10.62,
-   "dauer": 1.49
+   "start": 12.15,
+   "dauer": 1.9
   },
   {
    "text": "Ganz aufhalten kann sie es nicht.",
-   "start": 12.32,
-   "dauer": 1.99
+   "start": 14.27,
+   "dauer": 2.29
   },
   {
    "text": "Ohne Keramik bleibt Wasser flach liegen.",
-   "start": 14.98,
-   "dauer": 2.35
+   "start": 17.17,
+   "dauer": 2.81
   },
   {
    "text": "Mit Keramik perlt es ab.",
-   "start": 17.55,
-   "dauer": 1.59
+   "start": 20.2,
+   "dauer": 1.87
   },
   {
    "text": "Der Dreck haftet schlechter.",
-   "start": 20.21,
-   "dauer": 1.33
+   "start": 22.84,
+   "dauer": 1.85
   },
   {
    "text": "Beim Waschen geht er leichter runter.",
-   "start": 22.01,
-   "dauer": 1.76
+   "start": 25.18,
+   "dauer": 2.03
   },
   {
    "text": "Waschen musst du trotzdem.",
-   "start": 24.04,
-   "dauer": 1.18
+   "start": 27.8,
+   "dauer": 1.98
   },
   {
    "text": "Keramikversiegelung ab siebenhundert Euro.",
-   "start": 26.45,
-   "dauer": 2.73
+   "start": 30.6,
+   "dauer": 2.62
   },
   {
    "text": "Schick uns drei Fotos per Wotsäpp.",
-   "start": 29.4,
-   "dauer": 1.94
+   "start": 33.44,
+   "dauer": 2.01
   }
  ]
 }
