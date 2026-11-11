@@ -1,7 +1,7 @@
 # Reel „Keramik erklärt“ (11.11.2026)
 
-Erklär-Animation im Carcura-Design: 9:16, 1080 × 1920, 30 fps, 26,5 s, ohne Ton.
-Video: `ausgabe/keramik-erklaer.mp4` (4,4 MB). Titelbild-Vorschlag: `ausgabe/vorschau.jpg` (Bild bei 2,6 s).
+Erklär-Animation im Carcura-Design: 9:16, 1080 × 1920, 30 fps, 33 s, mit Sprecherstimme (-15 LUFS).
+Video: `ausgabe/keramik-erklaer.mp4` (5,8 MB). Titelbild-Vorschlag: `ausgabe/vorschau.jpg` (Bild bei 2,6 s).
 
 Idee: Vergleich mit der Handyhülle aus einem Reel von @happyvalleydetailing_925. Umsetzung, Texte und Design sind eigen.
 
@@ -37,11 +37,25 @@ Kennst du jemanden, der sein Handy besser schützt als sein Auto? Schick ihm das
 WhatsApp-Link für Bio oder Story (Herkunft messbar):
 `https://wa.me/491706669516?text=Hallo%20Carcura%2C%20ich%20komme%20vom%20Keramik-Video`
 
-Musik: in der Instagram-App eine lizenzierte, ruhige Spur wählen, nicht im Video einbauen (Rechte).
+Musik: in der Instagram-App eine lizenzierte, ruhige Spur wählen und leise unter die Stimme legen (Rechte).
+
+**KI-Kennzeichnung:** Die Stimme ist computererzeugt. Beim Hochladen auf Instagram/Facebook „KI-Info“ einschalten (Meta verlangt das für realistisch klingenden, digital erzeugten Ton).
+
+## Stimme
+
+- Erzeugt mit `stimme.py`: Piper (Open Source, lokal) mit der Stimme **„de_DE-thorsten-medium“**. Datensatz Thorsten-Voice (CC0) und Basismodell rdh (CC0), also kommerziell nutzbar.
+  „thorsten-high“ klingt etwas besser, ist aber von einem Forschungs-Datensatz (Lessac/Blizzard 2013, nur Forschungslizenz) abgeleitet → **nicht für Werbung**.
+- Jeder Satz startet, wenn sein Text im Bild erscheint. Wo die Stimme mehr Zeit braucht, wird die Szene gleichmäßig gedehnt (höchstens 1,5×). Die Zeitkarte steht in `ausgabe/karte.json`.
+- Geprüft per Spracherkennung (faster-whisper): Alle Sätze werden richtig erkannt. Für die Aussprache steht im Skript „Wotsäpp“ und „Hauchdünn, und glatt“.
+- Bessere Stimme: eigene Aufnahme (Handy, im Auto bei geschlossenen Türen) oder ElevenLabs (kostenpflichtig, kommerzielle Nutzung erst im bezahlten Tarif, Bedingungen vorher prüfen). Für beides die Sätze aus `SAETZE` in `stimme.py` einzeln sprechen bzw. erzeugen, dann die Dateien als `ausgabe/stimme/s_00.wav` … ablegen und den Zusammenbau neu starten.
+
+Sprechertext (14 Sätze):
+Dein Handy hat eine Hülle. · Und dein Lack? · Keramik ist eine Schicht mehr. · Hauchdünn und glatt. · Sonne macht Klarlack mit der Zeit stumpf. · Die Keramik bremst das. · Ganz aufhalten kann sie es nicht. · Ohne Keramik bleibt Wasser flach liegen. · Mit Keramik perlt es ab. · Der Dreck haftet schlechter. · Beim Waschen geht er leichter runter. · Waschen musst du trotzdem. · Keramikversiegelung ab siebenhundert Euro. · Schick uns drei Fotos per WhatsApp.
 
 ## Ändern und neu rendern
 
 - Texte, Zeiten und Farben stehen in `animation.html` (Funktion `render(t)`).
 - Vorschau im Browser: `animation.html` öffnen (läuft in Schleife) oder `animation.html?t=13.7` für ein Standbild.
-- Neu rendern (etwa 1 Minute): `node render.js video /tmp/bilder ausgabe/keramik-erklaer.mp4`
+- Stimme neu erzeugen: `PIPER_PY=<venv>/bin/python PIPER_MODELL=<pfad>/de_DE-thorsten-medium.onnx python3 stimme.py` (Piper: `pip install piper-tts==1.8.0` in einem venv; Stimme von huggingface.co/rhasspy/piper-voices, de/de_DE/thorsten/medium)
+- Neu rendern (etwa 1 Minute, nimmt `ausgabe/karte.json` und `ausgabe/stimme.wav` automatisch mit): `node render.js video /tmp/bilder ausgabe/keramik-erklaer.mp4`
 - Prüfbilder: `node render.js standbilder /tmp/standbilder`
