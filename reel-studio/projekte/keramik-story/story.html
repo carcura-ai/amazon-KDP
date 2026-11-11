@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<title>Keramik – Story</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;800&display=block" rel="stylesheet">
+<style>html,body{margin:0;background:#09090A}canvas{display:block}</style>
+</head>
+<body>
+<canvas id="c" width="1080" height="1920"></canvas>
+<script>
+/* Instagram-Story „Keramikversiegelung“: Problem → Ursache → Lösung → Beweis → Angebot → Termin.
+   Zeitplan kommt aus ausgabe/zeitplan.json (Sätze + Wortzeiten der Sprecherstimme). render(t) zeichnet ein Bild.
+   Story-Schutzzonen: oben 250 px (Fortschritt, Profil), unten 280 px (Antwortfeld) bleiben frei von Wichtigem. */
+const W = 1080, H = 1920;
+const GELB = '#E8F320', INK = '#09090A', GRAU = '#AEB2B9', ROT = '#FF5A4F';
+const c = document.getElementById('c'), x = c.getContext('2d');
+const cl = (v, a = 0, b = 1) => Math.min(b, Math.max(a, v));
+const p = (t, a, b) => b <= a ? (t >= a ? 1 : 0) : cl((t - a) / (b - a));
+const eo = v => 1 - Math.pow(1 - v, 3);
+const eio = v => v < .5 ? 4 * v * v * v : 1 - Math.pow(-2 * v + 2, 3) / 2;
+const eback = v => { const k = 1.70158; return 1 + (k + 1) * Math.pow(v - 1, 3) + k * Math.pow(v - 1, 2); };
+const lerp = (a, b, v) => a + (b - a) * v;
+function rng(s) { return function () { s |= 0; s = s + 0x6D2B79F5 | 0; let r = Math.imul(s ^ s >>> 15, 1 | s); r = r + Math.imul(r ^ r >>> 7, 61 | r) ^ r; return ((r ^ r >>> 14) >>> 0) / 4294967296; }; }
+
+// ---------- Zeitplan ----------
+let Z = null, DAUER = 50;
+const IDS = ['haken', 'auto', 'gefahr', 'merkst', 'problem', 'ursache', 'wende', 'loesung', 'schicht', 'uv', 'wasser', 'schmutz', 'ablauf', 'set', 'preis', 'cta', 'schluss'];
+function setzeZeitplan(z) {
+  if (!z) {                                         // Vorschau ohne Stimme: 2,8 s je Satz
+    z = { dauer: IDS.length * 2.8 + 2, saetze: IDS.map((id, i) => ({ id, start: .4 + i * 2.8, ende: .4 + i * 2.8 + 2.2, woerter: [] })) };
+  }
+  Z = {}; DAUER = z.dauer;
+  z.saetze.forEach((s, i) => { Z[s.id] = { a: s.start, e: s.ende, n: i + 1 < z.saetze.length ? z.saetze[i + 1].start : z.dauer, w: s.woerter || [] }; });
+}
+const S = id => Z[id];
+// Zeit des k-ten Wortes (sonst gleichmäßig verteilt über den Satz)
+function wort(id, k, anzahl) { const s = Z[id]; if (s.w.length > k) return s.w[k][1]; return lerp(s.a, s.e, k / Math.max(1, anzahl)); }
+function wortSuche(id, stamm, ersatzK, anzahl) {
+  const s = Z[id]; const f = s.w.find(w => w[0].startsWith(stamm)); return f ? f[1] : wort(id, ersatzK, anzahl);
+}
+const sichtbar = (t, a, b, ein = .45, aus = .35) => Math.min(p(t, a, a + ein), 1 - p(t, b - aus, b));
+
+// ---------- Querschnitt ----------
+const MITTE = 540, O = 1180;
+const KER = O, KLAR = [O + 22, O + 162], BASIS = [O + 162, O + 262], GRUND = [O + 262, O + 322], BLECH = [O + 322, H];
+const OB_L = KLAR[0], OB_R = KER;
+let geteilt = false;                                // ab der Lösung: rechts mit Keramik
+const ob = X => (geteilt && X >= MITTE) ? OB_R : OB_L;
+
+function textur(w, h, fn) { const o = document.createElement('canvas'); o.width = w; o.height = h; fn(o.getContext('2d'), w, h); return o; }
+const R0 = rng(7);
+const TX_BLECH = textur(W, BLECH[1] - BLECH[0], (g, w, h) => {
+  const gr = g.createLinearGradient(0, 0, 0, h);
+  gr.addColorStop(0, '#41444c'); gr.addColorStop(.03, '#2c2e34'); gr.addColorStop(.5, '#1b1c20'); gr.addColorStop(1, '#0d0d0f');
+  g.fillStyle = gr; g.fillRect(0, 0, w, h);
+  for (let i = 0; i < 1400; i++) { const y = R0() * h, l = 80 + R0() * 420, x0 = R0() * w - 100; g.strokeStyle = `rgba(255,255,255,${.012 + R0() * .035})`; g.lineWidth = 1; g.beginPath(); g.moveTo(x0, y); g.lineTo(x0 + l, y); g.stroke(); }
+});
+const TX_GRUND = textur(W, GRUND[1] - GRUND[0], (g, w, h) => {
+  g.fillStyle = '#3a3c43'; g.fillRect(0, 0, w, h);
+  for (let i = 0; i < 2600; i++) { g.fillStyle = `rgba(${R0() < .5 ? '255,255,255' : '0,0,0'},${R0() * .07})`; g.fillRect(R0() * w, R0() * h, 2, 2); }
+  g.fillStyle = 'rgba(255,255,255,.08)'; g.fillRect(0, 0, w, 1);
+});
+const TX_BASIS = textur(W, BASIS[1] - BASIS[0], (g, w, h) => {
+  const gr = g.createLinearGradient(0, 0, 0, h); gr.addColorStop(0, '#24467e'); gr.addColorStop(1, '#0f2346');
+  g.fillStyle = gr; g.fillRect(0, 0, w, h);
+  for (let i = 0; i < 2200; i++) { g.fillStyle = `rgba(${170 + R0() * 85},${200 + R0() * 55},255,${.12 + R0() * .55})`; g.beginPath(); g.arc(R0() * w, R0() * h, .5 + R0() * 1.3, 0, Math.PI * 2); g.fill(); }
+});
+const TX_GLANZ = textur(W, KLAR[1] - KLAR[0], (g, w, h) => {
+  for (let i = -h; i < w; i += 90) { const gr = g.createLinearGradient(i, 0, i + 40, 0); gr.addColorStop(0, 'rgba(255,255,255,0)'); gr.addColorStop(.5, 'rgba(255,255,255,.07)'); gr.addColorStop(1, 'rgba(255,255,255,0)'); g.fillStyle = gr; g.beginPath(); g.moveTo(i, h); g.lineTo(i + h * .6, 0); g.lineTo(i + h * .6 + 40, 0); g.lineTo(i + 40, h); g.fill(); }
+});
+const TX_TRUEB = textur(W, KLAR[1] - KLAR[0], (g, w, h) => {
+  g.fillStyle = 'rgba(206,204,198,.38)'; g.fillRect(0, 0, w, h);
+  for (let i = 0; i < 2600; i++) { g.fillStyle = `rgba(255,248,230,${R0() * .35})`; g.fillRect(R0() * w, R0() * h, 1 + R0() * 2, 1); }
+  for (let i = 0; i < 120; i++) { const x0 = R0() * w, y0 = R0() * h; g.strokeStyle = `rgba(255,250,235,${.15 + R0() * .25})`; g.lineWidth = 1; g.beginPath(); g.moveTo(x0, y0); g.lineTo(x0 + 6 + R0() * 18, y0 + (R0() - .5) * 6); g.stroke(); }
+});
+
+// Schäden der Problemphase (werden beim Polieren in „wende“ von links nach rechts entfernt)
+const R3 = rng(99);
+const FLECKEN = Array.from({ length: 16 }, () => ({ x: 40 + R3() * 1000, r: 14 + R3() * 22, t: R3() }));
+const SALZ = Array.from({ length: 70 }, () => ({ x: 20 + R3() * 1040, s: 3 + R3() * 5, t: R3(), r: R3() * 6 }));
+const PDRECK = Array.from({ length: 90 }, () => ({ x: 20 + R3() * 1040, r: 3 + R3() * 5.5, t: R3(), col: ['#6d5b44', '#4b4037', '#7c6b55', '#5a4c3c'][Math.floor(R3() * 4)] }));
+
+let truebL = 0, truebR = 0, polierX = -1e9;        // polierX: bis hierhin ist poliert (Schäden weg)
+
+function schnitt(t, alpha, eingang) {
+  if (alpha <= 0) return;
+  const lag = t0 => ({ a: p(t, t0, t0 + .5) * alpha, dy: (1 - eo(p(t, t0, t0 + .8))) * 90 });
+  const label = (s, y, a, col = 'rgba(255,255,255,.72)', gr = 24) => { x.save(); x.globalAlpha = a; x.font = `600 ${gr}px Poppins`; x.letterSpacing = '4px'; x.fillStyle = col; x.textAlign = 'left'; x.textBaseline = 'middle'; x.fillText(s, 34, y); x.restore(); };
+  const e0 = eingang;
+  let L = lag(e0);
+  x.globalAlpha = L.a; x.drawImage(TX_BLECH, 0, BLECH[0] + L.dy); label('BLECH', BLECH[0] + 46 + L.dy, L.a * .8);
+  L = lag(e0 + .15); x.globalAlpha = L.a; x.drawImage(TX_GRUND, 0, GRUND[0] + L.dy); label('GRUNDIERUNG', (GRUND[0] + GRUND[1]) / 2 + L.dy, L.a * .8);
+  L = lag(e0 + .3); x.globalAlpha = L.a; x.drawImage(TX_BASIS, 0, BASIS[0] + L.dy);
+  x.fillStyle = 'rgba(112,112,116,.5)';
+  x.globalAlpha = L.a * truebL; x.fillRect(0, BASIS[0] + L.dy, geteilt ? MITTE : W, BASIS[1] - BASIS[0]);
+  if (geteilt) { x.globalAlpha = L.a * truebR; x.fillRect(MITTE, BASIS[0] + L.dy, W - MITTE, BASIS[1] - BASIS[0]); }
+  label('BASISLACK (FARBE)', (BASIS[0] + BASIS[1]) / 2 + L.dy, L.a * .85);
+  L = lag(e0 + .45);
+  const kh = KLAR[1] - KLAR[0], ky = KLAR[0] + L.dy;
+  x.globalAlpha = L.a;
+  const kg = x.createLinearGradient(0, ky, 0, ky + kh); kg.addColorStop(0, 'rgba(210,226,244,.34)'); kg.addColorStop(1, 'rgba(150,176,208,.13)');
+  x.fillStyle = kg; x.fillRect(0, ky, W, kh); x.drawImage(TX_GLANZ, 0, ky);
+  const tbL = geteilt ? MITTE : W;
+  x.globalAlpha = L.a * truebL; x.drawImage(TX_TRUEB, 0, 0, tbL, kh, 0, ky, tbL, kh);
+  if (geteilt) { x.globalAlpha = L.a * truebR; x.drawImage(TX_TRUEB, MITTE, 0, W - MITTE, kh, MITTE, ky, W - MITTE, kh); }
+  x.globalAlpha = L.a; x.fillStyle = 'rgba(255,255,255,.6)'; x.fillRect(0, ky, W, 2);
+  label('KLARLACK', ky + kh / 2, L.a * .85, 'rgba(255,255,255,.8)');
+  x.globalAlpha = 1;
+}
+
+// ---------- Hintergrund ----------
+const R1 = rng(11);
+const STERNE = Array.from({ length: 170 }, () => ({ x: R1() * W, y: R1() * (O - 60), r: .6 + R1() * 1.6, a: .25 + R1() * .6, f: .6 + R1() * 2.2, ph: R1() * 6.3 }));
+const BOKEH = Array.from({ length: 10 }, () => ({ x: R1() * W, y: 620 + R1() * (O - 640), r: 40 + R1() * 90, a: .025 + R1() * .035, ph: R1() * 6.3 }));
+function hintergrund(t, warm, kalt) {
+  x.fillStyle = INK; x.fillRect(0, 0, W, H);
+  const g = x.createRadialGradient(W / 2, 560, 0, W / 2, 560, 950);
+  g.addColorStop(0, kalt > 0 ? `rgba(255,90,79,${.05 * kalt})` : 'rgba(255,255,255,.035)'); g.addColorStop(1, 'rgba(255,255,255,0)');
+  x.fillStyle = g; x.fillRect(0, 0, W, H);
+  for (const s of STERNE) { x.globalAlpha = s.a * (.55 + .45 * Math.sin(t * s.f + s.ph)); x.fillStyle = '#fff'; x.beginPath(); x.arc(s.x, s.y, s.r, 0, Math.PI * 2); x.fill(); }
+  for (const b of BOKEH) { x.globalAlpha = b.a * (1 + warm * .8); x.fillStyle = `rgb(255,${Math.round(255 - 40 * warm)},${Math.round(255 - 110 * warm)})`; x.beginPath(); x.arc(b.x + Math.sin(t * .25 + b.ph) * 22, b.y + Math.cos(t * .2 + b.ph) * 10, b.r, 0, Math.PI * 2); x.fill(); }
+  x.globalAlpha = 1;
+}
+
+// ---------- Text ----------
+function text(s, y, o = {}) {
+  const { size = 48, w = 400, col = '#fff', ls = 0, a = 1, dy = 0, sc = 1, glow = 0 } = o;
+  if (a <= 0) return;
+  x.save(); x.globalAlpha = a; x.translate(W / 2, y + dy); x.scale(sc, sc);
+  x.font = `${w} ${size}px Poppins`; x.letterSpacing = ls + 'px'; x.fillStyle = col; x.textAlign = 'center'; x.textBaseline = 'alphabetic';
+  if (glow) { x.shadowColor = col; x.shadowBlur = glow; }
+  x.fillText(s, ls / 2, 0); x.restore();
+}
+function rein(t, a0, b0, fn, ein = .45, aus = .35) {         // Element blendet bei a0 ein, bei b0 aus
+  const a = sichtbar(t, a0, b0, ein, aus); if (a <= 0) return;
+  fn(a, (1 - eo(p(t, a0, a0 + .6))) * 30, eback(p(t, a0, a0 + .5)));
+}
+
+// ---------- Kapitel-Reiter ----------
+function reiter(t) {
+  const a0 = S('uv').a - .2, b0 = S('ablauf').a; const a = sichtbar(t, a0, b0, .4, .4); if (a <= 0) return;
+  const namen = ['UV', 'WASSER', 'SCHMUTZ'], y = 330, h = 66, pad = 36, gap = 18;
+  x.save(); x.globalAlpha = a; x.font = '600 28px Poppins'; x.letterSpacing = '5px';
+  const ws = namen.map(n => x.measureText(n).width + pad * 2); const ges = ws.reduce((s, v) => s + v, 0) + gap * 2;
+  const xs = []; let X = (W - ges) / 2; ws.forEach(w => { xs.push(X); X += w + gap; });
+  const k = t < S('wasser').a - .2 ? 0 : t < S('schmutz').a - .2 ? eio(p(t, S('wasser').a - .2, S('wasser').a + .2)) : 1 + eio(p(t, S('schmutz').a - .2, S('schmutz').a + .2));
+  const i0 = Math.floor(k), i1 = Math.min(2, i0 + 1), f = k - i0;
+  namen.forEach((n, i) => { x.beginPath(); x.roundRect(xs[i], y - h / 2, ws[i], h, h / 2); x.strokeStyle = 'rgba(255,255,255,.2)'; x.lineWidth = 2; x.stroke(); });
+  x.beginPath(); x.roundRect(lerp(xs[i0], xs[i1], f), y - h / 2, lerp(ws[i0], ws[i1], f), h, h / 2); x.fillStyle = GELB; x.fill();
+  x.textAlign = 'center'; x.textBaseline = 'middle';
+  namen.forEach((n, i) => { x.fillStyle = Math.abs(xs[i] - lerp(xs[i0], xs[i1], f)) < ws[i] / 2 ? INK : 'rgba(255,255,255,.62)'; x.fillText(n, xs[i] + ws[i] / 2 + 2.5, y + 2); });
+  x.restore();
+}
+
+// ---------- Szene 1: Handy mit Hülle, dann Auto ----------
+function handy(t) {
+  const s = S('haken'), a = sichtbar(t, s.a - .3, S('auto').a + .5, .5, .5); if (a <= 0) return;
+  const huelle = eback(p(t, lerp(s.a, s.e, .55), lerp(s.a, s.e, .55) + .45));
+  const weg = eio(p(t, S('auto').a - .1, S('auto').a + .5));
+  x.save(); x.globalAlpha = a; x.translate(W / 2 - weg * 260, 1020); x.scale(1 - weg * .25, 1 - weg * .25);
+  x.lineWidth = 6; x.strokeStyle = 'rgba(255,255,255,.9)';
+  x.beginPath(); x.roundRect(-120, -235, 240, 470, 34); x.stroke();
+  x.fillStyle = 'rgba(255,255,255,.06)'; x.fill();
+  x.beginPath(); x.roundRect(-38, -218, 76, 14, 7); x.fillStyle = 'rgba(255,255,255,.7)'; x.fill();
+  if (huelle > 0) {                                   // Hülle schiebt sich drüber
+    x.save(); x.translate(0, (1 - huelle) * 320); x.globalAlpha = a * cl(huelle * 1.4);
+    x.shadowColor = GELB; x.shadowBlur = 30; x.lineWidth = 16; x.strokeStyle = GELB;
+    x.beginPath(); x.roundRect(-140, -255, 280, 510, 46); x.stroke(); x.restore();
+  }
+  x.restore();
+}
+function autoLinie(t) {
+  const s = S('auto'), a = sichtbar(t, s.a, S('gefahr').a + .4, .4, .5); if (a <= 0) return;
+  const zeichnen = eio(p(t, s.a, s.a + 1.4));
+  x.save(); x.globalAlpha = a; x.translate(W / 2 + 140, 1000); x.scale(.82, .82); x.translate(-500, -170);
+  x.lineCap = 'round'; x.lineJoin = 'round'; x.lineWidth = 7; x.strokeStyle = 'rgba(255,255,255,.92)';
+  x.setLineDash([4000, 4000]); x.lineDashOffset = 4000 * (1 - zeichnen);
+  x.beginPath();
+  x.moveTo(70, 250); x.lineTo(45, 240); x.quadraticCurveTo(28, 200, 62, 176); x.quadraticCurveTo(120, 150, 250, 136);
+  x.bezierCurveTo(330, 82, 430, 62, 520, 68); x.bezierCurveTo(600, 74, 660, 108, 702, 134);
+  x.quadraticCurveTo(860, 148, 940, 174); x.quadraticCurveTo(988, 196, 975, 236); x.lineTo(958, 250); x.lineTo(864, 250);
+  x.arc(790, 250, 74, 0, Math.PI, true); x.lineTo(304, 250); x.arc(230, 250, 74, 0, Math.PI, true); x.lineTo(70, 250);
+  x.stroke();
+  x.beginPath(); x.moveTo(300, 140); x.bezierCurveTo(360, 98, 440, 84, 520, 86); x.bezierCurveTo(580, 90, 625, 112, 650, 136); x.closePath(); x.lineWidth = 5; x.stroke();
+  x.setLineDash([]);
+  const r = p(t, s.a + .7, s.a + 1.3);
+  if (r > 0) for (const cx of [230, 790]) { x.globalAlpha = a * r; x.lineWidth = 7; x.beginPath(); x.arc(cx, 250, 58, 0, Math.PI * 2); x.stroke(); x.lineWidth = 4; x.beginPath(); x.arc(cx, 250, 30, 0, Math.PI * 2); x.stroke(); }
+  x.restore();
+}
+
+// ---------- Szene 2: Gefahren schlagen ein ----------
+function gefahren(t) {
+  const s = S('gefahr');
+  const tw = [wortSuche('gefahr', 'sonne', 0, 4), wortSuche('gefahr', 'regen', 1, 4), wortSuche('gefahr', 'streu', 2, 4), wortSuche('gefahr', 'vogel', 3, 4)];
+  const namen = ['Sonne', 'Regen', 'Streusalz', 'Vogelkot'];
+  const ende = S('merkst').a;
+  // großes Wort, das gerade fällt
+  namen.forEach((n, i) => {
+    const b = i < 3 ? tw[i + 1] : ende; const a = sichtbar(t, tw[i] - .05, b + .05, .12, .15);
+    if (a > 0) text(n + '.', 640, { size: 128, w: 800, ls: -4, a, sc: lerp(1.25, 1, eo(p(t, tw[i] - .05, tw[i] + .25))) });
+  });
+  // Sonne: Strahlen + Trübung
+  const sa = sichtbar(t, tw[0] - .1, tw[1] + .3, .2, .3);
+  if (sa > 0) {
+    x.save(); x.globalAlpha = sa; x.strokeStyle = '#ffd88c'; x.lineWidth = 4; x.shadowColor = 'rgba(255,200,110,.9)'; x.shadowBlur = 14; x.setLineDash([30, 60]); x.lineDashOffset = -t * 600;
+    for (let k = 0; k < 9; k++) { const tx = 70 + k * 117.5; x.beginPath(); x.moveTo(MITTE + (tx - MITTE) * .25, 760); x.lineTo(tx, OB_L); x.stroke(); }
+    x.restore();
+  }
+  // Regen
+  if (t > tw[1] - .1 && t < tw[2] + .4) {
+    const R = rng(5); x.save(); x.strokeStyle = 'rgba(190,220,255,.75)'; x.lineWidth = 3;
+    for (let i = 0; i < 40; i++) { const x0 = R() * W, v = 1500 + R() * 600, d0 = R() * .6; const y = 760 + ((t - tw[1] + d0) * v) % (OB_L - 760); x.beginPath(); x.moveTo(x0, y); x.lineTo(x0 - 6, y + 34); x.stroke(); }
+    x.restore();
+  }
+  // Vogelkot fällt
+  const fv = p(t, tw[3] - .25, tw[3] + .05);
+  if (fv > 0 && fv < 1) { x.save(); x.fillStyle = '#e9e6dc'; x.beginPath(); x.ellipse(720, lerp(760, OB_L - 14, fv * fv), 16, 22, 0, 0, Math.PI * 2); x.fill(); x.restore(); }
+}
+function schaeden(t) {
+  const s = S('gefahr');
+  const tR = wortSuche('gefahr', 'regen', 1, 4), tS = wortSuche('gefahr', 'streu', 2, 4), tV = wortSuche('gefahr', 'vogel', 3, 4);
+  const weg = X => X < polierX;                       // schon poliert?
+  if (t > S('loesung').a + 1) return;
+  // Wasserflecken (Kalkränder)
+  for (const f of FLECKEN) {
+    const a = p(t, tR + .2 + f.t * .5, tR + .5 + f.t * .5); if (a <= 0 || weg(f.x)) continue;
+    x.save(); x.globalAlpha = a * .85; x.strokeStyle = 'rgba(235,235,225,.8)'; x.lineWidth = 3;
+    x.beginPath(); x.ellipse(f.x, OB_L + 2, f.r, 5, 0, 0, Math.PI * 2); x.stroke(); x.restore();
+  }
+  // Streusalz
+  for (const k of SALZ) {
+    const v = p(t, tS - .1 + k.t * .4, tS + .2 + k.t * .4); if (v <= 0 || weg(k.x)) continue;
+    const y = lerp(820, OB_L - k.s, v * v);
+    x.save(); x.translate(k.x, y); x.rotate(k.r); x.fillStyle = 'rgba(245,245,240,.95)'; x.fillRect(-k.s / 2, -k.s / 2, k.s, k.s); x.restore();
+  }
+  // Vogelkot: Fleck + Ätzkrater im Klarlack
+  const v = p(t, tV + .05, tV + .3);
+  if (v > 0 && !weg(720)) {
+    x.save(); x.fillStyle = 'rgba(70,52,30,.55)'; x.beginPath(); x.ellipse(720, OB_L + 16, 46 * eo(v), 18 * eo(v), 0, 0, Math.PI * 2); x.fill();
+    x.fillStyle = '#e9e6dc'; x.beginPath(); x.ellipse(720, OB_L - 6, 40 * eo(v), 9, 0, 0, Math.PI * 2); x.fill();
+    x.fillStyle = 'rgba(160,150,120,.9)'; x.beginPath(); x.ellipse(712, OB_L - 9, 14 * eo(v), 4, 0, 0, Math.PI * 2); x.fill(); x.restore();
+  }
+  // Dreck, der hängen bleibt (Problem-Satz)
+  const td = wortSuche('problem', 'dreck', 9, 13);
+  for (const d of PDRECK) {
+    const u = p(t, td - .1 + d.t * .6, td + .3 + d.t * .6); if (u <= 0 || weg(d.x)) continue;
+    x.save(); x.fillStyle = d.col; x.beginPath(); x.arc(d.x, lerp(860, OB_L - d.r * .6, u * u), d.r, 0, Math.PI * 2); x.fill(); x.restore();
+  }
+}
+function problemChips(t) {
+  const s = S('problem');
+  const tk = [wortSuche('problem', 'stumpf', 3, 13), wortSuche('problem', 'flecken', 6, 13), wortSuche('problem', 'dreck', 9, 13)];
+  const namen = ['Stumpfer Lack', 'Wasserflecken', 'Dreck bleibt hängen'];
+  const ende = S('ursache').a;
+  namen.forEach((n, i) => {
+    const a = sichtbar(t, tk[i] - .1, ende, .3, .35); if (a <= 0) return;
+    const y = 640 + i * 116, sc = eback(p(t, tk[i] - .1, tk[i] + .35));
+    x.save(); x.globalAlpha = a; x.translate(W / 2, y); x.scale(sc, sc);
+    x.font = '600 46px Poppins'; const bw = x.measureText(n).width + 150;
+    x.beginPath(); x.roundRect(-bw / 2, -46, bw, 92, 46); x.fillStyle = 'rgba(255,90,79,.12)'; x.fill(); x.strokeStyle = 'rgba(255,90,79,.55)'; x.lineWidth = 2; x.stroke();
+    x.strokeStyle = ROT; x.lineWidth = 6; x.lineCap = 'round'; const kx = -bw / 2 + 52;
+    x.beginPath(); x.moveTo(kx - 13, -13); x.lineTo(kx + 13, 13); x.moveTo(kx + 13, -13); x.lineTo(kx - 13, 13); x.stroke();
+    x.fillStyle = '#fff'; x.textAlign = 'left'; x.textBaseline = 'middle'; x.fillText(n, kx + 36, 2); x.restore();
+  });
+}
+function ursacheHighlight(t) {
+  const s = S('ursache'), a = sichtbar(t, s.a, S('wende').a + .2, .4, .4); if (a <= 0) return;
+  const puls = .6 + .4 * Math.sin((t - s.a) * 6);
+  x.save(); x.globalAlpha = a * .55; x.fillStyle = INK; x.fillRect(0, BASIS[0], W, H - BASIS[0]); x.restore();
+  x.save(); x.globalAlpha = a; x.strokeStyle = GELB; x.lineWidth = 5; x.shadowColor = GELB; x.shadowBlur = 20 * puls;
+  x.strokeRect(6, KLAR[0] - 2, W - 12, KLAR[1] - KLAR[0] + 4); x.restore();
+}
+function polieren(t) {
+  const s = S('wende'); const v = p(t, s.a, S('loesung').a - .05);
+  polierX = t < s.a ? -1e9 : lerp(-120, W + 120, eio(v));
+  if (v <= 0 || v >= 1) return;
+  const g = x.createLinearGradient(polierX - 160, 0, polierX + 40, 0);
+  g.addColorStop(0, 'rgba(255,255,255,0)'); g.addColorStop(.8, 'rgba(255,255,255,.55)'); g.addColorStop(1, 'rgba(255,255,255,0)');
+  x.save(); x.fillStyle = g; x.fillRect(polierX - 160, KLAR[0] - 30, 200, KLAR[1] - KLAR[0] + 30); x.restore();
+}
+
+// ---------- Szene 3: Keramik ----------
+function keramik(t) {
+  const s = S('loesung'); const v = p(t, s.a - .15, s.a + .45); if (v <= 0) return;
+  const y = KER - 260 * (1 - eo(v)), blitz = v >= 1 ? 1 - p(t, s.a + .45, s.a + 1.3) : 0;
+  x.save(); x.globalAlpha = p(t, s.a - .15, s.a + .1); x.shadowColor = GELB; x.shadowBlur = 16 + blitz * 60;
+  x.fillStyle = GELB; x.fillRect(MITTE, y, W - MITTE, KLAR[0] - KER); x.shadowBlur = 0;
+  x.fillStyle = 'rgba(255,255,255,.55)'; x.fillRect(MITTE, y, W - MITTE, 2);
+  const sw = p(t, s.a + .5, s.a + 1.5);
+  if (sw > 0 && sw < 1) {
+    const sx = lerp(MITTE - 120, W + 120, eio(sw)); const g = x.createLinearGradient(sx - 120, 0, sx + 120, 0);
+    g.addColorStop(0, 'rgba(255,255,255,0)'); g.addColorStop(.5, 'rgba(255,255,255,.95)'); g.addColorStop(1, 'rgba(255,255,255,0)');
+    x.save(); x.beginPath(); x.rect(MITTE, y - 4, W - MITTE, KLAR[0] - KER + 8); x.clip(); x.fillStyle = g; x.fillRect(sx - 120, y - 4, 240, KLAR[0] - KER + 8); x.restore();
+  }
+  // „verbindet sich fest“: kleine Verbindungsstriche zwischen Keramik und Klarlack
+  const sch = S('schicht'), tb = wortSuche('schicht', 'verbindet', 6, 10);
+  for (let i = 0; i < 22; i++) {
+    const xx = MITTE + 14 + i * 24, u = p(t, tb + i * .03, tb + i * .03 + .2); if (u <= 0) continue;
+    x.globalAlpha = u * (1 - p(t, S('uv').a, S('uv').a + .5)); x.fillStyle = '#fffbd0'; x.fillRect(xx, KLAR[0] - 2, 3, 10 * u);
+  }
+  x.restore();
+  const ha = p(t, s.a + .3, s.a + .9) * (1 - p(t, S('ablauf').a - .3, S('ablauf').a + .1));
+  if (ha > 0) {
+    x.save(); x.globalAlpha = ha * .45; x.strokeStyle = '#fff'; x.setLineDash([6, 10]); x.lineWidth = 2; x.beginPath(); x.moveTo(MITTE, KER - 150); x.lineTo(MITTE, GRUND[1]); x.stroke(); x.restore();
+    x.save(); x.globalAlpha = ha; x.font = '600 30px Poppins'; x.letterSpacing = '6px'; x.textAlign = 'center';
+    x.fillStyle = 'rgba(255,255,255,.66)'; x.fillText('OHNE', MITTE / 2 + 3, KER - 122);
+    x.fillStyle = GELB; x.fillText('MIT KERAMIK', MITTE + (W - MITTE) / 2 + 3, KER - 122); x.restore();
+  }
+}
+
+// ---------- Szene 4: UV, Wasser, Schmutz (links ohne, rechts mit) ----------
+function sonneUV(t) {
+  const s = S('uv'), a = sichtbar(t, s.a - .2, S('wasser').a + .1, .4, .5); if (a <= 0) return;
+  const sx = MITTE, sy = lerp(1250, 975, eo(p(t, s.a - .2, s.a + .6)));
+  x.save(); x.globalAlpha = a;
+  let g = x.createRadialGradient(sx, sy, 0, sx, sy, 340); g.addColorStop(0, 'rgba(255,214,140,.42)'); g.addColorStop(1, 'rgba(255,214,140,0)');
+  x.fillStyle = g; x.beginPath(); x.arc(sx, sy, 340, 0, Math.PI * 2); x.fill();
+  g = x.createRadialGradient(sx - 8, sy - 8, 0, sx, sy, 66); g.addColorStop(0, '#fffaf0'); g.addColorStop(.55, '#ffe2a0'); g.addColorStop(1, '#e8b553');
+  x.shadowColor = 'rgba(255,205,120,.9)'; x.shadowBlur = 60; x.fillStyle = g; x.beginPath(); x.arc(sx, sy, 66, 0, Math.PI * 2); x.fill();
+  x.restore();
+  const ra = sichtbar(t, s.a + .3, S('wasser').a, .4, .4); if (ra <= 0) return;
+  x.save(); x.lineCap = 'round';
+  for (let k = 0; k < 9; k++) {
+    const tx = 70 + k * 117.5, ty = ob(tx), links = tx < MITTE, dx = tx - sx, dy = ty - sy, n = Math.hypot(dx, dy), ux = dx / n, uy = dy / n;
+    const sx0 = sx + ux * 74, sy0 = sy + uy * 74;
+    x.setLineDash([26, 64]); x.lineDashOffset = -t * 520; x.shadowColor = 'rgba(255,200,110,.9)'; x.shadowBlur = 12;
+    x.globalAlpha = ra * .85; x.strokeStyle = '#ffd88c'; x.lineWidth = 3; x.beginPath(); x.moveTo(sx0, sy0); x.lineTo(tx, ty); x.stroke();
+    if (links) { const tief = BASIS[0] + 30 - ty; x.globalAlpha = ra * .6; x.beginPath(); x.moveTo(tx, ty); x.lineTo(tx + ux / uy * tief, ty + tief); x.stroke(); }
+    else { x.globalAlpha = ra * .6; x.beginPath(); x.moveTo(tx, ty); x.lineTo(tx + ux * 120, ty - uy * 120); x.stroke(); }
+    x.shadowBlur = 0;
+  }
+  x.restore();
+}
+function kappe(cx, sy, a, h) { a = Math.max(a, .5); const R = (a * a + h * h) / (2 * h), cy = sy - h + R; x.beginPath(); x.arc(cx, cy, R, Math.atan2(sy - cy, a), Math.atan2(sy - cy, -a), true); x.closePath(); return R; }
+function tropfen(cx, sy, a, h, alpha, amBoden) {
+  if (alpha <= 0) return;
+  x.save(); x.globalAlpha = alpha;
+  if (amBoden) { x.fillStyle = 'rgba(0,0,0,.45)'; x.beginPath(); x.ellipse(cx, sy + 2, a * 1.05 + 3, 5, 0, 0, Math.PI * 2); x.fill(); }
+  const R = kappe(cx, sy, a, h);
+  const g = x.createLinearGradient(0, sy - h, 0, sy); g.addColorStop(0, 'rgba(218,238,255,.62)'); g.addColorStop(.55, 'rgba(130,186,242,.30)'); g.addColorStop(1, 'rgba(82,142,218,.45)');
+  x.fillStyle = g; x.fill(); x.lineWidth = 2.5; x.strokeStyle = 'rgba(232,246,255,.88)'; x.stroke();
+  const breit = h > a ? R : a;
+  x.save(); kappe(cx, sy, a, h); x.clip(); x.fillStyle = 'rgba(255,255,255,.92)'; x.beginPath();
+  x.ellipse(cx - breit * .36, sy - h * .7, Math.max(2, Math.min(breit * .3, R * .24)), Math.max(1.6, Math.min(h * .15, R * .15)), h > a ? -.5 : 0, 0, Math.PI * 2); x.fill(); x.restore();
+  if (amBoden && h > a) { const gg = x.createRadialGradient(cx + a * .2, sy - 1, 0, cx + a * .2, sy - 1, a * 1.7); gg.addColorStop(0, 'rgba(255,255,236,.85)'); gg.addColorStop(1, 'rgba(255,255,236,0)'); x.fillStyle = gg; x.beginPath(); x.ellipse(cx + a * .2, sy - 1, a * 1.7, 8, 0, 0, Math.PI * 2); x.fill(); }
+  x.restore();
+}
+function wasser(t) {
+  const s = S('wasser'); if (t < s.a - .4 || t > S('schmutz').a + .3) return;
+  const weg = 1 - p(t, S('schmutz').a - .2, S('schmutz').a + .2), t0 = s.a - .35;
+  const T = [{ x: 135, d: 0, l: 1 }, { x: 405, d: .3, l: 1 }, { x: 650, d: .12, l: 0 }, { x: 800, d: .42, l: 0 }, { x: 945, d: .65, l: 0 }];
+  for (const d of T) {
+    const sy = d.l ? OB_L : OB_R, ta = t0 + d.d, ti = ta + .38; if (t < ta) continue;
+    if (t < ti) { const v = p(t, ta, ti); tropfen(d.x, lerp(985, sy, v * v), .5, 86, p(t, ta, ta + .06), false); continue; }
+    const v = p(t, ti, ti + .45), e = 1 - Math.exp(-5 * v) * Math.cos(9 * v);
+    if (d.l) { tropfen(d.x, sy, lerp(.5, 118, e), lerp(86, 22, e), weg, true); continue; }
+    const ss = Math.max(0, t - (t0 + 1.75)), xr = d.x + .5 * (1100 + (d.x - 650)) * ss * ss, wob = ss > 0 ? Math.sin(ss * 22) * 1.5 : 0;
+    if (xr < W + 120) tropfen(xr, sy, lerp(.5, 25, e) + wob * .4, lerp(86, 94, e) - wob * 2, 1, true);
+  }
+}
+const R2 = rng(42), DRECK = [];
+for (let i = 0; i < 150; i++) {
+  const links = i < 75, x0 = links ? 26 + R2() * 496 : 556 + R2() * 500, r = 3 + R2() * 6, n = 5 + Math.floor(R2() * 3), pts = [];
+  for (let k = 0; k < n; k++) { const w = k / n * Math.PI * 2; pts.push([Math.cos(w) * r * (.7 + R2() * .5), Math.sin(w) * r * (.7 + R2() * .5)]); }
+  DRECK.push({ links, x0, r, pts, col: ['#6d5b44', '#4b4037', '#7c6b55', '#5a4c3c'][Math.floor(R2() * 4)], ts: R2() * .7, yh: 260 + R2() * 260, bleibt: links && R2() < .72 });
+}
+function schmutz(t) {
+  const s = S('schmutz'); if (t < s.a - .3 || t > S('ablauf').a + .3) return;
+  const fade = 1 - p(t, S('ablauf').a - .3, S('ablauf').a + .2);
+  const tw = wortSuche('schmutz', 'wäsche', 6, 10), w0 = tw - .1, w1 = w0 + 1.5;
+  const welle = tt => lerp(-80, W + 120, eio(p(tt, w0, w1)));
+  for (const d of DRECK) {
+    const ts = s.a - .2 + d.ts; if (t < ts) continue;
+    if (d.tp === undefined || d._w0 !== w0) { let lo = w0, hi = w1; for (let k = 0; k < 30; k++) { const m = (lo + hi) / 2; if (welle(m) < d.x0) lo = m; else hi = m; } d.tp = hi; d._w0 = w0; }
+    const ruhe = d.links ? OB_L + d.r * .15 : OB_R - d.r * .85, v = p(t, ts, ts + .55);
+    let px = d.x0, py = lerp(ruhe - d.yh, ruhe, v * v), a = 1;
+    if (!d.bleibt && t > d.tp) { const q = t - d.tp; px += 620 * q + 300 * q * q; py = Math.min(py, ob(px) - d.r) - Math.min(8, q * 30); a = 1 - p(q, 0, 1.1); }
+    if (a <= 0) continue;
+    x.save(); x.globalAlpha = a * fade; x.translate(px, py); x.fillStyle = d.col; x.beginPath(); d.pts.forEach((q, k) => k ? x.lineTo(q[0], q[1]) : x.moveTo(q[0], q[1])); x.closePath(); x.fill(); x.restore();
+  }
+  if (t > w0 - .05 && t < w1 + .7) {
+    const e = welle(t), a = 1 - p(t, w1, w1 + .6), oben = [];
+    for (let X = -100; X <= e; X += 10) oben.push([X, ob(X) - 30 - 8 * Math.sin(X * .03 + t * 9)]);
+    oben.push([e + 30, ob(e) - 13]);
+    x.save(); x.globalAlpha = a; x.beginPath(); oben.forEach(([X, Y], i) => i ? x.lineTo(X, Y) : x.moveTo(X, Y));
+    x.lineTo(e + 42, ob(e)); if (e > MITTE) { x.lineTo(MITTE, OB_R); x.lineTo(MITTE, OB_L); } x.lineTo(-100, OB_L); x.closePath();
+    x.fillStyle = 'rgba(150,205,255,.36)'; x.fill();
+    x.beginPath(); oben.forEach(([X, Y], i) => i ? x.lineTo(X, Y) : x.moveTo(X, Y)); x.strokeStyle = 'rgba(236,249,255,.95)'; x.lineWidth = 3; x.stroke(); x.restore();
+  }
+  [[640, w1 + .1], [770, w1 + .3], [890, w1 + .5], [1010, w1 + .65]].forEach(([fx, t0]) => {
+    const v = p(t, t0, t0 + .6); if (v <= 0 || v >= 1) return; const sv = Math.sin(v * Math.PI), r = 34 * sv;
+    x.save(); x.globalAlpha = sv * fade; x.strokeStyle = '#fff'; x.lineWidth = 2.5; x.shadowColor = '#fff'; x.shadowBlur = 10;
+    x.beginPath(); x.moveTo(fx - r, OB_R - 3); x.lineTo(fx + r, OB_R - 3); x.moveTo(fx, OB_R - 3 - r); x.lineTo(fx, OB_R - 3 + r * .5); x.stroke(); x.restore();
+  });
+}
+
+// ---------- Szene 5: Ablauf von Hand ----------
+function ablauf(t) {
+  const s = S('ablauf'), ende = S('preis').a, a = sichtbar(t, s.a - .1, ende, .4, .35); if (a <= 0) return;
+  text('So machen wir das', 470, { size: 40, col: GRAU, a, ls: .5 });
+  text('Komplett von Hand.', 560, { size: 84, w: 800, ls: -3, a });
+  const schritte = [['Handwäsche', 'wasch'], ['Kneten', 'knet'], ['Politur', 'polier'], ['Keramik', 'keramik']];
+  schritte.forEach(([n, stamm], i) => {
+    const ti = wortSuche('ablauf', stamm, [6, 7, 8, 13][i], 18), v = p(t, ti - .1, ti + .3); if (v <= 0) return;
+    const y = 700 + i * 150, sc = eback(v), letzte = i === 3;
+    x.save(); x.globalAlpha = a * cl(v * 1.5); x.translate(W / 2, y); x.scale(sc, sc);
+    x.beginPath(); x.roundRect(-380, -58, 760, 116, 30);
+    x.fillStyle = letzte ? 'rgba(232,243,32,.14)' : 'rgba(255,255,255,.05)'; x.fill();
+    x.strokeStyle = letzte ? GELB : 'rgba(255,255,255,.18)'; x.lineWidth = 2; x.stroke();
+    x.beginPath(); x.arc(-310, 0, 30, 0, Math.PI * 2); x.fillStyle = letzte ? GELB : 'rgba(255,255,255,.12)'; x.fill();
+    x.font = '700 30px Poppins'; x.fillStyle = letzte ? INK : '#fff'; x.textAlign = 'center'; x.textBaseline = 'middle'; x.fillText(String(i + 1), -310, 2);
+    x.font = '600 46px Poppins'; x.textAlign = 'left'; x.fillStyle = letzte ? GELB : '#fff'; x.fillText(n, -250, 3);
+    const hk = p(t, ti + .2, ti + .5);                 // Haken zeichnet sich
+    if (hk > 0) { x.strokeStyle = letzte ? GELB : '#7CE38B'; x.lineWidth = 7; x.lineCap = 'round'; x.lineJoin = 'round'; x.setLineDash([80, 80]); x.lineDashOffset = 80 * (1 - hk); x.beginPath(); x.moveTo(300, 2); x.lineTo(322, 24); x.lineTo(356, -22); x.stroke(); }
+    x.restore();
+  });
+  const ts = S('set'), v = p(t, ts.a - .1, ts.a + .35);
+  if (v > 0) {
+    x.save(); x.globalAlpha = a * cl(v * 1.5); x.translate(W / 2, 1330); x.scale(eback(v), eback(v));
+    x.font = '600 40px Poppins'; const tx = '+ Pflegeset für zu Hause', bw = x.measureText(tx).width + 90;
+    x.beginPath(); x.roundRect(-bw / 2, -46, bw, 92, 46); x.fillStyle = GELB; x.fill();
+    x.fillStyle = INK; x.textAlign = 'center'; x.textBaseline = 'middle'; x.fillText(tx, 0, 3); x.restore();
+  }
+  text('Carcura · Walterschen, Westerwald', 1450, { size: 30, col: GRAU, a: a * p(t, s.a + .6, s.a + 1.1) });
+}
+
+// ---------- Szene 6: Angebot, Kontakt, Schluss ----------
+const LOGO = new Image(); LOGO.src = '../../brand/logo_weiss.png';
+function angebot(t) {
+  const s = S('preis'), a = sichtbar(t, s.a - .15, S('schluss').a + .1, .4, .4); if (a <= 0) return;
+  if (LOGO.complete && LOGO.naturalWidth) { const w = 430, h = w * LOGO.naturalHeight / LOGO.naturalWidth; x.save(); x.globalAlpha = a; x.drawImage(LOGO, (W - w) / 2, 440 - h / 2, w, h); x.restore(); }
+  rein(t, s.a - .1, S('schluss').a + .1, (aa, dy) => text('Keramikversiegelung', 720, { size: 76, w: 700, ls: -2, a: aa, dy }));
+  const tp = wortSuche('preis', '700', 2, 4);
+  rein(t, tp - .15, S('schluss').a + .1, (aa, dy, sc) => text('ab 700 €', 890, { size: 160, w: 800, col: GELB, ls: -5, a: aa, sc, glow: 18 }));
+  rein(t, tp + .3, S('schluss').a + .1, (aa, dy) => text('inkl. Handwäsche, Kneten, Politur und Pflegeset', 975, { size: 34, col: GRAU, a: aa, dy }));
+  const c0 = S('cta').a;
+  rein(t, c0 - .1, S('schluss').a + .1, (aa, dy, sc) => {
+    const puls = 1 + .02 * Math.sin((t - c0) * 5);
+    x.save(); x.globalAlpha = aa; x.translate(W / 2, 1120 + dy); x.scale(sc * puls, sc * puls);
+    x.beginPath(); x.roundRect(-400, -60, 800, 120, 60); x.fillStyle = GELB; x.fill();
+    x.font = '700 42px Poppins'; x.fillStyle = INK; x.textAlign = 'center'; x.textBaseline = 'middle'; x.fillText('3 Fotos vom Lack per WhatsApp', 0, 3); x.restore();
+  });
+  const tk = wortSuche('cta', 'vorher', 12, 17);
+  rein(t, tk - .1, S('schluss').a + .1, (aa, dy) => text('Du weißt vorher, was es kostet.', 1250, { size: 40, w: 600, a: aa, dy }));
+}
+function schluss(t) {
+  const s = S('schluss'); if (t < s.a - .2) return;
+  rein(t, s.a - .1, DAUER + 5, (aa, dy) => { text('Gönn deinem Lack', 640, { size: 92, w: 800, ls: -3, a: aa, dy }); text('die Hülle,', 745, { size: 92, w: 800, ls: -3, a: aa, dy }); });
+  const tv = wortSuche('schluss', 'verdient', 6, 8);
+  rein(t, tv - .2, DAUER + 5, (aa, dy, sc) => text('die er verdient.', 850, { size: 92, w: 800, ls: -3, col: GELB, a: aa, sc, glow: 14 }));
+  rein(t, s.e + .2, DAUER + 5, (aa, dy) => {
+    text('Termin anfragen', 1040, { size: 44, w: 600, a: aa, dy });
+    const b = Math.sin((t - s.e) * 5) * 10;
+    x.save(); x.globalAlpha = aa; x.strokeStyle = GELB; x.lineWidth = 8; x.lineCap = 'round'; x.lineJoin = 'round';
+    x.beginPath(); x.moveTo(W / 2, 1090 + b); x.lineTo(W / 2, 1170 + b); x.moveTo(W / 2 - 30, 1140 + b); x.lineTo(W / 2, 1172 + b); x.lineTo(W / 2 + 30, 1140 + b); x.stroke(); x.restore();
+  });
+  if (LOGO.complete && LOGO.naturalWidth) { const a = p(t, s.a, s.a + .5), w = 260, h = w * LOGO.naturalHeight / LOGO.naturalWidth; x.save(); x.globalAlpha = a * .9; x.drawImage(LOGO, (W - w) / 2, 400 - h / 2, w, h); x.restore(); }
+}
+
+// ---------- Ein Bild ----------
+function render(t) {
+  const sz = id => S(id).a;
+  const kalt = sichtbar(t, sz('gefahr'), sz('wende') + .4, .6, .6), warm = sichtbar(t, sz('uv'), sz('wasser') + .2, .4, .6);
+  // Kamera: leichtes Heranfahren in den Problemszenen, Rückkehr zur Lösung
+  const zoom = 1 + .05 * eio(p(t, sz('merkst'), sz('ursache'))) * (1 - eio(p(t, sz('wende'), sz('loesung') + .3)));
+  hintergrund(t, warm, kalt);
+
+  // Querschnitt: kommt mit „gefahr“, geht vor dem Ablauf
+  geteilt = t >= sz('loesung') - .15;
+  truebL = geteilt ? eio(p(t, sz('uv') + .5, sz('wasser') - .1)) : .55 * eio(p(t, wortSuche('gefahr', 'sonne', 0, 4), wortSuche('gefahr', 'regen', 1, 4) + .2)) * (polierX > MITTE ? 0 : 1);
+  if (!geteilt && polierX > -1e8) truebL *= 1 - p(polierX, 0, W);
+  truebR = geteilt ? truebL * .22 : 0;
+  const sAlpha = sichtbar(t, sz('gefahr') - .35, sz('ablauf') + .1, .5, .5);
+  // Einstieg: Lupen-Kreis öffnet sich vom Auto aus
+  const lupe = p(t, sz('gefahr') - .35, sz('gefahr') + .45);
+  x.save(); x.translate(W / 2, 1300); x.scale(zoom, zoom); x.translate(-W / 2, -1300);
+  if (lupe > 0 && lupe < 1) { x.beginPath(); x.arc(560, 1060, 40 + 1500 * eio(lupe), 0, Math.PI * 2); x.clip(); }
+  schnitt(t, sAlpha, sz('gefahr') - .4);
+  if (sAlpha > 0) { schaeden(t); ursacheHighlight(t); polieren(t); keramik(t); sonneUV(t); wasser(t); schmutz(t); }
+  x.restore();
+  if (lupe > 0 && lupe < 1) { x.save(); x.strokeStyle = 'rgba(255,255,255,.8)'; x.lineWidth = 4; x.beginPath(); x.arc(560, 1060, 40 + 1500 * eio(lupe), 0, Math.PI * 2); x.stroke(); x.restore(); }
+
+  handy(t); autoLinie(t); gefahren(t); problemChips(t); reiter(t); ablauf(t); angebot(t); schluss(t);
+  text('Animation, vereinfachte Darstellung', 395, { size: 24, col: GRAU, a: sichtbar(t, sz('gefahr'), sz('ablauf'), .5, .4) * .75, ls: 1 });
+
+  // ---- Texte je Satz ----
+  rein(t, sz('haken') - .1, sz('auto') + .1, (a, dy) => { text('Dein Handy steckt', 560, { size: 84, w: 800, ls: -3, a, dy }); text('in einer Hülle.', 660, { size: 84, w: 800, ls: -3, a, dy }); });
+  rein(t, sz('auto') - .1, sz('gefahr'), (a, dy, sc) => text('Aber dein Auto?', 600, { size: 104, w: 800, ls: -4, col: GELB, a, sc }));
+  rein(t, wortSuche('auto', 'steht', 4, 11), sz('gefahr'), (a, dy) => { text('Steht jeden Tag draußen.', 700, { size: 46, col: GRAU, a, dy }); text('Ohne extra Schutz.', 760, { size: 46, w: 600, a, dy }); });
+  rein(t, sz('merkst') - .1, sz('problem') + .1, (a, dy) => text('Und irgendwann siehst du es …', 600, { size: 58, w: 600, a, dy }));
+  rein(t, sz('problem') - .2, sz('ursache'), (a, dy) => text('Was passiert:', 530, { size: 40, col: GRAU, a, dy }));
+  rein(t, sz('ursache') - .1, sz('wende'), (a, dy) => { text('Das Problem sitzt', 560, { size: 80, w: 800, ls: -3, a, dy }); text('im Klarlack.', 660, { size: 80, w: 800, ls: -3, col: GELB, a, dy }); });
+  rein(t, wortSuche('ursache', 'schützt', 8, 15), sz('wende'), (a, dy) => text('Er schützt deine Farbe.', 770, { size: 46, col: GRAU, a, dy }));
+  rein(t, wortSuche('ursache', 'aber', 11, 15), sz('wende'), (a, dy, sc) => text('Aber wer schützt ihn?', 850, { size: 54, w: 700, a, sc }));
+  rein(t, sz('wende') - .1, sz('loesung'), (a, dy) => text('Genau da setzen wir an.', 640, { size: 70, w: 700, ls: -2, a, dy }));
+  rein(t, sz('loesung') - .1, sz('uv') - .1, (a, dy, sc) => { text('Keramik-', 590, { size: 120, w: 800, ls: -4, col: GELB, a, sc, glow: 22 }); text('versiegelung.', 715, { size: 120, w: 800, ls: -4, col: GELB, a, sc, glow: 22 }); });
+  rein(t, sz('schicht') - .1, sz('uv') - .1, (a, dy) => { text('Hauchdünn. Glasklar.', 820, { size: 48, w: 600, a, dy }); text('Verbindet sich fest mit dem Lack.', 880, { size: 40, col: GRAU, a, dy }); });
+  rein(t, sz('uv') - .1, sz('wasser') - .1, (a, dy) => { text('Bleicht langsamer aus.', 600, { size: 84, w: 800, ls: -3, a, dy }); text('Die Keramik bremst UV – ganz stoppen kann sie es nicht.', 690, { size: 30, col: GRAU, a, dy }); });
+  rein(t, sz('wasser') - .1, sz('schmutz') - .1, (a, dy) => { text('Wasser perlt ab.', 600, { size: 96, w: 800, ls: -3, a, dy }); text('Kontaktwinkel bis 165° laut Hersteller', 690, { size: 30, col: GELB, a: a * .9, dy }); });
+  rein(t, sz('schmutz') - .1, sz('ablauf') - .1, (a, dy) => { text('Dreck findet', 570, { size: 92, w: 800, ls: -3, a, dy }); text('weniger Halt.', 672, { size: 92, w: 800, ls: -3, col: GELB, a, dy }); });
+  rein(t, wortSuche('schmutz', 'wäsche', 6, 10) - .2, sz('ablauf') - .1, (a, dy) => text('Die Wäsche geht viel leichter.', 770, { size: 44, col: GRAU, a, dy }));
+
+  const v = x.createRadialGradient(W / 2, H * .45, H * .35, W / 2, H * .45, H * .8);
+  v.addColorStop(0, 'rgba(0,0,0,0)'); v.addColorStop(1, 'rgba(0,0,0,.45)'); x.fillStyle = v; x.fillRect(0, 0, W, H);
+}
+window.render = render;
+window.starte = z => { setzeZeitplan(z); window.DAUER = DAUER; };
+
+Promise.all(['300', '400', '600', '700', '800'].map(w => document.fonts.load(`${w} 40px Poppins`)))
+  .then(() => new Promise(r => LOGO.complete ? r() : (LOGO.onload = LOGO.onerror = r)))
+  .then(() => {
+    window.schriftOk = document.fonts.check('700 40px Poppins');
+    window.bereit = true;
+    if (navigator.webdriver) return;                   // render.js setzt den Zeitplan selbst
+    fetch('ausgabe/zeitplan.json').then(r => r.json()).catch(() => null).then(z => {
+      window.starte(z);
+      const q = new URLSearchParams(location.search).get('t');
+      if (q !== null) { render(parseFloat(q)); return; }
+      const t0 = performance.now(); (function lauf() { render(((performance.now() - t0) / 1000) % DAUER); requestAnimationFrame(lauf); })();
+    });
+  });
+</script>
+</body>
+</html>

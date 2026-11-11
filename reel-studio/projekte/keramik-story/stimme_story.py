@@ -1,0 +1,175 @@
+"""Sprecherstimme für die Keramik-Story (Qwen3-TTS VoiceDesign 1.7B, Apache-2.0, entworfene Stimme, kein Klon).
+
+1) erzeugen (Qwen-venv):   <qwen-venv>/bin/python stimme_story.py erzeugen 1 2 3     → ausgabe/takes/take_<seed>.wav
+2) bewerten (System-Python, faster-whisper):   python3 stimme_story.py bewerten       → Wortgenauigkeit + Lebendigkeit je Take
+3) schneiden (System-Python):   python3 stimme_story.py schneiden <seed>              → Sätze, Zeitplan, Sprachspur
+Der ganze Text wird in einem Durchgang gesprochen (gleiche Stimme, Spannungsbogen), danach per Spracherkennung in Sätze zerlegt.
+Die natürlichen Pausen bleiben erhalten; nach einzelnen Sätzen kommt etwas Luft für die Bilder dazu (PAUSE_NACH).
+"""
+import difflib
+import json
+import re
+import subprocess
+import sys
+from pathlib import Path
+
+HIER = Path(__file__).resolve().parent
+AUS = HIER / "ausgabe"
+TAKES = AUS / "takes"
+
+# (ID, Satz). Die IDs steuern die Szenen in story.html.
+SAETZE = [
+    ("haken", "Dein Handy steckt in einer Hülle."),
+    ("auto", "Aber dein Auto? Das steht jeden Tag draußen. Ohne extra Schutz."),
+    ("gefahr", "Sonne. Regen. Streusalz. Vogelkot."),
+    ("merkst", "Und irgendwann siehst du es …"),
+    ("problem", "Der Lack wird stumpf. Wasser hinterlässt Flecken. Und der Dreck geht kaum noch runter."),
+    ("ursache", "Das Problem sitzt ganz oben, im Klarlack. Er schützt deine Farbe. Aber wer schützt ihn?"),
+    ("wende", "Genau da setzen wir an."),
+    ("loesung", "Mit einer Keramikversiegelung."),
+    ("schicht", "Eine hauchdünne, glasklare Schutzschicht, die sich fest mit deinem Lack verbindet."),
+    ("uv", "Die Sonne bleicht ihn langsamer aus."),
+    ("wasser", "Wasser perlt einfach ab."),
+    ("schmutz", "Und Dreck findet weniger Halt. Die Wäsche geht viel leichter."),
+    ("ablauf", "Bei uns in Walterschen machen wir alles von Hand: waschen, kneten, polieren. Erst dann kommt die Keramik drauf."),
+    ("set", "Und ein Pflegeset für zu Hause gibt's dazu."),
+    ("preis", "Keramikversiegelung ab siebenhundert Euro."),
+    ("cta", "Schick uns einfach drei Fotos von deinem Lack per WhatsApp. Du weißt vorher, was es kostet."),
+    ("schluss", "Gönn deinem Lack die Hülle, die er verdient."),
+]
+# Extra-Luft nach einem Satz (Sekunden), damit die Animation wirken kann
+PAUSE_NACH = {"gefahr": 0.5, "problem": 0.4, "wende": 0.2, "loesung": 0.9, "uv": 1.4, "wasser": 1.9, "schmutz": 1.0,
+              "ablauf": 0.3, "cta": 0.4, "schluss": 2.6}
+VORLAUF = 0.35
+
+STIMME = ("Native German male voice-over artist in his early thirties, warm and slightly husky timbre, standard High German "
+          "from Germany with no regional, Austrian or Swiss accent. He delivers a premium car-care commercial with real "
+          "emotion: he starts close and empathetic, almost confidential, with a hint of concern while describing the problem, "
+          "builds tension, then turns confident, warm and genuinely enthusiastic when revealing the solution, and ends "
+          "friendly and inviting. Dynamic intonation, clear emphasis on key words, natural pauses for effect, never "
+          "monotone, never over-acted.")
+
+
+def text_ganz():
+    return " ".join(s for _, s in SAETZE)
+
+
+def erzeugen(seeds):
+    import soundfile as sf
+    import torch
+    from qwen_tts import Qwen3TTSModel
+    torch.set_num_threads(4)
+    m = Qwen3TTSModel.from_pretrained("Qwen/Qwen3-TTS-12Hz-1.7B-VoiceDesign", device_map="cpu", dtype=torch.float32)
+    TAKES.mkdir(parents=True, exist_ok=True)
+    for seed in seeds:
+        torch.manual_seed(int(seed))
+        wavs, sr = m.generate_voice_design(text=text_ganz(), instruct=STIMME, language="German")
+        sf.write(str(TAKES / f"take_{seed}.wav"), wavs[0], sr)
+        print("Take", seed, round(len(wavs[0]) / sr, 1), "s", flush=True)
+
+
+def norm(w):
+    return re.sub(r"[^a-zäöüß0-9]", "", w.lower())
+
+
+def woerter(pfad):
+    import numpy as np
+    from faster_whisper import WhisperModel
+    raw = subprocess.run(["ffmpeg", "-v", "error", "-i", str(pfad), "-f", "s16le", "-ac", "1", "-ar", "16000", "-"],
+                         capture_output=True, check=True).stdout
+    audio = np.frombuffer(raw, np.int16).astype(np.float32) / 32768
+    global _WM
+    if "_WM" not in globals():
+        _WM = WhisperModel("small", device="cpu", compute_type="int8")
+    segs, info = _WM.transcribe(audio, language="de", word_timestamps=True, beam_size=5)
+    return [(norm(w.word), w.start, w.end) for s in segs for w in s.words if norm(w.word)], audio
+
+
+def skriptwoerter():
+    return [(norm(w), k) for k, (_, s) in enumerate(SAETZE) for w in s.replace("siebenhundert", "700").split() if norm(w)]
+
+
+def lebendigkeit(audio):
+    """Streuung der Tonhöhe in Halbtönen: höher = mehr Betonung, weniger monoton."""
+    import numpy as np
+    import librosa
+    f0, stimmhaft, _ = librosa.pyin(audio, fmin=60, fmax=300, sr=16000, frame_length=1024)
+    f0 = f0[stimmhaft & ~np.isnan(f0)]
+    return float(np.std(12 * np.log2(f0 / np.median(f0)))) if len(f0) else 0.0
+
+
+def bewerten():
+    ergebnis = {}
+    for take in sorted(TAKES.glob("take_*.wav")):
+        erk, audio = woerter(take)
+        sk = skriptwoerter()
+        sm = difflib.SequenceMatcher(a=[w for w, _ in sk], b=[w for w, _, _ in erk], autojunk=False)
+        genau = sum(b.size for b in sm.get_matching_blocks()) / len(sk)
+        try:
+            leb = lebendigkeit(audio)
+        except Exception as e:  # librosa fehlt
+            leb = -1.0
+        dauer = len(audio) / 16000
+        ergebnis[take.stem] = {"wortgenauigkeit": round(genau, 3), "lebendigkeit_halbtoene": round(leb, 2), "dauer": round(dauer, 1)}
+        print(take.stem, ergebnis[take.stem], flush=True)
+    json.dump(ergebnis, open(TAKES / "bewertung.json", "w"), indent=1)
+
+
+def schneiden(seed):
+    take = TAKES / f"take_{seed}.wav"
+    erk, _ = woerter(take)
+    sk = skriptwoerter()
+    zuord = {}
+    sm = difflib.SequenceMatcher(a=[w for w, _ in sk], b=[w for w, _, _ in erk], autojunk=False)
+    for op, a0, a1, b0, b1 in sm.get_opcodes():
+        if op in ("equal", "replace") and b1 > b0:
+            for i in range(a1 - a0):
+                zuord[a0 + i] = min(b0 + i * (b1 - b0) // (a1 - a0), b1 - 1)
+    grenzen = []
+    for k in range(len(SAETZE)):
+        idx = [zuord[i] for i, (_, kk) in enumerate(sk) if kk == k and i in zuord]
+        if not idx:
+            sys.exit(f"Satz {k} nicht gefunden: {SAETZE[k][1]}")
+        grenzen.append([erk[min(idx)][1], erk[max(idx)][2]])
+    schnitte = [max(0.0, grenzen[0][0] - .06)]
+    for k in range(len(grenzen) - 1):
+        schnitte.append((grenzen[k][1] + grenzen[k + 1][0]) / 2)
+    schnitte.append(grenzen[-1][1] + .3)
+
+    # Sprachspur: Satzstücke in Originalabständen, plus Luft nach einzelnen Sätzen
+    teile, plan, t = [], [], VORLAUF
+    for k, (sid, satz) in enumerate(SAETZE):
+        a, b = schnitte[k], schnitte[k + 1]
+        stueck = AUS / "saetze" / f"{k:02d}_{sid}.wav"
+        stueck.parent.mkdir(parents=True, exist_ok=True)
+        subprocess.run(["ffmpeg", "-v", "error", "-y", "-i", str(take), "-ss", f"{a:.3f}", "-to", f"{b:.3f}",
+                        "-af", "afade=t=in:d=0.015,afade=t=out:st=%.3f:d=0.03" % max(0, b - a - .03),
+                        "-ar", "48000", "-ac", "1", str(stueck)], check=True)
+        sprech_a = t + (grenzen[k][0] - a)                  # wann das erste Wort wirklich kommt
+        sprech_e = t + (grenzen[k][1] - a)
+        ww = [[w, round(t + (s0 - a), 3), round(t + (e0 - a), 3)] for w, s0, e0 in erk if a <= s0 < b]
+        plan.append({"id": sid, "start": round(sprech_a, 3), "ende": round(sprech_e, 3), "text": satz, "woerter": ww})
+        teile.append((stueck, t))
+        t += (b - a) + PAUSE_NACH.get(sid, 0.0)
+    dauer = t
+    eing, filt = [], []
+    for i, (p, s) in enumerate(teile):
+        eing += ["-i", str(p)]
+        ms = int(round(s * 1000))
+        filt.append(f"[{i}]adelay={ms}|{ms}[d{i}]")
+    filt.append("".join(f"[d{i}]" for i in range(len(teile))) + f"amix=inputs={len(teile)}:normalize=0,"
+                "highpass=f=70,equalizer=f=160:t=q:w=1:g=1.5,equalizer=f=3200:t=q:w=1.2:g=1.5,"
+                "acompressor=threshold=-21dB:ratio=2.5:attack=8:release=150:makeup=2,"
+                f"apad=whole_dur={dauer:.3f},atrim=0:{dauer:.3f}[a]")
+    subprocess.run(["ffmpeg", "-v", "error", "-y", *eing, "-filter_complex", ";".join(filt), "-map", "[a]",
+                    "-ar", "48000", "-ac", "1", str(AUS / "stimme_roh.wav")], check=True)
+    json.dump({"dauer": round(dauer, 3), "take": seed, "saetze": plan}, open(AUS / "zeitplan.json", "w", encoding="utf-8"),
+              ensure_ascii=False, indent=1)
+    print(f"Dauer {dauer:.1f} s")
+    for p in plan:
+        print(f"{p['start']:6.2f}–{p['ende']:6.2f}  {p['id']:8s} {p['text']}")
+
+
+if __name__ == "__main__":
+    {"erzeugen": lambda: erzeugen(sys.argv[2:] or ["1"]), "bewerten": bewerten,
+     "schneiden": lambda: schneiden(sys.argv[2])}[sys.argv[1]]()
