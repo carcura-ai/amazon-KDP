@@ -25,7 +25,7 @@ function rng(s) { return function () { s |= 0; s = s + 0x6D2B79F5 | 0; let r = M
 
 // ---------- Zeitplan ----------
 let Z = null, DAUER = 50;
-const IDS = ['haken', 'auto', 'teaser', 'gefahr', 'merkst', 'problem', 'ursache', 'wende', 'loesung', 'schicht', 'uv', 'wasser', 'schmutz', 'ablauf', 'set', 'preis', 'geschenk', 'cta', 'schluss'];
+const IDS = ['haken', 'auto', 'teaser', 'gefahr', 'merkst', 'problem', 'ursache', 'wende', 'loesung', 'schicht', 'uv', 'wasser', 'schmutz', 'ablauf', 'set', 'preis', 'geschenk', 'cta', 'weihnacht', 'schluss'];
 function setzeZeitplan(z) {
   if (!z) {                                         // Vorschau ohne Stimme: 2,8 s je Satz
     z = { dauer: IDS.length * 2.8 + 2, saetze: IDS.map((id, i) => ({ id, start: .4 + i * 2.8, ende: .4 + i * 2.8 + 2.2, woerter: [] })) };
@@ -446,32 +446,103 @@ function geschenkChip(t) {
 // ---------- Szene 6: Angebot, Kontakt, Schluss ----------
 const LOGO = new Image(); LOGO.src = '../../brand/logo_weiss.png';
 function angebot(t) {
-  const s = S('preis'), a = sichtbar(t, s.a - .15, S('schluss').a + .1, .4, .4); if (a <= 0) return;
+  const AE = S('weihnacht').a - .05;
+  const s = S('preis'), a = sichtbar(t, s.a - .15, AE, .4, .4); if (a <= 0) return;
   if (LOGO.complete && LOGO.naturalWidth) { const w = 430, h = w * LOGO.naturalHeight / LOGO.naturalWidth; x.save(); x.globalAlpha = a; x.drawImage(LOGO, (W - w) / 2, 440 - h / 2, w, h); x.restore(); }
-  rein(t, s.a - .1, S('schluss').a + .1, (aa, dy) => text('Keramikversiegelung', 720, { size: 76, w: 700, ls: -2, a: aa, dy }));
+  rein(t, s.a - .1, AE, (aa, dy) => text('Keramikversiegelung', 720, { size: 76, w: 700, ls: -2, a: aa, dy }));
   const tp = wortSuche('preis', '700', 2, 4);
-  rein(t, tp - .15, S('schluss').a + .1, (aa, dy, sc) => text('ab 700 €', 890, { size: 160, w: 800, col: GELB, ls: -5, a: aa, sc, glow: 18 }));
-  rein(t, tp + .3, S('schluss').a + .1, (aa, dy) => text('inkl. Handwäsche, Kneten, Politur und Pflegeset', 975, { size: 34, col: GRAU, a: aa, dy }));
+  rein(t, tp - .15, AE, (aa, dy, sc) => text('ab 700 €', 890, { size: 160, w: 800, col: GELB, ls: -5, a: aa, sc, glow: 18 }));
+  rein(t, tp + .3, AE, (aa, dy) => text('inkl. Handwäsche, Kneten, Politur und Pflegeset', 975, { size: 34, col: GRAU, a: aa, dy }));
   const c0 = S('cta').a;
-  rein(t, c0 - .1, S('schluss').a + .1, (aa, dy, sc) => {
+  rein(t, c0 - .1, AE, (aa, dy, sc) => {
     const puls = 1 + .02 * Math.sin((t - c0) * 5);
     x.save(); x.globalAlpha = aa; x.translate(W / 2, 1310 + dy); x.scale(sc * puls, sc * puls);
     x.beginPath(); x.roundRect(-400, -60, 800, 120, 60); x.fillStyle = GELB; x.fill();
     x.font = '700 42px Poppins'; x.fillStyle = INK; x.textAlign = 'center'; x.textBaseline = 'middle'; x.fillText('3 Fotos vom Lack per WhatsApp', 0, 3); x.restore();
   });
   const g0 = S('geschenk').a, tws = wortSuche('geschenk', 'waschset', 9, 12);
-  rein(t, tws - .25, S('schluss').a + .1, (aa, dy, sc) => {
+  rein(t, tws - .25, AE, (aa, dy, sc) => {
     x.save(); x.globalAlpha = aa; x.translate(W / 2, 1090); x.scale(sc, sc);
     x.font = '700 46px Poppins'; const tx = '+ Waschset geschenkt', bw = x.measureText(tx).width + 150;
     x.beginPath(); x.roundRect(-bw / 2, -50, bw, 100, 50); x.fillStyle = 'rgba(232,243,32,.14)'; x.fill(); x.strokeStyle = GELB; x.lineWidth = 3; x.shadowColor = GELB; x.shadowBlur = 16; x.stroke(); x.shadowBlur = 0;
     geschenkBild(-bw / 2 + 58, 6, 38, GELB);
     x.fillStyle = GELB; x.textAlign = 'left'; x.textBaseline = 'middle'; x.fillText(tx, -bw / 2 + 100, 3); x.restore();
   });
-  rein(t, g0 - .1, S('schluss').a + .1, (aa, dy) => text('bei Buchung bis 31.12.2026', 1185, { size: 30, col: GRAU, a: aa, dy }));
+  rein(t, g0 - .1, AE, (aa, dy) => text('bei Buchung bis 31.12.2026', 1185, { size: 30, col: GRAU, a: aa, dy }));
   const ta = wortSuche('cta', 'angebot', 13, 20), tk = wortSuche('cta', 'vorher', 16, 20);
-  rein(t, ta - .25, S('schluss').a + .1, (aa, dy) => text('Du bekommst unser Angebot', 1430, { size: 40, w: 600, a: aa, dy }));
-  rein(t, tk - .1, S('schluss').a + .1, (aa, dy) => text('und weißt vorher, was es kostet.', 1486, { size: 36, col: GRAU, a: aa, dy }));
+  rein(t, ta - .25, AE, (aa, dy) => text('Du bekommst unser Angebot', 1430, { size: 40, w: 600, a: aa, dy }));
+  rein(t, tk - .1, AE, (aa, dy) => text('und weißt vorher, was es kostet.', 1486, { size: 36, col: GRAU, a: aa, dy }));
 }
+// ---------- Weihnachten: Schnee, Weihnachtsmann, „Ho, ho, ho!“ ----------
+const R4 = rng(2412);
+const FLOCKEN = Array.from({ length: 150 }, () => ({ x: R4() * W, y: R4() * H, r: 2 + R4() * 5, v: 90 + R4() * 170, f: .5 + R4() * 1.5, ph: R4() * 6.3, a: .35 + R4() * .6 }));
+function schnee(t) {
+  const a = p(t, S('weihnacht').a - .3, S('weihnacht').a + .8); if (a <= 0) return;
+  x.save(); x.fillStyle = '#fff';
+  for (const f of FLOCKEN) { x.globalAlpha = a * f.a; x.beginPath(); x.arc((f.x + Math.sin(t * f.f + f.ph) * 26 + W) % W, (f.y + f.v * t) % H, f.r, 0, Math.PI * 2); x.fill(); }
+  x.restore();
+}
+const tHoho = () => S('weihnacht').e + .3;
+function weihnachtsmann(t) {
+  const s = S('weihnacht'), t0 = s.a - .2, tH = tHoho(), tW = tH + 2.6;      // läuft rein, bleibt stehen (Ho, ho, ho), läuft raus
+  if (t < t0 || t > tW + 2.2) return;
+  const steht = t >= tH && t < tW;
+  const cx = t < tH ? lerp(-230, 540, p(t, t0, tH)) : steht ? 540 : lerp(540, W + 260, p(t, tW, tW + 2.0));
+  const weg = t < tH ? (t - t0) : steht ? (tH - t0) : (tH - t0) + (t - tW);
+  const ph = weg * 7.5, schwung = steht ? 0 : Math.sin(ph), huepf = steht ? Math.abs(Math.sin((t - tH) * 9.5)) * 14 * (1 - p(t, tH + 1.2, tH + 1.6)) : Math.abs(Math.sin(ph)) * 7;
+  const ROT = '#D8322A', DUNKELROT = '#A8201B', HAUT = '#F2C9A5';
+  x.save(); x.translate(cx, 1590 - huepf); x.scale(1.22, 1.22);
+  x.fillStyle = 'rgba(0,0,0,.4)'; x.beginPath(); x.ellipse(0, 6 + huepf / 1.22, 95, 12, 0, 0, Math.PI * 2); x.fill();
+  // Sack
+  x.save(); x.translate(-78, -205); x.rotate(-.25); x.fillStyle = '#8A5A2B'; x.beginPath(); x.ellipse(0, 0, 58, 74, 0, 0, Math.PI * 2); x.fill();
+  x.fillStyle = '#6E4520'; x.beginPath(); x.ellipse(18, -66, 22, 12, .3, 0, Math.PI * 2); x.fill(); x.restore();
+  // Beine (hinteres zuerst)
+  const bein = (w, farbe) => { x.save(); x.translate(0, -112); x.rotate(w); x.fillStyle = farbe; x.beginPath(); x.roundRect(-18, 0, 36, 86, 12); x.fill();
+    x.fillStyle = '#fff'; x.fillRect(-19, 70, 38, 12); x.fillStyle = '#17171a'; x.beginPath(); x.roundRect(-20, 80, 58, 28, 12); x.fill(); x.restore(); };
+  bein(steht ? -.16 : -.5 * schwung, DUNKELROT); bein(steht ? .16 : .5 * schwung, ROT);
+  // Mantel
+  x.fillStyle = ROT; x.beginPath(); x.ellipse(0, -176, 74, 84, 0, 0, Math.PI * 2); x.fill();
+  x.fillStyle = '#fff'; x.beginPath(); x.roundRect(-70, -118, 140, 24, 12); x.fill();
+  x.beginPath(); x.roundRect(-11, -250, 22, 140, 10); x.fill();
+  x.fillStyle = '#17171a'; x.fillRect(-73, -178, 146, 24);
+  x.strokeStyle = GELB; x.lineWidth = 6; x.strokeRect(-16, -183, 32, 34);
+  // Arm (winkt beim Stehen)
+  const armW = steht ? -2.2 + Math.sin((t - tH) * 10) * .35 : -.7 * schwung;
+  x.save(); x.translate(26, -222); x.rotate(armW); x.fillStyle = DUNKELROT; x.beginPath(); x.roundRect(-16, 0, 32, 78, 14); x.fill();
+  x.fillStyle = '#fff'; x.fillRect(-18, 62, 36, 14); x.fillStyle = '#17171a'; x.beginPath(); x.arc(0, 90, 18, 0, Math.PI * 2); x.fill(); x.restore();
+  // Kopf: Bart, Gesicht, Mütze
+  x.fillStyle = '#fff'; x.beginPath(); x.ellipse(16, -250, 50, 56, 0, 0, Math.PI * 2); x.fill();
+  x.fillStyle = HAUT; x.beginPath(); x.arc(18, -282, 32, 0, Math.PI * 2); x.fill();
+  x.fillStyle = '#fff'; x.beginPath(); x.ellipse(6, -262, 17, 9, -.2, 0, Math.PI * 2); x.ellipse(34, -262, 17, 9, .2, 0, Math.PI * 2); x.fill();
+  x.fillStyle = '#E39A86'; x.beginPath(); x.arc(22, -272, 9, 0, Math.PI * 2); x.fill();
+  x.fillStyle = '#17171a'; x.beginPath(); x.arc(9, -288, 4.2, 0, Math.PI * 2); x.arc(33, -288, 4.2, 0, Math.PI * 2); x.fill();
+  if (steht) { x.fillStyle = '#7a2a22'; x.beginPath(); x.ellipse(21, -248, 9, 6 + 4 * Math.abs(Math.sin((t - tH) * 9.5)), 0, 0, Math.PI * 2); x.fill(); }
+  x.fillStyle = ROT; x.beginPath(); x.moveTo(-16, -308); x.quadraticCurveTo(6, -396, -62, -356); x.quadraticCurveTo(20, -372, 54, -308); x.closePath(); x.fill();
+  x.fillStyle = '#fff'; x.beginPath(); x.roundRect(-22, -318, 84, 24, 12); x.fill(); x.beginPath(); x.arc(-64, -356, 15, 0, Math.PI * 2); x.fill();
+  x.restore();
+  // Sprechblase
+  const ba = sichtbar(t, tH, tW + .1, .15, .25);
+  if (ba > 0) {
+    const sc = eback(p(t, tH, tH + .3));
+    x.save(); x.globalAlpha = ba; x.translate(cx + 60, 1590 - 520); x.scale(sc, sc);
+    x.fillStyle = '#fff'; x.beginPath(); x.roundRect(-190, -62, 380, 124, 50); x.fill();
+    x.beginPath(); x.moveTo(-60, 56); x.lineTo(-84, 104); x.lineTo(-16, 58); x.closePath(); x.fill();
+    x.font = '800 60px Poppins'; x.fillStyle = INK; x.textAlign = 'center'; x.textBaseline = 'middle'; x.fillText('Ho, ho, ho!', 0, 4); x.restore();
+  }
+}
+function weihnachten(t) {
+  const s = S('weihnacht'), ende = S('schluss').a - .05;
+  rein(t, s.a - .1, ende, (a, dy) => { text('Noch kein', 560, { size: 84, w: 800, ls: -3, a, dy }); text('Weihnachtsgeschenk?', 662, { size: 84, w: 800, ls: -3, a, dy }); });
+  rein(t, wortSuche('weihnacht', 'für', 5, 14) - .1, ende, (a, dy) => text('für einen Autoliebhaber', 742, { size: 46, col: GRAU, a, dy }));
+  rein(t, wortSuche('weihnacht', 'buch', 9, 14) - .15, ende, (a, dy, sc) => text('Jetzt buchen.', 900, { size: 116, w: 800, ls: -4, col: GELB, a, sc, glow: 18 }));
+  rein(t, wortSuche('weihnacht', 'gutschein', 13, 14) - .15, ende, (a, dy, sc) => {
+    x.save(); x.globalAlpha = a; x.translate(W / 2, 1020); x.scale(sc, sc);
+    x.font = '600 40px Poppins'; const tx = 'Auch als Gutschein', bw = x.measureText(tx).width + 80;
+    x.beginPath(); x.roundRect(-bw / 2, -42, bw, 84, 42); x.fillStyle = 'rgba(255,255,255,.08)'; x.fill(); x.strokeStyle = 'rgba(255,255,255,.4)'; x.lineWidth = 2; x.stroke();
+    x.fillStyle = '#fff'; x.textAlign = 'center'; x.textBaseline = 'middle'; x.fillText(tx, 0, 3); x.restore();
+  });
+}
+
 function schluss(t) {
   const s = S('schluss'); if (t < s.a - .2) return;
   rein(t, s.a - .1, DAUER + 5, (aa, dy) => { text('Gönn deinem Lack', 640, { size: 92, w: 800, ls: -3, a: aa, dy }); text('die Hülle,', 745, { size: 92, w: 800, ls: -3, a: aa, dy }); });
@@ -510,7 +581,8 @@ function render(t) {
   x.restore();
   if (lupe > 0 && lupe < 1) { x.save(); x.strokeStyle = 'rgba(255,255,255,.8)'; x.lineWidth = 4; x.beginPath(); x.arc(560, 1060, 40 + 1500 * eio(lupe), 0, Math.PI * 2); x.stroke(); x.restore(); }
 
-  handy(t); autoLinie(t); geschenkChip(t); gefahren(t); problemChips(t); reiter(t); ablauf(t); angebot(t); schluss(t);
+  handy(t); autoLinie(t); geschenkChip(t); gefahren(t); problemChips(t); reiter(t); ablauf(t); angebot(t); weihnachten(t); schluss(t);
+  schnee(t); weihnachtsmann(t);
   text('Animation, vereinfachte Darstellung', 412, { size: 24, col: GRAU, a: sichtbar(t, sz('gefahr'), sz('ablauf'), .5, .4) * .75, ls: 1 });
 
   // ---- Texte je Satz ----

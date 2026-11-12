@@ -260,6 +260,21 @@ lege(fx, glitzer(), wort("preis", "700", 2, 4), -7)
 lege(fx, whoosh(.5), SATZ["cta"]["start"] - .15, -9)
 lege(fx, pop(), SATZ["cta"]["start"], -5)
 lege(fx, glitzer(), wort("schluss", "verdient", 6, 8), -5)
+# Weihnachten: Schellen über die ganze Szene
+def schellen(dauer):
+    n = int(dauer * SR); s = np.zeros(n); schritt = .31
+    for k in range(int(dauer / schritt)):
+        m = int(.22 * SR); t = tt(m); i = int(k * schritt * SR)
+        klang = (np.sin(2 * np.pi * 2637 * t) + .7 * np.sin(2 * np.pi * 3951 * t) + .5 * np.sin(2 * np.pi * 5274 * t)) * np.exp(-t * 22)
+        klang += filt(RNG.standard_normal(m), "highpass", 7000) * np.exp(-t * 40) * .5
+        s[i:i + m] += klang[: max(0, min(m, n - i))] * (.9 if k % 2 == 0 else .55)
+    return s * huelle(n, .3, .8) * .22
+
+
+t_wei = SATZ["weihnacht"]["start"]
+lege(fx, schellen(DAUER - t_wei), t_wei - .2, -4)
+lege(fx, whoosh(.6), t_wei - .25, -9)
+lege(fx, pop(), wort("weihnacht", "buch", 9, 14) - .1, -5)
 lege(fx, pop(), wort("teaser", "geschenk", 6, 9), -6)
 lege(fx, glitzer(), wort("teaser", "geschenk", 6, 9) + .05, -8)
 lege(fx, pop(), wort("geschenk", "waschset", 9, 12) - .2, -5)
@@ -277,13 +292,20 @@ def schreibe(name, x):
 schreibe("musik.wav", musik)
 schreibe("effekte.wav", fx)
 # Mischung: Musik unter der Stimme absenken, Effekte dazu, Lautheit -14 LUFS
+# „Ho, ho, ho!“ des Weihnachtsmanns (eigene entworfene Stimme, ausgabe/hohoho.wav) direkt nach dem Weihnachtssatz
+t_hoho = SATZ["weihnacht"]["ende"] + .3
+hoho = AUS / "hohoho.wav"
+if not hoho.exists():
+    raise SystemExit("ausgabe/hohoho.wav fehlt (hohoho.py ausführen)")
 filt_kette = (
-    "[0]aformat=channel_layouts=stereo,volume=1.0,asplit=2[v][sc];"
+    f"[3]aformat=channel_layouts=mono,loudnorm=I=-17:TP=-2,adelay={int(t_hoho * 1000)}|{int(t_hoho * 1000)},apad[h];"
+    "[0][h]amix=inputs=2:normalize=0:duration=first[vh];"
+    "[vh]aformat=channel_layouts=stereo,volume=1.0,asplit=2[v][sc];"
     "[1]volume=0.20[m];[m][sc]sidechaincompress=threshold=0.04:ratio=6:attack=15:release=350[md];"
     "[2]volume=0.42[f];"
     f"[v][md][f]amix=inputs=3:normalize=0,atrim=0:{DAUER:.3f},loudnorm=I=-14:TP=-1.5:LRA=9[a]"
 )
 subprocess.run(["ffmpeg", "-v", "error", "-y", "-i", str(AUS / "stimme_roh.wav"), "-i", str(AUS / "musik.wav"),
-                "-i", str(AUS / "effekte.wav"), "-filter_complex", filt_kette, "-map", "[a]", "-ar", "48000",
+                "-i", str(AUS / "effekte.wav"), "-i", str(hoho), "-filter_complex", filt_kette, "-map", "[a]", "-ar", "48000",
                 str(AUS / "ton.wav")], check=True)
 print("ton.wav fertig,", round(DAUER, 1), "s")
