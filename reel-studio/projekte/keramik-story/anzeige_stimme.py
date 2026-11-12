@@ -9,15 +9,15 @@ from pathlib import Path
 HIER = Path(__file__).resolve().parent
 AUS = HIER / "ausgabe"
 K = AUS / "kandidaten_anzeige"
-DAUER = 24.5
+DAUER = 26.8
 # (Name, frühester Start, spätestes Ende, Satz) – nur Aussagen aus dem Anzeigen-Briefing
 SAETZE = [
-    ("haken", 0.15, 3.35, "Streusalz, Regen, Baumharz. Jeden Tag auf deinem Lack."),
-    ("folge", 3.55, 7.5, "Die Folge: stumpfer Lack und Wasserflecken."),
-    ("loesung", 8.1, 11.0, "Die Lösung: Keramikversiegelung. Hauchdünn und glasklar."),
-    ("hand", 11.1, 14.0, "Komplett von Hand, in unserer Halle in Walterschen."),
-    ("angebot", 14.25, 20.9, "Ab siebenhundert Euro, mit Handwäsche, Kneten, Politur und Pflegeset. Bei Buchung bis Jahresende: Waschset geschenkt."),
-    ("schluss", 21.15, 24.3, "Auch als Gutschein. Jetzt Angebot anfordern."),
+    ("haken", 0.1, 3.75, "Streusalz, Regen, Baumharz. Jeden Tag auf deinem Lack."),
+    ("folge", 3.85, 7.6, "Die Folge: stumpfer Lack und Wasserflecken."),
+    ("loesung", 8.0, 12.25, "Die Lösung: Keramikversiegelung. Hauchdünn und glasklar."),
+    ("hand", 12.3, 15.2, "Komplett von Hand, in unserer Halle in Walterschen."),
+    ("angebot", 15.3, 23.1, "Ab siebenhundert Euro, mit Handwäsche, Kneten, Politur und Pflegeset. Bei Buchung bis Jahresende: Waschset geschenkt."),
+    ("schluss", 23.2, 26.6, "Auch als Gutschein. Jetzt Angebot anfordern."),
 ]
 
 if sys.argv[1] == "erzeugen":
@@ -52,18 +52,18 @@ else:
             erk, _, sprechende = hoeren(f, modell)
             ist = [w for w, *_ in erk]
             genau = sum(b.size for b in difflib.SequenceMatcher(a=soll, b=ist, autojunk=False).get_matching_blocks()) / max(len(soll), len(ist), 1)
-            a = max(0.0, erk[0][1] - .1); lang = sprechende + .1 - a
+            a = max(0.0, erk[0][1] - .3); lang = sprechende + .1 - a
             alle.append((round(genau, 2), -lang, f, a, lang))
             print(f"{f.name:14s} genau {genau:.2f} {lang:.2f} s  {' '.join(ist)}")
         genau, _, f, a, lang = max(alle)                       # deutlichste, bei Gleichstand die kürzeste
         fenster = ende - start
-        tempo = min(1.1, max(1.0, lang / fenster))             # nur wenn nötig minimal schneller
+        tempo = 1.08                                            # einheitlich, kaum hörbar
         stueck = K / f"gewaehlt_{name}.wav"
         subprocess.run(["ffmpeg", "-v", "error", "-y", "-i", str(f), "-af",
                         f"atrim=start={a:.3f}:end={a + lang:.3f},asetpts=PTS-STARTPTS,atempo={tempo:.3f},afade=t=in:d=0.02",
                         "-ar", "48000", "-ac", "1", str(stueck)], check=True)
-        plan.append({"id": name, "datei": f.name, "genau": genau, "start": start, "dauer": round(lang / tempo, 2), "tempo": round(tempo, 2),
-                     "passt": lang / tempo <= fenster + .05})
+        plan.append({"id": name, "datei": f.name, "genau": float(genau), "start": start, "dauer": round(lang / tempo, 2), "tempo": round(tempo, 2),
+                     "passt": bool(lang / tempo <= fenster + .05)})
         eing += ["-i", str(stueck)]
         filt.append(f"[{i}]adelay={int(start * 1000)}|{int(start * 1000)}[d{i}]")
     filt.append("".join(f"[d{i}]" for i in range(len(SAETZE))) + f"amix=inputs={len(SAETZE)}:normalize=0,highpass=f=70,"

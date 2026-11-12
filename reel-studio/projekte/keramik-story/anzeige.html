@@ -14,8 +14,8 @@
    Wichtige Texte liegen zwischen 14 % von oben (y 269) und 20 % von unten (y 1536).
    Nur freigegebene Aussagen: Streusalz/Regen/Baumharz, stumpfer Lack, Wasserflecken, hauchdünn, glasklar, Wasser perlt ab,
    von Hand in Walterschen, ab 700 € inkl. Handwäsche/Kneten/Politur/Pflegeset, Waschset bei Buchung bis 31.12.2026, Gutschein. */
-const W = 1080, H = 1920, DAUER = 24.5;
-const T = { folge: 3.2, loesung: 8.0, wasser: 9.6, hand: 11.1, angebot: 14.0, schluss: 21.0 };
+const W = 1080, H = 1920, DAUER = 26.8;
+const T = { folge: 3.7, loesung: 8.0, wasser: 9.6, hand: 12.3, angebot: 15.2, schluss: 23.1 };
 const GELB = '#E8F320', INK = '#09090A', GRAU = '#AEB2B9', HELL = '#D5D7DB', ROT = '#FF5A4F';
 const c = document.getElementById('c'), x = c.getContext('2d');
 const cl = (v, a = 0, b = 1) => Math.min(b, Math.max(a, v));
@@ -178,7 +178,7 @@ function haken(t) {
 
 // ---------- Szene 2: Folge ----------
 function chips(t) {
-  [['Stumpfer Lack', 3.5, 560], ['Wasserflecken', 4.7, 690]].forEach(([n, t0, y]) => {
+  [['Stumpfer Lack', 4.3, 560], ['Wasserflecken', 5.6, 690]].forEach(([n, t0, y]) => {
     const a = sichtbar(t, t0, T.loesung - .35, .25, .3); if (a <= 0) return;
     const sc = eback(p(t, t0, t0 + .4));
     x.save(); x.globalAlpha = a; x.translate(W / 2, y); x.scale(sc, sc);

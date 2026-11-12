@@ -67,3 +67,7 @@ Ohne Ton verständlich (alle Aussagen als Text), keine Sprache, Musik und Effekt
 Gegenüber der langen Story gestrichen: Handy-Aufhänger, „Geschenk am Ende“, Sonne/UV, Vogelkot, „Dreck bleibt hängen“, Ursache im Klarlack, Kontaktwinkel 165°, Schmutz-Welle, die vier Arbeitsschritte, WhatsApp-Knopf, Weihnachtsmann, Sprecher.
 Neu rendern: `<venv>/bin/python anzeige_ton.py` → `node anzeige_render.js video /tmp/bilder ausgabe/keramik-anzeige.mp4 ausgabe/anzeige_ton.wav` → `node anzeige_render.js quadrat ausgabe/keramik-angebot-1x1.jpg`.
 **Laufzeit der Anzeige spätestens am 31.12.2026 beenden** (Aktion endet).
+
+**Nachtrag 12.11.: Anzeige mit Sprecher** (Stimme „Kumpel“, `anzeige_stimme.py`), auf Wunsch von Alex. Dadurch 26,8 s statt 24,5 s. Zeiten jetzt: Problem 0–3,7 s · Folge 3,7–8 s · Lösung 8–15,2 s („von Hand“ ab 12,3 s) · Angebot 15,2–23,1 s · Abschluss 23,1–26,8 s. Die Zeittabelle oben gilt für die erste Fassung ohne Sprecher.
+Sprechertext: Streusalz, Regen, Baumharz. Jeden Tag auf deinem Lack. · Die Folge: stumpfer Lack und Wasserflecken. · Die Lösung: Keramikversiegelung. Hauchdünn und glasklar. · Komplett von Hand, in unserer Halle in Walterschen. · Ab siebenhundert Euro, mit Handwäsche, Kneten, Politur und Pflegeset. Bei Buchung bis Jahresende: Waschset geschenkt. · Auch als Gutschein. Jetzt Angebot anfordern.
+Ablauf: `anzeige_stimme.py erzeugen` (Qwen-venv) → `python3 anzeige_stimme.py bauen` → `anzeige_ton.py` → rendern.

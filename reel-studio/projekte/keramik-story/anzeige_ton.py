@@ -5,7 +5,7 @@ from pathlib import Path
 
 HIER = Path(__file__).resolve().parent
 exec(compile((HIER / "ton.py").read_text(encoding="utf-8").split("# ---------- Musik ----------")[0], "ton.py", "exec"))
-DAUER = 24.5
+DAUER = 26.8
 N = int(DAUER * SR) + SR
 
 
@@ -36,12 +36,12 @@ while t < DAUER:
     for k in range(8):
         lege(musik, pluck(ARP[i % 4][k % 4] + (12 if k >= 4 else 0)), t + k * TAKT / 8, -12)
     for k in range(4):
-        lege(musik, kick(), t + k * TAKT / 4, -9 if t >= 13.9 or k % 2 == 0 else -40)
-    if t >= 13.9:
+        lege(musik, kick(), t + k * TAKT / 4, -9 if t >= 15.1 or k % 2 == 0 else -40)
+    if t >= 15.1:
         for k in range(8):
             lege(musik, shaker(), t + k * TAKT / 8 + TAKT / 16, -10)
     t += TAKT; i += 1
-lege(musik, flaeche([48, 55, 60, 64, 67], 3.2, hell=2600), 21.6, -6)
+lege(musik, flaeche([48, 55, 60, 64, 67], 3.2, hell=2600), 23.7, -6)
 aus = np.ones(N); k0 = int((DAUER - .9) * SR); aus[k0:] = np.clip(np.linspace(1, 0, N - k0), 0, 1)
 musik = hall(musik * aus, 2.4, .3)
 
@@ -50,21 +50,21 @@ lege(fx, salz(), .15, -2)
 lege(fx, regen(1.2), .75, -4)
 for z in (1.7, 1.85, 2.0):
     lege(fx, platsch(), z, -9)
-lege(fx, fehlerton(), 3.5, -7); lege(fx, fehlerton(), 4.7, -7)
+lege(fx, fehlerton(), 4.3, -7); lege(fx, fehlerton(), 5.6, -7)
 lege(fx, whoosh(.7, 1500, 9000), 7.35, -8)
 lege(fx, aufschlag(), 7.98, -1)
 lege(fx, glitzer(), 8.5, -6)
 for d in (0, .3, .12, .42, .65):
     lege(fx, tropf(), 9.6 + d + .38, -6)
-lege(fx, pop(), 11.6, -8)
-lege(fx, whoosh(.6), 13.7, -9)
-lege(fx, pop(), 14.15, -7)
-kurz = int(1.0 * SR); lege(fx, aufschlag()[:kurz] * huelle(kurz, .001, .5), 14.35, -5)
-lege(fx, glitzer(), 14.45, -7)
-lege(fx, pop(), 15.3, -5); lege(fx, glitzer(), 15.35, -6)
-lege(fx, whoosh(.6), 20.75, -9)
-lege(fx, schellen(DAUER - 20.9), 20.9, -4)
-lege(fx, pop(), 21.95, -5)
+lege(fx, pop(), 12.3, -8)
+lege(fx, whoosh(.6), 14.9, -9)
+lege(fx, pop(), 15.35, -7)
+kurz = int(1.0 * SR); lege(fx, aufschlag()[:kurz] * huelle(kurz, .001, .5), 15.55, -5)
+lege(fx, glitzer(), 15.65, -7)
+lege(fx, pop(), 16.5, -5); lege(fx, glitzer(), 16.55, -6)
+lege(fx, whoosh(.6), 22.85, -9)
+lege(fx, schellen(DAUER - 23.0), 23.0, -4)
+lege(fx, pop(), 24.05, -5)
 fx = hall(fx, 1.2, .18)
 
 AUS = HIER / "ausgabe"
