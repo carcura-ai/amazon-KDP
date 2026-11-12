@@ -1,0 +1,56 @@
+[
+ {
+  "id": "haken",
+  "datei": "haken_2.wav",
+  "genau": 1.0,
+  "start": 0.1,
+  "dauer": 3.74,
+  "tempo": 1.08,
+  "passt": false
+ },
+ {
+  "id": "folge",
+  "datei": "folge_0.wav",
+  "genau": 1.0,
+  "start": 3.85,
+  "dauer": 2.91,
+  "tempo": 1.08,
+  "passt": true
+ },
+ {
+  "id": "loesung",
+  "datei": "loesung_0.wav",
+  "genau": 0.71,
+  "start": 8.0,
+  "dauer": 4.17,
+  "tempo": 1.08,
+  "passt": true
+ },
+ {
+  "id": "hand",
+  "datei": "hand_1.wav",
+  "genau": 1.0,
+  "start": 12.3,
+  "dauer": 2.86,
+  "tempo": 1.08,
+  "passt": true
+ },
+ {
+  "id": "angebot",
+  "datei": "angebot_0.wav",
+  "genau": 1.0,
+  "start": 15.3,
+  "dauer": 7.72,
+  "tempo": 1.08,
+  "passt": true
+ },
+ {
+  "id": "schluss",
+  "datei": "schluss_0.wav",
+  "genau": 1.0,
+  "start": 23.2,
+  "dauer": 3.22,
+  "tempo": 1.08,
+  "passt": true
+ }
+]

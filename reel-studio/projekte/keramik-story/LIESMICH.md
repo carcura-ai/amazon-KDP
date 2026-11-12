@@ -1,0 +1,73 @@
+# Story „Keramikversiegelung“ (11.11.2026)
+
+Verkaufs-Story für Instagram (9:16, 1080 × 1920, 30 fps). **Stand 12.11.2026:** 84,5 s, deshalb in zwei Teilen für die Story (ein Story-Abschnitt darf höchstens 60 s lang sein):
+
+| Datei | Länge | Einsatz |
+|---|---|---|
+| `ausgabe/keramik-story-teil1.mp4` | 30,5 s | Story Teil 1: Aufhänger, Geschenk-Hinweis, Probleme, endet mit „Aber wer schützt ihn?“ |
+| `ausgabe/keramik-story-teil2.mp4` | 54,0 s | Story Teil 2: Lösung, Nutzen, Ablauf, Angebot, Weihnachten, Schluss → hier den Link-Sticker setzen |
+| `ausgabe/keramik-story.mp4` | 84,5 s | am Stück, z. B. als Reel |
+
+Alles selbst erzeugt: Animation (Code), Stimmen (KI), Musik und Effekte (Synthese). Lautheit -14,2 LUFS.
+
+Sprechertext (Stand 12.11.): Dein Handy steckt in einer Hülle. · Aber dein Auto? Das steht jeden Tag draußen. Ohne extra Schutz. · [Pause] Bleib kurz dran: Am Ende wartet ein Geschenk auf dich. · Die Probleme sind: Sonne, Regen, Streusalz und Vogelkot. · Und irgendwann siehst du es … · Der Lack wird stumpf. Wasser hinterlässt Flecken. Und der Dreck geht kaum noch runter. · Das Problem sitzt ganz oben, im Klarlack. Er schützt deine Farbe. Aber wer schützt ihn? · Genau da setzen wir an. · Mit einer Keramikversiegelung. · Eine hauchdünne, glasklare Schutzschicht, die sich fest mit deinem Lack verbindet. · Die Sonne bleicht den Lack langsamer aus. · Wasser perlt einfach ab. · Und Dreck findet weniger Halt. Die Wäsche geht viel leichter. · Bei uns in Walterschen, direkt bei Altenkirchen, machen wir alles von Hand: waschen, kneten, polieren. Erst dann kommt die Keramik drauf. · Keramikversiegelung ab siebenhundert Euro. · Und wenn du bis Jahresende buchst, schenken wir dir ein Waschset dazu. · Schick uns einfach drei Fotos von deinem Lack per WhatsApp. Dann bekommst du unser Angebot und weißt vorher, was es kostet. · Du hast noch kein Weihnachtsgeschenk für einen Autoliebhaber? Dann buch jetzt, auch als Gutschein. · [Weihnachtsmann: „Ho, ho, ho!“] · Gönn deinem Lack die Hülle, die er verdient.
+
+**Aktion (von Alex am 12.11. bestätigt):** Waschset geschenkt, zusätzlich zum Pflegeset, bei Buchung bis 31.12.2026 (Termin darf später liegen). Die Bedingung steht im Bild („bei Buchung bis 31.12.2026“). **Nach dem 31.12. darf dieses Video nicht mehr laufen** (Highlight entfernen oder Fassung ohne Aktion rendern).
+
+**Stimme seit 12.11. mittags: „der Kumpel“** (von Alex nach Hörprobe gewählt): neu entworfene Stimme, Mann um 30, locker, leicht rau (`stimmproben.py`, Referenz `ausgabe/stimmproben/ref_kumpel.wav`). Einsprechen: `STIMME=kumpel <qwen-venv>/bin/python stimme_klon.py erzeugen 3`, dann `STIMME=kumpel python3 stimme_klon.py waehlen`. Aktuelle Längen: ganz 86,7 s, Teil 1 30,7 s, Teil 2 56,1 s, -14,7 LUFS. Ohne `STIMME` gilt die frühere Stimme (Take 33).
+
+Stimme: Satz für Satz mit `stimme_klon.py` (gleiche Stimme wie Take 33, 4–8 Fassungen je Satz, die deutlichste gewinnt; bei „Schutz“ und „Walterschen“ zählt genau dieses Wort). Kein Beschleunigen. „Ho, ho, ho“: `hohoho.py` (eigene entworfene Stimme). Teilen: `teilen.py`.
+
+## Dramaturgie (Problem → Ursache → Lösung → Beweis → Angebot → Termin)
+
+| Teil | Gesprochen | Bild |
+|---|---|---|
+| Aufhänger | „Dein Handy steckt in einer Hülle. Aber dein Auto? Das steht jeden Tag draußen. Ohne extra Schutz.“ | Handy bekommt gelbe Hülle, Auto zeichnet sich als Linie |
+| Gefahr | „Sonne. Regen. Streusalz. Vogelkot.“ | Lupe in den Lack; jedes Wort schlägt sichtbar ein (Trübung, Kalkflecken, Salz, Ätzfleck) |
+| Problem | „Der Lack wird stumpf. Wasser hinterlässt Flecken. Und der Dreck geht kaum noch runter.“ | drei rote Hinweise, Dreck bleibt liegen, Kamera fährt heran, Musik in Moll mit Herzschlag |
+| Ursache | „Das Problem sitzt ganz oben, im Klarlack. Er schützt deine Farbe. Aber wer schützt ihn?“ | Klarlack leuchtet gelb auf |
+| Wende | „Genau da setzen wir an.“ | Polierlicht läuft drüber, Schäden verschwinden, Riser |
+| Lösung | „Mit einer Keramikversiegelung. Eine hauchdünne, glasklare Schutzschicht, die sich fest mit deinem Lack verbindet.“ | Aufschlag: gelbe Schicht landet, Musik wechselt nach Dur |
+| Nutzen | UV, Wasser, Schmutz (links ohne, rechts mit) | Sonne/Strahlen, Perlen rollen ab, Welle spült Dreck weg |
+| Beweis | „Bei uns in Walterschen machen wir alles von Hand: waschen, kneten, polieren …“ + Pflegeset | 4 Schritte haken sich ab |
+| Angebot | „Keramikversiegelung ab siebenhundert Euro. Schick uns einfach drei Fotos … per WhatsApp. Du weißt vorher, was es kostet.“ | Logo, Preis, WhatsApp-Knopf |
+| Schluss | „Gönn deinem Lack die Hülle, die er verdient.“ | Pfeil „Termin anfragen“ → **hier den Link-Sticker setzen** |
+
+Aussagen geprüft (UWG): keine Versprechen ohne Beleg. „bremst“ statt „verhindert“, Herstellerwert mit „laut Hersteller“, „Animation, vereinfachte Darstellung“ im Bild, Preis aus `brand/MARKE.md`.
+
+## Beim Posten der Story
+
+1. Video hochladen, **Link-Sticker** unter den gelben Pfeil („Termin anfragen“) setzen:
+   `https://wa.me/491706669516?text=Hallo%20Carcura%2C%20ich%20komme%20von%20der%20Keramik-Story`
+2. **„KI-Info“** einschalten (die Stimme ist KI-erzeugt).
+3. Danach als Highlight „Keramik“ speichern, dann wirkt sie dauerhaft auf dem Profil.
+
+## Technik
+
+- Stimme, aktueller Weg: `<qwen-venv>/bin/python stimme_klon.py erzeugen 4` → `python3 stimme_klon.py waehlen` (schreibt `zeitplan.json` und `stimme_roh.wav`) → `ton.py` → `render.js`. Die Referenzstellen für die Stimme stammen aus `ausgabe/takes/take_33.wav` (nicht im Repo; neu erzeugbar mit `stimme_story.py erzeugen 33`).
+- Stimme, erster Weg: `stimme_story.py` (Qwen3-TTS VoiceDesign 1.7B, Apache-2.0, entworfene Stimme). 3 Durchgänge mit verschiedenen Seeds → `bewerten` (Wortgenauigkeit per Spracherkennung, Lebendigkeit = Streuung der Tonhöhe) → bester Durchgang wird `schneiden` übergeben → `ausgabe/zeitplan.json` (Satz- und Wortzeiten) + `ausgabe/stimme_roh.wav`.
+- Bild: `story.html` liest die Zeiten. Jede Animation hängt am gesprochenen Wort (z. B. „Regen“ → Regen fällt genau dann).
+- Ton: `ton.py` (numpy/scipy) erzeugt Musik und Effekte auf dieselben Zeiten, senkt die Musik unter der Stimme ab und bringt alles auf -14 LUFS → `ausgabe/ton.wav`.
+- Video: `node render.js video /tmp/bilder ausgabe/keramik-story.mp4 ausgabe/ton.wav`
+- venvs liegen im Scratchpad (nicht im Repo): torch (CPU) von download.pytorch.org, `qwen-tts==0.1.1` von PyPI. `ton.py` läuft mit demselben venv (braucht scipy).
+
+## Meta-Anzeige (Kurzfassung, 12.11.2026)
+
+Ziel Leads, Facebook + Instagram. Dateien: `ausgabe/keramik-anzeige.mp4` (24,5 s, 1080 × 1920, H.264, 30 fps, 5,5 MB, -14,4 LUFS) und `ausgabe/keramik-angebot-1x1.jpg`/`.png` (1080 × 1080, Feed).
+Ohne Ton verständlich (alle Aussagen als Text), keine Sprache, Musik und Effekte selbst erzeugt (`anzeige_ton.py`). Wichtige Texte liegen zwischen 14 % von oben und 20 % von unten (geprüft mit `node anzeige_render.js standbilder <ordner> zonen …`).
+
+| Zeit | Inhalt |
+|---|---|
+| 0–3,2 s | „Streusalz, Regen, Baumharz – jeden Tag auf deinem Lack.“ Auto-Symbol; Salz, Regen und Harz fallen, der Lack wird stumpf und fleckig |
+| 3,2–8 s | ✕ Stumpfer Lack (3,5 s), ✕ Wasserflecken (4,7 s); Lackschichten „OHNE“ |
+| 8–14 s | „Keramikversiegelung. Hauchdünn. Glasklar.“ OHNE / MIT KERAMIK, Wasser perlt ab (ab 9,6 s), „Komplett von Hand – in unserer Halle in Walterschen.“ (ab 11,6 s) |
+| 14–21 s | Logo, „Keramikversiegelung ab 700 €“, „inkl. Handwäsche, Kneten, Politur und Pflegeset“, „+ Waschset geschenkt“, „bei Buchung bis 31.12.2026“. Ab 15,9 s vollständig, steht 5,1 s |
+| 21–24,5 s | „Auch als Gutschein. Das Weihnachtsgeschenk für Autoliebhaber.“, Knopf „Jetzt Angebot anfordern“, leichter Schnee |
+
+Gegenüber der langen Story gestrichen: Handy-Aufhänger, „Geschenk am Ende“, Sonne/UV, Vogelkot, „Dreck bleibt hängen“, Ursache im Klarlack, Kontaktwinkel 165°, Schmutz-Welle, die vier Arbeitsschritte, WhatsApp-Knopf, Weihnachtsmann, Sprecher.
+Neu rendern: `<venv>/bin/python anzeige_ton.py` → `node anzeige_render.js video /tmp/bilder ausgabe/keramik-anzeige.mp4 ausgabe/anzeige_ton.wav` → `node anzeige_render.js quadrat ausgabe/keramik-angebot-1x1.jpg`.
+**Laufzeit der Anzeige spätestens am 31.12.2026 beenden** (Aktion endet).
+
+**Nachtrag 12.11.: Anzeige mit Sprecher** (Stimme „Kumpel“, `anzeige_stimme.py`), auf Wunsch von Alex. Dadurch 26,8 s statt 24,5 s. Zeiten jetzt: Problem 0–3,7 s · Folge 3,7–8 s · Lösung 8–15,2 s („von Hand“ ab 12,3 s) · Angebot 15,2–23,1 s · Abschluss 23,1–26,8 s. Die Zeittabelle oben gilt für die erste Fassung ohne Sprecher.
+Sprechertext: Streusalz, Regen, Baumharz. Jeden Tag auf deinem Lack. · Die Folge: stumpfer Lack und Wasserflecken. · Die Lösung: Keramikversiegelung. Hauchdünn und glasklar. · Komplett von Hand, in unserer Halle in Walterschen. · Ab siebenhundert Euro, mit Handwäsche, Kneten, Politur und Pflegeset. Bei Buchung bis Jahresende: Waschset geschenkt. · Auch als Gutschein. Jetzt Angebot anfordern.
+Ablauf: `anzeige_stimme.py erzeugen` (Qwen-venv) → `python3 anzeige_stimme.py bauen` → `anzeige_ton.py` → rendern.

@@ -1,0 +1,105 @@
+{
+ "dauer": 37.252,
+ "punkte": [
+  [
+   0.0,
+   0.0
+  ],
+  [
+   3.61,
+   3.5
+  ],
+  [
+   8.59,
+   6.3
+  ],
+  [
+   16.85,
+   11.5
+  ],
+  [
+   22.55,
+   16.8
+  ],
+  [
+   29.55,
+   21.6
+  ],
+  [
+   37.252,
+   26.5
+  ]
+ ],
+ "saetze": [
+  {
+   "text": "Dein Handy hat eine Hülle.",
+   "start": 0.26,
+   "dauer": 1.37
+  },
+  {
+   "text": "Und dein Lack?",
+   "start": 1.85,
+   "dauer": 1.27
+  },
+  {
+   "text": "Keramik ist eine Schicht mehr.",
+   "start": 4.05,
+   "dauer": 2.3
+  },
+  {
+   "text": "Hauchdünn, und glatt.",
+   "start": 6.57,
+   "dauer": 1.71
+  },
+  {
+   "text": "Sonne macht Klarlack mit der Zeit stumpf.",
+   "start": 9.15,
+   "dauer": 2.78
+  },
+  {
+   "text": "Die Keramik bremst das.",
+   "start": 12.15,
+   "dauer": 1.9
+  },
+  {
+   "text": "Ganz aufhalten kann sie es nicht.",
+   "start": 14.27,
+   "dauer": 2.29
+  },
+  {
+   "text": "Ohne Keramik bleibt Wasser flach liegen.",
+   "start": 17.17,
+   "dauer": 2.81
+  },
+  {
+   "text": "Mit Keramik perlt es ab.",
+   "start": 20.2,
+   "dauer": 1.87
+  },
+  {
+   "text": "Der Dreck haftet schlechter.",
+   "start": 22.84,
+   "dauer": 1.85
+  },
+  {
+   "text": "Beim Waschen geht er leichter runter.",
+   "start": 25.18,
+   "dauer": 2.03
+  },
+  {
+   "text": "Waschen musst du trotzdem.",
+   "start": 27.8,
+   "dauer": 1.98
+  },
+  {
+   "text": "Keramikversiegelung ab siebenhundert Euro.",
+   "start": 30.6,
+   "dauer": 2.62
+  },
+  {
+   "text": "Schick uns drei Fotos per Wotsäpp.",
+   "start": 33.44,
+   "dauer": 2.01
+  }
+ ]
+}

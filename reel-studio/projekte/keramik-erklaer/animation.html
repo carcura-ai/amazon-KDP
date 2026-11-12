@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<title>Keramik erklärt – Reel</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=block" rel="stylesheet">
+<style>html,body{margin:0;background:#09090A}canvas{display:block}</style>
+</head>
+<body>
+<canvas id="c" width="1080" height="1920"></canvas>
+<script>
+/* Reel „Keramik erklärt“ (9:16, 1080 × 1920, 30 fps, 26,5 s).
+   Jedes Bild wird aus der Zeit t berechnet: render(t). Gerendert wird mit render.js (Playwright → JPEG → ffmpeg).
+   Vorschau im Browser: animation.html?t=9.5 zeigt ein Standbild, ohne Parameter läuft die Animation. */
+const W = 1080, H = 1920, DAUER = 26.5;
+const GELB = '#E8F320', INK = '#09090A', GRAU = '#AEB2B9';
+const c = document.getElementById('c'), x = c.getContext('2d');
+
+const cl = (v, a = 0, b = 1) => Math.min(b, Math.max(a, v));
+const p = (t, a, b) => cl((t - a) / (b - a));
+const eo = v => 1 - Math.pow(1 - v, 3);
+const eio = v => v < .5 ? 4 * v * v * v : 1 - Math.pow(-2 * v + 2, 3) / 2;
+const lerp = (a, b, v) => a + (b - a) * v;
+const sicht = (t, a, b, ein = .5, aus = .4) => Math.min(p(t, a, a + ein), 1 - p(t, b - aus, b));
+function rng(s) { return function () { s |= 0; s = s + 0x6D2B79F5 | 0; let r = Math.imul(s ^ s >>> 15, 1 | s); r = r + Math.imul(r ^ r >>> 7, 61 | r) ^ r; return ((r ^ r >>> 14) >>> 0) / 4294967296; }; }
+
+// ---------- Querschnitt: links ohne, rechts mit Keramik ----------
+const MITTE = 540, O = 1160;
+const KER = O, KLAR = [O + 22, O + 162], BASIS = [O + 162, O + 262], GRUND = [O + 262, O + 322], BLECH = [O + 322, H];
+const OB_L = KLAR[0], OB_R = KER;                       // Oberfläche links (Klarlack) und rechts (Keramik)
+const ob = X => X < MITTE ? OB_L : OB_R;
+
+function textur(w, h, fn) { const o = document.createElement('canvas'); o.width = w; o.height = h; fn(o.getContext('2d'), w, h); return o; }
+const R0 = rng(7);
+const TX_BLECH = textur(W, BLECH[1] - BLECH[0], (g, w, h) => {
+  const gr = g.createLinearGradient(0, 0, 0, h);
+  gr.addColorStop(0, '#41444c'); gr.addColorStop(.03, '#2c2e34'); gr.addColorStop(.5, '#1b1c20'); gr.addColorStop(1, '#0d0d0f');
+  g.fillStyle = gr; g.fillRect(0, 0, w, h);
+  for (let i = 0; i < 1400; i++) {                   // gebürstetes Metall
+    const y = R0() * h, l = 80 + R0() * 420, x0 = R0() * w - 100;
+    g.strokeStyle = `rgba(255,255,255,${.012 + R0() * .035})`; g.lineWidth = 1;
+    g.beginPath(); g.moveTo(x0, y); g.lineTo(x0 + l, y); g.stroke();
+  }
+});
+const TX_GRUND = textur(W, GRUND[1] - GRUND[0], (g, w, h) => {
+  g.fillStyle = '#3a3c43'; g.fillRect(0, 0, w, h);
+  for (let i = 0; i < 2600; i++) { g.fillStyle = `rgba(${R0() < .5 ? '255,255,255' : '0,0,0'},${R0() * .07})`; g.fillRect(R0() * w, R0() * h, 2, 2); }
+  g.fillStyle = 'rgba(255,255,255,.08)'; g.fillRect(0, 0, w, 1);
+});
+const TX_BASIS = textur(W, BASIS[1] - BASIS[0], (g, w, h) => {
+  const gr = g.createLinearGradient(0, 0, 0, h);
+  gr.addColorStop(0, '#24467e'); gr.addColorStop(1, '#0f2346');
+  g.fillStyle = gr; g.fillRect(0, 0, w, h);
+  for (let i = 0; i < 2200; i++) {                   // Metallic-Flakes
+    g.fillStyle = `rgba(${170 + R0() * 85},${200 + R0() * 55},255,${.12 + R0() * .55})`;
+    g.beginPath(); g.arc(R0() * w, R0() * h, .5 + R0() * 1.3, 0, Math.PI * 2); g.fill();
+  }
+});
+const TX_GLANZ = textur(W, KLAR[1] - KLAR[0], (g, w, h) => {
+  for (let i = -h; i < w; i += 90) {                 // schräge Lichtkanten im Klarlack
+    const gr = g.createLinearGradient(i, 0, i + 40, 0);
+    gr.addColorStop(0, 'rgba(255,255,255,0)'); gr.addColorStop(.5, 'rgba(255,255,255,.07)'); gr.addColorStop(1, 'rgba(255,255,255,0)');
+    g.fillStyle = gr; g.beginPath(); g.moveTo(i, h); g.lineTo(i + h * .6, 0); g.lineTo(i + h * .6 + 40, 0); g.lineTo(i + 40, h); g.fill();
+  }
+});
+const TX_TRUEB = textur(W, KLAR[1] - KLAR[0], (g, w, h) => {
+  g.fillStyle = 'rgba(206,204,198,.38)'; g.fillRect(0, 0, w, h);
+  for (let i = 0; i < 2600; i++) { g.fillStyle = `rgba(255,248,230,${R0() * .35})`; g.fillRect(R0() * w, R0() * h, 1 + R0() * 2, 1); }
+  for (let i = 0; i < 120; i++) {                    // feine Mikrorisse
+    const x0 = R0() * w, y0 = R0() * h; g.strokeStyle = `rgba(255,250,235,${.15 + R0() * .25})`; g.lineWidth = 1;
+    g.beginPath(); g.moveTo(x0, y0); g.lineTo(x0 + 6 + R0() * 18, y0 + (R0() - .5) * 6); g.stroke();
+  }
+});
+
+// ---------- Hintergrund ----------
+const R1 = rng(11);
+const STERNE = Array.from({ length: 170 }, () => ({ x: R1() * W, y: R1() * (O - 60), r: .6 + R1() * 1.6, a: .25 + R1() * .6, f: .6 + R1() * 2.2, ph: R1() * 6.3 }));
+const BOKEH = Array.from({ length: 10 }, () => ({ x: R1() * W, y: 620 + R1() * (O - 640), r: 40 + R1() * 90, a: .025 + R1() * .035, ph: R1() * 6.3 }));
+
+function hintergrund(t, sonne) {
+  x.fillStyle = INK; x.fillRect(0, 0, W, H);
+  const g = x.createRadialGradient(W / 2, 520, 0, W / 2, 520, 900);
+  g.addColorStop(0, 'rgba(255,255,255,.035)'); g.addColorStop(1, 'rgba(255,255,255,0)');
+  x.fillStyle = g; x.fillRect(0, 0, W, H);
+  for (const s of STERNE) {
+    x.globalAlpha = s.a * (.55 + .45 * Math.sin(t * s.f + s.ph));
+    x.fillStyle = '#fff'; x.beginPath(); x.arc(s.x, s.y, s.r, 0, Math.PI * 2); x.fill();
+  }
+  for (const b of BOKEH) {
+    const warm = sonne * .8;
+    x.globalAlpha = b.a * (1 + warm);
+    x.fillStyle = `rgb(255,${Math.round(255 - 50 * warm)},${Math.round(255 - 120 * warm)})`;
+    x.beginPath(); x.arc(b.x + Math.sin(t * .25 + b.ph) * 22, b.y + Math.cos(t * .2 + b.ph) * 10, b.r, 0, Math.PI * 2); x.fill();
+  }
+  x.globalAlpha = 1;
+}
+
+// ---------- Text ----------
+function text(s, y, o = {}) {
+  const { size = 48, w = 400, col = '#fff', ls = 0, a = 1, dy = 0 } = o;
+  if (a <= 0) return;
+  x.save(); x.globalAlpha = a; x.font = `${w} ${size}px Poppins`; x.letterSpacing = ls + 'px';
+  x.fillStyle = col; x.textAlign = 'center'; x.textBaseline = 'alphabetic';
+  x.fillText(s, W / 2 + ls / 2, y + dy); x.restore();
+}
+function textBunt(teile, y, o = {}) {
+  const { size = 48, w = 700, ls = 0, a = 1, dy = 0 } = o;
+  if (a <= 0) return;
+  x.save(); x.globalAlpha = a; x.font = `${w} ${size}px Poppins`; x.letterSpacing = ls + 'px'; x.textAlign = 'left';
+  const breite = teile.reduce((s, [q]) => s + x.measureText(q).width, 0);
+  let X = (W - breite) / 2;
+  for (const [q, f] of teile) { x.fillStyle = f; x.fillText(q, X, y + dy); X += x.measureText(q).width; }
+  x.restore();
+}
+function block(t, a0, b0, fn) {
+  const a = sicht(t, a0, b0, .55, .4); if (a <= 0) return;
+  fn(a, (1 - eo(p(t, a0, a0 + .7))) * 30);
+}
+
+// ---------- Kapitel-Reiter ----------
+function reiter(t) {
+  const a = sicht(t, 6.3, 21.7, .5, .5); if (a <= 0) return;
+  const namen = ['UV', 'WASSER', 'SCHMUTZ'], y = 250, h = 66, pad = 36, gap = 18;
+  x.save(); x.globalAlpha = a; x.font = '600 28px Poppins'; x.letterSpacing = '5px';
+  const ws = namen.map(n => x.measureText(n).width + pad * 2);
+  const ges = ws.reduce((s, v) => s + v, 0) + gap * 2;
+  const xs = []; let X = (W - ges) / 2; ws.forEach(w => { xs.push(X); X += w + gap; });
+  let k = t < 11.55 ? 0 : t < 16.8 ? eio(p(t, 11.55, 12.0)) : 1 + eio(p(t, 16.8, 17.25));
+  const i0 = Math.floor(k), i1 = Math.min(2, i0 + 1), f = k - i0;
+  const px = lerp(xs[i0], xs[i1], f), pw = lerp(ws[i0], ws[i1], f);
+  namen.forEach((n, i) => { x.beginPath(); x.roundRect(xs[i], y - h / 2, ws[i], h, h / 2); x.strokeStyle = 'rgba(255,255,255,.2)'; x.lineWidth = 2; x.stroke(); });
+  x.beginPath(); x.roundRect(px, y - h / 2, pw, h, h / 2); x.fillStyle = GELB; x.fill();
+  x.textAlign = 'center'; x.textBaseline = 'middle';
+  namen.forEach((n, i) => {
+    const an = Math.abs(xs[i] - px) < ws[i] / 2;
+    x.fillStyle = an ? INK : 'rgba(255,255,255,.62)';
+    x.fillText(n, xs[i] + ws[i] / 2 + 2.5, y + 2);
+  });
+  x.restore();
+}
+
+// ---------- Querschnitt ----------
+let truebL = 0, truebR = 0;
+function schnitt(t, alpha) {
+  const lag = t0 => ({ a: p(t, t0, t0 + .5) * alpha, dy: (1 - eo(p(t, t0, t0 + .8))) * 90 });
+  const label = (s, y, a, col = 'rgba(255,255,255,.72)') => {
+    x.save(); x.globalAlpha = a; x.font = '600 24px Poppins'; x.letterSpacing = '4px'; x.fillStyle = col;
+    x.textAlign = 'left'; x.textBaseline = 'middle'; x.fillText(s, 34, y); x.restore();
+  };
+  let L = lag(.3);
+  x.globalAlpha = L.a; x.drawImage(TX_BLECH, 0, BLECH[0] + L.dy); label('BLECH', BLECH[0] + 46 + L.dy, L.a * .8);
+  L = lag(.6);
+  x.globalAlpha = L.a; x.drawImage(TX_GRUND, 0, GRUND[0] + L.dy); label('GRUNDIERUNG', (GRUND[0] + GRUND[1]) / 2 + L.dy, L.a * .8);
+  L = lag(.9);
+  x.globalAlpha = L.a; x.drawImage(TX_BASIS, 0, BASIS[0] + L.dy);
+  x.fillStyle = 'rgba(112,112,116,.5)';                        // Farbe bleicht unter UV aus
+  x.globalAlpha = L.a * truebL; x.fillRect(0, BASIS[0] + L.dy, MITTE, BASIS[1] - BASIS[0]);
+  x.globalAlpha = L.a * truebR; x.fillRect(MITTE, BASIS[0] + L.dy, W - MITTE, BASIS[1] - BASIS[0]);
+  label('BASISLACK', (BASIS[0] + BASIS[1]) / 2 + L.dy, L.a * .85);
+  L = lag(1.2);
+  const kh = KLAR[1] - KLAR[0], ky = KLAR[0] + L.dy;
+  x.globalAlpha = L.a;
+  const kg = x.createLinearGradient(0, ky, 0, ky + kh);
+  kg.addColorStop(0, 'rgba(210,226,244,.34)'); kg.addColorStop(1, 'rgba(150,176,208,.13)');
+  x.fillStyle = kg; x.fillRect(0, ky, W, kh);
+  x.drawImage(TX_GLANZ, 0, ky);
+  x.globalAlpha = L.a * truebL; x.drawImage(TX_TRUEB, 0, 0, MITTE, kh, 0, ky, MITTE, kh);
+  x.globalAlpha = L.a * truebR; x.drawImage(TX_TRUEB, MITTE, 0, W - MITTE, kh, MITTE, ky, W - MITTE, kh);
+  x.globalAlpha = L.a; x.fillStyle = 'rgba(255,255,255,.6)'; x.fillRect(0, ky, W, 2);
+  label('KLARLACK', ky + kh / 2, L.a * .85, 'rgba(255,255,255,.8)');
+  x.globalAlpha = 1;
+
+  // Keramik fällt auf die rechte Hälfte
+  const ka = p(t, 3.7, 4.0) * alpha;
+  if (ka > 0) {
+    const v = p(t, 3.7, 4.45), y = KER - 240 * (1 - eo(v));
+    const blitz = v >= 1 ? 1 - p(t, 4.45, 5.2) : 0;
+    x.save(); x.globalAlpha = ka;
+    x.shadowColor = GELB; x.shadowBlur = 16 + blitz * 50;
+    x.fillStyle = GELB; x.fillRect(MITTE, y, W - MITTE, KLAR[0] - KER);
+    x.shadowBlur = 0;
+    x.fillStyle = 'rgba(255,255,255,.55)'; x.fillRect(MITTE, y, W - MITTE, 2);
+    const sw = p(t, 4.5, 5.6);                                      // Lichtlauf über die Schicht
+    if (sw > 0 && sw < 1) {
+      const sx = lerp(MITTE - 120, W + 120, eio(sw));
+      const g = x.createLinearGradient(sx - 120, 0, sx + 120, 0);
+      g.addColorStop(0, 'rgba(255,255,255,0)'); g.addColorStop(.5, 'rgba(255,255,255,.95)'); g.addColorStop(1, 'rgba(255,255,255,0)');
+      x.save(); x.beginPath(); x.rect(MITTE, y - 4, W - MITTE, KLAR[0] - KER + 8); x.clip();
+      x.fillStyle = g; x.fillRect(sx - 120, y - 4, 240, KLAR[0] - KER + 8); x.restore();
+    }
+    x.restore();
+  }
+
+  // Trennlinie und Überschriften
+  const ha = p(t, 4.4, 5.0) * alpha;
+  if (ha > 0) {
+    x.save(); x.globalAlpha = ha * .45; x.strokeStyle = '#fff'; x.setLineDash([6, 10]); x.lineWidth = 2;
+    x.beginPath(); x.moveTo(MITTE, KER - 150); x.lineTo(MITTE, GRUND[1]); x.stroke(); x.restore();
+    x.save(); x.globalAlpha = ha; x.font = '600 30px Poppins'; x.letterSpacing = '6px'; x.textAlign = 'center';
+    x.fillStyle = 'rgba(255,255,255,.66)'; x.fillText('OHNE', MITTE / 2 + 3, KER - 122);
+    x.fillStyle = GELB; x.fillText('MIT KERAMIK', MITTE + (W - MITTE) / 2 + 3, KER - 122);
+    x.restore();
+  }
+}
+
+// ---------- UV ----------
+function sonnePos(t) { return { sx: MITTE, sy: lerp(1230, 975, eo(p(t, 6.5, 7.7))), a: sicht(t, 6.5, 11.7, .4, .6) }; }
+function sonne(t) {
+  const { sx, sy, a } = sonnePos(t); if (a <= 0) return;
+  x.save(); x.globalAlpha = a;
+  let g = x.createRadialGradient(sx, sy, 0, sx, sy, 340);
+  g.addColorStop(0, 'rgba(255,214,140,.42)'); g.addColorStop(1, 'rgba(255,214,140,0)');
+  x.fillStyle = g; x.beginPath(); x.arc(sx, sy, 340, 0, Math.PI * 2); x.fill();
+  g = x.createRadialGradient(sx - 8, sy - 8, 0, sx, sy, 66);
+  g.addColorStop(0, '#fffaf0'); g.addColorStop(.55, '#ffe2a0'); g.addColorStop(1, '#e8b553');
+  x.shadowColor = 'rgba(255,205,120,.9)'; x.shadowBlur = 60;
+  x.fillStyle = g; x.beginPath(); x.arc(sx, sy, 66, 0, Math.PI * 2); x.fill();
+  x.restore();
+}
+function strahlen(t) {
+  const a = sicht(t, 7.0, 11.4, .5, .5); if (a <= 0) return;
+  const { sx, sy } = sonnePos(t);
+  x.save(); x.lineCap = 'round';
+  for (let k = 0; k < 9; k++) {
+    const tx = 70 + k * 117.5, ty = ob(tx), links = tx < MITTE;
+    const dx = tx - sx, dy = ty - sy, n = Math.hypot(dx, dy), ux = dx / n, uy = dy / n;
+    const sx0 = sx + ux * 74, sy0 = sy + uy * 74;
+    x.setLineDash([]); x.globalAlpha = a * .12; x.strokeStyle = '#ffd88c'; x.lineWidth = 2;
+    x.beginPath(); x.moveTo(sx0, sy0); x.lineTo(tx, ty); x.stroke();
+    x.setLineDash([26, 64]); x.lineDashOffset = -t * 520;
+    x.shadowColor = 'rgba(255,200,110,.9)'; x.shadowBlur = 12;
+    x.globalAlpha = a * .85; x.strokeStyle = '#ffd88c'; x.lineWidth = 3;
+    x.beginPath(); x.moveTo(sx0, sy0); x.lineTo(tx, ty); x.stroke();
+    if (links) {                                         // ohne Schutz: Strahl geht in den Lack
+      const tief = BASIS[0] + 30 - ty;
+      x.globalAlpha = a * .6; x.beginPath(); x.moveTo(tx, ty); x.lineTo(tx + ux / uy * tief, ty + tief); x.stroke();
+    } else {                                             // mit Keramik: Großteil wird zurückgeworfen
+      x.globalAlpha = a * .6; x.beginPath(); x.moveTo(tx, ty); x.lineTo(tx + ux * 120, ty - uy * 120); x.stroke();
+      x.globalAlpha = a * .16; x.beginPath(); x.moveTo(tx, ty); x.lineTo(tx + ux / uy * 34, ty + 34); x.stroke();
+      x.setLineDash([]); x.shadowBlur = 0;
+      const g = x.createRadialGradient(tx, ty, 0, tx, ty, 26);
+      g.addColorStop(0, `rgba(255,252,210,${.75 * a * (.6 + .4 * Math.sin(t * 10 + k))})`); g.addColorStop(1, 'rgba(255,252,210,0)');
+      x.globalAlpha = 1; x.fillStyle = g; x.beginPath(); x.arc(tx, ty, 26, 0, Math.PI * 2); x.fill();
+    }
+    x.shadowBlur = 0;
+  }
+  x.restore();
+}
+
+// ---------- Wasser ----------
+function kappe(cx, sy, a, h) {                         // Kugelkappe auf der Oberfläche: halbe Breite a, Höhe h
+  a = Math.max(a, .5);
+  const R = (a * a + h * h) / (2 * h), cy = sy - h + R;
+  const ar = Math.atan2(sy - cy, a), al = Math.atan2(sy - cy, -a);
+  x.beginPath(); x.arc(cx, cy, R, ar, al, true); x.closePath();
+  return R;
+}
+function tropfen(cx, sy, a, h, alpha, amBoden) {
+  if (alpha <= 0) return;
+  x.save(); x.globalAlpha = alpha;
+  if (amBoden) { x.fillStyle = 'rgba(0,0,0,.45)'; x.beginPath(); x.ellipse(cx, sy + 2, a * 1.05 + 3, 5, 0, 0, Math.PI * 2); x.fill(); }
+  const R = kappe(cx, sy, a, h);
+  const g = x.createLinearGradient(0, sy - h, 0, sy);
+  g.addColorStop(0, 'rgba(218,238,255,.62)'); g.addColorStop(.55, 'rgba(130,186,242,.30)'); g.addColorStop(1, 'rgba(82,142,218,.45)');
+  x.fillStyle = g; x.fill();
+  x.lineWidth = 2.5; x.strokeStyle = 'rgba(232,246,255,.88)'; x.stroke();
+  const breit = h > a ? R : a;
+  x.save(); kappe(cx, sy, a, h); x.clip();                    // Glanzpunkt bleibt im Tropfen
+  x.fillStyle = 'rgba(255,255,255,.92)'; x.beginPath();
+  x.ellipse(cx - breit * .36, sy - h * .7, Math.max(2, Math.min(breit * .3, R * .24)), Math.max(1.6, Math.min(h * .15, R * .15)), h > a ? -.5 : 0, 0, Math.PI * 2); x.fill();
+  x.restore();
+  if (amBoden && h > a) {                              // Licht bündelt sich unter der Perle
+    const gg = x.createRadialGradient(cx + a * .2, sy - 1, 0, cx + a * .2, sy - 1, a * 1.7);
+    gg.addColorStop(0, 'rgba(255,255,236,.85)'); gg.addColorStop(1, 'rgba(255,255,236,0)');
+    x.fillStyle = gg; x.beginPath(); x.ellipse(cx + a * .2, sy - 1, a * 1.7, 8, 0, 0, Math.PI * 2); x.fill();
+  }
+  x.restore();
+}
+const TROPFEN = [
+  { x: 135, t0: 12.0, s: 'L' }, { x: 405, t0: 12.45, s: 'L' },
+  { x: 650, t0: 12.15, s: 'R' }, { x: 800, t0: 12.55, s: 'R' }, { x: 945, t0: 12.95, s: 'R' },
+];
+function wasser(t) {
+  const weg = 1 - p(t, 16.0, 16.6);
+  for (const d of TROPFEN) {
+    const sy = d.s === 'L' ? OB_L : OB_R, ti = d.t0 + .45;
+    if (t < d.t0 || weg <= 0) continue;
+    if (t < ti) { const v = p(t, d.t0, ti); tropfen(d.x, lerp(985, sy, v * v), .5, 86, p(t, d.t0, d.t0 + .08), false); continue; }
+    const v = p(t, ti, ti + .45), e = 1 - Math.exp(-5 * v) * Math.cos(9 * v);
+    if (d.s === 'L') { tropfen(d.x, sy, lerp(.5, 118, e), lerp(86, 22, e), weg, true); continue; }
+    const s = Math.max(0, t - 14.0);                          // alle Perlen rollen gemeinsam ab
+    const xr = d.x + .5 * (900 + (d.x - 650) * .8) * s * s, wob = s > 0 ? Math.sin(s * 22) * 1.5 : 0;
+    if (xr < W + 120) tropfen(xr, sy, lerp(.5, 25, e) + wob * .4, lerp(86, 94, e) - wob * 2, 1, true);
+  }
+}
+
+// ---------- Schmutz ----------
+const R2 = rng(42), DRECK = [];
+for (let i = 0; i < 150; i++) {
+  const links = i < 75, x0 = links ? 26 + R2() * 496 : 556 + R2() * 500, r = 3 + R2() * 6;
+  const n = 5 + Math.floor(R2() * 3), pts = [];
+  for (let k = 0; k < n; k++) { const w = k / n * Math.PI * 2; pts.push([Math.cos(w) * r * (.7 + R2() * .5), Math.sin(w) * r * (.7 + R2() * .5)]); }
+  DRECK.push({ links, x0, r, pts, col: ['#6d5b44', '#4b4037', '#7c6b55', '#5a4c3c'][Math.floor(R2() * 4)], ts: 16.9 + R2() * .9, yh: 260 + R2() * 260, bleibt: links && R2() < .72 });
+}
+const welle = t => lerp(-80, W + 120, eio(p(t, 18.6, 20.4)));
+for (const d of DRECK) { let lo = 18.6, hi = 20.4; for (let k = 0; k < 30; k++) { const m = (lo + hi) / 2; if (welle(m) < d.x0) lo = m; else hi = m; } d.tp = hi; }
+function dreck(t, alpha) {
+  for (const d of DRECK) {
+    if (t < d.ts) continue;
+    const ruhe = d.links ? OB_L + d.r * .15 : OB_R - d.r * .85;
+    const v = p(t, d.ts, d.ts + .55);
+    let px = d.x0, py = lerp(ruhe - d.yh, ruhe, v * v), a = 1;
+    if (!d.bleibt && t > d.tp) {
+      const s = t - d.tp; px += 620 * s + 300 * s * s;
+      py = Math.min(py, ob(px) - d.r) - Math.min(8, s * 30); a = 1 - p(s, 0, 1.1);
+    }
+    if (a <= 0) continue;
+    x.save(); x.globalAlpha = a * alpha; x.translate(px, py); x.fillStyle = d.col;
+    x.beginPath(); d.pts.forEach((q, k) => k ? x.lineTo(q[0], q[1]) : x.moveTo(q[0], q[1])); x.closePath(); x.fill();
+    x.restore();
+  }
+}
+function wasserfilm(t) {
+  if (t < 18.55 || t > 21.1) return;
+  const e = welle(t), a = 1 - p(t, 20.4, 21.0);
+  const oben = [];
+  for (let X = -100; X <= e; X += 10) oben.push([X, ob(X) - 30 - 8 * Math.sin(X * .03 + t * 9)]);
+  oben.push([e + 30, ob(e) - 13]);
+  x.save(); x.globalAlpha = a;
+  x.beginPath(); oben.forEach(([X, Y], i) => i ? x.lineTo(X, Y) : x.moveTo(X, Y));
+  x.lineTo(e + 42, ob(e));
+  if (e > MITTE) { x.lineTo(MITTE, OB_R); x.lineTo(MITTE, OB_L); }
+  x.lineTo(-100, OB_L); x.closePath();
+  x.fillStyle = 'rgba(150,205,255,.36)'; x.fill();
+  x.beginPath(); oben.forEach(([X, Y], i) => i ? x.lineTo(X, Y) : x.moveTo(X, Y));
+  x.strokeStyle = 'rgba(236,249,255,.95)'; x.lineWidth = 3; x.stroke();
+  x.restore();
+}
+function funkeln(t) {
+  [[640, 20.5], [770, 20.7], [890, 20.9], [1010, 21.05]].forEach(([fx, t0]) => {
+    const v = p(t, t0, t0 + .6); if (v <= 0 || v >= 1) return;
+    const s = Math.sin(v * Math.PI), r = 34 * s;
+    x.save(); x.globalAlpha = s; x.strokeStyle = '#fff'; x.lineWidth = 2.5; x.shadowColor = '#fff'; x.shadowBlur = 10;
+    x.beginPath(); x.moveTo(fx - r, OB_R - 3); x.lineTo(fx + r, OB_R - 3); x.moveTo(fx, OB_R - 3 - r); x.lineTo(fx, OB_R - 3 + r * .5); x.stroke();
+    x.restore();
+  });
+}
+
+// ---------- Schlusskarte ----------
+const LOGO = new Image(); LOGO.src = '../../brand/logo_weiss.png';
+function schluss(t) {
+  const a0 = p(t, 21.9, 22.5); if (a0 <= 0) return;
+  if (LOGO.complete && LOGO.naturalWidth) {
+    const w = 470, h = w * LOGO.naturalHeight / LOGO.naturalWidth;
+    x.save(); x.globalAlpha = a0; x.drawImage(LOGO, (W - w) / 2, 380 - h / 2 + (1 - eo(a0)) * 20, w, h); x.restore();
+  }
+  const zeile = (t0, fn) => { const a = p(t, t0, t0 + .5); if (a > 0) fn(a, (1 - eo(a)) * 26); };
+  zeile(22.3, (a, dy) => text('Keramikversiegelung', 720, { size: 76, w: 700, ls: -2, a, dy }));
+  zeile(22.6, (a, dy) => text('ab 700 €', 880, { size: 150, w: 700, col: GELB, ls: -4, a, dy }));
+  zeile(22.9, (a, dy) => text('mit Handwäsche, Kneten und Politur', 970, { size: 38, col: GRAU, a, dy }));
+  zeile(23.3, (a, dy) => {
+    const puls = 1 + .025 * Math.sin(Math.max(0, t - 23.8) * 4) * p(t, 23.8, 24.2);
+    x.save(); x.globalAlpha = a; x.translate(W / 2, 1110 + dy); x.scale(puls, puls);
+    x.beginPath(); x.roundRect(-390, -58, 780, 116, 58); x.fillStyle = GELB; x.fill();
+    x.font = '600 40px Poppins'; x.fillStyle = INK; x.textAlign = 'center'; x.textBaseline = 'middle';
+    x.fillText('3 Fotos vom Lack per WhatsApp', 0, 2); x.restore();
+  });
+  zeile(23.7, (a, dy) => text('Walterschen · Westerwald · carcura.info', 1250, { size: 32, col: GRAU, a, dy }));
+}
+
+// ---------- Ein Bild ----------
+function render(t) {
+  const { a: sa } = sonnePos(t);
+  hintergrund(t, Math.max(0, sa));
+  truebL = eio(p(t, 7.4, 10.8)); truebR = truebL * .22;
+  const sAlpha = 1 - p(t, 21.5, 22.2);
+
+  sonne(t);
+  schnitt(t, sAlpha);
+  strahlen(t);
+  wasser(t);
+  dreck(t, sAlpha);
+  wasserfilm(t);
+  funkeln(t);
+  reiter(t);
+  text('Animation, vereinfachte Darstellung', 330, { size: 24, col: GRAU, a: sicht(t, 4.4, 21.7, .6, .5) * .75, ls: 1 });
+
+  // Szene 0: Aufhänger
+  block(t, .2, 3.4, (a, dy) => text('Dein Handy hat eine Hülle.', 560, { size: 60, w: 300, col: GRAU, a, dy }));
+  block(t, .75, 3.4, (a, dy) => textBunt([['Und dein ', '#fff'], ['Lack?', GELB]], 690, { size: 118, w: 700, ls: -4, a, dy }));
+  block(t, 1.35, 3.4, (a, dy) => text('Was eine Keramikversiegelung wirklich macht', 785, { size: 36, col: GRAU, ls: .5, a, dy }));
+  // Szene 1: die Schicht
+  block(t, 3.7, 6.2, (a, dy) => text('Eine Schicht mehr.', 620, { size: 100, w: 700, ls: -3, a, dy }));
+  block(t, 4.15, 6.2, (a, dy) => { text('Hauchdünn und glatt.', 730, { size: 44, col: GRAU, a, dy }); text('Sie liegt wie eine Hülle auf dem Klarlack.', 790, { size: 44, col: GRAU, a, dy }); });
+  // Szene 2: UV
+  block(t, 6.6, 11.35, (a, dy) => { text('UV macht Klarlack', 560, { size: 88, w: 700, ls: -3, a, dy }); text('mit der Zeit stumpf.', 660, { size: 88, w: 700, ls: -3, a, dy }); });
+  block(t, 7.5, 11.35, (a, dy) => { text('Die Keramik bremst das.', 770, { size: 44, col: GRAU, a, dy }); text('Ganz aufhalten kann sie es nicht.', 830, { size: 44, col: GRAU, a, dy }); });
+  // Szene 3: Wasser
+  block(t, 11.75, 16.5, (a, dy) => text('Wasser perlt ab.', 600, { size: 100, w: 700, ls: -3, a, dy }));
+  block(t, 12.25, 16.5, (a, dy) => { text('Ohne Keramik bleibt es flach liegen.', 710, { size: 42, col: GRAU, a, dy }); text('Mit Keramik zieht es sich zu Perlen zusammen.', 768, { size: 42, col: GRAU, a, dy }); });
+  block(t, 13.4, 16.5, (a, dy) => text('Kontaktwinkel bis 165° laut Hersteller', 850, { size: 30, col: GELB, ls: .5, a: a * .9, dy }));
+  // Szene 4: Schmutz
+  block(t, 16.95, 21.5, (a, dy) => { text('Dreck haftet', 560, { size: 100, w: 700, ls: -3, a, dy }); text('schlechter.', 668, { size: 100, w: 700, ls: -3, col: GELB, a, dy }); });
+  block(t, 17.7, 21.5, (a, dy) => { text('Beim Waschen geht er leichter runter.', 775, { size: 42, col: GRAU, a, dy }); text('Waschen musst du trotzdem.', 833, { size: 42, col: GRAU, a, dy }); });
+  // Szene 5: Schluss
+  schluss(t);
+
+  const v = x.createRadialGradient(W / 2, H * .45, H * .35, W / 2, H * .45, H * .8);
+  v.addColorStop(0, 'rgba(0,0,0,0)'); v.addColorStop(1, 'rgba(0,0,0,.45)');
+  x.fillStyle = v; x.fillRect(0, 0, W, H);
+}
+window.render = render; window.DAUER = DAUER;
+
+Promise.all(['300', '400', '600', '700'].map(w => document.fonts.load(`${w} 40px Poppins`)))
+  .then(() => new Promise(r => LOGO.complete ? r() : (LOGO.onload = LOGO.onerror = r)))
+  .then(() => {
+    window.schriftOk = document.fonts.check('700 40px Poppins');
+    window.bereit = true;
+    const q = new URLSearchParams(location.search).get('t');
+    if (q !== null) { render(parseFloat(q)); return; }
+    if (navigator.webdriver) { render(0); return; }
+    const start = performance.now();
+    (function lauf() { render(((performance.now() - start) / 1000) % DAUER); requestAnimationFrame(lauf); })();
+  });
+</script>
+</body>
+</html>

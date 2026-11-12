@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<title>Keramik – Anzeige</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;800&display=block" rel="stylesheet">
+<style>html,body{margin:0;background:#09090A}canvas{display:block}</style>
+</head>
+<body>
+<canvas id="c" width="1080" height="1920"></canvas>
+<script>
+/* Meta-Anzeige „Keramikversiegelung“ (Leads): 24,5 s, 9:16, ohne Ton verständlich.
+   Problem (0–3,2) → Folge (3,2–8) → Lösung (8–14) → Angebot (14–21) → Abschluss (21–24,5).
+   Wichtige Texte liegen zwischen 14 % von oben (y 269) und 20 % von unten (y 1536).
+   Nur freigegebene Aussagen: Streusalz/Regen/Baumharz, stumpfer Lack, Wasserflecken, hauchdünn, glasklar, Wasser perlt ab,
+   von Hand in Walterschen, ab 700 € inkl. Handwäsche/Kneten/Politur/Pflegeset, Waschset bei Buchung bis 31.12.2026, Gutschein. */
+const W = 1080, H = 1920, DAUER = 26.8;
+const T = { folge: 3.7, loesung: 8.0, wasser: 9.6, hand: 12.3, angebot: 15.2, schluss: 23.1 };
+const GELB = '#E8F320', INK = '#09090A', GRAU = '#AEB2B9', HELL = '#D5D7DB', ROT = '#FF5A4F';
+const c = document.getElementById('c'), x = c.getContext('2d');
+const cl = (v, a = 0, b = 1) => Math.min(b, Math.max(a, v));
+const p = (t, a, b) => b <= a ? (t >= a ? 1 : 0) : cl((t - a) / (b - a));
+const eo = v => 1 - Math.pow(1 - v, 3);
+const eio = v => v < .5 ? 4 * v * v * v : 1 - Math.pow(-2 * v + 2, 3) / 2;
+const eback = v => { const k = 1.70158; return 1 + (k + 1) * Math.pow(v - 1, 3) + k * Math.pow(v - 1, 2); };
+const lerp = (a, b, v) => a + (b - a) * v;
+const sichtbar = (t, a, b, ein = .35, aus = .3) => Math.min(p(t, a, a + ein), 1 - p(t, b - aus, b));
+function rng(s) { return function () { s |= 0; s = s + 0x6D2B79F5 | 0; let r = Math.imul(s ^ s >>> 15, 1 | s); r = r + Math.imul(r ^ r >>> 7, 61 | r) ^ r; return ((r ^ r >>> 14) >>> 0) / 4294967296; }; }
+
+// ---------- Querschnitt ----------
+const MITTE = 540, O = 1180;
+const KER = O, KLAR = [O + 22, O + 162], BASIS = [O + 162, O + 262], GRUND = [O + 262, O + 322], BLECH = [O + 322, H];
+const OB_L = KLAR[0], OB_R = KER;
+let geteilt = false, polierX = -1e9, truebL = 0, truebR = 0;
+const ob = X => (geteilt && X >= MITTE) ? OB_R : OB_L;
+function textur(w, h, fn) { const o = document.createElement('canvas'); o.width = w; o.height = h; fn(o.getContext('2d'), w, h); return o; }
+const R0 = rng(7);
+const TX_BLECH = textur(W, BLECH[1] - BLECH[0], (g, w, h) => {
+  const gr = g.createLinearGradient(0, 0, 0, h); gr.addColorStop(0, '#41444c'); gr.addColorStop(.03, '#2c2e34'); gr.addColorStop(.5, '#1b1c20'); gr.addColorStop(1, '#0d0d0f');
+  g.fillStyle = gr; g.fillRect(0, 0, w, h);
+  for (let i = 0; i < 1400; i++) { const y = R0() * h, l = 80 + R0() * 420, x0 = R0() * w - 100; g.strokeStyle = `rgba(255,255,255,${.012 + R0() * .035})`; g.lineWidth = 1; g.beginPath(); g.moveTo(x0, y); g.lineTo(x0 + l, y); g.stroke(); }
+});
+const TX_GRUND = textur(W, GRUND[1] - GRUND[0], (g, w, h) => {
+  g.fillStyle = '#3a3c43'; g.fillRect(0, 0, w, h);
+  for (let i = 0; i < 2600; i++) { g.fillStyle = `rgba(${R0() < .5 ? '255,255,255' : '0,0,0'},${R0() * .07})`; g.fillRect(R0() * w, R0() * h, 2, 2); }
+  g.fillStyle = 'rgba(255,255,255,.08)'; g.fillRect(0, 0, w, 1);
+});
+const TX_BASIS = textur(W, BASIS[1] - BASIS[0], (g, w, h) => {
+  const gr = g.createLinearGradient(0, 0, 0, h); gr.addColorStop(0, '#24467e'); gr.addColorStop(1, '#0f2346'); g.fillStyle = gr; g.fillRect(0, 0, w, h);
+  for (let i = 0; i < 2200; i++) { g.fillStyle = `rgba(${170 + R0() * 85},${200 + R0() * 55},255,${.12 + R0() * .55})`; g.beginPath(); g.arc(R0() * w, R0() * h, .5 + R0() * 1.3, 0, Math.PI * 2); g.fill(); }
+});
+const TX_GLANZ = textur(W, KLAR[1] - KLAR[0], (g, w, h) => {
+  for (let i = -h; i < w; i += 90) { const gr = g.createLinearGradient(i, 0, i + 40, 0); gr.addColorStop(0, 'rgba(255,255,255,0)'); gr.addColorStop(.5, 'rgba(255,255,255,.07)'); gr.addColorStop(1, 'rgba(255,255,255,0)'); g.fillStyle = gr; g.beginPath(); g.moveTo(i, h); g.lineTo(i + h * .6, 0); g.lineTo(i + h * .6 + 40, 0); g.lineTo(i + 40, h); g.fill(); }
+});
+const TX_TRUEB = textur(W, KLAR[1] - KLAR[0], (g, w, h) => {
+  g.fillStyle = 'rgba(206,204,198,.38)'; g.fillRect(0, 0, w, h);
+  for (let i = 0; i < 2600; i++) { g.fillStyle = `rgba(255,248,230,${R0() * .35})`; g.fillRect(R0() * w, R0() * h, 1 + R0() * 2, 1); }
+  for (let i = 0; i < 120; i++) { const x0 = R0() * w, y0 = R0() * h; g.strokeStyle = `rgba(255,250,235,${.15 + R0() * .25})`; g.lineWidth = 1; g.beginPath(); g.moveTo(x0, y0); g.lineTo(x0 + 6 + R0() * 18, y0 + (R0() - .5) * 6); g.stroke(); }
+});
+function schnitt(alpha) {
+  if (alpha <= 0) return;
+  const label = (s, y, a, col = 'rgba(255,255,255,.72)') => { x.save(); x.globalAlpha = a; x.font = '600 24px Poppins'; x.letterSpacing = '4px'; x.fillStyle = col; x.textAlign = 'left'; x.textBaseline = 'middle'; x.fillText(s, 34, y); x.restore(); };
+  x.globalAlpha = alpha; x.drawImage(TX_BLECH, 0, BLECH[0]); label('BLECH', BLECH[0] + 46, alpha * .8);
+  x.globalAlpha = alpha; x.drawImage(TX_GRUND, 0, GRUND[0]); label('GRUNDIERUNG', (GRUND[0] + GRUND[1]) / 2, alpha * .8);
+  x.globalAlpha = alpha; x.drawImage(TX_BASIS, 0, BASIS[0]);
+  x.fillStyle = 'rgba(112,112,116,.5)';
+  x.globalAlpha = alpha * truebL; x.fillRect(0, BASIS[0], MITTE, BASIS[1] - BASIS[0]);
+  x.globalAlpha = alpha * truebR; x.fillRect(MITTE, BASIS[0], W - MITTE, BASIS[1] - BASIS[0]);
+  label('BASISLACK (FARBE)', (BASIS[0] + BASIS[1]) / 2, alpha * .85);
+  const kh = KLAR[1] - KLAR[0], ky = KLAR[0];
+  x.globalAlpha = alpha;
+  const kg = x.createLinearGradient(0, ky, 0, ky + kh); kg.addColorStop(0, 'rgba(210,226,244,.34)'); kg.addColorStop(1, 'rgba(150,176,208,.13)');
+  x.fillStyle = kg; x.fillRect(0, ky, W, kh); x.drawImage(TX_GLANZ, 0, ky);
+  x.globalAlpha = alpha * truebL; x.drawImage(TX_TRUEB, 0, 0, MITTE, kh, 0, ky, MITTE, kh);
+  x.globalAlpha = alpha * truebR; x.drawImage(TX_TRUEB, MITTE, 0, W - MITTE, kh, MITTE, ky, W - MITTE, kh);
+  x.globalAlpha = alpha; x.fillStyle = 'rgba(255,255,255,.6)'; x.fillRect(0, ky, W, 2);
+  label('KLARLACK', ky + kh / 2, alpha * .85, 'rgba(255,255,255,.8)');
+  x.globalAlpha = 1;
+}
+
+// ---------- Hintergrund ----------
+const R1 = rng(11);
+const STERNE = Array.from({ length: 170 }, () => ({ x: R1() * W, y: R1() * (O - 60), r: .6 + R1() * 1.6, a: .25 + R1() * .6, f: .6 + R1() * 2.2, ph: R1() * 6.3 }));
+const BOKEH = Array.from({ length: 10 }, () => ({ x: R1() * W, y: 620 + R1() * (O - 640), r: 40 + R1() * 90, a: .025 + R1() * .035, ph: R1() * 6.3 }));
+function hintergrund(t, kalt, hoehe = H) {
+  x.fillStyle = INK; x.fillRect(0, 0, W, hoehe);
+  const g = x.createRadialGradient(W / 2, hoehe * .3, 0, W / 2, hoehe * .3, 950);
+  g.addColorStop(0, kalt > 0 ? `rgba(255,90,79,${.05 * kalt})` : 'rgba(255,255,255,.035)'); g.addColorStop(1, 'rgba(255,255,255,0)');
+  x.fillStyle = g; x.fillRect(0, 0, W, hoehe);
+  for (const s of STERNE) { if (s.y > hoehe) continue; x.globalAlpha = s.a * (.55 + .45 * Math.sin(t * s.f + s.ph)); x.fillStyle = '#fff'; x.beginPath(); x.arc(s.x, s.y, s.r, 0, Math.PI * 2); x.fill(); }
+  for (const b of BOKEH) { if (b.y > hoehe) continue; x.globalAlpha = b.a; x.fillStyle = '#fff'; x.beginPath(); x.arc(b.x + Math.sin(t * .25 + b.ph) * 22, b.y + Math.cos(t * .2 + b.ph) * 10, b.r, 0, Math.PI * 2); x.fill(); }
+  x.globalAlpha = 1;
+}
+function vignette(hoehe = H) {
+  const v = x.createRadialGradient(W / 2, hoehe * .45, hoehe * .35, W / 2, hoehe * .45, hoehe * .8);
+  v.addColorStop(0, 'rgba(0,0,0,0)'); v.addColorStop(1, 'rgba(0,0,0,.45)'); x.fillStyle = v; x.fillRect(0, 0, W, hoehe);
+}
+
+// ---------- Text ----------
+function text(s, y, o = {}) {
+  const { size = 48, w = 400, col = '#fff', ls = 0, a = 1, dy = 0, sc = 1, glow = 0, cx = W / 2 } = o;
+  if (a <= 0) return;
+  x.save(); x.globalAlpha = a; x.translate(cx, y + dy); x.scale(sc, sc);
+  x.font = `${w} ${size}px Poppins`; x.letterSpacing = ls + 'px'; x.fillStyle = col; x.textAlign = 'center'; x.textBaseline = 'alphabetic';
+  if (glow) { x.shadowColor = col; x.shadowBlur = glow; }
+  x.fillText(s, ls / 2, 0); x.restore();
+}
+function textBunt(teile, y, o = {}) {
+  const { size = 48, w = 800, ls = 0, a = 1 } = o; if (a <= 0) return;
+  x.save(); x.globalAlpha = a; x.font = `${w} ${size}px Poppins`; x.letterSpacing = ls + 'px'; x.textAlign = 'left';
+  const breite = teile.reduce((s, [q]) => s + x.measureText(q).width, 0); let X = (W - breite) / 2;
+  for (const [q, f] of teile) { x.fillStyle = f; x.fillText(q, X, y); X += x.measureText(q).width; }
+  x.restore();
+}
+function rein(t, a0, b0, fn, ein = .35, aus = .3) { const a = sichtbar(t, a0, b0, ein, aus); if (a <= 0) return; fn(a, (1 - eo(p(t, a0, a0 + .5))) * 26, eback(p(t, a0, a0 + .45))); }
+
+// ---------- Szene 1: Problem ----------
+const R3 = rng(99);
+const SALZ = Array.from({ length: 80 }, () => ({ x: 20 + R3() * 1040, s: 3 + R3() * 5, t: R3(), r: R3() * 6 }));
+const FLECKEN = Array.from({ length: 16 }, () => ({ x: 40 + R3() * 1000, r: 14 + R3() * 22, t: R3() }));
+const HARZ = [150, 330, 470, 640, 800, 960].map(X => ({ x: X + (R3() - .5) * 40, r: 16 + R3() * 12, t: R3() }));
+const weg = X => X >= MITTE && X < polierX;                    // rechts wegpoliert
+function auto(t) {
+  const a = sichtbar(t, -1, T.folge + .3, .01, .4); if (a <= 0) return;
+  const zeichnen = lerp(.35, 1, eio(p(t, 0, .7)));
+  x.save(); x.globalAlpha = a; x.translate(W / 2, 880); x.scale(.6, .6); x.translate(-500, -170);
+  x.lineCap = 'round'; x.lineJoin = 'round'; x.lineWidth = 9; x.strokeStyle = 'rgba(255,255,255,.92)';
+  x.setLineDash([4000, 4000]); x.lineDashOffset = 4000 * (1 - zeichnen);
+  x.beginPath(); x.moveTo(70, 250); x.lineTo(45, 240); x.quadraticCurveTo(28, 200, 62, 176); x.quadraticCurveTo(120, 150, 250, 136);
+  x.bezierCurveTo(330, 82, 430, 62, 520, 68); x.bezierCurveTo(600, 74, 660, 108, 702, 134);
+  x.quadraticCurveTo(860, 148, 940, 174); x.quadraticCurveTo(988, 196, 975, 236); x.lineTo(958, 250); x.lineTo(864, 250);
+  x.arc(790, 250, 74, 0, Math.PI, true); x.lineTo(304, 250); x.arc(230, 250, 74, 0, Math.PI, true); x.lineTo(70, 250); x.stroke();
+  x.beginPath(); x.moveTo(300, 140); x.bezierCurveTo(360, 98, 440, 84, 520, 86); x.bezierCurveTo(580, 90, 625, 112, 650, 136); x.closePath(); x.lineWidth = 6; x.stroke();
+  x.setLineDash([]);
+  for (const cx of [230, 790]) { x.lineWidth = 9; x.beginPath(); x.arc(cx, 250, 58, 0, Math.PI * 2); x.stroke(); x.lineWidth = 5; x.beginPath(); x.arc(cx, 250, 30, 0, Math.PI * 2); x.stroke(); }
+  x.restore();
+}
+function gefahren(t, alpha) {
+  if (alpha <= 0) return;
+  // Streusalz (ab 0,15 s)
+  for (const k of SALZ) {
+    const v = p(t, .15 + k.t * .45, .45 + k.t * .45); if (v <= 0 || weg(k.x)) continue;
+    x.save(); x.globalAlpha = alpha; x.translate(k.x, lerp(780, OB_L - k.s, v * v)); x.rotate(k.r); x.fillStyle = 'rgba(245,245,240,.95)'; x.fillRect(-k.s / 2, -k.s / 2, k.s, k.s); x.restore();
+  }
+  // Regen (0,75–2,0 s) und Wasserflecken (Kalkränder)
+  if (t > .7 && t < 2.1) {
+    const R = rng(5); x.save(); x.globalAlpha = alpha * sichtbar(t, .7, 2.1, .15, .3); x.strokeStyle = 'rgba(190,220,255,.75)'; x.lineWidth = 3;
+    for (let i = 0; i < 44; i++) { const x0 = R() * W, v = 1500 + R() * 600, d0 = R() * .6; const y = 720 + ((t - .7 + d0) * v) % (OB_L - 720); x.beginPath(); x.moveTo(x0, y); x.lineTo(x0 - 6, y + 34); x.stroke(); }
+    x.restore();
+  }
+  for (const f of FLECKEN) {
+    const a = p(t, 1.1 + f.t * .7, 1.5 + f.t * .7); if (a <= 0 || weg(f.x)) continue;
+    x.save(); x.globalAlpha = alpha * a * .9; x.strokeStyle = 'rgba(235,235,225,.85)'; x.lineWidth = 3; x.beginPath(); x.ellipse(f.x, OB_L + 2, f.r, 5, 0, 0, Math.PI * 2); x.stroke(); x.restore();
+  }
+  // Baumharz (ab 1,35 s): bernsteinfarbene Tropfen, die kleben bleiben
+  for (const h of HARZ) {
+    const t0 = 1.35 + h.t * .45, v = p(t, t0, t0 + .32); if (v <= 0 || weg(h.x)) continue;
+    const liegt = eo(p(t, t0 + .32, t0 + .6));
+    x.save(); x.globalAlpha = alpha;
+    if (v < 1) { x.fillStyle = '#D2912F'; x.beginPath(); x.ellipse(h.x, lerp(780, OB_L - h.r, v * v), h.r * .55, h.r * .8, 0, 0, Math.PI * 2); x.fill(); }
+    else {
+      x.fillStyle = '#C07F22'; x.beginPath(); x.ellipse(h.x, OB_L, h.r * (1 + .5 * liegt), h.r * (.75 - .3 * liegt), 0, Math.PI, 0); x.fill();
+      x.fillStyle = 'rgba(255,225,150,.7)'; x.beginPath(); x.ellipse(h.x - h.r * .35, OB_L - h.r * .3, h.r * .28, h.r * .1, -.3, 0, Math.PI * 2); x.fill();
+    }
+    x.restore();
+  }
+}
+function haken(t) {
+  const a = 1 - p(t, T.folge - .25, T.folge + .05); if (a <= 0) return;
+  const sc = lerp(1.04, 1, eo(p(t, 0, .35)));
+  const f = (a0, b0) => (t >= a0 && t < b0) ? GELB : '#fff';
+  x.save(); x.translate(W / 2, 480); x.scale(sc, sc); x.translate(-W / 2, -480);
+  textBunt([['Streusalz,', f(.15, .75)], [' Regen,', f(.75, 1.35)]], 440, { size: 96, ls: -3, a });
+  textBunt([['Baumharz', f(1.35, 1.95)], [' –', '#fff']], 552, { size: 96, ls: -3, a });
+  x.restore();
+  text('jeden Tag auf deinem Lack.', 650, { size: 58, w: 700, col: GELB, a: a * p(t, .45, .8), dy: (1 - eo(p(t, .45, .95))) * 20 });
+}
+
+// ---------- Szene 2: Folge ----------
+function chips(t) {
+  [['Stumpfer Lack', 4.3, 560], ['Wasserflecken', 5.6, 690]].forEach(([n, t0, y]) => {
+    const a = sichtbar(t, t0, T.loesung - .35, .25, .3); if (a <= 0) return;
+    const sc = eback(p(t, t0, t0 + .4));
+    x.save(); x.globalAlpha = a; x.translate(W / 2, y); x.scale(sc, sc);
+    x.font = '600 56px Poppins'; const bw = x.measureText(n).width + 170;
+    x.beginPath(); x.roundRect(-bw / 2, -54, bw, 108, 54); x.fillStyle = 'rgba(255,90,79,.12)'; x.fill(); x.strokeStyle = 'rgba(255,90,79,.6)'; x.lineWidth = 2.5; x.stroke();
+    x.strokeStyle = ROT; x.lineWidth = 7; x.lineCap = 'round'; const kx = -bw / 2 + 60;
+    x.beginPath(); x.moveTo(kx - 15, -15); x.lineTo(kx + 15, 15); x.moveTo(kx + 15, -15); x.lineTo(kx - 15, 15); x.stroke();
+    x.fillStyle = '#fff'; x.textAlign = 'left'; x.textBaseline = 'middle'; x.fillText(n, kx + 42, 3); x.restore();
+  });
+}
+
+// ---------- Szene 3: Lösung ----------
+function polieren(t) {
+  polierX = t < 7.4 ? -1e9 : lerp(MITTE - 60, W + 140, eio(p(t, 7.4, 8.0)));
+  const v = p(t, 7.4, 8.0); if (v <= 0 || v >= 1) return;
+  const g = x.createLinearGradient(polierX - 160, 0, polierX + 40, 0);
+  g.addColorStop(0, 'rgba(255,255,255,0)'); g.addColorStop(.8, 'rgba(255,255,255,.55)'); g.addColorStop(1, 'rgba(255,255,255,0)');
+  x.save(); x.beginPath(); x.rect(MITTE, KLAR[0] - 40, W - MITTE, KLAR[1] - KLAR[0] + 40); x.clip(); x.fillStyle = g; x.fillRect(polierX - 160, KLAR[0] - 30, 200, KLAR[1] - KLAR[0] + 30); x.restore();
+}
+function keramik(t, alpha) {
+  const v = p(t, T.loesung - .1, T.loesung + .5); if (v <= 0) return;
+  const y = KER - 260 * (1 - eo(v)), blitz = v >= 1 ? 1 - p(t, T.loesung + .5, T.loesung + 1.3) : 0;
+  x.save(); x.globalAlpha = alpha * p(t, T.loesung - .1, T.loesung + .15); x.shadowColor = GELB; x.shadowBlur = 16 + blitz * 60;
+  x.fillStyle = GELB; x.fillRect(MITTE, y, W - MITTE, KLAR[0] - KER); x.shadowBlur = 0;
+  x.fillStyle = 'rgba(255,255,255,.55)'; x.fillRect(MITTE, y, W - MITTE, 2);
+  const sw = p(t, T.loesung + .55, T.loesung + 1.5);
+  if (sw > 0 && sw < 1) {
+    const sx = lerp(MITTE - 120, W + 120, eio(sw)); const g = x.createLinearGradient(sx - 120, 0, sx + 120, 0);
+    g.addColorStop(0, 'rgba(255,255,255,0)'); g.addColorStop(.5, 'rgba(255,255,255,.95)'); g.addColorStop(1, 'rgba(255,255,255,0)');
+    x.save(); x.beginPath(); x.rect(MITTE, y - 4, W - MITTE, KLAR[0] - KER + 8); x.clip(); x.fillStyle = g; x.fillRect(sx - 120, y - 4, 240, KLAR[0] - KER + 8); x.restore();
+  }
+  x.restore();
+}
+function ohneMit(t, alpha) {
+  const a = sichtbar(t, T.folge + .1, 99, .4, .1) * alpha; if (a <= 0) return;
+  const teil = eio(p(t, 7.6, 8.2));
+  x.save(); x.font = '600 30px Poppins'; x.letterSpacing = '6px'; x.textAlign = 'center';
+  x.globalAlpha = a; x.fillStyle = 'rgba(255,255,255,.7)'; x.fillText('OHNE', lerp(W / 2, MITTE / 2, teil) + 3, KER - 122);
+  x.globalAlpha = a * p(t, 8.2, 8.6); x.fillStyle = GELB; x.fillText('MIT KERAMIK', MITTE + (W - MITTE) / 2 + 3, KER - 122);
+  x.restore();
+  const la = alpha * p(t, 8.2, 8.6);
+  if (la > 0) { x.save(); x.globalAlpha = la * .45; x.strokeStyle = '#fff'; x.setLineDash([6, 10]); x.lineWidth = 2; x.beginPath(); x.moveTo(MITTE, KER - 150); x.lineTo(MITTE, GRUND[1]); x.stroke(); x.restore(); }
+}
+function kappe(cx, sy, a, h) { a = Math.max(a, .5); const R = (a * a + h * h) / (2 * h), cy = sy - h + R; x.beginPath(); x.arc(cx, cy, R, Math.atan2(sy - cy, a), Math.atan2(sy - cy, -a), true); x.closePath(); return R; }
+function tropfen(cx, sy, a, h, alpha, amBoden) {
+  if (alpha <= 0) return;
+  x.save(); x.globalAlpha = alpha;
+  if (amBoden) { x.fillStyle = 'rgba(0,0,0,.45)'; x.beginPath(); x.ellipse(cx, sy + 2, a * 1.05 + 3, 5, 0, 0, Math.PI * 2); x.fill(); }
+  const R = kappe(cx, sy, a, h);
+  const g = x.createLinearGradient(0, sy - h, 0, sy); g.addColorStop(0, 'rgba(218,238,255,.62)'); g.addColorStop(.55, 'rgba(130,186,242,.30)'); g.addColorStop(1, 'rgba(82,142,218,.45)');
+  x.fillStyle = g; x.fill(); x.lineWidth = 2.5; x.strokeStyle = 'rgba(232,246,255,.88)'; x.stroke();
+  const breit = h > a ? R : a;
+  x.save(); kappe(cx, sy, a, h); x.clip(); x.fillStyle = 'rgba(255,255,255,.92)'; x.beginPath();
+  x.ellipse(cx - breit * .36, sy - h * .7, Math.max(2, Math.min(breit * .3, R * .24)), Math.max(1.6, Math.min(h * .15, R * .15)), h > a ? -.5 : 0, 0, Math.PI * 2); x.fill(); x.restore();
+  if (amBoden && h > a) { const gg = x.createRadialGradient(cx + a * .2, sy - 1, 0, cx + a * .2, sy - 1, a * 1.7); gg.addColorStop(0, 'rgba(255,255,236,.85)'); gg.addColorStop(1, 'rgba(255,255,236,0)'); x.fillStyle = gg; x.beginPath(); x.ellipse(cx + a * .2, sy - 1, a * 1.7, 8, 0, 0, Math.PI * 2); x.fill(); }
+  x.restore();
+}
+function wasser(t, alpha) {
+  const t0 = T.wasser; if (t < t0) return;
+  const D = [{ x: 135, d: 0, l: 1 }, { x: 405, d: .3, l: 1 }, { x: 650, d: .12, l: 0 }, { x: 800, d: .42, l: 0 }, { x: 945, d: .65, l: 0 }];
+  for (const d of D) {
+    const sy = d.l ? OB_L : OB_R, ta = t0 + d.d, ti = ta + .38; if (t < ta) continue;
+    if (t < ti) { const v = p(t, ta, ti); tropfen(d.x, lerp(985, sy, v * v), .5, 86, alpha * p(t, ta, ta + .06), false); continue; }
+    const v = p(t, ti, ti + .45), e = 1 - Math.exp(-5 * v) * Math.cos(9 * v);
+    if (d.l) { tropfen(d.x, sy, lerp(.5, 118, e), lerp(86, 22, e), alpha, true); continue; }
+    const ss = Math.max(0, t - (t0 + 1.75)), xr = d.x + .5 * (1100 + (d.x - 650)) * ss * ss, wob = ss > 0 ? Math.sin(ss * 22) * 1.5 : 0;
+    if (xr < W + 120) tropfen(xr, sy, lerp(.5, 25, e) + wob * .4, lerp(86, 94, e) - wob * 2, alpha, true);
+  }
+}
+
+// ---------- Szene 4 + 5: Angebot, Abschluss ----------
+const LOGO = new Image(); LOGO.src = '../../brand/logo_weiss.png';
+function logo(cy, breite, a) { if (a <= 0 || !LOGO.complete || !LOGO.naturalWidth) return; const h = breite * LOGO.naturalHeight / LOGO.naturalWidth; x.save(); x.globalAlpha = a; x.drawImage(LOGO, (W - breite) / 2, cy - h / 2, breite, h); x.restore(); }
+function geschenkBild(cx, cy, g, col) {
+  x.save(); x.translate(cx, cy); x.strokeStyle = col; x.lineWidth = Math.max(2.5, g * .12); x.lineJoin = 'round'; x.lineCap = 'round';
+  x.strokeRect(-g * .5, -g * .12, g, g * .62); x.strokeRect(-g * .58, -g * .36, g * 1.16, g * .24);
+  x.beginPath(); x.moveTo(0, -g * .36); x.lineTo(0, g * .5); x.stroke();
+  x.beginPath(); x.moveTo(0, -g * .36); x.bezierCurveTo(-g * .5, -g * .85, -g * .6, -g * .3, 0, -g * .36); x.bezierCurveTo(g * .5, -g * .85, g * .6, -g * .3, 0, -g * .36); x.stroke();
+  x.restore();
+}
+function geschenkChip(cy, a, sc) {
+  if (a <= 0) return;
+  x.save(); x.globalAlpha = a; x.translate(W / 2, cy); x.scale(sc, sc);
+  x.font = '700 50px Poppins'; const tx = '+ Waschset geschenkt', bw = x.measureText(tx).width + 160;
+  x.beginPath(); x.roundRect(-bw / 2, -56, bw, 112, 56); x.fillStyle = 'rgba(232,243,32,.14)'; x.fill(); x.strokeStyle = GELB; x.lineWidth = 3; x.shadowColor = GELB; x.shadowBlur = 16; x.stroke(); x.shadowBlur = 0;
+  geschenkBild(-bw / 2 + 62, 6, 42, GELB);
+  x.fillStyle = GELB; x.textAlign = 'left'; x.textBaseline = 'middle'; x.fillText(tx, -bw / 2 + 108, 3); x.restore();
+}
+// Angebot als Block; y0 = oberer Bezug, damit dasselbe Layout auch für das 1:1-Bild taugt
+function angebotBlock(y0, e) {                      // e(k) → [alpha, skalierung] je Element
+  logo(y0, 400, e(0)[0]);
+  text('Keramikversiegelung', y0 + 270, { size: 78, w: 700, ls: -2, a: e(1)[0] });
+  text('ab 700 €', y0 + 445, { size: 172, w: 800, col: GELB, ls: -5, a: e(2)[0], sc: e(2)[1], glow: 18 });
+  text('inkl. Handwäsche, Kneten, Politur und Pflegeset', y0 + 535, { size: 38, col: HELL, a: e(3)[0] });
+  geschenkChip(y0 + 685, e(4)[0], e(4)[1]);
+  text('bei Buchung bis 31.12.2026', y0 + 795, { size: 38, w: 600, col: HELL, a: e(5)[0] });
+}
+function angebot(t) {
+  const a = sichtbar(t, T.angebot - .05, T.schluss + .1, .01, .3); if (a <= 0) return;
+  const zeiten = [0, .15, .4, .8, 1.3, 1.5];
+  angebotBlock(410, k => { const t0 = T.angebot + zeiten[k]; return [a * p(t, t0, t0 + .35), eback(p(t, t0, t0 + .45))]; });
+}
+const R4 = rng(2412);
+const FLOCKEN = Array.from({ length: 110 }, () => ({ x: R4() * W, y: R4() * H, r: 2 + R4() * 4.5, v: 90 + R4() * 160, f: .5 + R4() * 1.5, ph: R4() * 6.3, a: .3 + R4() * .55 }));
+function schnee(t) {
+  const a = p(t, T.schluss - .3, T.schluss + .7); if (a <= 0) return;
+  x.save(); x.fillStyle = '#fff';
+  for (const f of FLOCKEN) { x.globalAlpha = a * f.a; x.beginPath(); x.arc((f.x + Math.sin(t * f.f + f.ph) * 26 + W) % W, (f.y + f.v * t) % H, f.r, 0, Math.PI * 2); x.fill(); }
+  x.restore();
+}
+function abschluss(t) {
+  const s = T.schluss; if (t < s - .1) return;
+  logo(400, 280, p(t, s, s + .4) * .95);
+  rein(t, s + .05, 99, (a, dy, sc) => text('Auch als Gutschein', 680, { size: 100, w: 800, ls: -3, col: GELB, a, sc, glow: 14 }));
+  rein(t, s + .45, 99, (a, dy) => { text('Das Weihnachtsgeschenk', 810, { size: 64, w: 600, a, dy }); text('für Autoliebhaber.', 892, { size: 64, w: 600, a, dy }); });
+  rein(t, s + .95, 99, (a, dy, sc) => {
+    const puls = 1 + .025 * Math.sin((t - s) * 5.5);
+    x.save(); x.globalAlpha = a; x.translate(W / 2, 1090 + dy); x.scale(sc * puls, sc * puls);
+    x.beginPath(); x.roundRect(-390, -66, 780, 132, 66); x.fillStyle = GELB; x.shadowColor = GELB; x.shadowBlur = 24; x.fill(); x.shadowBlur = 0;
+    x.font = '700 50px Poppins'; x.fillStyle = INK; x.textAlign = 'center'; x.textBaseline = 'middle'; x.fillText('Jetzt Angebot anfordern', 0, 3); x.restore();
+  });
+}
+
+// ---------- Ein Bild ----------
+function render(t) {
+  const kalt = sichtbar(t, .3, 7.8, .6, .5);
+  hintergrund(t, kalt);
+  geteilt = t >= T.loesung - .1;
+  polieren(t);
+  truebL = lerp(.0, .85, eio(p(t, .4, 3.4)));
+  truebR = truebL * (1 - p(t, 7.4, 8.0));
+  const sAlpha = 1 - p(t, T.angebot - .4, T.angebot);
+  const zoom = 1 + .05 * eio(p(t, T.folge, 6.5)) * (1 - eio(p(t, 7.3, 8.1)));
+  x.save(); x.translate(W / 2, 1300); x.scale(zoom, zoom); x.translate(-W / 2, -1300);
+  schnitt(sAlpha); gefahren(t, sAlpha); polieren(t); keramik(t, sAlpha); wasser(t, sAlpha); ohneMit(t, sAlpha);
+  x.restore();
+  auto(t); haken(t); chips(t);
+  text('Animation, vereinfachte Darstellung', 322, { size: 26, col: GRAU, a: .8 * (1 - p(t, T.angebot - .4, T.angebot)), ls: 1 });
+  rein(t, T.loesung - .05, T.angebot - .1, (a, dy, sc) => { text('Keramik-', 520, { size: 118, w: 800, ls: -4, col: GELB, a, sc, glow: 22 }); text('versiegelung.', 642, { size: 118, w: 800, ls: -4, col: GELB, a, sc, glow: 22 }); });
+  rein(t, T.loesung + .7, T.angebot - .1, (a, dy) => text('Hauchdünn. Glasklar.', 742, { size: 56, w: 600, a, dy }));
+  rein(t, T.wasser + .7, T.angebot - .1, (a, dy) => text('Wasser perlt ab.', 838, { size: 50, w: 600, col: HELL, a, dy }));
+  rein(t, T.hand, T.angebot - .1, (a, dy) => { text('Komplett von Hand –', 940, { size: 48, w: 700, a, dy }); text('in unserer Halle in Walterschen.', 1000, { size: 44, col: HELL, a, dy }); });
+  angebot(t); abschluss(t); schnee(t);
+  vignette();
+  if (window.ZONEN) { x.fillStyle = 'rgba(255,0,0,.22)'; x.fillRect(0, 0, W, H * .14); x.fillRect(0, H * .8, W, H * .2); }
+}
+// 1:1-Standbild des Angebots (1080 × 1080) für den Feed
+function quadrat() {
+  c.width = 1080; c.height = 1080;
+  hintergrund(3, 0, 1080);
+  angebotBlock(150, () => [1, 1]);
+  vignette(1080);
+}
+window.render = render; window.quadrat = quadrat; window.DAUER = DAUER;
+
+Promise.all(['300', '400', '600', '700', '800'].map(w => document.fonts.load(`${w} 40px Poppins`)))
+  .then(() => new Promise(r => LOGO.complete ? r() : (LOGO.onload = LOGO.onerror = r)))
+  .then(() => {
+    window.schriftOk = document.fonts.check('700 40px Poppins'); window.bereit = true;
+    if (navigator.webdriver) return;
+    const q = new URLSearchParams(location.search).get('t');
+    if (q !== null) { render(parseFloat(q)); return; }
+    const t0 = performance.now(); (function lauf() { render(((performance.now() - t0) / 1000) % DAUER); requestAnimationFrame(lauf); })();
+  });
+</script>
+</body>
+</html>

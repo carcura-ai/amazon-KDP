@@ -1,0 +1,1131 @@
+{
+ "dauer": 86.725,
+ "tempo": 1.0,
+ "saetze": [
+  {
+   "id": "haken",
+   "start": 0.35,
+   "ende": 2.41,
+   "text": "Dein Handy steckt in einer Hülle.",
+   "woerter": [
+    [
+     "dein",
+     0.35,
+     1.23
+    ],
+    [
+     "handy",
+     1.23,
+     1.47
+    ],
+    [
+     "steckt",
+     1.47,
+     1.83
+    ],
+    [
+     "in",
+     1.83,
+     1.95
+    ],
+    [
+     "einer",
+     1.95,
+     2.13
+    ],
+    [
+     "hülle",
+     2.13,
+     2.41
+    ]
+   ]
+  },
+  {
+   "id": "auto",
+   "start": 2.66,
+   "ende": 7.4,
+   "text": "Aber dein Auto? Das steht jeden Tag draußen. Ohne extra Schutz.",
+   "woerter": [
+    [
+     "aber",
+     2.66,
+     3.42
+    ],
+    [
+     "dein",
+     3.42,
+     3.6
+    ],
+    [
+     "auto",
+     3.6,
+     3.94
+    ],
+    [
+     "das",
+     4.52,
+     4.74
+    ],
+    [
+     "steht",
+     4.74,
+     4.9
+    ],
+    [
+     "jeden",
+     4.9,
+     5.12
+    ],
+    [
+     "tag",
+     5.12,
+     5.38
+    ],
+    [
+     "draußen",
+     5.38,
+     5.8
+    ],
+    [
+     "ohne",
+     6.48,
+     6.7
+    ],
+    [
+     "extra",
+     6.7,
+     7.04
+    ],
+    [
+     "schutz",
+     7.04,
+     7.4
+    ]
+   ]
+  },
+  {
+   "id": "teaser",
+   "start": 8.12,
+   "ende": 11.46,
+   "text": "Bleib kurz dran: Am Ende wartet ein Geschenk auf dich.",
+   "woerter": [
+    [
+     "bleib",
+     8.12,
+     8.92
+    ],
+    [
+     "kurz",
+     8.92,
+     9.08
+    ],
+    [
+     "dran",
+     9.08,
+     9.36
+    ],
+    [
+     "am",
+     9.92,
+     10.08
+    ],
+    [
+     "ende",
+     10.08,
+     10.32
+    ],
+    [
+     "wartet",
+     10.32,
+     10.66
+    ],
+    [
+     "ein",
+     10.66,
+     10.82
+    ],
+    [
+     "geschenk",
+     10.82,
+     11.18
+    ],
+    [
+     "auf",
+     11.18,
+     11.32
+    ],
+    [
+     "dich",
+     11.32,
+     11.46
+    ]
+   ]
+  },
+  {
+   "id": "gefahr",
+   "start": 12.12,
+   "ende": 16.64,
+   "text": "Die Probleme sind: Sonne, Regen, Streusalz und Vogelkot.",
+   "woerter": [
+    [
+     "die",
+     12.12,
+     12.58
+    ],
+    [
+     "probleme",
+     12.58,
+     12.9
+    ],
+    [
+     "sind",
+     12.9,
+     13.22
+    ],
+    [
+     "sonne",
+     13.22,
+     14.26
+    ],
+    [
+     "regen",
+     14.52,
+     14.96
+    ],
+    [
+     "streusalz",
+     15.24,
+     15.94
+    ],
+    [
+     "und",
+     15.94,
+     16.08
+    ],
+    [
+     "vogelkot",
+     16.08,
+     16.64
+    ]
+   ]
+  },
+  {
+   "id": "merkst",
+   "start": 17.21,
+   "ende": 18.67,
+   "text": "Und irgendwann siehst du es …",
+   "woerter": [
+    [
+     "und",
+     17.21,
+     17.63
+    ],
+    [
+     "irgendwann",
+     17.63,
+     17.97
+    ],
+    [
+     "siehst",
+     17.97,
+     18.41
+    ],
+    [
+     "du",
+     18.41,
+     18.51
+    ],
+    [
+     "es",
+     18.51,
+     18.67
+    ]
+   ]
+  },
+  {
+   "id": "problem",
+   "start": 19.005,
+   "ende": 24.365,
+   "text": "Der Lack wird stumpf. Wasser hinterlässt Flecken. Und der Dreck geht kaum noch runter.",
+   "woerter": [
+    [
+     "der",
+     19.005,
+     19.545
+    ],
+    [
+     "lack",
+     19.545,
+     19.765
+    ],
+    [
+     "wird",
+     19.765,
+     19.885
+    ],
+    [
+     "stumpf",
+     19.885,
+     20.385
+    ],
+    [
+     "wasser",
+     21.005,
+     21.325
+    ],
+    [
+     "hinterlässt",
+     21.325,
+     21.845
+    ],
+    [
+     "flecken",
+     21.845,
+     22.165
+    ],
+    [
+     "und",
+     22.165,
+     22.925
+    ],
+    [
+     "der",
+     22.925,
+     23.045
+    ],
+    [
+     "dreck",
+     23.045,
+     23.325
+    ],
+    [
+     "geht",
+     23.325,
+     23.585
+    ],
+    [
+     "kaum",
+     23.585,
+     23.845
+    ],
+    [
+     "noch",
+     23.845,
+     24.065
+    ],
+    [
+     "runter",
+     24.065,
+     24.365
+    ]
+   ]
+  },
+  {
+   "id": "ursache",
+   "start": 24.675,
+   "ende": 30.215,
+   "text": "Das Problem sitzt ganz oben, im Klarlack. Er schützt deine Farbe. Aber wer schützt ihn?",
+   "woerter": [
+    [
+     "das",
+     24.675,
+     25.235
+    ],
+    [
+     "problem",
+     25.235,
+     25.535
+    ],
+    [
+     "sitzt",
+     25.535,
+     25.755
+    ],
+    [
+     "ganz",
+     25.755,
+     25.995
+    ],
+    [
+     "oben",
+     25.995,
+     26.355
+    ],
+    [
+     "im",
+     26.355,
+     26.735
+    ],
+    [
+     "klarlack",
+     26.735,
+     27.235
+    ],
+    [
+     "er",
+     27.715,
+     27.815
+    ],
+    [
+     "schützt",
+     27.815,
+     28.095
+    ],
+    [
+     "deine",
+     28.095,
+     28.255
+    ],
+    [
+     "farbe",
+     28.255,
+     28.615
+    ],
+    [
+     "aber",
+     29.375,
+     29.555
+    ],
+    [
+     "wer",
+     29.555,
+     29.695
+    ],
+    [
+     "schützt",
+     29.695,
+     30.075
+    ],
+    [
+     "ihn",
+     30.075,
+     30.215
+    ]
+   ]
+  },
+  {
+   "id": "wende",
+   "start": 30.925,
+   "ende": 32.345,
+   "text": "Genau da setzen wir an.",
+   "woerter": [
+    [
+     "genau",
+     30.925,
+     31.445
+    ],
+    [
+     "da",
+     31.445,
+     31.705
+    ],
+    [
+     "setzen",
+     31.705,
+     31.905
+    ],
+    [
+     "wir",
+     31.905,
+     32.145
+    ],
+    [
+     "an",
+     32.145,
+     32.345
+    ]
+   ]
+  },
+  {
+   "id": "loesung",
+   "start": 32.515,
+   "ende": 34.195,
+   "text": "Mit einer Keramikversiegelung.",
+   "woerter": [
+    [
+     "mit",
+     32.515,
+     33.035
+    ],
+    [
+     "einer",
+     33.035,
+     33.235
+    ],
+    [
+     "keramikversiegelung",
+     33.235,
+     34.195
+    ]
+   ]
+  },
+  {
+   "id": "schicht",
+   "start": 35.115,
+   "ende": 39.935,
+   "text": "Eine hauchdünne, glasklare Schutzschicht, die sich fest mit deinem Lack verbindet.",
+   "woerter": [
+    [
+     "eine",
+     35.115,
+     35.935
+    ],
+    [
+     "hauchdünne",
+     35.935,
+     36.555
+    ],
+    [
+     "glasklare",
+     36.895,
+     37.435
+    ],
+    [
+     "schutzschicht",
+     37.435,
+     38.015
+    ],
+    [
+     "die",
+     38.315,
+     38.435
+    ],
+    [
+     "sich",
+     38.435,
+     38.575
+    ],
+    [
+     "fest",
+     38.575,
+     38.775
+    ],
+    [
+     "mit",
+     38.775,
+     39.015
+    ],
+    [
+     "deinem",
+     39.015,
+     39.255
+    ],
+    [
+     "lack",
+     39.255,
+     39.475
+    ],
+    [
+     "verbindet",
+     39.475,
+     39.935
+    ]
+   ]
+  },
+  {
+   "id": "uv",
+   "start": 40.22,
+   "ende": 42.5,
+   "text": "Die Sonne bleicht den Lack langsamer aus.",
+   "woerter": [
+    [
+     "die",
+     40.22,
+     40.72
+    ],
+    [
+     "sonne",
+     40.72,
+     41.08
+    ],
+    [
+     "bleicht",
+     41.08,
+     41.44
+    ],
+    [
+     "den",
+     41.44,
+     41.56
+    ],
+    [
+     "lack",
+     41.56,
+     41.8
+    ],
+    [
+     "langsamer",
+     41.8,
+     42.28
+    ],
+    [
+     "aus",
+     42.28,
+     42.5
+    ]
+   ]
+  },
+  {
+   "id": "wasser",
+   "start": 43.57,
+   "ende": 45.17,
+   "text": "Wasser perlt einfach ab.",
+   "woerter": [
+    [
+     "wasser",
+     43.57,
+     44.23
+    ],
+    [
+     "perlt",
+     44.23,
+     44.61
+    ],
+    [
+     "einfach",
+     44.61,
+     44.91
+    ],
+    [
+     "ab",
+     44.91,
+     45.17
+    ]
+   ]
+  },
+  {
+   "id": "schmutz",
+   "start": 46.6,
+   "ende": 50.34,
+   "text": "Und Dreck findet weniger Halt. Die Wäsche geht viel leichter.",
+   "woerter": [
+    [
+     "und",
+     46.6,
+     47.24
+    ],
+    [
+     "dreck",
+     47.24,
+     47.52
+    ],
+    [
+     "findet",
+     47.52,
+     47.78
+    ],
+    [
+     "weniger",
+     47.78,
+     48.12
+    ],
+    [
+     "halt",
+     48.12,
+     48.5
+    ],
+    [
+     "die",
+     49.12,
+     49.26
+    ],
+    [
+     "wäsche",
+     49.26,
+     49.5
+    ],
+    [
+     "geht",
+     49.5,
+     49.72
+    ],
+    [
+     "viel",
+     49.72,
+     49.88
+    ],
+    [
+     "leichter",
+     49.88,
+     50.34
+    ]
+   ]
+  },
+  {
+   "id": "ablauf",
+   "start": 51.245,
+   "ende": 59.385,
+   "text": "Bei uns in Walterschen, direkt bei Altenkirchen, machen wir alles von Hand: waschen, kneten, polieren. Erst dann kommt die Keramik drauf.",
+   "woerter": [
+    [
+     "bei",
+     51.245,
+     51.745
+    ],
+    [
+     "uns",
+     51.745,
+     51.905
+    ],
+    [
+     "in",
+     51.905,
+     52.025
+    ],
+    [
+     "walterschen",
+     52.025,
+     52.525
+    ],
+    [
+     "direkt",
+     52.845,
+     53.005
+    ],
+    [
+     "bei",
+     53.005,
+     53.225
+    ],
+    [
+     "altenkirchen",
+     53.225,
+     53.905
+    ],
+    [
+     "machen",
+     54.425,
+     54.665
+    ],
+    [
+     "wir",
+     54.665,
+     54.805
+    ],
+    [
+     "alles",
+     54.805,
+     55.085
+    ],
+    [
+     "von",
+     55.085,
+     55.305
+    ],
+    [
+     "hand",
+     55.305,
+     55.605
+    ],
+    [
+     "waschen",
+     56.045,
+     56.505
+    ],
+    [
+     "kneten",
+     56.725,
+     56.985
+    ],
+    [
+     "polieren",
+     57.165,
+     57.525
+    ],
+    [
+     "erst",
+     57.925,
+     58.085
+    ],
+    [
+     "dann",
+     58.085,
+     58.345
+    ],
+    [
+     "kommt",
+     58.345,
+     58.565
+    ],
+    [
+     "die",
+     58.565,
+     58.685
+    ],
+    [
+     "keramik",
+     58.685,
+     59.145
+    ],
+    [
+     "drauf",
+     59.145,
+     59.385
+    ]
+   ]
+  },
+  {
+   "id": "set",
+   "start": 59.485,
+   "ende": 59.485,
+   "text": "Und ein Pflegeset für zu Hause gibt's dazu.",
+   "woerter": []
+  },
+  {
+   "id": "preis",
+   "start": 60.635,
+   "ende": 63.055,
+   "text": "Keramikversiegelung ab siebenhundert Euro.",
+   "woerter": [
+    [
+     "keramikversiegelung",
+     60.635,
+     61.835
+    ],
+    [
+     "ab",
+     61.835,
+     62.135
+    ],
+    [
+     "700",
+     62.135,
+     62.655
+    ],
+    [
+     "euro",
+     62.655,
+     63.055
+    ]
+   ]
+  },
+  {
+   "id": "geschenk",
+   "start": 63.325,
+   "ende": 67.265,
+   "text": "Und wenn du bis Jahresende buchst, schenken wir dir ein Waschset dazu.",
+   "woerter": [
+    [
+     "und",
+     63.325,
+     64.125
+    ],
+    [
+     "wenn",
+     64.125,
+     64.245
+    ],
+    [
+     "du",
+     64.245,
+     64.365
+    ],
+    [
+     "bis",
+     64.365,
+     64.485
+    ],
+    [
+     "jahresende",
+     64.485,
+     65.005
+    ],
+    [
+     "buchst",
+     65.005,
+     65.505
+    ],
+    [
+     "schenken",
+     65.885,
+     66.145
+    ],
+    [
+     "wir",
+     66.145,
+     66.305
+    ],
+    [
+     "dir",
+     66.305,
+     66.405
+    ],
+    [
+     "ein",
+     66.405,
+     66.585
+    ],
+    [
+     "waschset",
+     66.585,
+     67.045
+    ],
+    [
+     "dazu",
+     67.045,
+     67.265
+    ]
+   ]
+  },
+  {
+   "id": "cta",
+   "start": 68.055,
+   "ende": 75.055,
+   "text": "Schick uns einfach drei Fotos von deinem Lack per WhatsApp. Dann bekommst du unser Angebot und weißt vorher, was es kostet.",
+   "woerter": [
+    [
+     "schick",
+     68.055,
+     68.615
+    ],
+    [
+     "uns",
+     68.615,
+     68.775
+    ],
+    [
+     "einfach",
+     68.775,
+     69.135
+    ],
+    [
+     "drei",
+     69.135,
+     69.415
+    ],
+    [
+     "fotos",
+     69.415,
+     69.935
+    ],
+    [
+     "von",
+     69.935,
+     70.055
+    ],
+    [
+     "deinem",
+     70.055,
+     70.335
+    ],
+    [
+     "lack",
+     70.335,
+     70.535
+    ],
+    [
+     "per",
+     70.535,
+     70.735
+    ],
+    [
+     "whatsapp",
+     70.735,
+     71.115
+    ],
+    [
+     "dann",
+     72.175,
+     72.475
+    ],
+    [
+     "bekommst",
+     72.475,
+     72.855
+    ],
+    [
+     "du",
+     72.855,
+     72.935
+    ],
+    [
+     "unser",
+     72.935,
+     73.115
+    ],
+    [
+     "angebot",
+     73.115,
+     73.595
+    ],
+    [
+     "und",
+     73.595,
+     73.675
+    ],
+    [
+     "weißt",
+     73.675,
+     73.975
+    ],
+    [
+     "vorher",
+     73.975,
+     74.255
+    ],
+    [
+     "was",
+     74.415,
+     74.495
+    ],
+    [
+     "es",
+     74.495,
+     74.635
+    ],
+    [
+     "kostet",
+     74.635,
+     75.055
+    ]
+   ]
+  },
+  {
+   "id": "weihnacht",
+   "start": 75.225,
+   "ende": 80.165,
+   "text": "Du hast noch kein Weihnachtsgeschenk für einen Autoliebhaber? Dann buch jetzt, auch als Gutschein.",
+   "woerter": [
+    [
+     "du",
+     75.225,
+     75.665
+    ],
+    [
+     "hast",
+     75.665,
+     75.785
+    ],
+    [
+     "noch",
+     75.785,
+     75.965
+    ],
+    [
+     "kein",
+     75.965,
+     76.125
+    ],
+    [
+     "weihnachtsgeschenk",
+     76.125,
+     76.865
+    ],
+    [
+     "für",
+     76.865,
+     76.965
+    ],
+    [
+     "einen",
+     76.965,
+     77.085
+    ],
+    [
+     "autoliebhaber",
+     77.085,
+     77.905
+    ],
+    [
+     "dann",
+     78.365,
+     78.485
+    ],
+    [
+     "buch",
+     78.485,
+     78.785
+    ],
+    [
+     "jetzt",
+     78.785,
+     79.005
+    ],
+    [
+     "auch",
+     79.005,
+     79.425
+    ],
+    [
+     "als",
+     79.425,
+     79.625
+    ],
+    [
+     "gutschein",
+     79.625,
+     80.165
+    ]
+   ]
+  },
+  {
+   "id": "schluss",
+   "start": 82.635,
+   "ende": 84.715,
+   "text": "Gönn deinem Lack die Hülle, die er verdient.",
+   "woerter": [
+    [
+     "gönn",
+     82.635,
+     83.295
+    ],
+    [
+     "deinem",
+     83.295,
+     83.515
+    ],
+    [
+     "lack",
+     83.515,
+     83.715
+    ],
+    [
+     "die",
+     83.715,
+     83.855
+    ],
+    [
+     "hülle",
+     83.855,
+     84.095
+    ],
+    [
+     "die",
+     84.115,
+     84.255
+    ],
+    [
+     "er",
+     84.255,
+     84.355
+    ],
+    [
+     "verdient",
+     84.355,
+     84.715
+    ]
+   ]
+  }
+ ],
+ "gewaehlt": {
+  "haken": "haken_2.wav",
+  "auto": "auto_1.wav",
+  "teaser": "teaser_2.wav",
+  "gefahr": "gefahr_1.wav",
+  "merkst": "merkst_1.wav",
+  "problem": "problem_1.wav",
+  "ursache": "ursache_0.wav",
+  "wende": "wende_1.wav",
+  "loesung": "loesung_0.wav",
+  "schicht": "schicht_1.wav",
+  "uv": "uv_2.wav",
+  "wasser": "wasser_0.wav",
+  "schmutz": "schmutz_1.wav",
+  "ablauf": "ablauf_0.wav",
+  "preis": "preis_0.wav",
+  "geschenk": "geschenk_2.wav",
+  "cta": "cta_0.wav",
+  "weihnacht": "weihnacht_2.wav",
+  "schluss": "schluss_2.wav"
+ }
+}
