@@ -50,3 +50,20 @@ Aussagen geprüft (UWG): keine Versprechen ohne Beleg. „bremst“ statt „ver
 - Ton: `ton.py` (numpy/scipy) erzeugt Musik und Effekte auf dieselben Zeiten, senkt die Musik unter der Stimme ab und bringt alles auf -14 LUFS → `ausgabe/ton.wav`.
 - Video: `node render.js video /tmp/bilder ausgabe/keramik-story.mp4 ausgabe/ton.wav`
 - venvs liegen im Scratchpad (nicht im Repo): torch (CPU) von download.pytorch.org, `qwen-tts==0.1.1` von PyPI. `ton.py` läuft mit demselben venv (braucht scipy).
+
+## Meta-Anzeige (Kurzfassung, 12.11.2026)
+
+Ziel Leads, Facebook + Instagram. Dateien: `ausgabe/keramik-anzeige.mp4` (24,5 s, 1080 × 1920, H.264, 30 fps, 5,5 MB, -14,4 LUFS) und `ausgabe/keramik-angebot-1x1.jpg`/`.png` (1080 × 1080, Feed).
+Ohne Ton verständlich (alle Aussagen als Text), keine Sprache, Musik und Effekte selbst erzeugt (`anzeige_ton.py`). Wichtige Texte liegen zwischen 14 % von oben und 20 % von unten (geprüft mit `node anzeige_render.js standbilder <ordner> zonen …`).
+
+| Zeit | Inhalt |
+|---|---|
+| 0–3,2 s | „Streusalz, Regen, Baumharz – jeden Tag auf deinem Lack.“ Auto-Symbol; Salz, Regen und Harz fallen, der Lack wird stumpf und fleckig |
+| 3,2–8 s | ✕ Stumpfer Lack (3,5 s), ✕ Wasserflecken (4,7 s); Lackschichten „OHNE“ |
+| 8–14 s | „Keramikversiegelung. Hauchdünn. Glasklar.“ OHNE / MIT KERAMIK, Wasser perlt ab (ab 9,6 s), „Komplett von Hand – in unserer Halle in Walterschen.“ (ab 11,6 s) |
+| 14–21 s | Logo, „Keramikversiegelung ab 700 €“, „inkl. Handwäsche, Kneten, Politur und Pflegeset“, „+ Waschset geschenkt“, „bei Buchung bis 31.12.2026“. Ab 15,9 s vollständig, steht 5,1 s |
+| 21–24,5 s | „Auch als Gutschein. Das Weihnachtsgeschenk für Autoliebhaber.“, Knopf „Jetzt Angebot anfordern“, leichter Schnee |
+
+Gegenüber der langen Story gestrichen: Handy-Aufhänger, „Geschenk am Ende“, Sonne/UV, Vogelkot, „Dreck bleibt hängen“, Ursache im Klarlack, Kontaktwinkel 165°, Schmutz-Welle, die vier Arbeitsschritte, WhatsApp-Knopf, Weihnachtsmann, Sprecher.
+Neu rendern: `<venv>/bin/python anzeige_ton.py` → `node anzeige_render.js video /tmp/bilder ausgabe/keramik-anzeige.mp4 ausgabe/anzeige_ton.wav` → `node anzeige_render.js quadrat ausgabe/keramik-angebot-1x1.jpg`.
+**Laufzeit der Anzeige spätestens am 31.12.2026 beenden** (Aktion endet).
