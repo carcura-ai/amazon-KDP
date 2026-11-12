@@ -25,7 +25,7 @@ function rng(s) { return function () { s |= 0; s = s + 0x6D2B79F5 | 0; let r = M
 
 // ---------- Zeitplan ----------
 let Z = null, DAUER = 50;
-const IDS = ['haken', 'auto', 'gefahr', 'merkst', 'problem', 'ursache', 'wende', 'loesung', 'schicht', 'uv', 'wasser', 'schmutz', 'ablauf', 'set', 'preis', 'cta', 'schluss'];
+const IDS = ['haken', 'auto', 'teaser', 'gefahr', 'merkst', 'problem', 'ursache', 'wende', 'loesung', 'schicht', 'uv', 'wasser', 'schmutz', 'ablauf', 'set', 'preis', 'geschenk', 'cta', 'schluss'];
 function setzeZeitplan(z) {
   if (!z) {                                         // Vorschau ohne Stimme: 2,8 s je Satz
     z = { dauer: IDS.length * 2.8 + 2, saetze: IDS.map((id, i) => ({ id, start: .4 + i * 2.8, ende: .4 + i * 2.8 + 2.2, woerter: [] })) };
@@ -140,7 +140,7 @@ function rein(t, a0, b0, fn, ein = .45, aus = .35) {         // Element blendet 
 // ---------- Kapitel-Reiter ----------
 function reiter(t) {
   const a0 = S('uv').a - .2, b0 = S('ablauf').a; const a = sichtbar(t, a0, b0, .4, .4); if (a <= 0) return;
-  const namen = ['UV', 'WASSER', 'SCHMUTZ'], y = 330, h = 66, pad = 36, gap = 18;
+  const namen = ['UV', 'WASSER', 'SCHMUTZ'], y = 350, h = 66, pad = 36, gap = 18;
   x.save(); x.globalAlpha = a; x.font = '600 28px Poppins'; x.letterSpacing = '5px';
   const ws = namen.map(n => x.measureText(n).width + pad * 2); const ges = ws.reduce((s, v) => s + v, 0) + gap * 2;
   const xs = []; let X = (W - ges) / 2; ws.forEach(w => { xs.push(X); X += w + gap; });
@@ -425,6 +425,24 @@ function ablauf(t) {
   text('Carcura · Walterschen, direkt bei Altenkirchen', 1450, { size: 30, col: GRAU, a: a * p(t, s.a + .6, s.a + 1.1) });
 }
 
+// ---------- Geschenk: Hinweis oben, bleibt bis zur Auflösung im Angebot ----------
+function geschenkBild(cx, cy, g, col) {
+  x.save(); x.translate(cx, cy); x.strokeStyle = col; x.lineWidth = Math.max(2.5, g * .12); x.lineJoin = 'round'; x.lineCap = 'round';
+  x.strokeRect(-g * .5, -g * .12, g, g * .62); x.strokeRect(-g * .58, -g * .36, g * 1.16, g * .24);
+  x.beginPath(); x.moveTo(0, -g * .36); x.lineTo(0, g * .5); x.stroke();
+  x.beginPath(); x.moveTo(0, -g * .36); x.bezierCurveTo(-g * .5, -g * .85, -g * .6, -g * .3, 0, -g * .36); x.bezierCurveTo(g * .5, -g * .85, g * .6, -g * .3, 0, -g * .36); x.stroke();
+  x.restore();
+}
+function geschenkChip(t) {
+  const t0 = wortSuche('teaser', 'geschenk', 6, 9), a = sichtbar(t, t0, S('geschenk').a, .3, .3); if (a <= 0) return;
+  const sc = eback(p(t, t0, t0 + .45)) * (1 + .04 * Math.sin((t - t0) * 3) * (1 - p(t, t0 + 2, t0 + 3)));
+  x.save(); x.globalAlpha = a; x.translate(W / 2, 278); x.scale(sc, sc);
+  x.font = '600 26px Poppins'; x.letterSpacing = '1px'; const tx = 'Geschenk am Ende', bw = x.measureText(tx).width + 92;
+  x.beginPath(); x.roundRect(-bw / 2, -26, bw, 52, 26); x.fillStyle = 'rgba(232,243,32,.12)'; x.fill(); x.strokeStyle = 'rgba(232,243,32,.7)'; x.lineWidth = 2; x.stroke();
+  geschenkBild(-bw / 2 + 36, 3, 22, GELB);
+  x.fillStyle = GELB; x.textAlign = 'left'; x.textBaseline = 'middle'; x.fillText(tx, -bw / 2 + 62, 2); x.restore();
+}
+
 // ---------- Szene 6: Angebot, Kontakt, Schluss ----------
 const LOGO = new Image(); LOGO.src = '../../brand/logo_weiss.png';
 function angebot(t) {
@@ -437,18 +455,29 @@ function angebot(t) {
   const c0 = S('cta').a;
   rein(t, c0 - .1, S('schluss').a + .1, (aa, dy, sc) => {
     const puls = 1 + .02 * Math.sin((t - c0) * 5);
-    x.save(); x.globalAlpha = aa; x.translate(W / 2, 1120 + dy); x.scale(sc * puls, sc * puls);
+    x.save(); x.globalAlpha = aa; x.translate(W / 2, 1310 + dy); x.scale(sc * puls, sc * puls);
     x.beginPath(); x.roundRect(-400, -60, 800, 120, 60); x.fillStyle = GELB; x.fill();
     x.font = '700 42px Poppins'; x.fillStyle = INK; x.textAlign = 'center'; x.textBaseline = 'middle'; x.fillText('3 Fotos vom Lack per WhatsApp', 0, 3); x.restore();
   });
-  const tk = wortSuche('cta', 'vorher', 12, 17);
-  rein(t, tk - .1, S('schluss').a + .1, (aa, dy) => text('Du weißt vorher, was es kostet.', 1250, { size: 40, w: 600, a: aa, dy }));
+  const g0 = S('geschenk').a, tws = wortSuche('geschenk', 'waschset', 9, 12);
+  rein(t, tws - .25, S('schluss').a + .1, (aa, dy, sc) => {
+    x.save(); x.globalAlpha = aa; x.translate(W / 2, 1090); x.scale(sc, sc);
+    x.font = '700 46px Poppins'; const tx = '+ Waschset geschenkt', bw = x.measureText(tx).width + 150;
+    x.beginPath(); x.roundRect(-bw / 2, -50, bw, 100, 50); x.fillStyle = 'rgba(232,243,32,.14)'; x.fill(); x.strokeStyle = GELB; x.lineWidth = 3; x.shadowColor = GELB; x.shadowBlur = 16; x.stroke(); x.shadowBlur = 0;
+    geschenkBild(-bw / 2 + 58, 6, 38, GELB);
+    x.fillStyle = GELB; x.textAlign = 'left'; x.textBaseline = 'middle'; x.fillText(tx, -bw / 2 + 100, 3); x.restore();
+  });
+  rein(t, g0 - .1, S('schluss').a + .1, (aa, dy) => text('bei Buchung bis 31.12.2026', 1185, { size: 30, col: GRAU, a: aa, dy }));
+  const ta = wortSuche('cta', 'angebot', 13, 20), tk = wortSuche('cta', 'vorher', 16, 20);
+  rein(t, ta - .25, S('schluss').a + .1, (aa, dy) => text('Du bekommst unser Angebot', 1430, { size: 40, w: 600, a: aa, dy }));
+  rein(t, tk - .1, S('schluss').a + .1, (aa, dy) => text('und weißt vorher, was es kostet.', 1486, { size: 36, col: GRAU, a: aa, dy }));
 }
 function schluss(t) {
   const s = S('schluss'); if (t < s.a - .2) return;
   rein(t, s.a - .1, DAUER + 5, (aa, dy) => { text('Gönn deinem Lack', 640, { size: 92, w: 800, ls: -3, a: aa, dy }); text('die Hülle,', 745, { size: 92, w: 800, ls: -3, a: aa, dy }); });
   const tv = wortSuche('schluss', 'verdient', 6, 8);
   rein(t, tv - .2, DAUER + 5, (aa, dy, sc) => text('die er verdient.', 850, { size: 92, w: 800, ls: -3, col: GELB, a: aa, sc, glow: 14 }));
+  rein(t, s.e + .1, DAUER + 5, (aa, dy) => text('Bis 31.12. buchen: Waschset geschenkt', 945, { size: 34, w: 600, col: GELB, a: aa * .9, dy }));
   rein(t, s.e + .2, DAUER + 5, (aa, dy) => {
     text('Termin anfragen', 1040, { size: 44, w: 600, a: aa, dy });
     const b = Math.sin((t - s.e) * 5) * 10;
@@ -481,13 +510,15 @@ function render(t) {
   x.restore();
   if (lupe > 0 && lupe < 1) { x.save(); x.strokeStyle = 'rgba(255,255,255,.8)'; x.lineWidth = 4; x.beginPath(); x.arc(560, 1060, 40 + 1500 * eio(lupe), 0, Math.PI * 2); x.stroke(); x.restore(); }
 
-  handy(t); autoLinie(t); gefahren(t); problemChips(t); reiter(t); ablauf(t); angebot(t); schluss(t);
-  text('Animation, vereinfachte Darstellung', 395, { size: 24, col: GRAU, a: sichtbar(t, sz('gefahr'), sz('ablauf'), .5, .4) * .75, ls: 1 });
+  handy(t); autoLinie(t); geschenkChip(t); gefahren(t); problemChips(t); reiter(t); ablauf(t); angebot(t); schluss(t);
+  text('Animation, vereinfachte Darstellung', 412, { size: 24, col: GRAU, a: sichtbar(t, sz('gefahr'), sz('ablauf'), .5, .4) * .75, ls: 1 });
 
   // ---- Texte je Satz ----
   rein(t, sz('haken') - .1, sz('auto') + .1, (a, dy) => { text('Dein Handy steckt', 560, { size: 84, w: 800, ls: -3, a, dy }); text('in einer Hülle.', 660, { size: 84, w: 800, ls: -3, a, dy }); });
-  rein(t, sz('auto') - .1, sz('gefahr'), (a, dy, sc) => text('Aber dein Auto?', 600, { size: 104, w: 800, ls: -4, col: GELB, a, sc }));
-  rein(t, wortSuche('auto', 'steht', 4, 11), sz('gefahr'), (a, dy) => { text('Steht jeden Tag draußen.', 700, { size: 46, col: GRAU, a, dy }); text('Ohne extra Schutz.', 760, { size: 46, w: 600, a, dy }); });
+  rein(t, sz('auto') - .1, sz('teaser') - .05, (a, dy, sc) => text('Aber dein Auto?', 600, { size: 104, w: 800, ls: -4, col: GELB, a, sc }));
+  rein(t, sz('teaser') - .1, sz('gefahr') - .1, (a, dy) => { text('Bleib kurz dran.', 560, { size: 54, w: 600, col: GRAU, a, dy }); text('Am Ende wartet', 670, { size: 92, w: 800, ls: -3, a, dy }); });
+  rein(t, wortSuche('teaser', 'geschenk', 6, 9) - .15, sz('gefahr') - .1, (a, dy, sc) => text('ein Geschenk.', 775, { size: 92, w: 800, ls: -3, col: GELB, a, sc, glow: 14 }));
+  rein(t, wortSuche('auto', 'steht', 4, 11), sz('teaser') - .05, (a, dy) => { text('Steht jeden Tag draußen.', 700, { size: 46, col: GRAU, a, dy }); text('Ohne extra Schutz.', 760, { size: 46, w: 600, a, dy }); });
   if (S('merkst').e > S('merkst').a + .3) rein(t, sz('merkst') - .1, sz('problem') + .1, (a, dy) => text('Und irgendwann siehst du es …', 600, { size: 58, w: 600, a, dy }));
   rein(t, sz('gefahr') - .1, sz('merkst') + .1, (a, dy) => text('Die Probleme:', 520, { size: 46, w: 600, col: GRAU, a, dy }), .3, .25);
   rein(t, sz('problem') - .2, sz('ursache'), (a, dy) => text('Was passiert:', 530, { size: 40, col: GRAU, a, dy }));

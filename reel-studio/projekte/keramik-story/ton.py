@@ -260,6 +260,10 @@ lege(fx, glitzer(), wort("preis", "700", 2, 4), -7)
 lege(fx, whoosh(.5), SATZ["cta"]["start"] - .15, -9)
 lege(fx, pop(), SATZ["cta"]["start"], -5)
 lege(fx, glitzer(), wort("schluss", "verdient", 6, 8), -5)
+lege(fx, pop(), wort("teaser", "geschenk", 6, 9), -6)
+lege(fx, glitzer(), wort("teaser", "geschenk", 6, 9) + .05, -8)
+lege(fx, pop(), wort("geschenk", "waschset", 9, 12) - .2, -5)
+lege(fx, glitzer(), wort("geschenk", "waschset", 9, 12), -6)
 fx = hall(fx, 1.2, .18)
 
 

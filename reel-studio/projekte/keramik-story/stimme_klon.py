@@ -20,7 +20,7 @@ from stimme_story import ABSTAND, AUS, AUSLASSEN, PAUSE_NACH, SAETZE, TAKES, VOR
 
 KAND = AUS / "kandidaten"
 TAKE = TAKES / "take_33.wav"
-MAX_DAUER = 59.6          # ein Story-Segment
+MAX_DAUER = 90.0          # kein Zeitdruck mehr: Story wird in zwei Teilen gepostet (teilen.py), also kein Beschleunigen
 # Wörter, auf die es besonders ankommt: Hier zählt, wie sicher und wie ausführlich genau dieses Wort gesprochen ist
 SCHLUESSEL = {"auto": "schutz", "ablauf": "walterschen"}
 # Referenzstellen in Take 33 (Sekunden) mit ihrem Text; je Satz die passende Stimmung
