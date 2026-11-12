@@ -42,7 +42,7 @@ SAETZE = [
     ("schluss", "Gönn deinem Lack die Hülle, die er verdient."),
 ]
 # Extra-Luft nach einem Satz (Sekunden), damit die Animation wirken kann
-PAUSE_NACH = {"weihnacht": 2.8, "auto": 0.45, "teaser": 0.3, "ursache": 0.5, "geschenk": 0.3, "gefahr": 0.3, "loesung": 0.6, "uv": 0.8, "wasser": 1.2, "schmutz": 0.5, "ablauf": 0.9, "schluss": 1.7}
+PAUSE_NACH = {"weihnacht": 2.3, "auto": 0.45, "teaser": 0.3, "ursache": 0.5, "geschenk": 0.3, "gefahr": 0.3, "loesung": 0.6, "uv": 0.8, "wasser": 1.2, "schmutz": 0.5, "ablauf": 0.9, "schluss": 1.7}
 AUSLASSEN = {"set"}
 AB_WORT = {"loesung": "keramik"}   # Satz erst ab diesem Wort verwenden („Mit einer“ ist im Take genuschelt)   # nur eingeblendet, nicht gesprochen (Story bleibt unter 60 s)
 VORLAUF = 0.35

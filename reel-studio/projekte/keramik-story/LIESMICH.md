@@ -1,7 +1,20 @@
 # Story „Keramikversiegelung“ (11.11.2026)
 
-Verkaufs-Story für Instagram (9:16, 1080 × 1920, 30 fps, unter 60 s → ein Story-Segment).
-Video: `ausgabe/keramik-story.mp4` (59,2 s, 11 MB, -14,5 LUFS). **Stimme neu aufgelegt am 12.11.** (`stimme_klon.py`): gleiche Stimme wie Take 33, aber Satz für Satz gesprochen (Qwen3-TTS Base, 4 Fassungen je Satz, die deutlichste gewinnt). Nirgends wird mehr im Sprechfluss geschnitten. Tempo nur +4 %. Die Spracherkennung versteht die fertige Spur Wort für Wort richtig. „bleicht ihn“ wurde zu „bleicht den Lack“ (wurde als „ihnen“ verstanden). Der Pflegeset-Satz wird nur eingeblendet. Alles selbst erzeugt: Animation (Code), Stimme (KI), Musik und Effekte (Synthese).
+Verkaufs-Story für Instagram (9:16, 1080 × 1920, 30 fps). **Stand 12.11.2026:** 84,5 s, deshalb in zwei Teilen für die Story (ein Story-Abschnitt darf höchstens 60 s lang sein):
+
+| Datei | Länge | Einsatz |
+|---|---|---|
+| `ausgabe/keramik-story-teil1.mp4` | 30,5 s | Story Teil 1: Aufhänger, Geschenk-Hinweis, Probleme, endet mit „Aber wer schützt ihn?“ |
+| `ausgabe/keramik-story-teil2.mp4` | 54,0 s | Story Teil 2: Lösung, Nutzen, Ablauf, Angebot, Weihnachten, Schluss → hier den Link-Sticker setzen |
+| `ausgabe/keramik-story.mp4` | 84,5 s | am Stück, z. B. als Reel |
+
+Alles selbst erzeugt: Animation (Code), Stimmen (KI), Musik und Effekte (Synthese). Lautheit -14,2 LUFS.
+
+Sprechertext (Stand 12.11.): Dein Handy steckt in einer Hülle. · Aber dein Auto? Das steht jeden Tag draußen. Ohne extra Schutz. · [Pause] Bleib kurz dran: Am Ende wartet ein Geschenk auf dich. · Die Probleme sind: Sonne, Regen, Streusalz und Vogelkot. · Und irgendwann siehst du es … · Der Lack wird stumpf. Wasser hinterlässt Flecken. Und der Dreck geht kaum noch runter. · Das Problem sitzt ganz oben, im Klarlack. Er schützt deine Farbe. Aber wer schützt ihn? · Genau da setzen wir an. · Mit einer Keramikversiegelung. · Eine hauchdünne, glasklare Schutzschicht, die sich fest mit deinem Lack verbindet. · Die Sonne bleicht den Lack langsamer aus. · Wasser perlt einfach ab. · Und Dreck findet weniger Halt. Die Wäsche geht viel leichter. · Bei uns in Walterschen, direkt bei Altenkirchen, machen wir alles von Hand: waschen, kneten, polieren. Erst dann kommt die Keramik drauf. · Keramikversiegelung ab siebenhundert Euro. · Und wenn du bis Jahresende buchst, schenken wir dir ein Waschset dazu. · Schick uns einfach drei Fotos von deinem Lack per WhatsApp. Dann bekommst du unser Angebot und weißt vorher, was es kostet. · Du hast noch kein Weihnachtsgeschenk für einen Autoliebhaber? Dann buch jetzt, auch als Gutschein. · [Weihnachtsmann: „Ho, ho, ho!“] · Gönn deinem Lack die Hülle, die er verdient.
+
+**Aktion (von Alex am 12.11. bestätigt):** Waschset geschenkt, zusätzlich zum Pflegeset, bei Buchung bis 31.12.2026 (Termin darf später liegen). Die Bedingung steht im Bild („bei Buchung bis 31.12.2026“). **Nach dem 31.12. darf dieses Video nicht mehr laufen** (Highlight entfernen oder Fassung ohne Aktion rendern).
+
+Stimme: Satz für Satz mit `stimme_klon.py` (gleiche Stimme wie Take 33, 4–8 Fassungen je Satz, die deutlichste gewinnt; bei „Schutz“ und „Walterschen“ zählt genau dieses Wort). Kein Beschleunigen. „Ho, ho, ho“: `hohoho.py` (eigene entworfene Stimme). Teilen: `teilen.py`.
 
 ## Dramaturgie (Problem → Ursache → Lösung → Beweis → Angebot → Termin)
 

@@ -484,7 +484,7 @@ function schnee(t) {
 }
 const tHoho = () => S('weihnacht').e + .3;
 function weihnachtsmann(t) {
-  const s = S('weihnacht'), t0 = s.a - .2, tH = tHoho(), tW = tH + 2.6;      // läuft rein, bleibt stehen (Ho, ho, ho), läuft raus
+  const s = S('weihnacht'), t0 = s.a - .2, tH = tHoho(), tW = tH + 2.0;      // läuft rein, bleibt stehen (Ho, ho, ho), läuft raus
   if (t < t0 || t > tW + 2.2) return;
   const steht = t >= tH && t < tW;
   const cx = t < tH ? lerp(-230, 540, p(t, t0, tH)) : steht ? 540 : lerp(540, W + 260, p(t, tW, tW + 2.0));
@@ -524,9 +524,9 @@ function weihnachtsmann(t) {
   const ba = sichtbar(t, tH, tW + .1, .15, .25);
   if (ba > 0) {
     const sc = eback(p(t, tH, tH + .3));
-    x.save(); x.globalAlpha = ba; x.translate(cx + 60, 1590 - 520); x.scale(sc, sc);
+    x.save(); x.globalAlpha = ba; x.translate(cx + 270, 1590 - 400); x.scale(sc, sc);      // rechts neben dem Kopf, frei vom Text
     x.fillStyle = '#fff'; x.beginPath(); x.roundRect(-190, -62, 380, 124, 50); x.fill();
-    x.beginPath(); x.moveTo(-60, 56); x.lineTo(-84, 104); x.lineTo(-16, 58); x.closePath(); x.fill();
+    x.beginPath(); x.moveTo(-170, -6); x.lineTo(-232, 30); x.lineTo(-160, 36); x.closePath(); x.fill();
     x.font = '800 60px Poppins'; x.fillStyle = INK; x.textAlign = 'center'; x.textBaseline = 'middle'; x.fillText('Ho, ho, ho!', 0, 4); x.restore();
   }
 }
