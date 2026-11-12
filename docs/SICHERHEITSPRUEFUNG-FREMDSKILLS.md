@@ -432,3 +432,14 @@ Stattdessen eigener Skill `blender-3d` + Werkzeug `3d-studio/` (nur eigener Code
 - Offizielles Blender-Archiv von download.blender.org: Download von der Sicherheitsregel der Sitzung gesperrt → Ubuntu-Paket `blender` 4.0.2 genutzt.
 - PyPI `oidn` 0.2.1 (Python-Anbindung fuer KI-Entrauschen): **abgelehnt.** Enthaelt eine vorkompilierte 55-MB-Bibliothek
   eines Einzelentwicklers, Stand 2023. Ersatz: rauscharme Materialien, mehr Samples, ffmpeg-Entrauschen (`3d-studio/web/export.sh`).
+
+## Hallmark (github.com/nutlope/hallmark) – 12.11.2026
+
+- Stand: Commit 04977e1 (11.11.2026), geklont nach Scratchpad, **nicht installiert** (kein Eintrag in `.claude/skills/`).
+- skill-security-auditor: **FAIL** (viele CRITICAL). Größtenteils Fehlalarme (`.exec()` von RegExp, Playwright `$eval`), aber echte Punkte:
+  `child_process` in Tests, Netzwerkzugriffe in `scripts/imagegen.mjs` (api.together.xyz, braucht `TOGETHER_API_KEY`)
+  und `scripts/theme.mjs` (Download von upload.wikimedia.org), `install.mjs`/`install-hook.mjs` schreiben Hooks.
+- Gelesen: `SKILL.md` vollständig, `references/redesign.md`, `references/layout.md`, `references/genres/atmospheric.md`.
+  Keine Prompt-Injection gefunden.
+- **Entscheidung:** Nur die Designregeln (Markdown) als Vorlage genutzt. **Kein Skript ausgeführt**, keine Installation, kein Hook, kein API-Key.
+- Ergebnis: Startseiten-Entwurf als HTML-Vorschau (Artifact), live nichts geändert.
