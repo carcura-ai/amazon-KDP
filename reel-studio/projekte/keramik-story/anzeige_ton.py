@@ -72,7 +72,14 @@ for name, sig in (("anzeige_musik.wav", musik), ("anzeige_effekte.wav", fx)):
     sig = sig / (np.max(np.abs(sig)) + 1e-9) * .89
     subprocess.run(["ffmpeg", "-v", "error", "-y", "-f", "f32le", "-ar", str(SR), "-ac", "2", "-i", "-", str(AUS / name)],
                    input=sig.astype(np.float32).tobytes(), check=True)
-subprocess.run(["ffmpeg", "-v", "error", "-y", "-i", str(AUS / "anzeige_musik.wav"), "-i", str(AUS / "anzeige_effekte.wav"),
-                "-filter_complex", f"[0]volume=0.6[m];[1]volume=0.5[f];[m][f]amix=inputs=2:normalize=0,atrim=0:{DAUER},loudnorm=I=-14:TP=-1.5:LRA=9[a]",
-                "-map", "[a]", "-ar", "48000", str(AUS / "anzeige_ton.wav")], check=True)
+# Mit Sprecher (ausgabe/anzeige_stimme.wav aus anzeige_stimme.py): Musik wird unter der Stimme abgesenkt
+stimme = AUS / "anzeige_stimme.wav"
+if stimme.exists():
+    kette = ("[2]aformat=channel_layouts=stereo,asplit=2[v][sc];[0]volume=0.2[m];[m][sc]sidechaincompress=threshold=0.04:ratio=6:attack=15:release=350[md];"
+             f"[1]volume=0.4[f];[v][md][f]amix=inputs=3:normalize=0,atrim=0:{DAUER},loudnorm=I=-14:TP=-1.5:LRA=9[a]")
+    extra = ["-i", str(stimme)]
+else:
+    kette, extra = f"[0]volume=0.6[m];[1]volume=0.5[f];[m][f]amix=inputs=2:normalize=0,atrim=0:{DAUER},loudnorm=I=-14:TP=-1.5:LRA=9[a]", []
+subprocess.run(["ffmpeg", "-v", "error", "-y", "-i", str(AUS / "anzeige_musik.wav"), "-i", str(AUS / "anzeige_effekte.wav"), *extra,
+                "-filter_complex", kette, "-map", "[a]", "-ar", "48000", str(AUS / "anzeige_ton.wav")], check=True)
 print("anzeige_ton.wav fertig")
