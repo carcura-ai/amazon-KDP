@@ -1,7 +1,7 @@
 # Story „Keramikversiegelung“ (11.11.2026)
 
 Verkaufs-Story für Instagram (9:16, 1080 × 1920, 30 fps, unter 60 s → ein Story-Segment).
-Video: `ausgabe/keramik-story.mp4` (57,9 s, 11 MB, -14,6 LUFS). Stimme: Take 33 von 3. Er hatte die beste Wortgenauigkeit (98,6 %), die meiste Betonung (Tonhöhe ±4,5 Halbtöne) und die wenigsten Leerpausen. Gekürzt durch 15 % schnelleres Sprechtempo bei gleicher Tonhöhe und engere Satzlücken. Der Pflegeset-Satz wird nur eingeblendet. Alles selbst erzeugt: Animation (Code), Stimme (KI), Musik und Effekte (Synthese).
+Video: `ausgabe/keramik-story.mp4` (59,2 s, 11 MB, -14,5 LUFS). **Stimme neu aufgelegt am 12.11.** (`stimme_klon.py`): gleiche Stimme wie Take 33, aber Satz für Satz gesprochen (Qwen3-TTS Base, 4 Fassungen je Satz, die deutlichste gewinnt). Nirgends wird mehr im Sprechfluss geschnitten. Tempo nur +4 %. Die Spracherkennung versteht die fertige Spur Wort für Wort richtig. „bleicht ihn“ wurde zu „bleicht den Lack“ (wurde als „ihnen“ verstanden). Der Pflegeset-Satz wird nur eingeblendet. Alles selbst erzeugt: Animation (Code), Stimme (KI), Musik und Effekte (Synthese).
 
 ## Dramaturgie (Problem → Ursache → Lösung → Beweis → Angebot → Termin)
 
@@ -29,7 +29,8 @@ Aussagen geprüft (UWG): keine Versprechen ohne Beleg. „bremst“ statt „ver
 
 ## Technik
 
-- Stimme: `stimme_story.py` (Qwen3-TTS VoiceDesign 1.7B, Apache-2.0, entworfene Stimme). 3 Durchgänge mit verschiedenen Seeds → `bewerten` (Wortgenauigkeit per Spracherkennung, Lebendigkeit = Streuung der Tonhöhe) → bester Durchgang wird `schneiden` übergeben → `ausgabe/zeitplan.json` (Satz- und Wortzeiten) + `ausgabe/stimme_roh.wav`.
+- Stimme, aktueller Weg: `<qwen-venv>/bin/python stimme_klon.py erzeugen 4` → `python3 stimme_klon.py waehlen` (schreibt `zeitplan.json` und `stimme_roh.wav`) → `ton.py` → `render.js`. Die Referenzstellen für die Stimme stammen aus `ausgabe/takes/take_33.wav` (nicht im Repo; neu erzeugbar mit `stimme_story.py erzeugen 33`).
+- Stimme, erster Weg: `stimme_story.py` (Qwen3-TTS VoiceDesign 1.7B, Apache-2.0, entworfene Stimme). 3 Durchgänge mit verschiedenen Seeds → `bewerten` (Wortgenauigkeit per Spracherkennung, Lebendigkeit = Streuung der Tonhöhe) → bester Durchgang wird `schneiden` übergeben → `ausgabe/zeitplan.json` (Satz- und Wortzeiten) + `ausgabe/stimme_roh.wav`.
 - Bild: `story.html` liest die Zeiten. Jede Animation hängt am gesprochenen Wort (z. B. „Regen“ → Regen fällt genau dann).
 - Ton: `ton.py` (numpy/scipy) erzeugt Musik und Effekte auf dieselben Zeiten, senkt die Musik unter der Stimme ab und bringt alles auf -14 LUFS → `ausgabe/ton.wav`.
 - Video: `node render.js video /tmp/bilder ausgabe/keramik-story.mp4 ausgabe/ton.wav`

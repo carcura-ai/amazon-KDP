@@ -72,7 +72,7 @@ def waehlen():
         if sid in AUSLASSEN:
             continue
         soll = [norm(w) for w in satz.replace("siebenhundert", "700").replace("gibt's", "gibt es").split() if norm(w)]
-        beste = None
+        alle = []
         for f in sorted(KAND.glob(f"{sid}_*.wav")):
             erk, dauer = hoeren(f, modell)
             ist = [w for w, *_ in erk]
@@ -82,11 +82,13 @@ def waehlen():
             tempo = sum(len(w) for w in soll) / max(dauer, .1)     # Buchstaben pro Sekunde
             punkte = (round(genau, 3), tempo < 19, round(sicher, 2))
             bericht.append(f"{f.name:16s} genau {genau:.2f}  unsicherstes Wort {sicher:.2f}  {dauer:.2f} s  {' '.join(ist)}")
-            if beste is None or punkte > beste[0]:
-                beste = (punkte, f, erk)
-        if beste is None:
+            alle.append((punkte, f, erk, erk[-1][2] - erk[0][1] if erk else 99))
+        if not alle:
             sys.exit(f"keine Fassung für {sid}")
-        wahl[sid] = beste
+        top = max(a[0] for a in alle)
+        # unter den gleich deutlichen Fassungen (Abstand höchstens 0,06) die kompakteste nehmen: mehr Zeit für die Bilder
+        gut = [a for a in alle if a[0][:2] == top[:2] and a[0][2] >= top[2] - .06]
+        wahl[sid] = min(gut, key=lambda a: a[3])[:3]
     print("\n".join(bericht))
 
     # Stücke: nur Stille an den Rändern entfernen (mit Rand), nichts im Sprechfluss schneiden
@@ -105,7 +107,8 @@ def waehlen():
         t, plan, teile = VORLAUF, [], []
         for sid, satz in SAETZE:
             if sid in AUSLASSEN:
-                plan.append({"id": sid, "start": round(t - ABSTAND + .05, 3), "ende": round(t - ABSTAND + .05, 3), "text": satz, "woerter": []})
+                z = round(plan[-1]["ende"] + .1, 3) if plan else t      # nur eingeblendet: direkt nach dem vorigen Satz
+                plan.append({"id": sid, "start": z, "ende": z, "text": satz, "woerter": []})
                 continue
             ziel, dauer, ww = stuecke[sid]
             plan.append({"id": sid, "start": round(t + ww[0][1] / tempo, 3), "ende": round(t + ww[-1][2] / tempo, 3), "text": satz,
@@ -117,10 +120,11 @@ def waehlen():
     # Erst in Originaltempo; wenn es nicht in ein Story-Segment passt: Bildpausen kürzen, dann minimal schneller
     tempo, pausen = 1.0, 1.0
     dauer, plan, teile = plane(tempo, pausen)
-    while dauer > MAX_DAUER and pausen > .5:
-        pausen -= .1; dauer, plan, teile = plane(tempo, pausen)
-    while dauer > MAX_DAUER and tempo < 1.1:
-        tempo += .01; dauer, plan, teile = plane(tempo, pausen)
+    for p_min, t_max in ((.7, 1.0), (.7, 1.04), (.4, 1.04), (.4, 1.1)):   # erst Pausen, dann unhörbar wenig Tempo
+        while dauer > MAX_DAUER and pausen > p_min + .01:
+            pausen -= .1; dauer, plan, teile = plane(tempo, pausen)
+        while dauer > MAX_DAUER and tempo < t_max - .001:
+            tempo += .01; dauer, plan, teile = plane(tempo, pausen)
     eing, filt = [], []
     for i, (p, s) in enumerate(teile):
         eing += ["-i", str(p)]

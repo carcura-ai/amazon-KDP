@@ -29,7 +29,7 @@ SAETZE = [
     ("wende", "Genau da setzen wir an."),
     ("loesung", "Mit einer Keramikversiegelung."),
     ("schicht", "Eine hauchdünne, glasklare Schutzschicht, die sich fest mit deinem Lack verbindet."),
-    ("uv", "Die Sonne bleicht ihn langsamer aus."),
+    ("uv", "Die Sonne bleicht den Lack langsamer aus."),
     ("wasser", "Wasser perlt einfach ab."),
     ("schmutz", "Und Dreck findet weniger Halt. Die Wäsche geht viel leichter."),
     ("ablauf", "Bei uns in Walterschen machen wir alles von Hand: waschen, kneten, polieren. Erst dann kommt die Keramik drauf."),
@@ -39,7 +39,7 @@ SAETZE = [
     ("schluss", "Gönn deinem Lack die Hülle, die er verdient."),
 ]
 # Extra-Luft nach einem Satz (Sekunden), damit die Animation wirken kann
-PAUSE_NACH = {"gefahr": 0.3, "loesung": 0.6, "uv": 0.8, "wasser": 1.2, "schmutz": 0.5, "schluss": 1.7}
+PAUSE_NACH = {"gefahr": 0.3, "loesung": 0.6, "uv": 0.8, "wasser": 1.2, "schmutz": 0.5, "ablauf": 0.9, "schluss": 1.7}
 AUSLASSEN = {"set"}
 AB_WORT = {"loesung": "keramik"}   # Satz erst ab diesem Wort verwenden („Mit einer“ ist im Take genuschelt)   # nur eingeblendet, nicht gesprochen (Story bleibt unter 60 s)
 VORLAUF = 0.35
