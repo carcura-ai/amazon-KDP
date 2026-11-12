@@ -14,6 +14,8 @@ Sprechertext (Stand 12.11.): Dein Handy steckt in einer Hülle. · Aber dein Aut
 
 **Aktion (von Alex am 12.11. bestätigt):** Waschset geschenkt, zusätzlich zum Pflegeset, bei Buchung bis 31.12.2026 (Termin darf später liegen). Die Bedingung steht im Bild („bei Buchung bis 31.12.2026“). **Nach dem 31.12. darf dieses Video nicht mehr laufen** (Highlight entfernen oder Fassung ohne Aktion rendern).
 
+**Stimme seit 12.11. mittags: „der Kumpel“** (von Alex nach Hörprobe gewählt): neu entworfene Stimme, Mann um 30, locker, leicht rau (`stimmproben.py`, Referenz `ausgabe/stimmproben/ref_kumpel.wav`). Einsprechen: `STIMME=kumpel <qwen-venv>/bin/python stimme_klon.py erzeugen 3`, dann `STIMME=kumpel python3 stimme_klon.py waehlen`. Aktuelle Längen: ganz 86,7 s, Teil 1 30,7 s, Teil 2 56,1 s, -14,7 LUFS. Ohne `STIMME` gilt die frühere Stimme (Take 33).
+
 Stimme: Satz für Satz mit `stimme_klon.py` (gleiche Stimme wie Take 33, 4–8 Fassungen je Satz, die deutlichste gewinnt; bei „Schutz“ und „Walterschen“ zählt genau dieses Wort). Kein Beschleunigen. „Ho, ho, ho“: `hohoho.py` (eigene entworfene Stimme). Teilen: `teilen.py`.
 
 ## Dramaturgie (Problem → Ursache → Lösung → Beweis → Angebot → Termin)
