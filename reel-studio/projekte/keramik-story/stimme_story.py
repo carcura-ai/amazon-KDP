@@ -22,7 +22,7 @@ TAKES = AUS / "takes"
 SAETZE = [
     ("haken", "Dein Handy steckt in einer Hülle."),
     ("auto", "Aber dein Auto? Das steht jeden Tag draußen. Ohne extra Schutz."),
-    ("gefahr", "Sonne. Regen. Streusalz. Vogelkot."),
+    ("gefahr", "Die Probleme sind: Sonne, Regen, Streusalz und Vogelkot."),
     ("merkst", "Und irgendwann siehst du es …"),
     ("problem", "Der Lack wird stumpf. Wasser hinterlässt Flecken. Und der Dreck geht kaum noch runter."),
     ("ursache", "Das Problem sitzt ganz oben, im Klarlack. Er schützt deine Farbe. Aber wer schützt ihn?"),
@@ -32,15 +32,15 @@ SAETZE = [
     ("uv", "Die Sonne bleicht den Lack langsamer aus."),
     ("wasser", "Wasser perlt einfach ab."),
     ("schmutz", "Und Dreck findet weniger Halt. Die Wäsche geht viel leichter."),
-    ("ablauf", "Bei uns in Walterschen machen wir alles von Hand: waschen, kneten, polieren. Erst dann kommt die Keramik drauf."),
+    ("ablauf", "Bei uns in Walterschen, direkt bei Altenkirchen, machen wir alles von Hand: waschen, kneten, polieren. Erst dann kommt die Keramik drauf."),
     ("set", "Und ein Pflegeset für zu Hause gibt's dazu."),
     ("preis", "Keramikversiegelung ab siebenhundert Euro."),
     ("cta", "Schick uns einfach drei Fotos von deinem Lack per WhatsApp. Du weißt vorher, was es kostet."),
     ("schluss", "Gönn deinem Lack die Hülle, die er verdient."),
 ]
 # Extra-Luft nach einem Satz (Sekunden), damit die Animation wirken kann
-PAUSE_NACH = {"gefahr": 0.3, "loesung": 0.6, "uv": 0.8, "wasser": 1.2, "schmutz": 0.5, "ablauf": 0.9, "schluss": 1.7}
-AUSLASSEN = {"set"}
+PAUSE_NACH = {"auto": 0.7, "gefahr": 0.3, "loesung": 0.6, "uv": 0.8, "wasser": 1.2, "schmutz": 0.5, "ablauf": 0.9, "schluss": 1.7}
+AUSLASSEN = {"set", "merkst"}
 AB_WORT = {"loesung": "keramik"}   # Satz erst ab diesem Wort verwenden („Mit einer“ ist im Take genuschelt)   # nur eingeblendet, nicht gesprochen (Story bleibt unter 60 s)
 VORLAUF = 0.35
 ABSTAND = 0.15        # Lücke zwischen zwei Sätzen (die Pausen innerhalb eines Satzes bleiben natürlich)

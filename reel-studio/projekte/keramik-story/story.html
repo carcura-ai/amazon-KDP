@@ -422,7 +422,7 @@ function ablauf(t) {
     x.beginPath(); x.roundRect(-bw / 2, -46, bw, 92, 46); x.fillStyle = GELB; x.fill();
     x.fillStyle = INK; x.textAlign = 'center'; x.textBaseline = 'middle'; x.fillText(tx, 0, 3); x.restore();
   }
-  text('Carcura · Walterschen, Westerwald', 1450, { size: 30, col: GRAU, a: a * p(t, s.a + .6, s.a + 1.1) });
+  text('Carcura · Walterschen, direkt bei Altenkirchen', 1450, { size: 30, col: GRAU, a: a * p(t, s.a + .6, s.a + 1.1) });
 }
 
 // ---------- Szene 6: Angebot, Kontakt, Schluss ----------
@@ -488,7 +488,8 @@ function render(t) {
   rein(t, sz('haken') - .1, sz('auto') + .1, (a, dy) => { text('Dein Handy steckt', 560, { size: 84, w: 800, ls: -3, a, dy }); text('in einer Hülle.', 660, { size: 84, w: 800, ls: -3, a, dy }); });
   rein(t, sz('auto') - .1, sz('gefahr'), (a, dy, sc) => text('Aber dein Auto?', 600, { size: 104, w: 800, ls: -4, col: GELB, a, sc }));
   rein(t, wortSuche('auto', 'steht', 4, 11), sz('gefahr'), (a, dy) => { text('Steht jeden Tag draußen.', 700, { size: 46, col: GRAU, a, dy }); text('Ohne extra Schutz.', 760, { size: 46, w: 600, a, dy }); });
-  rein(t, sz('merkst') - .1, sz('problem') + .1, (a, dy) => text('Und irgendwann siehst du es …', 600, { size: 58, w: 600, a, dy }));
+  if (S('merkst').e > S('merkst').a + .3) rein(t, sz('merkst') - .1, sz('problem') + .1, (a, dy) => text('Und irgendwann siehst du es …', 600, { size: 58, w: 600, a, dy }));
+  rein(t, sz('gefahr') - .1, sz('merkst') + .1, (a, dy) => text('Die Probleme:', 520, { size: 46, w: 600, col: GRAU, a, dy }), .3, .25);
   rein(t, sz('problem') - .2, sz('ursache'), (a, dy) => text('Was passiert:', 530, { size: 40, col: GRAU, a, dy }));
   rein(t, sz('ursache') - .1, sz('wende'), (a, dy) => { text('Das Problem sitzt', 560, { size: 80, w: 800, ls: -3, a, dy }); text('im Klarlack.', 660, { size: 80, w: 800, ls: -3, col: GELB, a, dy }); });
   rein(t, wortSuche('ursache', 'schützt', 8, 15), sz('wende'), (a, dy) => text('Er schützt deine Farbe.', 770, { size: 46, col: GRAU, a, dy }));

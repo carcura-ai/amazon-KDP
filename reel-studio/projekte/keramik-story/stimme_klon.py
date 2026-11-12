@@ -21,6 +21,8 @@ from stimme_story import ABSTAND, AUS, AUSLASSEN, PAUSE_NACH, SAETZE, TAKES, VOR
 KAND = AUS / "kandidaten"
 TAKE = TAKES / "take_33.wav"
 MAX_DAUER = 59.6          # ein Story-Segment
+# Wörter, auf die es besonders ankommt: Hier zählt, wie sicher und wie ausführlich genau dieses Wort gesprochen ist
+SCHLUESSEL = {"auto": "schutz", "ablauf": "walterschen"}
 # Referenzstellen in Take 33 (Sekunden) mit ihrem Text; je Satz die passende Stimmung
 REFS = {
     "einstieg": (0.0, 7.25, "Dein Handy steckt in einer Hülle. Aber dein Auto? Das steht jeden Tag draußen. Ohne extra Schutz."),
@@ -31,7 +33,7 @@ REF_FUER = {"haken": "einstieg", "auto": "einstieg", "gefahr": "problem", "merks
             "ursache": "problem"}          # alle anderen: "loesung"
 
 
-def erzeugen(fassungen):
+def erzeugen(fassungen, nur=None, ab=0):
     import soundfile as sf
     import torch
     from qwen_tts import Qwen3TTSModel
@@ -41,10 +43,10 @@ def erzeugen(fassungen):
     m = Qwen3TTSModel.from_pretrained("Qwen/Qwen3-TTS-12Hz-1.7B-Base", device_map="cpu", dtype=torch.float32)
     prompts = {k: m.create_voice_clone_prompt(ref_audio=(audio[int(a * sr):int(b * sr)], sr), ref_text=t)
                for k, (a, b, t) in REFS.items()}
-    for n in range(fassungen):                       # Fassung für Fassung, damit früh etwas Brauchbares da ist
+    for n in range(ab, ab + fassungen):              # Fassung für Fassung, damit früh etwas Brauchbares da ist
         for sid, satz in SAETZE:
             ziel = KAND / f"{sid}_{n}.wav"
-            if sid in AUSLASSEN or ziel.exists():
+            if sid in AUSLASSEN or ziel.exists() or (nur and sid not in nur):
                 continue
             torch.manual_seed(1000 * n + abs(hash(sid)) % 997)
             wavs, sr2 = m.generate_voice_clone(text=satz, language="German",
@@ -60,7 +62,18 @@ def hoeren(pfad, modell):
                          capture_output=True, check=True).stdout
     audio = np.frombuffer(raw, np.int16).astype(np.float32) / 32768
     segs, _ = modell.transcribe(audio, language="de", word_timestamps=True, beam_size=5)
-    return [(norm(w.word), w.start, w.end, w.probability) for s in segs for w in s.words if norm(w.word)], len(audio) / 16000
+    woerter = [(norm(w.word), w.start, w.end, w.probability) for s in segs for w in s.words if norm(w.word)]
+    # echtes Sprechende: vom letzten Wort bis zur Stille laufen (Whisper setzt Wortenden oft zu früh, „Schutz“ → „Schu“)
+    fen = 320
+    pegel = 20 * np.log10(np.sqrt(np.convolve(audio ** 2, np.ones(fen) / fen, "same")) + 1e-9)
+    still = pegel < pegel.max() - 40
+    ende = len(audio) / 16000
+    if woerter:
+        i = int(woerter[-1][2] * 16000)
+        while i < len(audio) - 1 and not still[i]:
+            i += 80
+        ende = i / 16000
+    return woerter, len(audio) / 16000, ende
 
 
 def waehlen():
@@ -74,27 +87,32 @@ def waehlen():
         soll = [norm(w) for w in satz.replace("siebenhundert", "700").replace("gibt's", "gibt es").split() if norm(w)]
         alle = []
         for f in sorted(KAND.glob(f"{sid}_*.wav")):
-            erk, dauer = hoeren(f, modell)
+            erk, dauer, sprechende = hoeren(f, modell)
             ist = [w for w, *_ in erk]
             treffer = sum(b.size for b in difflib.SequenceMatcher(a=soll, b=ist, autojunk=False).get_matching_blocks())
             genau = treffer / max(len(soll), len(ist), 1)          # fehlende UND erfundene Wörter zählen
             sicher = min((p for *_, p in erk), default=0.0)        # unsicherstes Wort = undeutlichste Stelle
             tempo = sum(len(w) for w in soll) / max(dauer, .1)     # Buchstaben pro Sekunde
+            lang = erk[-1][2] - erk[0][1] if erk else 99
+            if sid in SCHLUESSEL:
+                k = [(p, e - a) for w, a, e, p in erk if w.endswith(SCHLUESSEL[sid]) or w.startswith(SCHLUESSEL[sid])]
+                sicher = min(sicher + 1, 1) * (k[0][0] if k else 0)      # Sicherheit des Schlüsselworts
+                lang = -(k[0][1] if k else 0)                            # und: je länger es gesprochen wird, desto besser
             punkte = (round(genau, 3), tempo < 19, round(sicher, 2))
             bericht.append(f"{f.name:16s} genau {genau:.2f}  unsicherstes Wort {sicher:.2f}  {dauer:.2f} s  {' '.join(ist)}")
-            alle.append((punkte, f, erk, erk[-1][2] - erk[0][1] if erk else 99))
+            alle.append((punkte, f, erk, lang, sprechende))
         if not alle:
             sys.exit(f"keine Fassung für {sid}")
         top = max(a[0] for a in alle)
         # unter den gleich deutlichen Fassungen (Abstand höchstens 0,06) die kompakteste nehmen: mehr Zeit für die Bilder
         gut = [a for a in alle if a[0][:2] == top[:2] and a[0][2] >= top[2] - .06]
-        wahl[sid] = min(gut, key=lambda a: a[3])[:3]
+        g = min(gut, key=lambda a: a[3]); wahl[sid] = (g[0], g[1], g[2], g[4])
     print("\n".join(bericht))
 
     # Stücke: nur Stille an den Rändern entfernen (mit Rand), nichts im Sprechfluss schneiden
     stuecke = {}
-    for sid, (punkte, f, erk) in wahl.items():
-        a, b = max(0.0, erk[0][1] - .12), erk[-1][2] + .18
+    for sid, (punkte, f, erk, sprechende) in wahl.items():
+        a, b = max(0.0, erk[0][1] - .12), sprechende + .12
         ziel = AUS / "saetze" / f"{sid}.wav"
         subprocess.run(["ffmpeg", "-v", "error", "-y", "-i", str(f), "-af",
                         f"atrim=start={a:.3f}:end={b:.3f},asetpts=PTS-STARTPTS,afade=t=in:d=0.02,areverse,afade=t=in:d=0.05,areverse",
@@ -140,12 +158,15 @@ def waehlen():
                "gewaehlt": {sid: v[1].name for sid, v in wahl.items()}},
               open(AUS / "zeitplan.json", "w", encoding="utf-8"), ensure_ascii=False, indent=1)
     print(f"\nDauer {dauer:.1f} s, Tempo {tempo:.2f}, Bildpausen {pausen:.1f}")
-    for sid, (punkte, f, _) in wahl.items():
+    for sid, (punkte, f, *_) in wahl.items():
         print(f"{sid:8s} {f.name:14s} {punkte}")
 
 
 if __name__ == "__main__":
     if sys.argv[1] == "erzeugen":
-        erzeugen(int(sys.argv[2]) if len(sys.argv) > 2 else 4)
+        # erzeugen <anzahl> [ab=<n>] [id …]  → nur bestimmte Sätze, Nummerierung ab n
+        rest = sys.argv[3:]
+        ab = int(rest.pop(0)[3:]) if rest and rest[0].startswith("ab=") else 0
+        erzeugen(int(sys.argv[2]) if len(sys.argv) > 2 else 4, set(rest) or None, ab)
     else:
         waehlen()
