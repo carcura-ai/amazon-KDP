@@ -18,7 +18,10 @@ HIER = Path(__file__).resolve().parent
 sys.path.insert(0, str(HIER))
 from stimme_story import ABSTAND, AUS, AUSLASSEN, PAUSE_NACH, SAETZE, TAKES, VORLAUF, norm  # noqa: E402
 
-KAND = AUS / "kandidaten"
+import os
+# STIMME=<name>: andere Stimme. Referenz ist dann ausgabe/stimmproben/ref_<name>.wav mit Text in ref_<name>.txt
+STIMME = os.environ.get("STIMME", "")
+KAND = AUS / ("kandidaten_" + STIMME if STIMME else "kandidaten")
 TAKE = TAKES / "take_33.wav"
 MAX_DAUER = 90.0          # kein Zeitdruck mehr: Story wird in zwei Teilen gepostet (teilen.py), also kein Beschleunigen
 # Wörter, auf die es besonders ankommt: Hier zählt, wie sicher und wie ausführlich genau dieses Wort gesprochen ist
@@ -39,10 +42,15 @@ def erzeugen(fassungen, nur=None, ab=0):
     from qwen_tts import Qwen3TTSModel
     torch.set_num_threads(4)
     KAND.mkdir(parents=True, exist_ok=True)
-    audio, sr = sf.read(str(TAKE))
     m = Qwen3TTSModel.from_pretrained("Qwen/Qwen3-TTS-12Hz-1.7B-Base", device_map="cpu", dtype=torch.float32)
-    prompts = {k: m.create_voice_clone_prompt(ref_audio=(audio[int(a * sr):int(b * sr)], sr), ref_text=t)
-               for k, (a, b, t) in REFS.items()}
+    if STIMME:
+        ref = AUS / "stimmproben" / f"ref_{STIMME}.wav"
+        eins = m.create_voice_clone_prompt(ref_audio=str(ref), ref_text=ref.with_suffix(".txt").read_text(encoding="utf-8").strip())
+        prompts = {k: eins for k in REFS}
+    else:
+        audio, sr = sf.read(str(TAKE))
+        prompts = {k: m.create_voice_clone_prompt(ref_audio=(audio[int(a * sr):int(b * sr)], sr), ref_text=t)
+                   for k, (a, b, t) in REFS.items()}
     for n in range(ab, ab + fassungen):              # Fassung für Fassung, damit früh etwas Brauchbares da ist
         for sid, satz in SAETZE:
             ziel = KAND / f"{sid}_{n}.wav"

@@ -24,7 +24,10 @@ STIMMEN = {
 torch.set_num_threads(4)
 m = Qwen3TTSModel.from_pretrained("Qwen/Qwen3-TTS-12Hz-1.7B-VoiceDesign", device_map="cpu", dtype=torch.float32)
 ZIEL.mkdir(parents=True, exist_ok=True)
+import sys
 for name, beschreibung in STIMMEN.items():
+    if len(sys.argv) > 1 and name not in sys.argv[1:]:
+        continue
     for seed in (5, 6):
         torch.manual_seed(seed)
         wavs, sr = m.generate_voice_design(text=TEXT, instruct=beschreibung, language="German")
