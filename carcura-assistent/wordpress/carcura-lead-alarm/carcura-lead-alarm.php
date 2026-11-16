@@ -2,12 +2,13 @@
 /**
  * Plugin Name: Carcura Lead-Alarm
  * Description: Schickt jede neue Website-Anfrage sofort in eure Telegram-Gruppe (Alex + Richy), mit allen Kundendaten, gewählten Leistungen, Richtwert und WhatsApp-Knopf. Optional zusätzlich per E-Mail. Unabhängig davon, was das Revenue-Plugin speichert.
- * Version: 1.1.0
+ * Version: 1.2.0
  * Author: Carcura GbR
  * Requires PHP: 7.4
  *
  * Einrichtung: Werkzeuge → Carcura Lead-Alarm.
  * Ab 1.1: zählt Klicks auf die WhatsApp-Knöpfe der Website (anonym, ohne IP oder Cookie) – pro Leistung und Seite.
+ * Ab 1.2: Route /carcura-lead-alarm/v1/bericht – der Assistent schickt den Wochenbericht in die Telegram-Gruppe (nur Administrator).
  */
 
 if (!defined('ABSPATH')) {
@@ -315,6 +316,29 @@ add_action('rest_api_init', function () {
         'callback'            => function (WP_REST_Request $req) {
             $tage = max(1, min(120, (int) ($req->get_param('tage') ?: 7)));
             return ccla_wa_summary($tage);
+        },
+    ));
+    // Ab 1.2: Wochenbericht des Assistenten in dieselbe Telegram-Gruppe senden (nur mit Administrator-Anmeldung).
+    register_rest_route('carcura-lead-alarm/v1', '/bericht', array(
+        'methods'             => 'POST',
+        'permission_callback' => function () {
+            return current_user_can('manage_options');
+        },
+        'callback'            => function (WP_REST_Request $req) {
+            $s = ccla_settings();
+            if ($s['token'] === '' || $s['chat_id'] === '') {
+                return new WP_REST_Response(array('ok' => false, 'fehler' => 'Telegram ist im Lead-Alarm nicht eingerichtet'), 400);
+            }
+            $p    = $req->get_json_params();
+            $p    = is_array($p) ? $p : $req->get_params();
+            $text = mb_substr(trim(wp_strip_all_tags((string) ($p['text'] ?? ''))), 0, 3500);
+            if ($text === '') {
+                return new WP_REST_Response(array('ok' => false, 'fehler' => 'Kein Text'), 400);
+            }
+            $res = ccla_telegram_send($s['token'], $s['chat_id'], ccla_h($text));
+            return $res === true
+                ? array('ok' => true)
+                : new WP_REST_Response(array('ok' => false, 'fehler' => (string) $res), 502);
         },
     ));
 });
