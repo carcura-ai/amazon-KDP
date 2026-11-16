@@ -132,8 +132,10 @@ footer ul{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:
 .t{position:relative;aspect-ratio:4/5;border:0;padding:0;border-radius:18px;overflow:hidden;background:var(--ink3);cursor:pointer;color:#fff;font:inherit;text-align:left;animation:pop .5s var(--ease) both}
 @keyframes pop{from{opacity:0;transform:scale(.94)}to{opacity:1;transform:none}}
 .t img,.t video{width:100%;height:100%;object-fit:cover;transition:transform .6s var(--ease)}.t:hover img{transform:scale(1.05)}
-.t::after{content:"";position:absolute;inset:auto 0 0 0;height:45%;background:linear-gradient(0deg,rgba(9,9,10,.85),transparent);pointer-events:none}
-.t span.c{position:absolute;left:14px;right:14px;bottom:12px;z-index:1;font-size:.88rem;font-weight:500}
+.t.ba{grid-column:span 2;aspect-ratio:8/5;display:grid;grid-template-columns:1fr 1fr;gap:3px;cursor:default;background:var(--ink)}
+.t.ba img{width:100%;height:100%;min-height:0;object-fit:cover}.t.ba:hover img{transform:none}
+.t.ba .lab{position:absolute;top:12px;left:12px;z-index:1;padding:5px 12px;border-radius:999px;background:rgba(9,9,10,.8);font-size:.82rem;pointer-events:none}.t.ba .lab.r{left:auto;right:12px;background:var(--acc);color:var(--ink);font-weight:600}
+.glogo{width:min(300px,64vw);height:auto;margin-bottom:6px}
 .t .pl2{position:absolute;top:12px;right:12px;z-index:1;width:42px;height:42px;border-radius:50%;background:var(--acc);color:var(--ink);display:grid;place-items:center;font-size:1rem;padding-left:3px}
 @media(max-width:62rem){.grid{grid-template-columns:repeat(3,1fr)}}
 @media(max-width:48rem){.grid{grid-template-columns:repeat(2,1fr);gap:8px}}
@@ -226,7 +228,7 @@ footer ul{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:
 
 <!-- ================= GALERIE ================= -->
 <main id="v-galerie" hidden>
-  <section style="padding-bottom:0"><div class="w"><div class="head"><h1 style="font-size:clamp(2.2rem,6vw,4.4rem)">Carcura Galerie</h1><p class="lead">Unsere besten Fotos und Videos. Tippe ein Bild an, um es groß zu sehen.</p></div></div></section>
+  <section style="padding-bottom:0"><div class="w"><div class="head"><img class="glogo" src="https://carcura.info/wp-content/uploads/2026/11/carcura-logo-weiss.webp" alt="Carcura Fahrzeugaufbereitung" width="1200" height="600"><h1 style="font-size:clamp(2.2rem,6vw,4.4rem)">Ergebnisse sehen.</h1><p class="lead">Carcura Galerie: unsere besten Fotos und Videos aus der Halle.</p></div></div></section>
   <div class="chips" id="chips" role="group" aria-label="Filter"></div>
   <div class="w"><div class="grid" id="grid"></div>
     <div class="foot" style="margin-top:36px"><p style="color:var(--muted)">Dein Auto sieht bald auch so aus? Schreib uns einfach.</p><a class="btn btn-p" href="#">Preis per WhatsApp</a></div></div>
@@ -248,8 +250,12 @@ var REV=[['… super beeindruckend was die jungs aus meinem alten lack rausgehol
 var GAL=[
 ['i','2026/11/carcura-bmw-m3-innenraum-innenreinigung.webp','BMW M3 Innenraum nach der Innenreinigung','Innen'],
 ['i','2026/11/carcura-audi-tt-politur-keramik-walterschen.webp','Audi TT nach Politur und Keramik','Politur & Keramik'],
-['i','2026/10/carcura-bmw-m2-front-vorher-hd.webp','BMW M2 Front, vorher','Politur & Keramik'],
-['i','2026/10/carcura-bmw-m2-front-nachher-hd.webp','BMW M2 Front, nachher','Politur & Keramik'],
+['b','2026/11/carcura-tankklappe-vorher.webp','2026/11/carcura-tankklappe-nachher.webp','Tankklappe eines Ford, vorher und nachher','Vorher/Nachher'],
+['b','2026/10/carcura-bmw-m2-front-vorher-hd.webp','2026/10/carcura-bmw-m2-front-nachher-hd.webp','Front eines BMW M2, vorher und nachher','Vorher/Nachher'],
+['v','2026/11/carcura-opel-heck-lack.mp4','Video: Heck eines weißen Opel','Videos','2026/11/carcura-opel-heck-lack-poster.jpg'],
+['i','2026/11/carcura-weisser-lack-halle-glanz.webp','Glänzender weißer Lack in der Halle','Außen'],
+['i','2026/11/carcura-ford-schaum-vorwaesche.webp','Ford in Schaum bei der Vorwäsche','Außen'],
+['i','2026/11/carcura-felge-felgenreiniger-schaum.webp','Opel-Felge mit Schaum von der Felgenreinigung','Außen'],
 ['i','2026/10/carcura-innenreinigung-cockpit-hd.webp','Cockpit nach der Innenreinigung','Innen'],
 ['i','2026/10/carcura-keramik-abperleffekt-hd.webp','Abperleffekt auf Lack mit Keramik','Politur & Keramik'],
 ['i','2026/10/carcura-keramikversiegelung-xpertcoat-bmw-m2-hd.webp','Keramikversiegelung XPERTCOAT am BMW M2','Politur & Keramik'],
@@ -287,13 +293,15 @@ addEventListener('scroll',function(){requestAnimationFrame(onS)},{passive:true})
 function view(){var g=location.hash==='#galerie';$('#v-home').hidden=g;$('#v-galerie').hidden=!g;$$('.links a').forEach(function(a){a.classList.toggle('on',g?a.hasAttribute('data-g'):a.textContent==='Start')});scrollTo(0,0);if(g)build('Alle');watch();onS()}
 addEventListener('hashchange',view);
 /* Galerie: Filter, Bilder erst beim Scrollen, Videos erst auf Tipp, Großansicht */
-var CATS=['Alle','Innen','Außen','Politur & Keramik','Halle','Videos'],cur='Alle';
+var CATS=['Alle','Vorher/Nachher','Innen','Außen','Politur & Keramik','Halle','Videos'],cur='Alle';
 $('#chips').innerHTML=CATS.map(function(c){return'<button class="chip" aria-pressed="'+(c==='Alle')+'">'+c+'</button>'}).join('');
 $('#chips').addEventListener('click',function(e){var b=e.target.closest('.chip');if(!b)return;$$('.chip').forEach(function(x){x.setAttribute('aria-pressed',x===b)});build(b.textContent)});
-function build(c){cur=c;var h='';GAL.forEach(function(g,i){if(c!=='Alle'&&g[3]!==c)return;
- if(g[0]==='i')h+='<button class="t" data-i="'+i+'" aria-label="'+g[2]+' vergrößern"><img src="'+U+g[1]+'" alt="'+g[2]+'" loading="lazy" decoding="async"><span class="c">'+g[2]+'</span></button>';
- else h+='<button class="t" data-i="'+i+'" aria-label="'+g[2]+' abspielen"><img src="'+U+g[4]+'" alt="" loading="lazy" decoding="async"><span class="pl2" aria-hidden="true">▶</span><span class="c">'+g[2]+'</span></button>'});$('#grid').innerHTML=h}
-$('#grid').addEventListener('click',function(e){var t=e.target.closest('.t');if(!t)return;var g=GAL[+t.dataset.i];
+function build(c){cur=c;var h='';GAL.forEach(function(g,i){var k=g[0],cat=k==='b'?g[4]:g[3];if(c!=='Alle'&&cat!==c)return;
+ if(k==='b')h+='<div class="t ba"><img src="'+U+g[1]+'" alt="'+g[3]+' (vorher)" loading="lazy" decoding="async"><img src="'+U+g[2]+'" alt="'+g[3]+' (nachher)" loading="lazy" decoding="async"><span class="lab">Vorher</span><span class="lab r">Nachher</span></div>';
+ else if(k==='i')h+='<button class="t" data-i="'+i+'" aria-label="'+g[2]+' vergrößern"><img src="'+U+g[1]+'" alt="'+g[2]+'" loading="lazy" decoding="async"></button>';
+ else h+='<button class="t" data-i="'+i+'" aria-label="'+g[2]+' abspielen"><img src="'+U+g[4]+'" alt="" loading="lazy" decoding="async"><span class="pl2" aria-hidden="true">▶</span></button>'});$('#grid').innerHTML=h}
+$('#grid').addEventListener('input',function(e){if(e.target.type==='range')e.target.parentNode.style.setProperty('--p',e.target.value+'%')});
+$('#grid').addEventListener('click',function(e){var t=e.target.closest('.t');if(!t||t.classList.contains('ba'))return;var g=GAL[+t.dataset.i];
  if(g[0]==='v'){t.innerHTML='<video src="'+U+g[1]+'" poster="'+U+g[4]+'" controls autoplay playsinline preload="none"></video>';return}
  var lb=document.createElement('div');lb.className='lb';lb.innerHTML='<img src="'+U+g[1]+'" alt="'+g[2]+'"><button aria-label="Schließen">✕</button>';lb.onclick=function(){lb.remove()};document.body.appendChild(lb)});
 addEventListener('keydown',function(e){if(e.key==='Escape'){var l=$('.lb');if(l)l.remove()}});
