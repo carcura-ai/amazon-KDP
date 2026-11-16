@@ -443,3 +443,10 @@ Stattdessen eigener Skill `blender-3d` + Werkzeug `3d-studio/` (nur eigener Code
   Keine Prompt-Injection gefunden.
 - **Entscheidung:** Nur die Designregeln (Markdown) als Vorlage genutzt. **Kein Skript ausgeführt**, keine Installation, kein Hook, kein API-Key.
 - Ergebnis: Startseiten-Entwurf als HTML-Vorschau (Artifact), live nichts geändert.
+
+## Aufräumen am 16.11.2026
+
+Entfernt, weil in den verfügbaren Sitzungsprotokollen (ca. 12 Tage) nie aufgerufen und von keinem anderen Skill oder Prozess genutzt:
+`emil-design-eng`, `interaction-design`, `web-design-guidelines`, `a11y-audit`, `review-animations`, `weekly-review`, `local-search-ads`.
+Wiederherstellen: `git checkout <Commit vor diesem Eintrag> -- .claude/skills/<name>`.
+Behalten, weil in CLAUDE.md genannt oder Carcura-/KDP-Kern: godmode, l99, ooda, ghost, caveman, challenge, business-investment-advisor, karpathy-guidelines, skill-security-auditor, alle kdp-*, kinderbuch-entwickler, character-consistency, ebook-publishing, b2b-akquise, blender-3d, reel-producer, local-seo-manager, ui-ux-pro-max, impeccable, dramatic, premium, refined (von anderen Skills genutzt).
