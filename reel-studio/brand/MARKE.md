@@ -23,7 +23,7 @@ Bei Preisaenderungen auf der Website diese Datei aktualisieren (oder Claude neu 
 - Farben: Neon-Gelb **#E8F320** (Akzent) auf Fast-Schwarz **#09090A**, Grau #AEB2B9 fuer Nebentexte (aus dem Website-CSS).
 - Logo: `brand/logo_weiss.png` (weiss, transparent, 1396×671) – z. B. als `sticker` mit `"tilt": false` am Ende; Original: `brand/logo.png` (schwarzer Hintergrund).
 - Ansprache: Du. Ton: ehrlich, handwerklich, „wir sagen dir vorher, was es kostet“.
-- Markenversprechen von der Website: verbindlicher Endpreis vor dem Termin, ehrliche Beratung, Handwaesche statt Waschanlage.
+- Markenversprechen von der Website: faires Angebot nach Fotos (**kein Festpreis versprechen**, vom Inhaber am 18.11.2026 so festgelegt), ehrliche Beratung, Handwaesche statt Waschanlage.
 
 ## CTA-Links (immer mit vorausgefuelltem Text je Video → Herkunft messbar)
 
@@ -62,7 +62,7 @@ Bei Preisaenderungen auf der Website diese Datei aktualisieren (oder Claude neu 
 | Spot-Repair einzelner Kratzer | nach Foto per WhatsApp | |
 | Scheinwerferaufbereitung (beide, inkl. UV-Schutz) | 69 € | |
 | Wachsversiegelung – **NICHT bewerben**, weder im Masterplan noch live (06.11.); erst nach Preis-Bestaetigung durch Alex | – | – |
-| **Keramikversiegelung XPERTCOAT HYBRID** (inkl. Handwaesche, Kneten, 1-stufige Politur, Nanolex-Pflegeset Wert 62 €) | ab 700 € | |
+| **Keramikversiegelung XPERTCOAT HYBRID** (inkl. Handwaesche, Kneten, 1-stufige Politur; **Aktion bis 31.12.2026: Nanolex-Waschset geschenkt – es gibt KEIN Pflegeset**, Wert nur mit Beleg nennen) | ab 700 € | |
 | Keramikversiegelung mit 2-stufiger Politur | ab 900 € | |
 | Keramik-Pflege alle 2 Monate (Handwaesche mit Reactivating Shampoo) | 79 € pro Termin | |
 | Lederversiegelung (XPERTCOAT LEATHER) | +40 € zur Lederreinigung (in „detailliert“ schon enthalten) | |
