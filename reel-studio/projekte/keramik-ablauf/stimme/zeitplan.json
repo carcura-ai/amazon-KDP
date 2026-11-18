@@ -1,0 +1,446 @@
+{
+ "gap": 0.35,
+ "saetze": [
+  {
+   "i": 0,
+   "text": "Was passiert bei einer Keramikversiegelung?",
+   "start": 0.0,
+   "dauer": 1.96,
+   "genau": 1.0,
+   "datei": "s_0.wav",
+   "woerter": [
+    [
+     "Was",
+     0,
+     0.42
+    ],
+    [
+     "passiert",
+     0.42,
+     0.76
+    ],
+    [
+     "bei",
+     0.76,
+     0.94
+    ],
+    [
+     "einer",
+     0.94,
+     1.14
+    ],
+    [
+     "Keramikversiegelung?",
+     1.14,
+     2.14
+    ]
+   ]
+  },
+  {
+   "i": 1,
+   "text": "Zuerst waschen wir von Hand, entfernen Flugrost und Teer und kneten den Lack glatt.",
+   "start": 2.31,
+   "dauer": 4.658,
+   "genau": 1.0,
+   "datei": "s_1.wav",
+   "woerter": [
+    [
+     "Zuerst",
+     0,
+     0.9
+    ],
+    [
+     "waschen",
+     0.9,
+     1.18
+    ],
+    [
+     "wir",
+     1.18,
+     1.28
+    ],
+    [
+     "von",
+     1.28,
+     1.46
+    ],
+    [
+     "Hand,",
+     1.46,
+     1.78
+    ],
+    [
+     "entfernen",
+     2.06,
+     2.56
+    ],
+    [
+     "Flugrost",
+     2.56,
+     3.12
+    ],
+    [
+     "und",
+     3.12,
+     3.36
+    ],
+    [
+     "Teer",
+     3.36,
+     3.74
+    ],
+    [
+     "und",
+     3.74,
+     3.9
+    ],
+    [
+     "kneten",
+     3.9,
+     4.24
+    ],
+    [
+     "den",
+     4.24,
+     4.4
+    ],
+    [
+     "Lack",
+     4.4,
+     4.66
+    ],
+    [
+     "glatt.",
+     4.66,
+     5.0
+    ]
+   ]
+  },
+  {
+   "i": 2,
+   "text": "Dann polieren wir, auf Wunsch zweistufig gegen feine Kratzer.",
+   "start": 7.319,
+   "dauer": 3.435,
+   "genau": 1.0,
+   "datei": "s_2.wav",
+   "woerter": [
+    [
+     "Dann",
+     0,
+     0.3
+    ],
+    [
+     "polieren",
+     0.3,
+     0.8
+    ],
+    [
+     "wir",
+     0.8,
+     0.96
+    ],
+    [
+     "auf",
+     0.96,
+     1.4
+    ],
+    [
+     "Wunsch",
+     1.4,
+     1.78
+    ],
+    [
+     "zweistufig",
+     1.78,
+     2.46
+    ],
+    [
+     "gegen",
+     2.46,
+     2.64
+    ],
+    [
+     "feine",
+     2.64,
+     3.04
+    ],
+    [
+     "Kratzer.",
+     3.04,
+     3.46
+    ]
+   ]
+  },
+  {
+   "i": 3,
+   "text": "Dann kommt die Keramik: eine hauchdünne, glasklare Schicht.",
+   "start": 11.104,
+   "dauer": 3.397,
+   "genau": 1.0,
+   "datei": "s_3.wav",
+   "woerter": [
+    [
+     "Dann",
+     0,
+     0.72
+    ],
+    [
+     "kommt",
+     0.72,
+     0.96
+    ],
+    [
+     "die",
+     0.96,
+     1.08
+    ],
+    [
+     "Keramik,",
+     1.08,
+     1.6
+    ],
+    [
+     "eine",
+     2.0,
+     2.22
+    ],
+    [
+     "hauchdünne",
+     2.22,
+     2.84
+    ],
+    [
+     "glasklare",
+     2.84,
+     3.52
+    ],
+    [
+     "Schicht.",
+     3.52,
+     3.84
+    ]
+   ]
+  },
+  {
+   "i": 4,
+   "text": "Sie härtet bei uns in der Halle aus, die ersten zwölf Stunden unter Prüflicht.",
+   "start": 14.851,
+   "dauer": 4.412,
+   "genau": 1.0,
+   "datei": "s_4.wav",
+   "woerter": [
+    [
+     "Sie",
+     0,
+     0.54
+    ],
+    [
+     "härtet",
+     0.54,
+     0.92
+    ],
+    [
+     "bei",
+     0.92,
+     1.04
+    ],
+    [
+     "uns",
+     1.04,
+     1.22
+    ],
+    [
+     "in",
+     1.22,
+     1.34
+    ],
+    [
+     "der",
+     1.34,
+     1.44
+    ],
+    [
+     "Halle",
+     1.44,
+     1.72
+    ],
+    [
+     "aus,",
+     1.72,
+     1.96
+    ],
+    [
+     "die",
+     2.58,
+     2.68
+    ],
+    [
+     "ersten",
+     2.68,
+     2.92
+    ],
+    [
+     "zwölf",
+     2.92,
+     3.38
+    ],
+    [
+     "Stunden",
+     3.38,
+     3.68
+    ],
+    [
+     "unter",
+     3.68,
+     4.06
+    ],
+    [
+     "Prüflicht.",
+     4.06,
+     4.62
+    ]
+   ]
+  },
+  {
+   "i": 5,
+   "text": "Du bekommst eine Pflegeanleitung, und nach sechs Monaten schauen wir kostenlos nach.",
+   "start": 19.613,
+   "dauer": 4.043,
+   "genau": 1.0,
+   "datei": "s_5.wav",
+   "woerter": [
+    [
+     "Du",
+     0,
+     0.16
+    ],
+    [
+     "bekommst",
+     0.16,
+     0.54
+    ],
+    [
+     "eine",
+     0.54,
+     0.68
+    ],
+    [
+     "Pflegeanleitung",
+     0.68,
+     1.56
+    ],
+    [
+     "und",
+     1.56,
+     1.76
+    ],
+    [
+     "nach",
+     1.76,
+     1.94
+    ],
+    [
+     "sechs",
+     1.94,
+     2.16
+    ],
+    [
+     "Monaten",
+     2.16,
+     2.52
+    ],
+    [
+     "schauen",
+     2.52,
+     2.88
+    ],
+    [
+     "wir",
+     2.88,
+     3.04
+    ],
+    [
+     "kostenlos",
+     3.04,
+     3.62
+    ],
+    [
+     "nach.",
+     3.62,
+     3.9
+    ]
+   ]
+  },
+  {
+   "i": 6,
+   "text": "Ab siebenhundert Euro. Schick uns Fotos, wir machen dir ein faires Angebot.",
+   "start": 24.006,
+   "dauer": 4.559,
+   "genau": 1.0,
+   "datei": "s_6.wav",
+   "woerter": [
+    [
+     "Ab",
+     0,
+     0.4
+    ],
+    [
+     "700",
+     0.4,
+     0.96
+    ],
+    [
+     "Euro,",
+     0.96,
+     1.5
+    ],
+    [
+     "schick",
+     1.88,
+     2.18
+    ],
+    [
+     "uns",
+     2.18,
+     2.28
+    ],
+    [
+     "Fotos,",
+     2.28,
+     2.92
+    ],
+    [
+     "wir",
+     3.22,
+     3.34
+    ],
+    [
+     "machen",
+     3.34,
+     3.56
+    ],
+    [
+     "dir",
+     3.56,
+     3.72
+    ],
+    [
+     "ein",
+     3.72,
+     3.86
+    ],
+    [
+     "faires",
+     3.86,
+     4.18
+    ],
+    [
+     "Angebot.",
+     4.18,
+     4.78
+    ]
+   ]
+  }
+ ],
+ "gesamt": 28.914
+}
