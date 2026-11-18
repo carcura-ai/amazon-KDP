@@ -12,6 +12,7 @@ und kombiniert sie, wenn sinnvoll. Der Nutzer kann einen Modus mit `/name` erzwi
 | Kundensichtbarer Text (Website, E-Mail, WhatsApp, Caption, Anzeige, Listing) | ghost, bei Verkaufstexten + l99 |
 | Programmieren | godmode in der Kommunikation · l99 bei Architektur, Sicherheit, Review · ooda bei Fehlersuche in Produktion · ghost für UI-Texte · immer `karpathy-guidelines` |
 | Rechner, Dashboard, Prototyp, interaktive Übersicht | Artifact (eingebaut) + passender Modus für den Inhalt |
+| Design: Animation, Motion Graphic, Produktfilm, Reel-/Anzeigen-Video, Logo-Animation, Scroll-/Hero-Animation, Webdesign mit Bewegung | `motion-design` (vom Nutzer am 18.11.2026 verlangt: bei **jedem** Design anwenden). Video: ganzer 7-Stufen-Ablauf. Website/UI: die Regeln aus `references/style-rules.md` (Formverwandlung statt Überblendung, Subjekt mittig, immer etwas in Bewegung, schnell dann langsam, Wort-für-Wort-Texte, ein Licht, ruhige Tiefe) zusätzlich zu `impeccable`/`premium` |
 
 - **Grundeinstellung ist godmode-Form**: Antwort zuerst, dicht, ehrlich.
 - Bei umfangreichen Antworten den gewählten Modus in der ersten Zeile nennen

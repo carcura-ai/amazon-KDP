@@ -450,3 +450,17 @@ Entfernt, weil in den verfügbaren Sitzungsprotokollen (ca. 12 Tage) nie aufgeru
 `emil-design-eng`, `interaction-design`, `web-design-guidelines`, `a11y-audit`, `review-animations`, `weekly-review`, `local-search-ads`.
 Wiederherstellen: `git checkout <Commit vor diesem Eintrag> -- .claude/skills/<name>`.
 Behalten, weil in CLAUDE.md genannt oder Carcura-/KDP-Kern: godmode, l99, ooda, ghost, caveman, challenge, business-investment-advisor, karpathy-guidelines, skill-security-auditor, alle kdp-*, kinderbuch-entwickler, character-consistency, ebook-publishing, b2b-akquise, blender-3d, reel-producer, local-seo-manager, ui-ux-pro-max, impeccable, dramatic, premium, refined (von anderen Skills genutzt).
+
+## Motion Design (vom Nutzer bereitgestelltes ZIP) – 18.11.2026
+
+- **Quelle:** `Motion_Design_Skill.zip` (15 Dateien, 116 KB), vom Nutzer selbst hochgeladen. Urheber, Version und Lizenz sind im Paket nicht angegeben (keine LICENSE-Datei).
+  Entpackt in einen leeren Prüfbereich im Scratchpad, ZIP auf unsichere Pfade geprüft (keine).
+- skill-security-auditor: **FAIL (1 CRITICAL)** – `child_process` in `scripts/render.mjs`. Befund geprüft: **berechtigt, nicht bösartig.**
+  `render.mjs` startet lokal headless Chrome (Debug-Port nur auf 127.0.0.1) und `ffmpeg`, bedient die Seite über einen kleinen Webserver auf 127.0.0.1 und schreibt Bilder/Video in den Zielordner.
+- **Vollständig gelesen:** `SKILL.md`, `START HERE.md`, alle 4 Referenzen, beide Vorlagen, alle 5 Skripte (`render.mjs`, `mix.py`, `synth_sfx.py`, `contact_sheet.py`, `gl3d.js`).
+  Keine Netzwerkzugriffe nach außen, keine Zugangsdaten, keine Hooks, keine MCP-Konfiguration, kein `eval`/`exec`, keine Installation von Paketen, keine Prompt-Injection.
+- **Schwachstellen (gering):** Der lokale Webserver prüft Pfade nur mit `startsWith` (nur auf 127.0.0.1, für eigene Projektordner gedacht). Die Doku nennt für echte 3D-Modelle three.js von einem CDN (Version fest, nur auf ausdrücklichen Wunsch verwenden, Download vorher prüfen).
+  Bezahldienste (ElevenLabs, Suno) werden nur auf Zuruf des Nutzers genutzt.
+- **Entscheidung:** Installiert nach `.claude/skills/motion-design/`, Dateien unverändert (`cmp` auf `SKILL.md` identisch), dazu `HERKUNFT.md`.
+  Lizenz unbekannt: nur für den eigenen Gebrauch, nicht weitergeben. Fehlende Verweise im Paket: `engine-2d-puppet.md`, `blender.md`, `tracks.py`.
+- **Voraussetzungen im Container:** Node 22 ✅, ffmpeg 6.1 ✅, Chromium unter `/opt/pw-browsers/chromium-1243/chrome-linux64/chrome` ✅ (`CHROME=` setzen), Pillow ✅, numpy ✅, **scipy ❌, opencv-python ❌** (nur für Ton-Mischung bzw. Cutouts nötig).
