@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="de"><head><meta charset="utf-8"><title>Keramikversiegelung – Ablauf</title>
+<style>html,body{margin:0;background:#000;height:100%}body{display:flex;align-items:center;justify-content:center}canvas{width:min(100vw,calc(100vh*16/9));aspect-ratio:16/9;display:block}</style></head>
+<body><canvas id="c"></canvas>
+<script>
+// Carcura · Keramikversiegelung · Ablauf (24 s, 16:9). Alles Code, keine KI-Bilder. Seitenvertrag: renderAt(t), TOTAL, ready, EVENTS, ?t=, ?scale=.
+const W = 1920, H = 1080, q = new URLSearchParams(location.search), SCALE = parseFloat(q.get('scale') || '1');
+const cv = document.getElementById('c'); cv.width = W * SCALE; cv.height = H * SCALE; const g = cv.getContext('2d');
+// ---- Zeiten (alle Beats an einer Stelle: Umtakten = eine Zeile) -------------------------------------------
+const B = { hook: [0, 3], wash: [3, 7], polish: [7, 11], seal: [11, 15], cure: [15, 18], hand: [18, 21], end: [21, 24] };
+const T = { foam: [3.5, 5.7], clay: [5.5, 6.7], toPolish: [6.6, 7.5], band: [7.7, 10.2], glass: [11.2, 12.6], drops: [12.9, 13.8], roll: 14.1,
+  toRing: [14.6, 15.5], ring: [15.6, 17.5], toCard: [17.6, 18.5], cards: [18.6, 19.6], toLogo: [20.3, 21.2] };
+const TOTAL = B.end[1];
+const C = { ink: '#07070a', txt: '#f2f1ee', muted: '#a3a5ad', acc: '#e8f320', gold: '#cbbf94' };
+// ---- Helfer -------------------------------------------------------------------------------------------------
+const clamp01 = v => Math.max(0, Math.min(1, v)), lerp = (a, b, k) => a + (b - a) * k, prog = (t, a, b) => clamp01((t - a) / (b - a));
+const outExpo = k => (k = clamp01(k)) >= 1 ? 1 : 1 - Math.pow(2, -10 * k), outCubic = k => 1 - Math.pow(1 - clamp01(k), 3);
+const inOutCubic = k => { k = clamp01(k); return k < 0.5 ? 4 * k * k * k : 1 - Math.pow(-2 * k + 2, 3) / 2; }, sine = k => 0.5 - 0.5 * Math.cos(Math.PI * clamp01(k));
+function rng(seed) { return () => { seed |= 0; seed = seed + 0x6D2B79F5 | 0; let t = Math.imul(seed ^ seed >>> 15, 1 | seed); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+const FONT = 'Inter, "Helvetica Neue", Arial, sans-serif';
+const logo = new Image(); const logoReady = new Promise(r => { logo.onload = r; logo.onerror = r; logo.src = 'logo_weiss.png'; });
+// ---- Bühne: das Lack-Panel ----------------------------------------------------------------------------------
+const PX = 960, PY = 540, PW = 1000, PH = 560;
+const R1 = rng(11);
+const SPECK = Array.from({ length: 120 }, () => ({ x: lerp(-0.47, 0.47, R1()), y: lerp(-0.45, 0.45, R1()), r: lerp(2.5, 9, R1()), k: R1() }));   // Schmutz: Rost / Teer / Staub
+const R2 = rng(23);
+const SWIRL = Array.from({ length: 90 }, () => ({ x: lerp(-0.48, 0.48, R2()), y: lerp(-0.46, 0.46, R2()), r: lerp(8, 30, R2()), a0: R2() * 6.28, sp: lerp(.7, 2.0, R2()), al: lerp(.16, .38, R2()) }));
+const R3 = rng(37);
+const BUB = Array.from({ length: 80 }, () => ({ dx: R3() , y: lerp(-0.5, 0.5, R3()), r: lerp(10, 34, R3()), ph: R3() * 6.28 }));
+const R4 = rng(51);
+const DROP = Array.from({ length: 15 }, (_, i) => ({ x: lerp(-0.42, 0.42, R4()), y: lerp(-0.38, 0.38, R4()), r: lerp(14, 30, R4()), t0: lerp(T.drops[0], T.drops[1], R4()), roll: i % 4 === 0 }));
+const DUST = Array.from({ length: 36 }, () => ({ x: R4() * W, y: R4() * H, r: lerp(1, 2.6, R4()), s: lerp(6, 16, R4()), a: lerp(.08, .3, R4()) }));
+const rr = (x, y, w, h, r) => { g.beginPath(); g.roundRect(x, y, w, h, Math.max(0, Math.min(r, w / 2, h / 2))); };
+function words(str, cx, y, t, t0, size, color, weight = 700, tOut = 1e9, track = -0.02) {
+  g.save(); g.font = `${weight} ${size}px ${FONT}`; g.textAlign = 'left'; g.textBaseline = 'alphabetic';
+  const ws = str.split(' '), sp = size * 0.28, widths = ws.map(w => g.measureText(w).width), total = widths.reduce((a, b) => a + b, 0) + sp * (ws.length - 1);
+  let x = cx - total / 2;
+  ws.forEach((w, i) => { const a = prog(t, t0 + i * 0.075, t0 + i * 0.075 + 0.45) * (1 - prog(t, tOut + i * 0.03, tOut + i * 0.03 + 0.3));
+    if (a > 0.003) { g.globalAlpha = a; g.filter = `blur(${(1 - a) * 9 * SCALE}px)`; g.fillStyle = color; g.fillText(w, x, y + (1 - a) * 16); } x += widths[i] + sp; });
+  g.restore();
+}
+// ---- Hintergrund + immer etwas in Bewegung -------------------------------------------------------------------
+function background(t) {
+  g.fillStyle = C.ink; g.fillRect(0, 0, W, H);
+  const gr = g.createRadialGradient(960, 360, 80, 960, 540, 1000); gr.addColorStop(0, 'rgba(203,191,148,.10)'); gr.addColorStop(1, 'rgba(7,7,10,0)'); g.fillStyle = gr; g.fillRect(0, 0, W, H);
+  DUST.forEach(d => { const y = ((d.y - t * d.s) % H + H) % H; g.globalAlpha = d.a; g.fillStyle = C.gold; g.beginPath(); g.arc(d.x, y, d.r, 0, 6.283); g.fill(); }); g.globalAlpha = 1;
+}
+// ---- Panel (der Lack) -----------------------------------------------------------------------------------------
+function panelGeom(t) {   // Karte → Ring (Szene 5) → Übergabe-Karte (Szene 6), alles eine Formverwandlung
+  const a = inOutCubic(prog(t, ...T.toRing)), b = inOutCubic(prog(t, ...T.toCard));
+  let w = lerp(PW, 380, a), h = lerp(PH, 380, a), r = lerp(38, 190, a), x = PX, y = PY;
+  w = lerp(w, 560, b); h = lerp(h, 340, b); r = lerp(r, 34, b); x = lerp(x, 660, b); y = lerp(y, 540, b);
+  const toLogo = inOutCubic(prog(t, ...T.toLogo)); return { w: lerp(w, 40, toLogo), h: lerp(h, 40, toLogo), r, x: lerp(x, 960, toLogo), y: lerp(y, 420, toLogo), a, b, toLogo };
+}
+function paint(P, gloss, t) {
+  const x = P.x - P.w / 2, y = P.y - P.h / 2;
+  g.save(); rr(x, y, P.w, P.h, P.r); g.shadowColor = 'rgba(0,0,0,.6)'; g.shadowBlur = 70 * SCALE; g.shadowOffsetY = 26 * SCALE;
+  const gr = g.createLinearGradient(x, y, x + P.w, y + P.h); gr.addColorStop(0, '#1d2736'); gr.addColorStop(.55, '#111924'); gr.addColorStop(1, '#0a0f16'); g.fillStyle = gr; g.fill(); g.restore();
+  g.save(); rr(x, y, P.w, P.h, P.r); g.clip();
+  const hl = g.createLinearGradient(x, y, x + P.w * .9, y + P.h * .55); hl.addColorStop(0, `rgba(255,255,255,${.04 + .22 * gloss})`); hl.addColorStop(.45, `rgba(255,255,255,${.01 + .05 * gloss})`); hl.addColorStop(1, 'rgba(255,255,255,0)');
+  g.fillStyle = hl; g.beginPath(); g.moveTo(x, y); g.lineTo(x + P.w * .72, y); g.lineTo(x + P.w * .32, y + P.h); g.lineTo(x, y + P.h); g.closePath(); g.fill();
+  return { x, y };
+}
+function endClip() { g.restore(); }
+function dirt(P, t) {   // Szene 2: Schmutz, wird von der Schaumfront weggewaschen
+  const wave = lerp(P.x - P.w / 2 - 160, P.x + P.w / 2 + 260, outCubic(prog(t, ...T.foam)));
+  SPECK.forEach(s => { const sx = P.x + s.x * P.w, sy = P.y + s.y * P.h, a = clamp01((sx - (wave - 60)) / 120) * (1 - prog(t, ...T.clay) * 0 ); if (a < .01) return;
+    g.globalAlpha = a; g.fillStyle = s.k < .45 ? '#8a4b2a' : s.k < .8 ? '#17110d' : '#6b6455'; g.beginPath(); g.ellipse(sx, sy, s.r, s.r * .8, s.k * 3, 0, 6.283); g.fill();
+    g.globalAlpha = a * .4; g.fillStyle = '#fff'; g.beginPath(); g.arc(sx - s.r * .3, sy - s.r * .3, s.r * .25, 0, 6.283); g.fill(); });
+  g.globalAlpha = 1; return wave;
+}
+function foam(P, t, wave) {
+  if (t < T.foam[0] || t > T.foam[1] + 1.1) return;
+  const out = 1 - prog(t, T.foam[1] + .2, T.foam[1] + 1.0);
+  BUB.forEach(b => { const bx = wave - b.dx * 300 + Math.sin(t * 2 + b.ph) * 10, by = P.y + b.y * P.h + Math.cos(t * 1.7 + b.ph) * 8, a = out * clamp01(1 - b.dx * 1.1) * clamp01((bx - (P.x - P.w / 2 - 40)) / 60) * clamp01((P.x + P.w / 2 + 40 - bx) / 60);
+    if (a < .01) return; const r = b.r; const rg = g.createRadialGradient(bx - r * .3, by - r * .3, r * .1, bx, by, r); rg.addColorStop(0, `rgba(255,255,255,${.95 * a})`); rg.addColorStop(1, `rgba(190,205,225,${.35 * a})`);
+    g.fillStyle = rg; g.beginPath(); g.arc(bx, by, r, 0, 6.283); g.fill(); });
+}
+function clay(P, t) {   // Knetmasse: gleitet in drei Bahnen über den gewaschenen Lack
+  if (t < T.clay[0] - .1 || t > T.clay[1] + .5) return; const k = prog(t, ...T.clay), lane = Math.min(2, Math.floor(k * 3)), kk = k * 3 - lane, dir = lane % 2 ? -1 : 1;
+  const x = P.x + dir * lerp(-.42, .42, kk) * P.w, y = P.y + lerp(-.28, .28, (lane + .5) / 3) * P.h, a = (1 - prog(t, T.clay[1], T.clay[1] + .4)) * prog(t, T.clay[0] - .1, T.clay[0] + .1);
+  g.save(); g.globalAlpha = a; rr(x - 70, y - 30, 140, 60, 18); g.fillStyle = C.acc; g.shadowColor = 'rgba(232,243,32,.5)'; g.shadowBlur = 30 * SCALE; g.fill(); g.restore();
+}
+function swirls(P, t, bandX) {   // Szene 3: feine Kratzer, vom Polierlicht aufgelöst
+  const fadeIn = prog(t, T.toPolish[0] - .2, T.toPolish[1]); if (fadeIn < .01) return;
+  SWIRL.forEach(s => { const sx = P.x + s.x * P.w, sy = P.y + s.y * P.h, a = s.al * clamp01((sx - (bandX - 40)) / 120) * (t < T.band[0] ? fadeIn : 1) * (1 - prog(t, B.seal[0], B.seal[0] + .3) * 0); if (a < .01) return;
+    g.globalAlpha = a; g.strokeStyle = '#cfd8e8'; g.lineWidth = 1.1; g.beginPath(); g.arc(sx, sy, s.r, s.a0, s.a0 + s.sp); g.stroke(); }); g.globalAlpha = 1;
+}
+function band(P, t) {   // Polierlicht: ein breites Lichtband, aus dem Schaum-Kreis entstanden
+  const m = prog(t, ...T.toPolish), k = prog(t, ...T.band); if (t < T.toPolish[0] || t > T.band[1] + .6) return null;
+  const bx = lerp(P.x - P.w / 2 - 260, P.x + P.w / 2 + 320, inOutCubic(k)), w = lerp(40, 340, inOutCubic(m)) * (1 - prog(t, T.band[1], T.band[1] + .6) * .6), cx = m < 1 && k === 0 ? P.x : bx;
+  g.save(); g.translate(k === 0 ? lerp(P.x, bx, inOutCubic(m)) : bx, P.y); g.rotate(-.35);
+  const lg = g.createLinearGradient(-w, 0, w, 0); lg.addColorStop(0, 'rgba(255,255,255,0)'); lg.addColorStop(.5, `rgba(255,255,255,${.55 * (1 - prog(t, T.band[1], T.band[1] + .6))})`); lg.addColorStop(1, 'rgba(255,255,255,0)');
+  g.fillStyle = lg; g.fillRect(-w, -700, w * 2, 1400); g.restore(); return bx;
+}
+function glass(P, t) {   // Szene 4: die Keramikschicht senkt sich als hauchdünne Glasplatte auf den Lack
+  if (t < T.glass[0] || t > B.cure[0] + .6) return; const k = outExpo(prog(t, ...T.glass)), off = (1 - k) * -440, out = 1 - prog(t, T.toRing[0], T.toRing[1]);
+  const x = P.x - P.w / 2 - 8, y = P.y - P.h / 2 - 8 + off, w = P.w + 16, h = P.h + 16;
+  g.save(); g.globalAlpha = out * clamp01(k * 3); rr(x, y, w, h, 44); const gr = g.createLinearGradient(x, y, x + w, y + h); gr.addColorStop(0, 'rgba(232,243,32,.09)'); gr.addColorStop(.4, 'rgba(255,255,255,.06)'); gr.addColorStop(1, 'rgba(232,243,32,.05)');
+  g.fillStyle = gr; g.fill(); g.lineWidth = 2.2; g.strokeStyle = 'rgba(232,243,32,.85)'; g.stroke();
+  const sw = prog(t, T.glass[1] + .1, T.glass[1] + .9); if (sw > 0 && sw < 1) { g.save(); rr(x, y, w, h, 44); g.clip(); const sx = lerp(x - 200, x + w + 200, sw), sg = g.createLinearGradient(sx - 120, 0, sx + 120, 0); sg.addColorStop(0, 'rgba(255,255,255,0)'); sg.addColorStop(.5, 'rgba(255,255,255,.5)'); sg.addColorStop(1, 'rgba(255,255,255,0)'); g.fillStyle = sg; g.fillRect(sx - 120, y, 240, h); g.restore(); }
+  g.restore();
+}
+function drops(P, t) {   // Wasser perlt als runde Tropfen ab
+  if (t < T.drops[0]) return; const out = 1 - prog(t, T.toRing[0], T.toRing[1]);
+  DROP.forEach(d => { const k = outCubic(prog(t, d.t0, d.t0 + .45)); if (k <= 0) return; const roll = d.roll ? Math.pow(Math.max(0, t - T.roll), 2) * 38 : 0, x = P.x + d.x * P.w + (d.roll ? roll * .1 : 0), y = P.y + d.y * P.h + roll, r = d.r * k;
+    if (d.roll && roll > 3) { g.globalAlpha = .25 * out; g.strokeStyle = 'rgba(210,225,245,1)'; g.lineWidth = r * .6; g.beginPath(); g.moveTo(x - roll * .1, y - roll); g.lineTo(x, y); g.stroke(); }
+    g.globalAlpha = out; const rg = g.createRadialGradient(x - r * .35, y - r * .4, r * .1, x, y, r); rg.addColorStop(0, 'rgba(255,255,255,.55)'); rg.addColorStop(.7, 'rgba(160,190,225,.16)'); rg.addColorStop(1, 'rgba(210,230,255,.62)');
+    g.fillStyle = rg; g.beginPath(); g.arc(x, y, r, 0, 6.283); g.fill(); g.fillStyle = 'rgba(255,255,255,.9)'; g.beginPath(); g.arc(x - r * .38, y - r * .42, r * .2, 0, 6.283); g.fill(); }); g.globalAlpha = 1;
+}
+function ring(P, t) {   // Szene 5: Ring füllt sich über „12 Stunden“, Prüflicht-Linie läuft über den Lack
+  if (t < T.toRing[0] + .4 || t > T.toCard[1]) return; const k = outCubic(prog(t, T.ring[0], T.ring[1])), appear = prog(t, T.toRing[1] - .3, T.toRing[1] + .2) * (1 - prog(t, T.toCard[0], T.toCard[0] + .4));
+  g.save(); g.globalAlpha = appear; g.lineWidth = 12; g.strokeStyle = 'rgba(255,255,255,.14)'; g.beginPath(); g.arc(P.x, P.y, 214, 0, 6.283); g.stroke();
+  g.strokeStyle = C.acc; g.lineCap = 'round'; g.shadowColor = 'rgba(232,243,32,.55)'; g.shadowBlur = 26 * SCALE; g.beginPath(); g.arc(P.x, P.y, 214, -Math.PI / 2, -Math.PI / 2 + 6.283 * k); g.stroke(); g.shadowBlur = 0;
+  for (let i = 0; i < 12; i++) { const a = -Math.PI / 2 + i * Math.PI / 6; g.strokeStyle = 'rgba(255,255,255,.35)'; g.lineWidth = 3; g.beginPath(); g.moveTo(P.x + Math.cos(a) * 232, P.y + Math.sin(a) * 232); g.lineTo(P.x + Math.cos(a) * 246, P.y + Math.sin(a) * 246); g.stroke(); }
+  g.restore(); words('12 h', P.x, P.y + 22, t, T.ring[0] + .1, 84, C.txt, 800, T.toCard[0] - .1);
+  g.save(); g.beginPath(); g.arc(P.x, P.y, 188, 0, 6.283); g.clip(); const sy = P.y + Math.sin((t - T.ring[0]) * 1.6) * 130, lg = g.createLinearGradient(0, sy - 40, 0, sy + 40); lg.addColorStop(0, 'rgba(255,255,255,0)'); lg.addColorStop(.5, `rgba(255,255,255,${.32 * appear})`); lg.addColorStop(1, 'rgba(255,255,255,0)'); g.fillStyle = lg; g.fillRect(P.x - 200, sy - 40, 400, 80); g.restore();
+}
+// ---- Karten Übergabe -------------------------------------------------------------------------------------------
+function cards(P, t) {
+  if (t < T.toCard[0] || t > T.toLogo[1]) return; const out = 1 - inOutCubic(prog(t, ...T.toLogo)), appear = prog(t, T.toCard[1] - .2, T.toCard[1] + .5), k2 = outExpo(prog(t, ...T.cards)) , x = P.x - P.w / 2, y = P.y - P.h / 2;
+  g.save(); g.globalAlpha = out * appear;   // Karte 1: Pflegeanleitung (das verwandelte Lack-Panel)
+  g.strokeStyle = C.gold; g.lineWidth = 2; g.globalAlpha = out * appear * .6; rr(x, y, P.w, P.h, 34); g.stroke(); g.globalAlpha = out * appear;
+  g.fillStyle = C.acc; rr(x + 46, y + 52, 64, 82, 10); g.fill(); g.fillStyle = C.ink; for (let i = 0; i < 3; i++) { rr(x + 60, y + 72 + i * 18, 36, 6, 3); g.fill(); }
+  g.restore(); words('Pflegeanleitung', P.x + 40, y + 190, t, T.toCard[1] + .1, 50, C.txt, 800, T.toLogo[0] - .1); words('zur Übergabe', P.x + 40, y + 246, t, T.toCard[1] + .4, 30, C.muted, 500, T.toLogo[0] - .1);
+  const tl = inOutCubic(prog(t, ...T.toLogo)), bx = lerp(lerp(1700, 1250, k2), 960, tl), by = lerp(540, 420, tl), w = lerp(560, 40, tl), h = lerp(340, 40, tl), o2 = prog(t, T.cards[0], T.cards[0] + .3) * out;   // Karte 2: Nachkontrolle
+  g.save(); g.globalAlpha = o2; const gr = g.createLinearGradient(bx - w / 2, by - h / 2, bx + w / 2, by + h / 2); gr.addColorStop(0, '#1d2736'); gr.addColorStop(1, '#0c1118'); rr(bx - w / 2, by - h / 2, w, h, 34); g.fillStyle = gr; g.fill(); g.strokeStyle = C.gold; g.globalAlpha = o2 * .6; g.stroke(); g.restore();
+  words('Nachkontrolle', bx + 0, by - 40, t, T.cards[0] + .25, 52, C.txt, 800, T.toLogo[0] - .1); words('nach 6 Monaten', bx, by + 22, t, T.cards[0] + .5, 36, C.gold, 600, T.toLogo[0] - .1); words('kostenlos', bx, by + 92, t, T.cards[0] + .75, 54, C.acc, 800, T.toLogo[0] - .1);
+}
+// ---- Beschriftung je Schritt (Wort für Wort) -------------------------------------------------------------------
+function labels(t) {
+  const L = (n, title, sub, a, b) => { const tin = a + .15, tout = b - .35; words(`${n} · ${title}`, PX, 150, t, tin, 56, C.txt, 800, tout); words(sub, PX, 940, t, tin + .35, 32, C.muted, 500, tout); };
+  words('Was passiert bei einer', PX, 120, t, .35, 78, C.txt, 800, 2.5); words('Keramikversiegelung?', PX, 207, t, .85, 78, C.acc, 800, 2.5);
+  L('01', 'Waschen & dekontaminieren', 'Handwäsche · Flugrost- und Teerentfernung · Kneten', ...B.wash); L('02', 'Polieren', '1-stufig für Glanz · 2-stufig bei Waschkratzern', ...B.polish);
+  L('03', 'Versiegeln', 'hauchdünn · glasklar', ...B.seal); L('04', 'Aushärten', 'in der Halle · erste 12 Stunden unter Prüflicht', ...B.cure);
+}
+function endcard(t) {
+  const a = prog(t, T.toLogo[0] + .3, T.toLogo[1] + .5); if (a <= 0) return;
+  g.save(); g.globalAlpha = a; const lw = 520, lh = lw * logo.naturalHeight / (logo.naturalWidth || 1), pop = outExpo(prog(t, T.toLogo[0] + .3, T.toLogo[1] + .9)); if (logo.naturalWidth) g.drawImage(logo, 960 - lw / 2, 250 - lh / 2 - (1 - pop) * 14, lw, lh); g.restore();
+  words('Keramikversiegelung ab 700 €', 960, 520, t, 21.5, 66, C.txt, 800); words('Bis 31.12.2026: Waschset geschenkt', 960, 600, t, 21.95, 38, C.gold, 600);
+  const pa = outExpo(prog(t, 22.3, 22.9)); g.save(); g.globalAlpha = pa; rr(960 - 560, 680 + (1 - pa) * 18, 1120, 92, 46); g.fillStyle = C.acc; g.fill(); g.restore();
+  words('Schick uns Fotos – wir machen dir ein faires Angebot', 960, 738, t, 22.55, 34, C.ink, 800);
+  words('WhatsApp 0170 6669516 · carcura.info', 960, 860, t, 23.0, 32, C.muted, 500);
+}
+// ---- Bild zusammensetzen ----------------------------------------------------------------------------------------
+function render(t) {
+  g.setTransform(SCALE, 0, 0, SCALE, 0, 0); g.globalAlpha = 1; g.filter = 'none'; background(t);
+  const push = sine(prog(t, 0, 20.6)), world = { s: lerp(1, 1.09, push), dx: lerp(0, -22, push), dy: lerp(0, -8, push) };   // EINE Kamera: schiebt nur nach vorn, hört vor dem Endbild auf
+  const open = outExpo(prog(t, .1, 1.1));
+  g.save(); g.translate(960 + world.dx, 540 + world.dy); g.scale(world.s * lerp(.55, 1, open), world.s * lerp(.55, 1, open)); g.translate(-960, -540); g.globalAlpha = clamp01(open * 3) * (1 - 0);
+  const P = panelGeom(t), gloss = Math.max(prog(t, T.band[0] + .3, T.band[1]), 0) * .8 + prog(t, B.seal[0], B.seal[0] + 1) * .2;
+  if (P.toLogo < .98) { paint(P, gloss, t); const wave = dirt(P, t); foam(P, t, wave); const bx = band(P, t); swirls(P, t, bx == null ? (t < T.band[0] ? -1e4 : 1e4) : bx); drops(P, t); clay(P, t); endClip(); glass(P, t); ring(P, t); cards(P, t); }
+  g.restore(); g.globalAlpha = 1;
+  // Hook: goldene Linie zeichnet sich um das Panel
+  const dl = prog(t, .3, 2.2) * (1 - prog(t, 2.6, 3.2)) + (t > .3 && t < 2.7 ? .001 : 0); if (dl > 0) { g.save(); g.translate(960 + world.dx, 540 + world.dy); g.scale(world.s, world.s); g.translate(-960, -540); g.strokeStyle = C.gold; g.lineWidth = 3; g.lineCap = 'round'; g.globalAlpha = .9 * (1 - prog(t, 2.6, 3.2));
+    const per = 2 * (PW + PH) * .98; g.setLineDash([per * outCubic(prog(t, .3, 2.2)), 1e5]); rr(PX - PW / 2 - 14, PY - PH / 2 - 14, PW + 28, PH + 28, 50); g.stroke(); g.restore(); }
+  labels(t); endcard(t);
+  if (t < 21.6) { g.save(); g.globalAlpha = .5 * (1 - prog(t, 20.9, 21.5)); g.fillStyle = C.muted; g.font = `500 20px ${FONT}`; g.textAlign = 'center'; g.fillText('Animation, vereinfachte Darstellung', 960, 1040); g.restore(); }
+}
+window.TOTAL = TOTAL; window.renderAt = t => render(t);
+window.EVENTS = [{ name: 'hook.start', t: .35 }, { name: 'wash.foam', t: T.foam[0] }, { name: 'wash.clay', t: T.clay[0] }, { name: 'polish.band', t: T.band[0] }, { name: 'seal.glass', t: T.glass[0] + .35 }, { name: 'seal.drops', t: T.drops[0] },
+  { name: 'cure.ring', t: T.ring[0] }, { name: 'hand.card1', t: T.toCard[1] }, { name: 'hand.card2', t: T.cards[0] + .3 }, { name: 'end.logo', t: T.toLogo[1] }, { name: 'end.cta', t: 22.4 }, { name: 'end', t: TOTAL }];
+window.ready = Promise.all([document.fonts.load(`800 40px ${FONT}`), logoReady]).catch(() => {}).then(() => { if (q.has('t')) render(parseFloat(q.get('t'))); else (function tick(n) { render((n / 1000) % TOTAL); requestAnimationFrame(tick); })(0); return true; });
+</script></body></html>
