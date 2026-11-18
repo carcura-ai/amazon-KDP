@@ -129,7 +129,7 @@ function cards(P, t) {
 }
 // ---- Beschriftung je Schritt (Wort für Wort) -------------------------------------------------------------------
 function labels(t) {
-  const L = (n, title, sub, a, b) => { const tin = a + .15, tout = b - .35; words(`${n} · ${title}`, PX, 150, t, tin, 56, C.txt, 800, tout); words(sub, PX, 940, t, tin + .35, 32, C.muted, 500, tout); };
+  const L = (n, title, sub, a, b) => { const tin = a + .15, tout = b - .35; words(`${n} · ${title}`, PX, 150, t, tin, 56, C.txt, 800, tout); words(sub, PX, 925, t, tin + .35, 30, C.muted, 500, tout); };
   words('Was passiert bei einer', PX, 120, t, .35, 78, C.txt, 800, 2.5); words('Keramikversiegelung?', PX, 207, t, .85, 78, C.acc, 800, 2.5);
   L('01', 'Waschen & dekontaminieren', 'Handwäsche · Flugrost- und Teerentfernung · Kneten', ...B.wash); L('02', 'Polieren', '1-stufig für Glanz · 2-stufig bei Waschkratzern', ...B.polish);
   L('03', 'Versiegeln', 'hauchdünn · glasklar', ...B.seal); L('04', 'Aushärten', 'in der Halle · erste 12 Stunden unter Prüflicht', ...B.cure);
@@ -143,7 +143,8 @@ function endcard(t) {
   words('WhatsApp 0170 6669516 · carcura.info', 960, 860, t, 23.0, 32, C.muted, 500);
 }
 // ---- Bild zusammensetzen ----------------------------------------------------------------------------------------
-function render(t) {
+function render(tr) {
+  const t = warp(tr);
   g.setTransform(SCALE, 0, 0, SCALE, 0, 0); g.globalAlpha = 1; g.filter = 'none'; background(t);
   const push = sine(prog(t, 0, 20.6)), world = { s: lerp(1, 1.09, push), dx: lerp(0, -22, push), dy: lerp(0, -8, push) };   // EINE Kamera: schiebt nur nach vorn, hört vor dem Endbild auf
   const open = outExpo(prog(t, .1, 1.1));
@@ -155,10 +156,29 @@ function render(t) {
   const dl = prog(t, .3, 2.2) * (1 - prog(t, 2.6, 3.2)) + (t > .3 && t < 2.7 ? .001 : 0); if (dl > 0) { g.save(); g.translate(960 + world.dx, 540 + world.dy); g.scale(world.s, world.s); g.translate(-960, -540); g.strokeStyle = C.gold; g.lineWidth = 3; g.lineCap = 'round'; g.globalAlpha = .9 * (1 - prog(t, 2.6, 3.2));
     const per = 2 * (PW + PH) * .98; g.setLineDash([per * outCubic(prog(t, .3, 2.2)), 1e5]); rr(PX - PW / 2 - 14, PY - PH / 2 - 14, PW + 28, PH + 28, 50); g.stroke(); g.restore(); }
   labels(t); endcard(t);
-  if (t < 21.6) { g.save(); g.globalAlpha = .5 * (1 - prog(t, 20.9, 21.5)); g.fillStyle = C.muted; g.font = `500 20px ${FONT}`; g.textAlign = 'center'; g.fillText('Animation, vereinfachte Darstellung', 960, 1040); g.restore(); }
+  subtitles(tr);
+  if (t < 21.6) { g.save(); g.globalAlpha = .5 * (1 - prog(t, 20.9, 21.5)); g.fillStyle = C.muted; g.font = `500 20px ${FONT}`; g.textAlign = 'center'; g.fillText('Animation, vereinfachte Darstellung', 960, 1060); g.restore(); }
+}
+// ---- Zeitverzerrung: Szenen laufen so lange, wie der Sprecher braucht (höchstens 1,6-fach gedehnt, danach hält das Bild) ----------------------
+const DS = [0, 3, 7, 11, 15, 18, 21, 24]; let VOICE = null, RS = DS.slice(), REAL_TOTAL = TOTAL, SPEAK = [];
+function plan(z) {
+  VOICE = z; RS = [0]; SPEAK = [];
+  z.saetze.forEach((s, i) => { const d = DS[i + 1] - DS[i], L = Math.max(.9 * d, .3 + s.dauer + (i === 6 ? 1.4 : .8)); RS.push(RS[i] + L); SPEAK.push(RS[i] + .3); });
+  REAL_TOTAL = RS[7] + .4;
+}
+function warp(tr) { if (!VOICE) return tr; for (let i = 0; i < 7; i++) if (tr < RS[i + 1] || i === 6) { const d = DS[i + 1] - DS[i], L = RS[i + 1] - RS[i], f = d / Math.min(L, 1.6 * d); return Math.min(DS[i + 1], DS[i] + (tr - RS[i]) * f); } return 24; }
+const d2r = td => { if (!VOICE) return td; for (let i = 0; i < 7; i++) if (td <= DS[i + 1]) { const d = DS[i + 1] - DS[i], L = RS[i + 1] - RS[i], f = d / Math.min(L, 1.6 * d); return RS[i] + (td - DS[i]) / f; } return RS[7]; };
+function subtitles(tr) {
+  if (!VOICE) return; VOICE.saetze.forEach((s, i) => { const t0 = SPEAK[i], t1 = t0 + s.dauer + .25; if (tr < t0 - .05 || tr > t1) return;
+    const a = prog(tr, t0 - .05, t0 + .15) * (1 - prog(tr, t1 - .2, t1)); g.save(); g.globalAlpha = a; g.font = `600 34px ${FONT}`; g.textBaseline = 'alphabetic'; g.textAlign = 'left';
+    const ws = s.text.split(' '), sp = 9.5, wd = ws.map(w => g.measureText(w).width), tot = wd.reduce((x, y) => x + y, 0) + sp * (ws.length - 1); let x = 960 - tot / 2;
+    // Wortzeiten der Spracherkennung auf die Sollwörter verteilen (gleichmäßig über die erkannten Wörter, wenn Anzahl abweicht)
+    const ev = s.woerter; ws.forEach((w, k) => { const e = ev.length ? ev[Math.min(ev.length - 1, Math.round(k * (ev.length - 1) / Math.max(1, ws.length - 1)))] : [0, 0, 0]; g.fillStyle = (tr - t0) >= e[1] - .05 ? C.txt : 'rgba(163,165,173,.75)'; g.shadowColor = 'rgba(0,0,0,.8)'; g.shadowBlur = 8; g.fillText(w, x, 992); x += wd[k] + sp; }); g.restore(); });
 }
 window.TOTAL = TOTAL; window.renderAt = t => render(t);
-window.EVENTS = [{ name: 'hook.start', t: .35 }, { name: 'wash.foam', t: T.foam[0] }, { name: 'wash.clay', t: T.clay[0] }, { name: 'polish.band', t: T.band[0] }, { name: 'seal.glass', t: T.glass[0] + .35 }, { name: 'seal.drops', t: T.drops[0] },
-  { name: 'cure.ring', t: T.ring[0] }, { name: 'hand.card1', t: T.toCard[1] }, { name: 'hand.card2', t: T.cards[0] + .3 }, { name: 'end.logo', t: T.toLogo[1] }, { name: 'end.cta', t: 22.4 }, { name: 'end', t: TOTAL }];
-window.ready = Promise.all([document.fonts.load(`800 40px ${FONT}`), logoReady]).catch(() => {}).then(() => { if (q.has('t')) render(parseFloat(q.get('t'))); else (function tick(n) { render((n / 1000) % TOTAL); requestAnimationFrame(tick); })(0); return true; });
+const EV0 = [['hook.start', .35], ['wash.foam', T.foam[0]], ['wash.clay', T.clay[0]], ['polish.band', T.band[0]], ['seal.glass', T.glass[0] + .35], ['seal.drops', T.drops[0]], ['cure.ring', T.ring[0]], ['hand.card1', T.toCard[1]], ['hand.card2', T.cards[0] + .3], ['end.logo', T.toLogo[1]], ['end.cta', 22.4]];
+window.EVENTS = [];
+window.VOICE_AT = () => SPEAK;
+window.ready = Promise.all([document.fonts.load(`800 40px ${FONT}`), logoReady, fetch('stimme/zeitplan.json').then(r => r.ok ? r.json() : null).then(z => { if (z) plan(z); }).catch(() => {})]).catch(() => {}).then(() => { window.TOTAL = REAL_TOTAL; window.EVENTS = EV0.map(([name, td]) => ({ name, t: d2r(td) })).concat([{ name: 'end', t: REAL_TOTAL }]);
+  if (VOICE) window.EVENTS = window.EVENTS.concat(SPEAK.map((t, i) => ({ name: 'voice.' + i, t }))); if (q.has('t')) render(parseFloat(q.get('t'))); else (function tick(n) { render((n / 1000) % REAL_TOTAL); requestAnimationFrame(tick); })(0); return true; });
 </script></body></html>
