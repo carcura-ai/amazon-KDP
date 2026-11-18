@@ -99,11 +99,11 @@ Beschreibung: Aufbereitung der Frontscheinwerfer: angeschliffen, poliert und ver
 
 **CC-401 · Keramikversiegelung inkl. einstufiger Politur**
 Einheit: Pauschale · VK netto: 700,00 €
-Beschreibung: Handwäsche, Lack dekontaminiert und geknetet, einstufige Politur, Keramikversiegelung XPERTCOAT HYBRID, Nanolex-Pflegeset, kostenlose Nachkontrolle nach 6 Monaten.
+Beschreibung: Handwäsche, Lack dekontaminiert und geknetet, einstufige Politur, Keramikversiegelung XPERTCOAT HYBRID, kostenlose Nachkontrolle nach 6 Monaten.
 
 **CC-402 · Keramikversiegelung inkl. zweistufiger Politur**
 Einheit: Pauschale · VK netto: 900,00 €
-Beschreibung: Handwäsche, Lack dekontaminiert und geknetet, zweistufige Lackkorrektur, Keramikversiegelung XPERTCOAT HYBRID, Nanolex-Pflegeset, kostenlose Nachkontrolle nach 6 Monaten.
+Beschreibung: Handwäsche, Lack dekontaminiert und geknetet, zweistufige Lackkorrektur, Keramikversiegelung XPERTCOAT HYBRID, kostenlose Nachkontrolle nach 6 Monaten.
 
 **CC-403 · Keramik-Pflege**
 Einheit: Pauschale · VK netto: 79,00 €
@@ -124,6 +124,10 @@ Beschreibung: Scheiben gereinigt und mit Keramik versiegelt.
 **CC-407 · Scheiben-Keramik (Zusatz zur Lack-Keramik)**
 Einheit: Pauschale · VK netto: 80,00 €
 Beschreibung: Scheibenversiegelung im Rahmen der Keramikversiegelung.
+
+**CC-410 · Zugabe: Nanolex-Waschset (Aktion bis 31.12.2026)** *(nur zur Keramikversiegelung)*
+Einheit: Stück · VK netto: 0,00 €
+Beschreibung: Zugabe zur Keramikversiegelung (Aktion bis 31.12.2026): Nanolex-Waschset mit Wascheimer mit Schmutzsieb, Reactivating Shampoo, Reinigern für Scheiben und Reifen, Quick Detailer und Scrubpad. Kein Pflegeset mehr im Grundpreis.
 
 ## Wohnmobil
 
