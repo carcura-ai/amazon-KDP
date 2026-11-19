@@ -100,9 +100,11 @@
  </div>
  <div class="set" id="cxa-set" role="group" aria-label="Inhalt des Waschsets"><span>Das steckt im Set:</span></div>
 </section></div>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script>
+/* Sektion lädt three.js erst, wenn sie sichtbar wird. THREE_SRC: für die Website eigene Kopie der Datei hosten (Datenschutz), hier zum Ansehen der Vorschau ein öffentliches Netz. */
+var CXA_THREE_SRC='https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js';
 (function(){
+function boot(){
 'use strict';
 var root=document.getElementById('cxa');
 /* ================= Daten (ein Ort für Produkte und Texte) ================= */
@@ -292,9 +294,17 @@ function loop(now){if(!vis){running=false;return}var dt=Math.min(.05,(now-lastT)
  // schwächere Geräte: Auflösung stufenweise senken
  perf.n++;if(!perf.start)perf.start=now;if(perf.n>=90){var avg=(now-perf.start)/perf.n;if(avg>32&&perf.dpr>1){perf.dpr=Math.max(1,perf.dpr-.5);R._w=0}perf.n=0;perf.start=now}
  if(moving||needRender){needRender=false;requestAnimationFrame(loop)}else{running=false}}
+window.cxaState=function(){return JSON.stringify({p:S.p,target:S.target,sel:S.sel,card:card.classList.contains('on'),nogl:root.classList.contains('nogl')})};
 window.__seek=function(t,p,h,hb){S.p=p;S.target=p>0?1:0;S.sel=h===undefined?-1:h;S.hoverBucket=!!hb;S.time=t;frame(.016,t);frame(.016,t)};
 if(TEST){window.__seek(Q.has('t')?parseFloat(Q.get('t')):6,TEST.p,TEST.h,TEST.hb)}
 else{new IntersectionObserver(function(es){es.forEach(function(e){vis=e.isIntersecting;if(vis){S.time=S.time||0;need()}})},{threshold:.1}).observe(stage);document.addEventListener('visibilitychange',function(){vis=!document.hidden;if(vis)need()});
  if(REDUCED){S.time=9;frame(.016,9);frame(.016,9);need()}else need();addEventListener('resize',function(){R._w=0;need()})}
+}
+var rt=document.getElementById('cxa'),ende=new Date(rt.getAttribute('data-ende'));
+if(Math.ceil((ende-new Date())/864e5)<=0){rt.style.display='none';return}
+var st=document.getElementById('cxa-stage'),loaded=false;
+function go(){if(loaded)return;loaded=true;if(window.THREE){boot();return}var s=document.createElement('script');s.src=CXA_THREE_SRC;s.async=true;s.onload=boot;s.onerror=boot;document.head.appendChild(s)}
+if(new URLSearchParams(location.search).has('p')||!('IntersectionObserver' in window)){go()}
+else{new IntersectionObserver(function(es,o){if(es.some(function(e){return e.isIntersecting})){o.disconnect();go()}},{rootMargin:'300px'}).observe(st)}
 })();
 </script></body></html>
