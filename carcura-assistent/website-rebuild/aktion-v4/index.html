@@ -233,7 +233,7 @@ lidO.traverse(function(n){if(n.isMesh){n.material=n.material.clone();n.material.
 var selR=new T3.Mesh(new T3.RingGeometry(.4,.425,64),new T3.MeshBasicMaterial({color:0xe8f320,transparent:true,opacity:0,depthWrite:false,side:T3.DoubleSide}));selR.rotation.x=-Math.PI/2;selR.position.y=.006;grp.add(selR);
 /* ================= Ablauf: ein reversibler Fortschrittswert p, alles andere leitet sich ab ================= */
 var needRender=true,running=false,vis=true,lastT=0,V=new T3.Vector3(),vp=new T3.Vector3(),prevSel=-2,perf={n:0,sum:0,dpr:Math.min(window.devicePixelRatio||1,2)};
-function need(){needRender=true;if(!running&&vis&&!TEST){running=true;lastT=performance.now();requestAnimationFrame(loop)}}
+function need(){chips.forEach(function(c,i){c.setAttribute('aria-pressed',S.sel===i?'true':'false')});needRender=true;if(!running&&vis&&!TEST){running=true;lastT=performance.now();requestAnimationFrame(loop)}}
 function bez(a,b,c,d,k){var m=1-k;return m*m*m*a+3*m*m*k*b+3*m*k*k*c+k*k*k*d}
 function resize(){var w=stage.clientWidth,h=stage.clientHeight;if(!w||!h)return [w,h];var mob=w<700,dpr=Math.min(perf.dpr,mob?1.6:2);if(R._w!==w||R._h!==h||R._d!==dpr){R.setPixelRatio(dpr);R.setSize(w,h,false);R._w=w;R._h=h;R._d=dpr;cam.aspect=w/h;cam.updateProjectionMatrix();key.shadow.mapSize.set(mob?1024:2048,mob?1024:2048)}return [w,h]}
 function update(dt,t){
