@@ -27,7 +27,7 @@
 .cxa .hot.bucket b{width:22px;height:22px;margin:-11px;border-color:var(--acc)}
 .cxa .hint{position:absolute;z-index:4;transform:translate(-50%,0);font-size:.82rem;color:var(--txt);white-space:nowrap;pointer-events:none;padding:8px 14px 8px 12px;border-radius:999px;background:rgba(10,10,14,.72);border:1px solid rgba(232,243,32,.45);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);opacity:0;transition:opacity .6s var(--ease)}
 .cxa .hint.on{opacity:1}.cxa .hint svg{width:15px;height:15px;vertical-align:-3px;margin-right:6px;color:var(--acc)}
-.cxa .card{position:absolute;z-index:5;width:min(340px,calc(100% - 24px));padding:18px 20px 16px;border-radius:16px;background:rgba(12,12,16,.88);border:1px solid rgba(203,191,148,.32);box-shadow:0 30px 60px -28px #000,inset 0 1px 0 rgba(255,255,255,.06);backdrop-filter:blur(16px) saturate(1.2);-webkit-backdrop-filter:blur(16px) saturate(1.2);pointer-events:none;opacity:0;visibility:hidden;transform:translateY(8px) scale(.98);filter:blur(6px);transition:opacity .3s var(--ease),transform .5s var(--ease),filter .3s var(--ease),visibility 0s .5s}
+.cxa .card{position:absolute;z-index:5;width:min(340px,calc(100% - 24px));padding:15px 18px 13px;border-radius:16px;background:rgba(12,12,16,.88);border:1px solid rgba(203,191,148,.32);box-shadow:0 30px 60px -28px #000,inset 0 1px 0 rgba(255,255,255,.06);backdrop-filter:blur(16px) saturate(1.2);-webkit-backdrop-filter:blur(16px) saturate(1.2);pointer-events:none;opacity:0;visibility:hidden;transform:translateY(8px) scale(.98);filter:blur(6px);transition:opacity .3s var(--ease),transform .5s var(--ease),filter .3s var(--ease),visibility 0s .5s}
 .cxa .card.on{opacity:1;visibility:visible;transform:none;filter:none;pointer-events:auto;transition-delay:0s}
 .cxa .card h3{margin:0 0 6px;font-size:1.02rem;line-height:1.25;font-weight:680;letter-spacing:-.012em;color:var(--txt)}
 .cxa .card p{margin:0;font-size:.88rem;line-height:1.5;color:#cfd0d6;text-wrap:pretty}
@@ -269,7 +269,7 @@ function frame(dt,t){
  ptrS.x+=(ptr.x-ptrS.x)*Math.min(1,dt*5);ptrS.y+=(ptr.y-ptrS.y)*Math.min(1,dt*5);
  var u=eio((ts-CFG.camStart)/CFG.camDur),ent=eo(t/3.2),distC=(narrow?7.4:6.6)+(1-ent)*2.6,distO=narrow?(mob?10.4:9.4):8.8,dist=lerp(distC,distO,u)-.25*S.hb;
  var th=lerp(-.32,-.08,u)+(REDUCED?0:ptrS.x*.12),el=lerp(.3,.34,u)-(REDUCED?0:ptrS.y*.04),shift=narrow?0:.15*dist;
- var tgx=lerp(BX+(narrow?0:-shift*.0)-(narrow?0:.95),.3,u)-(narrow?0:shift*(.3+.7*u)),tgy=lerp(.62,1.3,u),tgz=lerp(BZ,0,u);
+ var tgx=lerp(BX+(narrow?0:-shift*.0)-(narrow?0:.95),.3,u)-(narrow?0:shift*(.3+.7*u)),tgy=lerp(.62,1.55,u),tgz=lerp(BZ,0,u);
  cam.position.set(tgx+Math.sin(th)*dist,Math.sin(el)*dist+tgy+.25,tgz+Math.cos(th)*dist);cam.lookAt(tgx,tgy,tgz);cam.updateMatrixWorld();
  // Ring und Hinweis
  ringM.material.opacity=.55*eo((t-.3)/1.6)*(1-.4*S.p);
@@ -286,8 +286,8 @@ function frame(dt,t){
  // Infokarte: gehört eindeutig zum Produkt (Pfeil), bleibt im Bild, deckt Text und Buttons nicht ab
  var show=item>=0&&P[item].k>=.98&&S.target===1,ci=item;
  if(show){if(prevSel!==ci){var dd=DATA[ci];ct.textContent=dd.name;cp.textContent=dd.txt;cp.parentNode.querySelectorAll('ul').forEach(function(u){u.remove()});if(dd.points){var ul=document.createElement('ul');dd.points.forEach(function(x){var li=document.createElement('li');li.textContent=x;ul.appendChild(li)});cp.after(ul)}cs.innerHTML='';if(dd.src){var s1=document.createElement('span');s1.textContent=dd.src;cs.appendChild(s1);var a=document.createElement('a');a.href=dd.link;a.target='_blank';a.rel='noopener noreferrer';a.textContent=dd.linkName;cs.appendChild(a);cs.style.display='flex'}else cs.style.display='none';prevSel=ci}
-  if(!narrow){var cw=card.offsetWidth||340,chh=card.offsetHeight||170,q=P[ci],cr=copyEl.getBoundingClientRect(),sr=stage.getBoundingClientRect(),minL=Math.max(12,cr.right-sr.left+18),left=Math.max(minL,Math.min(w-cw-12,q.sx-cw/2)),above=(q.tsy-chh-24)>=8,top=above?q.tsy-chh-24:q.bsy+24;if(top+chh>h-8)top=Math.max(8,Math.min(top,h-chh-8));
-   card.style.left=left+'px';card.style.top=top+'px';var tx=Math.max(16,Math.min(cw-28,q.sx-left-5));tip.style.left=tx+'px';tip.style.top=(above?chh-6:-6)+'px';tip.style.transform=above?'rotate(225deg)':'rotate(45deg)'}
+  if(!narrow){var cw=card.offsetWidth||340,chh=card.offsetHeight||170,q=P[ci],cr=copyEl.getBoundingClientRect(),sr=stage.getBoundingClientRect(),minL=Math.max(12,cr.right-sr.left+18),left=Math.max(minL,Math.min(w-cw-12,q.sx-cw/2)),above=(q.tsy-chh-22)>=8,below=(q.bsy+22+chh)<=h-8,top=above?q.tsy-chh-22:(below?q.bsy+22:Math.max(8,Math.min(h-chh-8,q.sy-chh/2))),side=!above&&!below;if(side){var ew=Math.max(60,(q.bsy-q.tsy)*.42),rl=q.sx+ew+18;left=(rl+cw<=w-12)?rl:Math.max(minL,q.sx-ew-18-cw)}
+   card.style.left=left+'px';card.style.top=top+'px';var tx=Math.max(16,Math.min(cw-28,q.sx-left-5));tip.style.left=tx+'px';tip.style.display=side?'none':'block';tip.style.top=(above?chh-6:-6)+'px';tip.style.transform=above?'rotate(225deg)':'rotate(45deg)'}
   card.classList.add('on')}else{card.classList.remove('on');if(item<0)prevSel=-2}
  if(S.p>=.999&&S.target===1&&!S.autoShown){S.autoShown=true;if(S.sel<0&&!TEST&&!REDUCED){S.sel=0}}
  chips.forEach(function(c,i){c.setAttribute('aria-pressed',(S.sel===i)?'true':'false');c.disabled=!(S.target===1&&S.p>.98);c.title=c.disabled?'Erst den Eimer öffnen':''});
@@ -298,6 +298,7 @@ function loop(now){if(!vis){running=false;return}var dt=Math.min(.05,(now-lastT)
  // schwächere Geräte: Auflösung stufenweise senken
  perf.n++;if(!perf.start)perf.start=now;if(perf.n>=90){var avg=(now-perf.start)/perf.n;if(avg>32&&perf.dpr>1){perf.dpr=Math.max(1,perf.dpr-.5);R._w=0}perf.n=0;perf.start=now}
  if(moving||needRender){needRender=false;requestAnimationFrame(loop)}else{running=false}}
+window.__dbg=function(){return JSON.stringify(P.map(function(q){return [Math.round(q.sy),Math.round(q.tsy),Math.round(q.bsy)]}))};
 window.__seek=function(t,p,h,hb){S.p=p;S.target=p>0?1:0;S.sel=h===undefined?-1:h;S.hoverBucket=!!hb;S.time=t;frame(.016,t);frame(.016,t)};
 if(TEST){window.__seek(Q.has('t')?parseFloat(Q.get('t')):6,TEST.p,TEST.h,TEST.hb)}
 else{new IntersectionObserver(function(es){es.forEach(function(e){vis=e.isIntersecting;if(vis){S.time=S.time||0;need()}})},{threshold:.1}).observe(stage);document.addEventListener('visibilitychange',function(){vis=!document.hidden;if(vis)need()});
