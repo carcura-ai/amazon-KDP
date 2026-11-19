@@ -14,7 +14,7 @@ js=js.replace("/* Sektion lädt three.js erst, wenn sie sichtbar wird. THREE_SRC
 js=js.replace("'on'","'cxon'").replace("'act'","'cxact'")
 css=css.replace('.btn.p','.cxb.cxp').replace('.btn.g','.cxb.cxg')
 for n,m in [('btn','cxb'),('sub','cxsub'),('card','cxcard'),('on','cxon'),('act','cxact'),('w','cxw')]:
-    css=re.sub(r'(?<![\w-])\.'+n+r'(?![\w-])','.'+m,css)
+    css=re.sub(r'(?<![\d-])\.'+n+r'(?![\w-])','.'+m,css)
 css=re.sub(r'(?<![#\w-])\.cxa(?![\w-])','#aktion .cxa',css)
 sec=sec.replace('class="btn p"','class="cxb cxp"').replace('class="btn g"','class="cxb cxg"').replace('class="sub"','class="cxsub"').replace('class="act"','class="cxact"').replace('class="card"','class="cxcard"').replace('class="w"','class="cxw"')
 head="""<!-- Carcura: Aktion „Keramik buchen. Waschset geschenkt.“ (bis 31.12.2026). Erzeugt mit build.py, nicht von Hand ändern.
