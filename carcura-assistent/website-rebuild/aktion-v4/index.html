@@ -111,7 +111,7 @@ function boot(){
 var root=document.getElementById('cxa');
 /* ================= Daten (ein Ort für Produkte und Texte) ================= */
 var DATA=[
- {id:'eimer',name:'Wascheimer mit Schmutzsieb',txt:'Das Nanolex Wash Bucket SET ist die Basis für die Fahrzeugwäsche. Das macht den Eimer besonders:',points:['Der Schmutzsieb-Einsatz wird in den Eimer eingesetzt und ergänzt ihn bei der Wäsche.','Ein passender Deckel gehört zur Aufbewahrung dazu.','Eimer, Sieb und Deckel kommen als zusammengehöriges Set.'],src:'Nach Angaben von Nanolex',link:'https://shop.nanolex.de/products/plenty-baseline-1869',linkName:'shop.nanolex.de'},
+ {id:'eimer',name:'Wascheimer mit Schmutzsieb',txt:'Das Nanolex Wash Bucket SET ist die Basis für die Fahrzeugwäsche. Das macht den Eimer besonders:',points:['Schmutzsieb-Einsatz für die Wäsche','Passender Deckel zur Aufbewahrung','Eimer, Sieb und Deckel als Set'],src:'Nach Angaben von Nanolex',link:'https://shop.nanolex.de/products/plenty-baseline-1869',linkName:'shop.nanolex.de'},
  {id:'shampoo',name:'Reactivating Shampoo von Nanolex',txt:'Reinigt gründlich und frischt dabei den vorhandenen Lackschutz auf. Schonend auch für versiegelte und gewachsene Lacke, bringt Wasser besser zum Abperlen und gibt bei jeder Wäsche mehr Glanz. Darum passt es genau zur Keramikversiegelung.',src:'Nach Angaben von Nanolex, entwickelt und produziert in Deutschland',link:'https://www.nanolexcarcare.com/car-care/reactivating-shampoo/',linkName:'nanolexcarcare.com'},
  {id:'scheiben',name:'Reiniger für Scheiben',txt:'Löst Schmutz, Fingerabdrücke und Insektenreste, ohne Streifen zu hinterlassen. Innen und außen anwendbar, auch für Spiegel.'},
  {id:'reifen',name:'Reiniger für Reifen',txt:'Reinigt Reifen und Gummi gründlich und bereitet sie für die Pflege vor, damit auch unten alles gepflegt aussieht.'},
@@ -122,7 +122,7 @@ DATA[1].txt=DATA[1].txt.replace('gewachsene','gewachste');
 /* Zeiten und Maße zentral */
 var CFG={open:2.2,close:1.6,lidStart:.06,lidDur:.75,prodStart:.42,stagger:.14,flight:.95,camStart:.2,camDur:1.7,
  pos:[[-1.1,-.2],[-.3,-.62],[.45,-.26],[1.1,-.56],[1.78,-.22],[.42,.62]],   // Zielplätze (x,z) auf dem Boden
- rot:[.5,-.25,.3,-.2,-.5,.4],foot:[.58,.3,.26,.26,.24,.34],anchor:[.9,1.3,.95,.95,.85,.2],
+ rot:[.5,-.25,.3,-.2,-.5,.4],foot:[.58,.3,.26,.26,.24,.34],anchor:[.9,1.3,.95,.95,.85,.2],top:[1.5,1.3,1.0,1.0,.9,.24],
  mouth:[[.0,.0],[.2,.05],[-.12,.18],[.08,-.2],[-.2,-.08],[.0,.2]],s0:.36};
 var END=new Date(root.getAttribute('data-ende')),DAYS=Math.ceil((END-new Date())/864e5);
 if(DAYS<=0){root.style.display='none';return}
@@ -269,14 +269,14 @@ function frame(dt,t){
  ptrS.x+=(ptr.x-ptrS.x)*Math.min(1,dt*5);ptrS.y+=(ptr.y-ptrS.y)*Math.min(1,dt*5);
  var u=eio((ts-CFG.camStart)/CFG.camDur),ent=eo(t/3.2),distC=(narrow?7.4:6.6)+(1-ent)*2.6,distO=narrow?(mob?10.4:9.4):8.8,dist=lerp(distC,distO,u)-.25*S.hb;
  var th=lerp(-.32,-.08,u)+(REDUCED?0:ptrS.x*.12),el=lerp(.3,.34,u)-(REDUCED?0:ptrS.y*.04),shift=narrow?0:.15*dist;
- var tgx=lerp(BX+(narrow?0:-shift*.0)-(narrow?0:.95),.3,u)-(narrow?0:shift*(.3+.7*u)),tgy=lerp(.62,.95,u),tgz=lerp(BZ,0,u);
+ var tgx=lerp(BX+(narrow?0:-shift*.0)-(narrow?0:.95),.3,u)-(narrow?0:shift*(.3+.7*u)),tgy=lerp(.62,1.3,u),tgz=lerp(BZ,0,u);
  cam.position.set(tgx+Math.sin(th)*dist,Math.sin(el)*dist+tgy+.25,tgz+Math.cos(th)*dist);cam.lookAt(tgx,tgy,tgz);cam.updateMatrixWorld();
  // Ring und Hinweis
  ringM.material.opacity=.55*eo((t-.3)/1.6)*(1-.4*S.p);
  R.render(scene,cam);
  // Hotspots
  var showHint=S.target===0&&S.p<.01&&t>2.2&&!S.hoverBucket&&S.sel<0;
- P.forEach(function(q,i){if(i===0){V.set(BX,.52,BZ)}else V.set(q.cx,(CFG.anchor[i]*.5)+q.cy,q.cz);vp.copy(V);grp.localToWorld(vp);vp.project(cam);q.sx=(vp.x*.5+.5)*w;q.sy=(-vp.y*.5+.5)*h;
+ P.forEach(function(q,i){if(i===0){V.set(BX,.52,BZ)}else V.set(q.cx,(CFG.anchor[i]*.5)+q.cy,q.cz);vp.copy(V);grp.localToWorld(vp);vp.project(cam);q.sx=(vp.x*.5+.5)*w;q.sy=(-vp.y*.5+.5)*h;vp.set(q.cx,q.cy+(i?CFG.top[i]*(q.sc||1):CFG.top[0]),q.cz);grp.localToWorld(vp);vp.project(cam);q.tsy=(-vp.y*.5+.5)*h;vp.set(q.cx,q.cy,q.cz);grp.localToWorld(vp);vp.project(cam);q.bsy=(-vp.y*.5+.5)*h;
   var b=hot[i],ready=i===0?true:(q.k>=.98&&S.target===1);
   if(i===0){var ww=Math.min(w*.3,Math.max(110,(narrow?w*.34:w*.2)))*(S.p>.5?.55:1);b.style.width=ww+'px';b.style.height=ww*(S.p>.5?1:1.05)+'px'}else{b.style.width='64px';b.style.height='64px'}
   b.style.left=q.sx+'px';b.style.top=q.sy+'px';b.classList.toggle('on',ready);b.classList.toggle('pulse',ready&&S.sel<0&&(i>0||S.target===0));b.classList.toggle('act',S.sel===i||S.hoverItem===i||(i===0&&S.hoverBucket));b.tabIndex=ready?0:-1;
@@ -286,8 +286,8 @@ function frame(dt,t){
  // Infokarte: gehört eindeutig zum Produkt (Pfeil), bleibt im Bild, deckt Text und Buttons nicht ab
  var show=item>=0&&P[item].k>=.98&&S.target===1,ci=item;
  if(show){if(prevSel!==ci){var dd=DATA[ci];ct.textContent=dd.name;cp.textContent=dd.txt;cp.parentNode.querySelectorAll('ul').forEach(function(u){u.remove()});if(dd.points){var ul=document.createElement('ul');dd.points.forEach(function(x){var li=document.createElement('li');li.textContent=x;ul.appendChild(li)});cp.after(ul)}cs.innerHTML='';if(dd.src){var s1=document.createElement('span');s1.textContent=dd.src;cs.appendChild(s1);var a=document.createElement('a');a.href=dd.link;a.target='_blank';a.rel='noopener noreferrer';a.textContent=dd.linkName;cs.appendChild(a);cs.style.display='flex'}else cs.style.display='none';prevSel=ci}
-  if(!narrow){var cw=card.offsetWidth||340,chh=card.offsetHeight||170,q=P[ci],cr=copyEl.getBoundingClientRect(),sr=stage.getBoundingClientRect(),minL=Math.max(12,cr.right-sr.left+18),left=Math.max(minL,Math.min(w-cw-12,q.sx-cw/2)),above=(q.sy-chh-40)>=10,top=above?q.sy-chh-40:q.sy+40;if(top+chh>h-10)top=Math.max(10,q.sy-chh-40);
-   card.style.left=left+'px';card.style.top=top+'px';var tx=Math.max(16,Math.min(cw-28,q.sx-left-5));tip.style.left=tx+'px';tip.style.top=(top>q.sy?-6:chh-6)+'px';tip.style.transform=top>q.sy?'rotate(45deg)':'rotate(225deg)'}
+  if(!narrow){var cw=card.offsetWidth||340,chh=card.offsetHeight||170,q=P[ci],cr=copyEl.getBoundingClientRect(),sr=stage.getBoundingClientRect(),minL=Math.max(12,cr.right-sr.left+18),left=Math.max(minL,Math.min(w-cw-12,q.sx-cw/2)),above=(q.tsy-chh-24)>=8,top=above?q.tsy-chh-24:q.bsy+24;if(top+chh>h-8)top=Math.max(8,Math.min(top,h-chh-8));
+   card.style.left=left+'px';card.style.top=top+'px';var tx=Math.max(16,Math.min(cw-28,q.sx-left-5));tip.style.left=tx+'px';tip.style.top=(above?chh-6:-6)+'px';tip.style.transform=above?'rotate(225deg)':'rotate(45deg)'}
   card.classList.add('on')}else{card.classList.remove('on');if(item<0)prevSel=-2}
  if(S.p>=.999&&S.target===1&&!S.autoShown){S.autoShown=true;if(S.sel<0&&!TEST&&!REDUCED){S.sel=0}}
  chips.forEach(function(c,i){c.setAttribute('aria-pressed',(S.sel===i)?'true':'false');c.disabled=!(S.target===1&&S.p>.98);c.title=c.disabled?'Erst den Eimer öffnen':''});
