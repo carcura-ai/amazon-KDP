@@ -31,6 +31,8 @@
 .cxa .card.on{opacity:1;visibility:visible;transform:none;filter:none;pointer-events:auto;transition-delay:0s}
 .cxa .card h3{margin:0 0 6px;font-size:1.02rem;line-height:1.25;font-weight:680;letter-spacing:-.012em;color:var(--txt)}
 .cxa .card p{margin:0;font-size:.88rem;line-height:1.5;color:#cfd0d6;text-wrap:pretty}
+.cxa .card ul{margin:10px 0 0;padding:0;list-style:none;display:grid;gap:7px}.cxa .card li{position:relative;padding-left:18px;font-size:.86rem;line-height:1.45;color:#e4e5e9}.cxa .card li:before{content:"";position:absolute;left:2px;top:.55em;width:6px;height:6px;background:var(--gold);transform:rotate(45deg)}
+.cxa .chip:disabled{opacity:.45;cursor:not-allowed;border-color:rgba(255,255,255,.12)}
 .cxa .card .src{margin-top:12px;padding-top:11px;border-top:1px solid rgba(255,255,255,.1);font-size:.74rem;color:var(--mut);display:flex;gap:6px 12px;flex-wrap:wrap;justify-content:space-between}
 .cxa .card .src a{color:var(--gold);text-underline-offset:3px}
 .cxa .card .x{position:absolute;right:8px;top:8px;width:32px;height:32px;border:0;border-radius:50%;background:transparent;color:var(--mut);cursor:pointer;font-size:1.1rem;line-height:1;display:none}
@@ -109,12 +111,12 @@ function boot(){
 var root=document.getElementById('cxa');
 /* ================= Daten (ein Ort für Produkte und Texte) ================= */
 var DATA=[
- {id:'eimer',name:'Wascheimer mit Schmutzsieb',txt:'Das Sieb am Boden fängt den Dreck ab. So nimmt der Waschhandschuh beim Eintauchen kaum Schmutz wieder auf, das schont den Lack.'},
+ {id:'eimer',name:'Wascheimer mit Schmutzsieb',txt:'Das Nanolex Wash Bucket SET ist die Basis für die Fahrzeugwäsche. Das macht den Eimer besonders:',points:['Der Schmutzsieb-Einsatz wird in den Eimer eingesetzt und ergänzt ihn bei der Wäsche.','Ein passender Deckel gehört zur Aufbewahrung dazu.','Eimer, Sieb und Deckel kommen als zusammengehöriges Set.'],src:'Nach Angaben von Nanolex',link:'https://shop.nanolex.de/products/plenty-baseline-1869',linkName:'shop.nanolex.de'},
  {id:'shampoo',name:'Reactivating Shampoo von Nanolex',txt:'Reinigt gründlich und frischt dabei den vorhandenen Lackschutz auf. Schonend auch für versiegelte und gewachsene Lacke, bringt Wasser besser zum Abperlen und gibt bei jeder Wäsche mehr Glanz. Darum passt es genau zur Keramikversiegelung.',src:'Nach Angaben von Nanolex, entwickelt und produziert in Deutschland',link:'https://www.nanolexcarcare.com/car-care/reactivating-shampoo/',linkName:'nanolexcarcare.com'},
  {id:'scheiben',name:'Reiniger für Scheiben',txt:'Löst Schmutz, Fingerabdrücke und Insektenreste, ohne Streifen zu hinterlassen. Innen und außen anwendbar, auch für Spiegel.'},
  {id:'reifen',name:'Reiniger für Reifen',txt:'Reinigt Reifen und Gummi gründlich und bereitet sie für die Pflege vor, damit auch unten alles gepflegt aussieht.'},
  {id:'detailer',name:'Quick Detailer',txt:'Zum schnellen Auffrischen zwischen den Wäschen: entfernt leichten Schmutz, Staub und Fingerabdrücke und bringt den Lack wieder zum Glänzen.'},
- {id:'pad',name:'Scrubpad',txt:'Für hartnäckige Stellen wie eingebrannte Insektenreste oder Wasserflecken, in kreisenden Bewegungen mit leichtem Druck.'}
+ {id:'pad',name:'Scrubpad',txt:'Doppelseitiges Reinigungspad für den Innenraum: Die ultrafeine Scheuerseite löst hartnäckigen Schmutz auf strukturierten Oberflächen, die weiche Mikrofaserseite wischt ihn ab. Wiederverwendbar und waschbar.',src:'Nach Angaben von Nanolex',link:'https://shop.nanolex.de/products/nanolex-scrub-pad',linkName:'shop.nanolex.de'}
 ];
 DATA[1].txt=DATA[1].txt.replace('gewachsene','gewachste');
 /* Zeiten und Maße zentral */
@@ -131,14 +133,14 @@ var TEST=Q.has('p')?{p:parseFloat(Q.get('p')),h:Q.has('h')?parseInt(Q.get('h')):
 var stage=document.getElementById('cxa-stage'),cv=document.getElementById('cxa-gl'),hots=document.getElementById('cxa-hots'),hint=document.getElementById('cxa-hint'),card=document.getElementById('cxa-card'),
  ct=document.getElementById('cxa-ct'),cp=document.getElementById('cxa-cp'),cs=document.getElementById('cxa-cs'),tip=document.getElementById('cxa-tip'),xb=document.getElementById('cxa-x'),tg=document.getElementById('cxa-toggle'),setEl=document.getElementById('cxa-set'),copyEl=document.getElementById('cxa-copy');
 /* ================= Zustand (eine Quelle der Wahrheit) ================= */
-var S={target:REDUCED?1:0,p:REDUCED?1:0,sel:-1,hoverItem:-1,hoverBucket:false,tail:0};
+var S={target:REDUCED?1:0,p:REDUCED?1:0,sel:-1,hoverItem:-1,hoverBucket:false,tail:0,autoShown:!!REDUCED};
 if(TEST){S.p=TEST.p;S.target=TEST.p>0?1:0;S.sel=TEST.h;S.hoverBucket=TEST.hb}
 var chips=[],hot=[];
 window.cxaState=function(){return JSON.stringify({p:S.p,target:S.target,sel:S.sel,card:card.classList.contains('on'),nogl:root.classList.contains('nogl')})};
-function setTarget(v){S.target=v;if(!v){S.sel=-1;S.hoverItem=-1}need()}
-function select(i){S.target=1;S.sel=(S.sel===i)?-1:i;need()}
+function setTarget(v){S.target=v;if(!v){S.sel=-1;S.hoverItem=-1;S.autoShown=false}need()}
+function select(i){if(S.target!==1&&S.p<.98)return;S.sel=(S.sel===i)?-1:i;need()}
 DATA.forEach(function(d,i){
- var c=document.createElement('button');c.type='button';c.className='chip';c.textContent=d.name.replace(' von Nanolex','');c.setAttribute('aria-pressed','false');c.addEventListener('click',function(){select(i)});setEl.appendChild(c);chips.push(c);
+ var c=document.createElement('button');c.type='button';c.className='chip';c.textContent=d.name.replace(' von Nanolex','');c.setAttribute('aria-pressed','false');c.disabled=true;c.title='Erst den Eimer öffnen';c.addEventListener('click',function(){select(i)});setEl.appendChild(c);chips.push(c);
  var b=document.createElement('button');b.type='button';b.className='hot'+(i===0?' bucket':'');b.innerHTML='<i></i><b></b>';b.addEventListener('click',function(){if(i===0){setTarget(S.target?0:1)}else select(i)});
  b.addEventListener('pointerenter',function(e){if(e.pointerType==='touch')return;if(i===0){S.hoverBucket=true}else S.hoverItem=i;need()});
  b.addEventListener('pointerleave',function(e){if(e.pointerType==='touch')return;if(i===0)S.hoverBucket=false;else if(S.hoverItem===i)S.hoverItem=-1;need()});
@@ -283,11 +285,12 @@ function frame(dt,t){
  tg.classList.toggle('on',S.target===1&&S.p>.98);
  // Infokarte: gehört eindeutig zum Produkt (Pfeil), bleibt im Bild, deckt Text und Buttons nicht ab
  var show=item>=0&&P[item].k>=.98&&S.target===1,ci=item;
- if(show){if(prevSel!==ci){var dd=DATA[ci];ct.textContent=dd.name;cp.textContent=dd.txt;cs.innerHTML='';if(dd.src){var s1=document.createElement('span');s1.textContent=dd.src;cs.appendChild(s1);var a=document.createElement('a');a.href=dd.link;a.target='_blank';a.rel='noopener noreferrer';a.textContent=dd.linkName;cs.appendChild(a);cs.style.display='flex'}else cs.style.display='none';prevSel=ci}
+ if(show){if(prevSel!==ci){var dd=DATA[ci];ct.textContent=dd.name;cp.textContent=dd.txt;cp.parentNode.querySelectorAll('ul').forEach(function(u){u.remove()});if(dd.points){var ul=document.createElement('ul');dd.points.forEach(function(x){var li=document.createElement('li');li.textContent=x;ul.appendChild(li)});cp.after(ul)}cs.innerHTML='';if(dd.src){var s1=document.createElement('span');s1.textContent=dd.src;cs.appendChild(s1);var a=document.createElement('a');a.href=dd.link;a.target='_blank';a.rel='noopener noreferrer';a.textContent=dd.linkName;cs.appendChild(a);cs.style.display='flex'}else cs.style.display='none';prevSel=ci}
   if(!narrow){var cw=card.offsetWidth||340,chh=card.offsetHeight||170,q=P[ci],cr=copyEl.getBoundingClientRect(),sr=stage.getBoundingClientRect(),minL=Math.max(12,cr.right-sr.left+18),left=Math.max(minL,Math.min(w-cw-12,q.sx-cw/2)),above=(q.sy-chh-40)>=10,top=above?q.sy-chh-40:q.sy+40;if(top+chh>h-10)top=Math.max(10,q.sy-chh-40);
    card.style.left=left+'px';card.style.top=top+'px';var tx=Math.max(16,Math.min(cw-28,q.sx-left-5));tip.style.left=tx+'px';tip.style.top=(top>q.sy?-6:chh-6)+'px';tip.style.transform=top>q.sy?'rotate(45deg)':'rotate(225deg)'}
   card.classList.add('on')}else{card.classList.remove('on');if(item<0)prevSel=-2}
- chips.forEach(function(c,i){c.setAttribute('aria-pressed',(S.sel===i)?'true':'false')});
+ if(S.p>=.999&&S.target===1&&!S.autoShown){S.autoShown=true;if(S.sel<0&&!TEST&&!REDUCED){S.sel=0}}
+ chips.forEach(function(c,i){c.setAttribute('aria-pressed',(S.sel===i)?'true':'false');c.disabled=!(S.target===1&&S.p>.98);c.title=c.disabled?'Erst den Eimer öffnen':''});
  // weiterlaufen, solange sich etwas bewegt
  var moving=S.p!==S.target||Math.abs(S.hb-hb)>.002||Math.abs(S.selK-(on?1:0))>.002||t<3.4||P.some(function(q,i){return Math.abs(q.hl-((S.sel===i||S.hoverItem===i)&&q.k>=.98?1:0))>.004})||(S.p<.001&&!REDUCED&&!S.hoverBucket);
  return moving}

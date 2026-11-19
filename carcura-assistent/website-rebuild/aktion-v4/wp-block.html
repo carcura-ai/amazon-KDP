@@ -1,118 +1,119 @@
-<!-- Carcura: Aktion „Keramik buchen. Waschset geschenkt.“ (bis 31.12.2026). Als Kubio-Block „Eigener HTML-Code“ einfügen.
-     Alles ist unter .cxa gekapselt. Vor dem Einbau: CXA_THREE_SRC auf eine eigene Kopie von three.min.js (r128) zeigen lassen (Datenschutz, kein Fremdserver).
-     Die Sektion blendet sich nach dem Enddatum (data-ende) selbst aus. Ohne WebGL oder bei reduzierter Bewegung gibt es eine ruhige Ersatzdarstellung. -->
-<style>
-/* Alles in .cxa gekapselt, damit es sich in WordPress/Kubio nicht mit Theme-Stilen beißt. Schrift: Systemschrift (eigene Schriftdateien lassen sich auf der Website nicht hochladen). */
-.cxa{--ink:#07070a;--panel:#0d0d11;--txt:#f2f1ee;--mut:#a3a5ad;--acc:#e8f320;--gold:#cbbf94;--ease:cubic-bezier(.16,1,.3,1);--out:cubic-bezier(.22,1,.36,1);
+<!-- Carcura: Aktion „Keramik buchen. Waschset geschenkt.“ (bis 31.12.2026). Erzeugt mit build.py, nicht von Hand ändern.
+     Sektion blendet sich nach dem Enddatum (data-ende) selbst aus. Ohne WebGL oder bei reduzierter Bewegung gibt es eine ruhige Ersatzdarstellung. -->
+<div id="aktion"><style>
+/* Alles in #aktion .cxa gekapselt, damit es sich in WordPress/Kubio nicht mit Theme-Stilen beißt. Schrift: Systemschrift (eigene Schriftdateien lassen sich auf der Website nicht hochladen). */
+#aktion .cxa{--ink:#07070a;--panel:#0d0d11;--txt:#f2f1ee;--mut:#a3a5ad;--acc:#e8f320;--gold:#cbbf94;--ease:cubic-bezier(.16,1,.3,1);--out:cubic-bezier(.22,1,.36,1);
  position:relative;isolation:isolate;margin:0 auto;max-width:1280px;border-radius:28px;overflow:hidden;background:var(--panel);color:var(--txt);border:1px solid rgba(203,191,148,.2);box-shadow:0 60px 140px -70px #000,inset 0 1px 0 rgba(255,255,255,.05);
  font:16px/1.55 system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
-.cxa *,.cxa *:before,.cxa *:after{box-sizing:border-box}
-.cxa ::selection{background:var(--acc);color:var(--ink)}
-.cxa :focus-visible{outline:2px solid var(--acc);outline-offset:3px}
-.cxa .stage{position:relative;aspect-ratio:16/8.4;min-height:500px;background:radial-gradient(80% 100% at 70% 100%,#17171d 0%,#0b0b0f 55%,#07070a 100%);touch-action:pan-y;overflow:hidden}
-.cxa canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
-.cxa .fx{position:absolute;inset:0;pointer-events:none;z-index:1}
-.cxa .fx:before{content:"";position:absolute;inset:0;background:radial-gradient(120% 90% at 30% 0%,rgba(203,191,148,.06),transparent 55%),radial-gradient(140% 120% at 55% 55%,transparent 55%,rgba(0,0,0,.5) 100%)}
-.cxa .hots{position:absolute;inset:0;z-index:3;pointer-events:none}
-.cxa .hot{position:absolute;border:0;border-radius:50%;background:transparent;padding:0;margin:0;cursor:pointer;pointer-events:auto;visibility:hidden;-webkit-tap-highlight-color:transparent;transform:translate(-50%,-50%)}
-.cxa .hot.on{visibility:visible}
-.cxa .hot i{position:absolute;left:50%;top:50%;width:12px;height:12px;margin:-6px;border-radius:50%;background:var(--gold);transition:transform .45s var(--ease),background-color .3s;pointer-events:none}
-.cxa .hot b{position:absolute;left:50%;top:50%;width:12px;height:12px;margin:-6px;border-radius:50%;border:1px solid var(--gold);opacity:0;pointer-events:none}
-.cxa .hot.pulse b{animation:cxping 2.6s var(--out) infinite}
+#aktion .cxa *,#aktion .cxa *:before,#aktion .cxa *:after{box-sizing:border-box}
+#aktion .cxa ::selection{background:var(--acc);color:var(--ink)}
+#aktion .cxa :focus-visible{outline:2px solid var(--acc);outline-offset:3px}
+#aktion .cxa .stage{position:relative;aspect-ratio:16/8.4;min-height:500px;background:radial-gradient(80% 100% at 70% 100%,#17171d 0%,#0b0b0f 55%,#07070a 100%);touch-action:pan-y;overflow:hidden}
+#aktion .cxa canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
+#aktion .cxa .fx{position:absolute;inset:0;pointer-events:none;z-index:1}
+#aktion .cxa .fx:before{content:"";position:absolute;inset:0;background:radial-gradient(120% 90% at 30% 0%,rgba(203,191,148,.06),transparent 55%),radial-gradient(140% 120% at 55% 55%,transparent 55%,rgba(0,0,0,.5) 100%)}
+#aktion .cxa .hots{position:absolute;inset:0;z-index:3;pointer-events:none}
+#aktion .cxa .hot{position:absolute;border:0;border-radius:50%;background:transparent;padding:0;margin:0;cursor:pointer;pointer-events:auto;visibility:hidden;-webkit-tap-highlight-color:transparent;transform:translate(-50%,-50%)}
+#aktion .cxa .hot.on{visibility:visible}
+#aktion .cxa .hot i{position:absolute;left:50%;top:50%;width:12px;height:12px;margin:-6px;border-radius:50%;background:var(--gold);transition:transform .45s var(--ease),background-color .3s;pointer-events:none}
+#aktion .cxa .hot b{position:absolute;left:50%;top:50%;width:12px;height:12px;margin:-6px;border-radius:50%;border:1px solid var(--gold);opacity:0;pointer-events:none}
+#aktion .cxa .hot.pulse b{animation:cxping 2.6s var(--out) infinite}
 @keyframes cxping{0%{opacity:.8;transform:scale(1)}70%,100%{opacity:0;transform:scale(3.4)}}
-.cxa .hot:hover i,.cxa .hot.act i,.cxa .hot:focus-visible i{transform:scale(1.55);background:var(--acc)}
-.cxa .hot:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
-.cxa .hot.bucket{border-radius:42% 42% 36% 36%}
-.cxa .hot.bucket i{width:22px;height:22px;margin:-11px;background:var(--ink);border:2px solid var(--acc);box-shadow:0 0 0 5px rgba(7,7,10,.5)}
-.cxa .hot.bucket b{width:22px;height:22px;margin:-11px;border-color:var(--acc)}
-.cxa .hint{position:absolute;z-index:4;transform:translate(-50%,0);font-size:.82rem;color:var(--txt);white-space:nowrap;pointer-events:none;padding:8px 14px 8px 12px;border-radius:999px;background:rgba(10,10,14,.72);border:1px solid rgba(232,243,32,.45);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);opacity:0;transition:opacity .6s var(--ease)}
-.cxa .hint.on{opacity:1}.cxa .hint svg{width:15px;height:15px;vertical-align:-3px;margin-right:6px;color:var(--acc)}
-.cxa .card{position:absolute;z-index:5;width:min(340px,calc(100% - 24px));padding:18px 20px 16px;border-radius:16px;background:rgba(12,12,16,.88);border:1px solid rgba(203,191,148,.32);box-shadow:0 30px 60px -28px #000,inset 0 1px 0 rgba(255,255,255,.06);backdrop-filter:blur(16px) saturate(1.2);-webkit-backdrop-filter:blur(16px) saturate(1.2);pointer-events:none;opacity:0;visibility:hidden;transform:translateY(8px) scale(.98);filter:blur(6px);transition:opacity .3s var(--ease),transform .5s var(--ease),filter .3s var(--ease),visibility 0s .5s}
-.cxa .card.on{opacity:1;visibility:visible;transform:none;filter:none;pointer-events:auto;transition-delay:0s}
-.cxa .card h3{margin:0 0 6px;font-size:1.02rem;line-height:1.25;font-weight:680;letter-spacing:-.012em;color:var(--txt)}
-.cxa .card p{margin:0;font-size:.88rem;line-height:1.5;color:#cfd0d6;text-wrap:pretty}
-.cxa .card .src{margin-top:12px;padding-top:11px;border-top:1px solid rgba(255,255,255,.1);font-size:.74rem;color:var(--mut);display:flex;gap:6px 12px;flex-wrap:wrap;justify-content:space-between}
-.cxa .card .src a{color:var(--gold);text-underline-offset:3px}
-.cxa .card .x{position:absolute;right:8px;top:8px;width:32px;height:32px;border:0;border-radius:50%;background:transparent;color:var(--mut);cursor:pointer;font-size:1.1rem;line-height:1;display:none}
-.cxa .tip{position:absolute;width:11px;height:11px;background:#0c0c10;border:1px solid rgba(203,191,148,.32);border-right:0;border-bottom:0}
-.cxa .toggle{position:absolute;right:14px;top:14px;z-index:6;height:36px;padding:0 16px;border-radius:999px;font:inherit;font-size:.8rem;color:var(--txt);background:rgba(7,7,10,.62);border:1px solid rgba(255,255,255,.2);cursor:pointer;opacity:0;visibility:hidden;transition:opacity .5s,border-color .3s,color .3s}
-.cxa .toggle.on{opacity:1;visibility:visible}.cxa .toggle:hover{border-color:var(--gold);color:var(--gold)}
-.cxa .copy{position:absolute;left:clamp(22px,4vw,60px);top:0;bottom:0;display:flex;flex-direction:column;justify-content:center;max-width:min(430px,35%);z-index:3;padding:clamp(22px,4vw,56px) 0}
-.cxa h2{margin:0 0 16px;font-size:clamp(2rem,3.7vw,3.3rem);line-height:1.02;letter-spacing:-.036em;font-weight:760;text-wrap:balance;color:var(--txt)}
-.cxa h2 .w{display:inline-block}
-.cxa h2 em{font-style:normal;color:var(--gold)}
-.cxa .sub{margin:0 0 24px;color:#cfd0d6;max-width:34ch;font-size:clamp(.92rem,1.2vw,1.04rem);text-wrap:pretty}
-.cxa .act{display:flex;flex-wrap:wrap;gap:12px;align-items:center}
-.cxa .btn{position:relative;display:inline-flex;align-items:center;justify-content:center;gap:12px;height:52px;padding:0 26px;border-radius:999px;font:inherit;font-weight:650;font-size:.95rem;letter-spacing:-.005em;text-decoration:none;border:1px solid transparent;overflow:hidden;transition:transform .5s var(--ease),background-color .3s,border-color .3s,color .3s,box-shadow .5s var(--ease);-webkit-tap-highlight-color:transparent;cursor:pointer}
-.cxa .btn:active{transform:scale(.97)}
-.cxa .btn.p{background:var(--acc);color:var(--ink);box-shadow:0 10px 30px -12px rgba(232,243,32,.55),inset 0 1px 0 rgba(255,255,255,.55)}
-.cxa .btn.p:hover{transform:translateY(-2px);background:#f2fe3a;box-shadow:0 16px 38px -12px rgba(232,243,32,.7),inset 0 1px 0 rgba(255,255,255,.6)}
-.cxa .btn.p:before{content:"";position:absolute;top:0;bottom:0;width:60%;left:-80%;background:linear-gradient(100deg,transparent,rgba(255,255,255,.65),transparent);transform:skewX(-18deg)}
-.cxa .btn.p:hover:before{animation:cxshine .9s var(--out) 1}
+#aktion .cxa .hot:hover i,#aktion .cxa .hot.act i,#aktion .cxa .hot:focus-visible i{transform:scale(1.55);background:var(--acc)}
+#aktion .cxa .hot:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
+#aktion .cxa .hot.bucket{border-radius:42% 42% 36% 36%}
+#aktion .cxa .hot.bucket i{width:22px;height:22px;margin:-11px;background:var(--ink);border:2px solid var(--acc);box-shadow:0 0 0 5px rgba(7,7,10,.5)}
+#aktion .cxa .hot.bucket b{width:22px;height:22px;margin:-11px;border-color:var(--acc)}
+#aktion .cxa .hint{position:absolute;z-index:4;transform:translate(-50%,0);font-size:.82rem;color:var(--txt);white-space:nowrap;pointer-events:none;padding:8px 14px 8px 12px;border-radius:999px;background:rgba(10,10,14,.72);border:1px solid rgba(232,243,32,.45);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);opacity:0;transition:opacity .6s var(--ease)}
+#aktion .cxa .hint.on{opacity:1}#aktion .cxa .hint svg{width:15px;height:15px;vertical-align:-3px;margin-right:6px;color:var(--acc)}
+#aktion .cxa .cxcard{position:absolute;z-index:5;width:min(340px,calc(100% - 24px));padding:18px 20px 16px;border-radius:16px;background:rgba(12,12,16,.88);border:1px solid rgba(203,191,148,.32);box-shadow:0 30px 60px -28px #000,inset 0 1px 0 rgba(255,255,255,.06);backdrop-filter:blur(16px) saturate(1.2);-webkit-backdrop-filter:blur(16px) saturate(1.2);pointer-events:none;opacity:0;visibility:hidden;transform:translateY(8px) scale(.98);filter:blur(6px);transition:opacity .3s var(--ease),transform .5s var(--ease),filter .3s var(--ease),visibility 0s .5s}
+#aktion .cxa .cxcard.on{opacity:1;visibility:visible;transform:none;filter:none;pointer-events:auto;transition-delay:0s}
+#aktion .cxa .cxcard h3{margin:0 0 6px;font-size:1.02rem;line-height:1.25;font-weight:680;letter-spacing:-.012em;color:var(--txt)}
+#aktion .cxa .cxcard p{margin:0;font-size:.88rem;line-height:1.5;color:#cfd0d6;text-wrap:pretty}
+#aktion .cxa .cxcard ul{margin:10px 0 0;padding:0;list-style:none;display:grid;gap:7px}#aktion .cxa .cxcard li{position:relative;padding-left:18px;font-size:.86rem;line-height:1.45;color:#e4e5e9}#aktion .cxa .cxcard li:before{content:"";position:absolute;left:2px;top:.55em;width:6px;height:6px;background:var(--gold);transform:rotate(45deg)}
+#aktion .cxa .chip:disabled{opacity:.45;cursor:not-allowed;border-color:rgba(255,255,255,.12)}
+#aktion .cxa .cxcard .src{margin-top:12px;padding-top:11px;border-top:1px solid rgba(255,255,255,.1);font-size:.74rem;color:var(--mut);display:flex;gap:6px 12px;flex-wrap:wrap;justify-content:space-between}
+#aktion .cxa .cxcard .src a{color:var(--gold);text-underline-offset:3px}
+#aktion .cxa .cxcard .x{position:absolute;right:8px;top:8px;width:32px;height:32px;border:0;border-radius:50%;background:transparent;color:var(--mut);cursor:pointer;font-size:1.1rem;line-height:1;display:none}
+#aktion .cxa .tip{position:absolute;width:11px;height:11px;background:#0c0c10;border:1px solid rgba(203,191,148,.32);border-right:0;border-bottom:0}
+#aktion .cxa .toggle{position:absolute;right:14px;top:14px;z-index:6;height:36px;padding:0 16px;border-radius:999px;font:inherit;font-size:.8rem;color:var(--txt);background:rgba(7,7,10,.62);border:1px solid rgba(255,255,255,.2);cursor:pointer;opacity:0;visibility:hidden;transition:opacity .5s,border-color .3s,color .3s}
+#aktion .cxa .toggle.on{opacity:1;visibility:visible}#aktion .cxa .toggle:hover{border-color:var(--gold);color:var(--gold)}
+#aktion .cxa .copy{position:absolute;left:clamp(22px,4vw,60px);top:0;bottom:0;display:flex;flex-direction:column;justify-content:center;max-width:min(430px,35%);z-index:3;padding:clamp(22px,4vw,56px) 0}
+#aktion .cxa h2{margin:0 0 16px;font-size:clamp(2rem,3.7vw,3.3rem);line-height:1.02;letter-spacing:-.036em;font-weight:760;text-wrap:balance;color:var(--txt)}
+#aktion .cxa h2 .cxw{display:inline-block}
+#aktion .cxa h2 em{font-style:normal;color:var(--gold)}
+#aktion .cxa .cxsub{margin:0 0 24px;color:#cfd0d6;max-width:34ch;font-size:clamp(.92rem,1.2vw,1.04rem);text-wrap:pretty}
+#aktion .cxa .cxact{display:flex;flex-wrap:wrap;gap:12px;align-items:center}
+#aktion .cxa .cxb{position:relative;display:inline-flex;align-items:center;justify-content:center;gap:12px;height:52px;padding:0 26px;border-radius:999px;font:inherit;font-weight:650;font-size:.95rem;letter-spacing:-.005em;text-decoration:none;border:1px solid transparent;overflow:hidden;transition:transform .5s var(--ease),background-color .3s,border-color .3s,color .3s,box-shadow .5s var(--ease);-webkit-tap-highlight-color:transparent;cursor:pointer}
+#aktion .cxa .cxb:active{transform:scale(.97)}
+#aktion .cxa .cxb.cxp{background:var(--acc);color:var(--ink);box-shadow:0 10px 30px -12px rgba(232,243,32,.55),inset 0 1px 0 rgba(255,255,255,.55)}
+#aktion .cxa .cxb.cxp:hover{transform:translateY(-2px);background:#f2fe3a;box-shadow:0 16px 38px -12px rgba(232,243,32,.7),inset 0 1px 0 rgba(255,255,255,.6)}
+#aktion .cxa .cxb.cxp:before{content:"";position:absolute;top:0;bottom:0;width:60%;left:-80%;background:linear-gradient(100deg,transparent,rgba(255,255,255,.65),transparent);transform:skewX(-18deg)}
+#aktion .cxa .cxb.cxp:hover:before{animation:cxshine .9s var(--out) 1}
 @keyframes cxshine{to{left:130%}}
-.cxa .btn svg{width:18px;height:18px;flex:none;transition:transform .5s var(--ease)}
-.cxa .btn.p:hover svg{transform:translateX(4px)}
-.cxa .btn.g{color:var(--txt);border-color:rgba(255,255,255,.26);background:rgba(255,255,255,.02)}
-.cxa .btn.g:hover{border-color:var(--gold);color:var(--gold);background:rgba(203,191,148,.06)}
-.cxa .fine{margin:20px 0 0;font-size:.8rem;line-height:1.55;color:var(--mut);max-width:44ch}
-.cxa .fine a{color:var(--gold);text-underline-offset:4px;text-decoration-thickness:1px}.cxa .fine a:hover{color:var(--txt)}
-.cxa .fine b{color:var(--txt);font-weight:650;font-variant-numeric:tabular-nums}
-.cxa .set{display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding:16px clamp(22px,4vw,60px) 20px;border-top:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.015)}
-.cxa .set span{font-size:.8rem;color:var(--mut);margin-right:6px}
-.cxa .chip{font:inherit;font-size:.82rem;color:var(--txt);background:transparent;border:1px solid rgba(255,255,255,.2);border-radius:999px;height:38px;padding:0 16px;cursor:pointer;transition:border-color .3s,background-color .3s,color .3s;-webkit-tap-highlight-color:transparent}
-.cxa .chip:hover{border-color:var(--gold);color:var(--gold)}
-.cxa .chip[aria-pressed=true]{border-color:var(--acc);background:rgba(232,243,32,.1);color:var(--acc)}
-.cxa .nogl-note{display:none}
-.cxa.nogl .stage{min-height:0;aspect-ratio:auto;padding:0}.cxa.nogl canvas,.cxa.nogl .hots,.cxa.nogl .hint,.cxa.nogl .toggle{display:none}
-.cxa.nogl .copy{position:static;max-width:none;padding:34px clamp(22px,4vw,60px) 10px}
-.cxa.nogl .card{position:static;transform:none;opacity:1;visibility:visible;filter:none;margin:8px clamp(22px,4vw,60px) 22px;width:auto;max-width:560px}
-@media (max-width:1100px) and (min-width:861px){.cxa .copy{max-width:38%}.cxa h2{font-size:clamp(1.8rem,3.5vw,2.5rem)}}
+#aktion .cxa .cxb svg{width:18px;height:18px;flex:none;transition:transform .5s var(--ease)}
+#aktion .cxa .cxb.cxp:hover svg{transform:translateX(4px)}
+#aktion .cxa .cxb.cxg{color:var(--txt);border-color:rgba(255,255,255,.26);background:rgba(255,255,255,.02)}
+#aktion .cxa .cxb.cxg:hover{border-color:var(--gold);color:var(--gold);background:rgba(203,191,148,.06)}
+#aktion .cxa .fine{margin:20px 0 0;font-size:.8rem;line-height:1.55;color:var(--mut);max-width:44ch}
+#aktion .cxa .fine a{color:var(--gold);text-underline-offset:4px;text-decoration-thickness:1px}#aktion .cxa .fine a:hover{color:var(--txt)}
+#aktion .cxa .fine b{color:var(--txt);font-weight:650;font-variant-numeric:tabular-nums}
+#aktion .cxa .set{display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding:16px clamp(22px,4vw,60px) 20px;border-top:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.015)}
+#aktion .cxa .set span{font-size:.8rem;color:var(--mut);margin-right:6px}
+#aktion .cxa .chip{font:inherit;font-size:.82rem;color:var(--txt);background:transparent;border:1px solid rgba(255,255,255,.2);border-radius:999px;height:38px;padding:0 16px;cursor:pointer;transition:border-color .3s,background-color .3s,color .3s;-webkit-tap-highlight-color:transparent}
+#aktion .cxa .chip:hover{border-color:var(--gold);color:var(--gold)}
+#aktion .cxa .chip[aria-pressed=true]{border-color:var(--acc);background:rgba(232,243,32,.1);color:var(--acc)}
+#aktion .cxa .nogl-note{display:none}
+#aktion .cxa.nogl .stage{min-height:0;aspect-ratio:auto;padding:0}#aktion .cxa.nogl canvas,#aktion .cxa.nogl .hots,#aktion .cxa.nogl .hint,#aktion .cxa.nogl .toggle{display:none}
+#aktion .cxa.nogl .copy{position:static;max-width:none;padding:34px clamp(22px,4vw,60px) 10px}
+#aktion .cxa.nogl .cxcard{position:static;transform:none;opacity:1;visibility:visible;filter:none;margin:8px clamp(22px,4vw,60px) 22px;width:auto;max-width:560px}
+@media (max-width:1100px) and (min-width:861px){#aktion .cxa .copy{max-width:38%}#aktion .cxa h2{font-size:clamp(1.8rem,3.5vw,2.5rem)}}
 @media (max-width:860px){
- .cxa{border-radius:22px}
- .cxa .stage{aspect-ratio:1/.92;min-height:0;order:1}
- .cxa .copy{position:static;max-width:none;order:2;padding:26px 22px 8px;justify-content:flex-start}
- .cxa{display:flex;flex-direction:column}
- .cxa .set{order:3;padding:14px 22px 22px}
- .cxa h2{font-size:clamp(2rem,9vw,2.9rem)}
- .cxa .act{flex-direction:column;align-items:stretch}.cxa .btn{width:100%}
- .cxa .card{left:10px!important;right:10px;bottom:10px;top:auto!important;width:auto;padding:16px 44px 14px 16px}
- .cxa .card .x{display:block}.cxa .tip{display:none}
- .cxa .set span{flex-basis:100%;margin:0 0 2px}
- .cxa .chip{flex:1 1 auto}
+ #aktion .cxa{border-radius:22px}
+ #aktion .cxa .stage{aspect-ratio:1/.92;min-height:0;order:1}
+ #aktion .cxa .copy{position:static;max-width:none;order:2;padding:26px 22px 8px;justify-content:flex-start}
+ #aktion .cxa{display:flex;flex-direction:column}
+ #aktion .cxa .set{order:3;padding:14px 22px 22px}
+ #aktion .cxa h2{font-size:clamp(2rem,9vw,2.9rem)}
+ #aktion .cxa .cxact{flex-direction:column;align-items:stretch}#aktion .cxa .cxb{width:100%}
+ #aktion .cxa .cxcard{left:10px!important;right:10px;bottom:10px;top:auto!important;width:auto;padding:16px 44px 14px 16px}
+ #aktion .cxa .cxcard .x{display:block}#aktion .cxa .tip{display:none}
+ #aktion .cxa .set span{flex-basis:100%;margin:0 0 2px}
+ #aktion .cxa .chip{flex:1 1 auto}
 }
-@media (prefers-reduced-motion:reduce){.cxa .hot.pulse b{animation:none}.cxa .card{transition:none}}
+@media (prefers-reduced-motion:reduce){#aktion .cxa .hot.pulse b{animation:none}#aktion .cxa .cxcard{transition:none}}
 </style>
 <section class="cxa" id="cxa" aria-labelledby="cxa-h" data-ende="2027-01-01T00:00:00">
  <div class="stage" id="cxa-stage">
   <canvas id="cxa-gl" aria-hidden="true"></canvas><div class="fx" aria-hidden="true"></div>
   <div class="hots" id="cxa-hots"></div>
   <div class="hint" id="cxa-hint"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11V5a2 2 0 0 1 4 0v6l4 1a2 2 0 0 1 1.4 2.4l-1 4A3 3 0 0 1 14.5 21H12a4 4 0 0 1-3.2-1.6L5 14.5a1.7 1.7 0 0 1 2.6-2.1L9 14"/></svg>Eimer öffnen</div>
-  <div class="card" id="cxa-card" role="region" aria-label="Produktinfo" aria-live="polite"><div class="tip" id="cxa-tip"></div><button class="x" id="cxa-x" type="button" aria-label="Info schließen">×</button><h3 id="cxa-ct"></h3><p id="cxa-cp"></p><div class="src" id="cxa-cs"></div></div>
+  <div class="cxcard" id="cxa-card" role="region" aria-label="Produktinfo" aria-live="polite"><div class="tip" id="cxa-tip"></div><button class="x" id="cxa-x" type="button" aria-label="Info schließen">×</button><h3 id="cxa-ct"></h3><p id="cxa-cp"></p><div class="src" id="cxa-cs"></div></div>
   <button class="toggle" id="cxa-toggle" type="button">Eimer schließen</button>
  </div>
  <div class="copy" id="cxa-copy">
-  <h2 id="cxa-h"><span class="w">Keramik</span> <span class="w">buchen.</span><br><em><span class="w">Waschset</span> <span class="w">geschenkt.</span></em></h2>
-  <p class="sub">Bei jeder gebuchten Keramikversiegelung bekommst du das Waschset dazu, auch als Gutschein zu Weihnachten.</p>
-  <div class="act"><a class="btn p" href="https://wa.me/491706669516?text=Hallo%20Carcura%2C%20ich%20m%C3%B6chte%20einen%20Termin%20f%C3%BCr%20die%20Keramikversiegelung%20(Aktion%20Nanolex-Waschset%20bis%2031.12.).%0AAuto%3A%20%0AOrt%3A%20" data-wa-service="aktion-keramik-termin">Termin vereinbaren<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a><a class="btn g" href="https://wa.me/491706669516?text=Hallo%20Carcura%2C%20bitte%20schickt%20mir%20die%20Pflegeanleitung%20f%C3%BCr%20die%20Keramik.%20Danke!" data-wa-service="pflegeanleitung"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20l1.3-4.2A8 8 0 1 1 8.2 18.7z"/></svg>Pflegeanleitung per WhatsApp</a></div>
+  <h2 id="cxa-h"><span class="cxw">Keramik</span> <span class="cxw">buchen.</span><br><em><span class="cxw">Waschset</span> <span class="cxw">geschenkt.</span></em></h2>
+  <p class="cxsub">Bei jeder gebuchten Keramikversiegelung bekommst du das Waschset dazu, auch als Gutschein zu Weihnachten.</p>
+  <div class="cxact"><a class="cxb cxp" href="https://wa.me/491706669516?text=Hallo%20Carcura%2C%20ich%20m%C3%B6chte%20einen%20Termin%20f%C3%BCr%20die%20Keramikversiegelung%20(Aktion%20Nanolex-Waschset%20bis%2031.12.).%0AAuto%3A%20%0AOrt%3A%20" data-wa-service="aktion-keramik-termin">Termin vereinbaren<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a><a class="cxb cxg" href="https://wa.me/491706669516?text=Hallo%20Carcura%2C%20bitte%20schickt%20mir%20die%20Pflegeanleitung%20f%C3%BCr%20die%20Keramik.%20Danke!" data-wa-service="pflegeanleitung"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20l1.3-4.2A8 8 0 1 1 8.2 18.7z"/></svg>Pflegeanleitung per WhatsApp</a></div>
   <p class="fine" id="cxa-fine">Gilt für jede gebuchte Keramikversiegelung bei Terminvereinbarung bis 31.12.2026, auch als <a href="/gutschein/">Gutschein zu Weihnachten</a>. <span id="cxa-days"></span> <a href="/keramikversiegelung/">Mehr zur Keramikversiegelung</a></p>
  </div>
  <div class="set" id="cxa-set" role="group" aria-label="Inhalt des Waschsets"><span>Das steckt im Set:</span></div>
 </section>
 <script>
-/* Sektion lädt three.js erst, wenn sie sichtbar wird. THREE_SRC: für die Website eigene Kopie der Datei hosten (Datenschutz), hier zum Ansehen der Vorschau ein öffentliches Netz. */
-var CXA_THREE_SRC='https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js';
+/* three.js (r128, MIT-Lizenz) liegt in der eigenen Mediathek und wird erst geladen, wenn die Sektion sichtbar wird. */
+var CXA_THREE_SRC='/wp-content/uploads/2026/11/three-r128.min_.js';
 (function(){
 function boot(){
 'use strict';
 var root=document.getElementById('cxa');
 /* ================= Daten (ein Ort für Produkte und Texte) ================= */
 var DATA=[
- {id:'eimer',name:'Wascheimer mit Schmutzsieb',txt:'Das Sieb am Boden fängt den Dreck ab. So nimmt der Waschhandschuh beim Eintauchen kaum Schmutz wieder auf, das schont den Lack.'},
+ {id:'eimer',name:'Wascheimer mit Schmutzsieb',txt:'Das Nanolex Wash Bucket SET ist die Basis für die Fahrzeugwäsche. Das macht den Eimer besonders:',points:['Der Schmutzsieb-Einsatz wird in den Eimer eingesetzt und ergänzt ihn bei der Wäsche.','Ein passender Deckel gehört zur Aufbewahrung dazu.','Eimer, Sieb und Deckel kommen als zusammengehöriges Set.'],src:'Nach Angaben von Nanolex',link:'https://shop.nanolex.de/products/plenty-baseline-1869',linkName:'shop.nanolex.de'},
  {id:'shampoo',name:'Reactivating Shampoo von Nanolex',txt:'Reinigt gründlich und frischt dabei den vorhandenen Lackschutz auf. Schonend auch für versiegelte und gewachsene Lacke, bringt Wasser besser zum Abperlen und gibt bei jeder Wäsche mehr Glanz. Darum passt es genau zur Keramikversiegelung.',src:'Nach Angaben von Nanolex, entwickelt und produziert in Deutschland',link:'https://www.nanolexcarcare.com/car-care/reactivating-shampoo/',linkName:'nanolexcarcare.com'},
  {id:'scheiben',name:'Reiniger für Scheiben',txt:'Löst Schmutz, Fingerabdrücke und Insektenreste, ohne Streifen zu hinterlassen. Innen und außen anwendbar, auch für Spiegel.'},
  {id:'reifen',name:'Reiniger für Reifen',txt:'Reinigt Reifen und Gummi gründlich und bereitet sie für die Pflege vor, damit auch unten alles gepflegt aussieht.'},
  {id:'detailer',name:'Quick Detailer',txt:'Zum schnellen Auffrischen zwischen den Wäschen: entfernt leichten Schmutz, Staub und Fingerabdrücke und bringt den Lack wieder zum Glänzen.'},
- {id:'pad',name:'Scrubpad',txt:'Für hartnäckige Stellen wie eingebrannte Insektenreste oder Wasserflecken, in kreisenden Bewegungen mit leichtem Druck.'}
+ {id:'pad',name:'Scrubpad',txt:'Doppelseitiges Reinigungspad für den Innenraum: Die ultrafeine Scheuerseite löst hartnäckigen Schmutz auf strukturierten Oberflächen, die weiche Mikrofaserseite wischt ihn ab. Wiederverwendbar und waschbar.',src:'Nach Angaben von Nanolex',link:'https://shop.nanolex.de/products/nanolex-scrub-pad',linkName:'shop.nanolex.de'}
 ];
 DATA[1].txt=DATA[1].txt.replace('gewachsene','gewachste');
 /* Zeiten und Maße zentral */
@@ -129,14 +130,14 @@ var TEST=Q.has('p')?{p:parseFloat(Q.get('p')),h:Q.has('h')?parseInt(Q.get('h')):
 var stage=document.getElementById('cxa-stage'),cv=document.getElementById('cxa-gl'),hots=document.getElementById('cxa-hots'),hint=document.getElementById('cxa-hint'),card=document.getElementById('cxa-card'),
  ct=document.getElementById('cxa-ct'),cp=document.getElementById('cxa-cp'),cs=document.getElementById('cxa-cs'),tip=document.getElementById('cxa-tip'),xb=document.getElementById('cxa-x'),tg=document.getElementById('cxa-toggle'),setEl=document.getElementById('cxa-set'),copyEl=document.getElementById('cxa-copy');
 /* ================= Zustand (eine Quelle der Wahrheit) ================= */
-var S={target:REDUCED?1:0,p:REDUCED?1:0,sel:-1,hoverItem:-1,hoverBucket:false,tail:0};
+var S={target:REDUCED?1:0,p:REDUCED?1:0,sel:-1,hoverItem:-1,hoverBucket:false,tail:0,autoShown:!!REDUCED};
 if(TEST){S.p=TEST.p;S.target=TEST.p>0?1:0;S.sel=TEST.h;S.hoverBucket=TEST.hb}
 var chips=[],hot=[];
-window.cxaState=function(){return JSON.stringify({p:S.p,target:S.target,sel:S.sel,card:card.classList.contains('on'),nogl:root.classList.contains('nogl')})};
-function setTarget(v){S.target=v;if(!v){S.sel=-1;S.hoverItem=-1}need()}
-function select(i){S.target=1;S.sel=(S.sel===i)?-1:i;need()}
+window.cxaState=function(){return JSON.stringify({p:S.p,target:S.target,sel:S.sel,card:card.classList.contains('cxon'),nogl:root.classList.contains('nogl')})};
+function setTarget(v){S.target=v;if(!v){S.sel=-1;S.hoverItem=-1;S.autoShown=false}need()}
+function select(i){if(S.target!==1&&S.p<.98)return;S.sel=(S.sel===i)?-1:i;need()}
 DATA.forEach(function(d,i){
- var c=document.createElement('button');c.type='button';c.className='chip';c.textContent=d.name.replace(' von Nanolex','');c.setAttribute('aria-pressed','false');c.addEventListener('click',function(){select(i)});setEl.appendChild(c);chips.push(c);
+ var c=document.createElement('button');c.type='button';c.className='chip';c.textContent=d.name.replace(' von Nanolex','');c.setAttribute('aria-pressed','false');c.disabled=true;c.title='Erst den Eimer öffnen';c.addEventListener('click',function(){select(i)});setEl.appendChild(c);chips.push(c);
  var b=document.createElement('button');b.type='button';b.className='hot'+(i===0?' bucket':'');b.innerHTML='<i></i><b></b>';b.addEventListener('click',function(){if(i===0){setTarget(S.target?0:1)}else select(i)});
  b.addEventListener('pointerenter',function(e){if(e.pointerType==='touch')return;if(i===0){S.hoverBucket=true}else S.hoverItem=i;need()});
  b.addEventListener('pointerleave',function(e){if(e.pointerType==='touch')return;if(i===0)S.hoverBucket=false;else if(S.hoverItem===i)S.hoverItem=-1;need()});
@@ -149,7 +150,7 @@ var ptr={x:0,y:0},ptrS={x:0,y:0};stage.addEventListener('pointermove',function(e
 /* ================= WebGL (mit Ersatzdarstellung) ================= */
 var T3=window.THREE,R=null;
 try{if(!T3)throw 0;R=new T3.WebGLRenderer({canvas:cv,antialias:true,alpha:true,powerPreference:'high-performance',preserveDrawingBuffer:!!TEST});if(!R.getContext())throw 0}catch(e){R=null}
-if(!R){root.classList.add('nogl');S.p=1;S.target=1;card.classList.add('on');var cur=1;function nogl(i){ct.textContent=DATA[i].name;cp.textContent=DATA[i].txt;cs.innerHTML='';if(DATA[i].src){cs.innerHTML='<span>'+DATA[i].src+'</span><a href="'+DATA[i].link+'" target="_blank" rel="noopener noreferrer">'+DATA[i].linkName+'</a>'}else cs.style.display='none';chips.forEach(function(c,k){c.setAttribute('aria-pressed',k===i?'true':'false')})}
+if(!R){root.classList.add('nogl');S.p=1;S.target=1;card.classList.add('cxon');var cur=1;function nogl(i){ct.textContent=DATA[i].name;cp.textContent=DATA[i].txt;cs.innerHTML='';if(DATA[i].src){cs.innerHTML='<span>'+DATA[i].src+'</span><a href="'+DATA[i].link+'" target="_blank" rel="noopener noreferrer">'+DATA[i].linkName+'</a>'}else cs.style.display='none';chips.forEach(function(c,k){c.setAttribute('aria-pressed',k===i?'true':'false')})}
  chips.forEach(function(c,i){c.onclick=function(){nogl(i)}});nogl(1);return}
 R.outputEncoding=T3.sRGBEncoding;R.toneMapping=T3.ACESFilmicToneMapping;R.shadowMap.enabled=true;R.shadowMap.type=T3.PCFSoftShadowMap;R.setClearColor(0x000000,0);
 var scene=new T3.Scene(),cam=new T3.PerspectiveCamera(24,16/8.4,.1,60);scene.fog=new T3.Fog(0x08080b,9,22);
@@ -275,17 +276,18 @@ function frame(dt,t){
  P.forEach(function(q,i){if(i===0){V.set(BX,.52,BZ)}else V.set(q.cx,(CFG.anchor[i]*.5)+q.cy,q.cz);vp.copy(V);grp.localToWorld(vp);vp.project(cam);q.sx=(vp.x*.5+.5)*w;q.sy=(-vp.y*.5+.5)*h;
   var b=hot[i],ready=i===0?true:(q.k>=.98&&S.target===1);
   if(i===0){var ww=Math.min(w*.3,Math.max(110,(narrow?w*.34:w*.2)))*(S.p>.5?.55:1);b.style.width=ww+'px';b.style.height=ww*(S.p>.5?1:1.05)+'px'}else{b.style.width='64px';b.style.height='64px'}
-  b.style.left=q.sx+'px';b.style.top=q.sy+'px';b.classList.toggle('on',ready);b.classList.toggle('pulse',ready&&S.sel<0&&(i>0||S.target===0));b.classList.toggle('act',S.sel===i||S.hoverItem===i||(i===0&&S.hoverBucket));b.tabIndex=ready?0:-1;
+  b.style.left=q.sx+'px';b.style.top=q.sy+'px';b.classList.toggle('cxon',ready);b.classList.toggle('pulse',ready&&S.sel<0&&(i>0||S.target===0));b.classList.toggle('cxact',S.sel===i||S.hoverItem===i||(i===0&&S.hoverBucket));b.tabIndex=ready?0:-1;
   b.setAttribute('aria-label',i===0?(S.target?'Eimer schließen':'Eimer öffnen, zeigt die Produkte des Waschsets'):DATA[i].name+', Info anzeigen');b.setAttribute('aria-expanded',i===0?String(!!S.target):String(S.sel===i))});
- hint.style.left=P[0].sx+'px';hint.style.top=Math.max(8,P[0].sy-(narrow?h*.30:h*.31))+'px';hint.classList.toggle('on',showHint);
- tg.classList.toggle('on',S.target===1&&S.p>.98);
+ hint.style.left=P[0].sx+'px';hint.style.top=Math.max(8,P[0].sy-(narrow?h*.30:h*.31))+'px';hint.classList.toggle('cxon',showHint);
+ tg.classList.toggle('cxon',S.target===1&&S.p>.98);
  // Infokarte: gehört eindeutig zum Produkt (Pfeil), bleibt im Bild, deckt Text und Buttons nicht ab
  var show=item>=0&&P[item].k>=.98&&S.target===1,ci=item;
- if(show){if(prevSel!==ci){var dd=DATA[ci];ct.textContent=dd.name;cp.textContent=dd.txt;cs.innerHTML='';if(dd.src){var s1=document.createElement('span');s1.textContent=dd.src;cs.appendChild(s1);var a=document.createElement('a');a.href=dd.link;a.target='_blank';a.rel='noopener noreferrer';a.textContent=dd.linkName;cs.appendChild(a);cs.style.display='flex'}else cs.style.display='none';prevSel=ci}
+ if(show){if(prevSel!==ci){var dd=DATA[ci];ct.textContent=dd.name;cp.textContent=dd.txt;cp.parentNode.querySelectorAll('ul').forEach(function(u){u.remove()});if(dd.points){var ul=document.createElement('ul');dd.points.forEach(function(x){var li=document.createElement('li');li.textContent=x;ul.appendChild(li)});cp.after(ul)}cs.innerHTML='';if(dd.src){var s1=document.createElement('span');s1.textContent=dd.src;cs.appendChild(s1);var a=document.createElement('a');a.href=dd.link;a.target='_blank';a.rel='noopener noreferrer';a.textContent=dd.linkName;cs.appendChild(a);cs.style.display='flex'}else cs.style.display='none';prevSel=ci}
   if(!narrow){var cw=card.offsetWidth||340,chh=card.offsetHeight||170,q=P[ci],cr=copyEl.getBoundingClientRect(),sr=stage.getBoundingClientRect(),minL=Math.max(12,cr.right-sr.left+18),left=Math.max(minL,Math.min(w-cw-12,q.sx-cw/2)),above=(q.sy-chh-40)>=10,top=above?q.sy-chh-40:q.sy+40;if(top+chh>h-10)top=Math.max(10,q.sy-chh-40);
    card.style.left=left+'px';card.style.top=top+'px';var tx=Math.max(16,Math.min(cw-28,q.sx-left-5));tip.style.left=tx+'px';tip.style.top=(top>q.sy?-6:chh-6)+'px';tip.style.transform=top>q.sy?'rotate(45deg)':'rotate(225deg)'}
-  card.classList.add('on')}else{card.classList.remove('on');if(item<0)prevSel=-2}
- chips.forEach(function(c,i){c.setAttribute('aria-pressed',(S.sel===i)?'true':'false')});
+  card.classList.add('cxon')}else{card.classList.remove('cxon');if(item<0)prevSel=-2}
+ if(S.p>=.999&&S.target===1&&!S.autoShown){S.autoShown=true;if(S.sel<0&&!TEST&&!REDUCED){S.sel=0}}
+ chips.forEach(function(c,i){c.setAttribute('aria-pressed',(S.sel===i)?'true':'false');c.disabled=!(S.target===1&&S.p>.98);c.title=c.disabled?'Erst den Eimer öffnen':''});
  // weiterlaufen, solange sich etwas bewegt
  var moving=S.p!==S.target||Math.abs(S.hb-hb)>.002||Math.abs(S.selK-(on?1:0))>.002||t<3.4||P.some(function(q,i){return Math.abs(q.hl-((S.sel===i||S.hoverItem===i)&&q.k>=.98?1:0))>.004})||(S.p<.001&&!REDUCED&&!S.hoverBucket);
  return moving}
@@ -305,4 +307,4 @@ function go(){if(loaded)return;loaded=true;if(window.THREE){boot();return}var s=
 if(new URLSearchParams(location.search).has('p')||!('IntersectionObserver' in window)){go()}
 else{new IntersectionObserver(function(es,o){if(es.some(function(e){return e.isIntersecting})){o.disconnect();go()}},{rootMargin:'300px'}).observe(st)}
 })();
-</script>
+</script></div>
