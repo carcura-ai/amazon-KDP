@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Carcura: Ideen für die Waschset-Aktion auf der Startseite</title>
+<style>
+:root{--ink:#07070a;--card:#0f0f13;--txt:#f2f1ee;--muted:#a3a5ad;--acc:#e8f320;--gold:#cbbf94}
+*{box-sizing:border-box}html{scroll-behavior:smooth}
+body{margin:0;background:var(--ink);color:var(--txt);font:16px/1.55 Inter,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;-webkit-font-smoothing:antialiased}
+.w{max-width:1120px;margin:0 auto;padding:0 20px}
+header{padding:56px 0 24px}
+.k{font-size:.74rem;letter-spacing:.22em;text-transform:uppercase;color:var(--gold);display:flex;align-items:center;gap:12px}.k:before{content:"";width:24px;height:1px;background:var(--gold)}
+h1{font-size:clamp(1.7rem,4vw,2.7rem);line-height:1.12;margin:14px 0 10px;font-weight:700;letter-spacing:-.02em}
+h2{font-size:clamp(1.25rem,2.4vw,1.7rem);margin:0 0 6px;letter-spacing:-.01em}
+p{margin:0 0 12px;color:var(--muted)}.lead{max-width:62ch}
+nav{display:flex;flex-wrap:wrap;gap:8px;margin:18px 0 0}nav a{color:var(--txt);text-decoration:none;font-size:.85rem;padding:7px 14px;border:1px solid rgba(203,191,148,.35);border-radius:999px}nav a:hover{background:rgba(203,191,148,.12)}
+section.i{padding:40px 0;border-top:1px solid rgba(255,255,255,.08)}
+.grid{display:grid;grid-template-columns:1.35fr 1fr;gap:28px;align-items:start}
+@media(max-width:860px){.grid{grid-template-columns:1fr}}
+.stage{position:relative;aspect-ratio:16/10;border-radius:18px;background:radial-gradient(120% 90% at 50% 0%,#15151b,#0a0a0d);border:1px solid rgba(203,191,148,.25);overflow:hidden;box-shadow:0 30px 80px -50px #000}
+.stage svg{position:absolute;inset:0;width:100%;height:100%}
+.rp{position:absolute;right:12px;top:12px;z-index:3;background:rgba(7,7,10,.7);color:var(--txt);border:1px solid rgba(255,255,255,.2);border-radius:999px;padding:6px 14px;font:inherit;font-size:.78rem;cursor:pointer}
+.rp:hover{border-color:var(--acc);color:var(--acc)}
+.tag{display:inline-block;font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;color:var(--ink);background:var(--gold);border-radius:999px;padding:3px 12px;margin-bottom:10px;font-weight:700}
+.tag.r{background:var(--acc)}
+table{width:100%;border-collapse:collapse;font-size:.9rem}td{padding:7px 0;border-bottom:1px solid rgba(255,255,255,.08);vertical-align:top}td:first-child{color:var(--gold);width:38%;padding-right:10px}
+.lt{fill:none}
+/* ---------- A Tropfen ---------- */
+.A .d{transform-box:fill-box;transform-origin:center;transform:scale(0);opacity:0}
+.A.go .d{animation:pop .5s cubic-bezier(.2,.9,.3,1) forwards;animation-delay:calc(var(--i)*.14s + .3s)}
+@keyframes pop{to{transform:scale(1);opacity:1}}
+.A .roll{opacity:0;transform:translate(0,0)}
+.A.go .roll{animation:roll 2.1s cubic-bezier(.5,0,.3,1) 2.2s forwards}
+@keyframes roll{0%{opacity:1;transform:translate(0,0)}100%{opacity:1;transform:translate(490px,-20px)}}
+.A .trail{stroke-dasharray:420;stroke-dashoffset:420;opacity:.55}
+.A.go .trail{animation:tr 2.1s cubic-bezier(.5,0,.3,1) 2.2s forwards}
+@keyframes tr{to{stroke-dashoffset:0}}
+.A .rev{opacity:0;transform:translateY(10px)}
+.A.go .rev{animation:up .8s ease 3.2s forwards}
+@keyframes up{to{opacity:1;transform:none}}
+/* ---------- B Schleife ---------- */
+.B .ln{stroke-dasharray:1;stroke-dashoffset:1}
+.B.go .ln{animation:draw 2.4s cubic-bezier(.6,0,.2,1) .2s forwards}
+@keyframes draw{to{stroke-dashoffset:0}}
+.B .bow{opacity:0;transform-box:fill-box;transform-origin:center;transform:scale(.5)}
+.B.go .bow{animation:pop .7s cubic-bezier(.2,.9,.3,1) 2.3s forwards}
+.B .it{opacity:0;transform:translateY(10px)}
+.B.go .it{animation:up .6s ease forwards;animation-delay:calc(var(--i)*.22s + 2.7s)}
+.B .shine{opacity:0}.B.go .shine{animation:sh 2.6s ease 4.1s infinite}
+@keyframes sh{0%{opacity:0;transform:translateX(-120px)}30%{opacity:.5}70%{opacity:.5}100%{opacity:0;transform:translateX(560px)}}
+/* ---------- C Set aus Licht ---------- */
+.C .core{transform-box:fill-box;transform-origin:center;transform:scale(0);opacity:0}
+.C.go .core{animation:core 1.4s cubic-bezier(.2,.8,.2,1) .2s forwards}
+@keyframes core{0%{transform:scale(0);opacity:0}40%{transform:scale(1);opacity:1}100%{transform:scale(.55);opacity:.0}}
+.C .p{transform-box:fill-box;transform-origin:center;opacity:0;transform:translate(var(--fx),var(--fy)) scale(.1)}
+.C.go .p{animation:fly 1.1s cubic-bezier(.2,.9,.25,1) forwards;animation-delay:calc(var(--i)*.16s + 1.1s)}
+@keyframes fly{to{opacity:1;transform:translate(0,0) scale(1)}}
+.C .lab{opacity:0}.C.go .lab{animation:up .8s ease 2.6s forwards}
+/* ---------- D Zähler ---------- */
+.D .rg{stroke-dasharray:var(--c);stroke-dashoffset:var(--c)}
+.D.go .rg{animation:rg 2.2s cubic-bezier(.4,0,.2,1) .2s forwards}
+@keyframes rg{to{stroke-dashoffset:var(--off)}}
+.D .sh{opacity:0}.D.go .sh{animation:sh2 3s ease 2.6s infinite}
+@keyframes sh2{0%{opacity:0;transform:translateX(-200px)}30%{opacity:.35}70%{opacity:.35}100%{opacity:0;transform:translateX(900px)}}
+/* ---------- Empfehlung ---------- */
+.E .ln{stroke-dasharray:1;stroke-dashoffset:1}.E.go .ln{animation:draw 2.2s cubic-bezier(.6,0,.2,1) .1s forwards}
+.E .it{opacity:0;transform:translateY(8px)}.E.go .it{animation:up .6s ease forwards;animation-delay:calc(var(--i)*.18s + 2.2s)}
+.E .sh{opacity:0}.E.go .sh{animation:sh2 3.4s ease 3.6s infinite}
+@media (prefers-reduced-motion:reduce){*{animation-duration:.01s!important;animation-delay:0s!important}}
+footer{padding:36px 0 70px;border-top:1px solid rgba(255,255,255,.08)}
+.rec{background:linear-gradient(135deg,#121216,#0a0a0d);border:1px solid rgba(232,243,32,.4);border-radius:18px;padding:22px}
+</style></head><body>
+<header><div class="w"><div class="k">Carcura · Startseite · Aktion bis 31.12.2026</div>
+<h1>Das Waschset-Angebot: vier Animationsideen zum Ansehen</h1>
+<p class="lead">Alle Ideen laufen live auf dieser Seite. Mit „Nochmal“ startest du sie neu. Gebaut im Carcura-Design (dunkel, Gold, wenig Schrift), alles ohne Bilder, daher schnell geladen und am Handy genauso scharf wie am Desktop. Den Preis des Sets nenne ich bewusst nicht, solange der Beleg fehlt.</p>
+<nav><a href="#a">A Wassertropfen</a><a href="#b">B Goldene Schleife</a><a href="#c">C Set aus Licht</a><a href="#d">D Zähler</a><a href="#e">Empfehlung</a></nav></div></header>
+<main class="w">
+
+<section class="i" id="a"><div class="grid"><div class="stage A" id="sa"><button class="rp" data-t="sa">Nochmal</button>
+<svg viewBox="0 0 800 500" aria-label="Wassertropfen perlen auf glänzendem Lack ab">
+<defs><linearGradient id="pa" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#1d2736"/><stop offset=".6" stop-color="#101822"/><stop offset="1" stop-color="#0a0f16"/></linearGradient>
+<radialGradient id="dp" cx=".35" cy=".3" r=".8"><stop offset="0" stop-color="#fff" stop-opacity=".65"/><stop offset=".7" stop-color="#a0bee1" stop-opacity=".16"/><stop offset="1" stop-color="#d2e6ff" stop-opacity=".6"/></radialGradient>
+<linearGradient id="hl" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#fff" stop-opacity=".22"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient></defs>
+<rect x="60" y="60" width="680" height="380" rx="30" fill="url(#pa)" stroke="rgba(203,191,148,.35)"/>
+<path d="M60 60H420L260 440H60Z" fill="url(#hl)" opacity=".7"/>
+<g>
+<circle class="d" style="--i:0" cx="170" cy="150" r="20" fill="url(#dp)"/><circle class="d" style="--i:1" cx="150" cy="250" r="15" fill="url(#dp)"/><circle class="d" style="--i:2" cx="350" cy="140" r="26" fill="url(#dp)"/>
+<circle class="d" style="--i:3" cx="660" cy="320" r="18" fill="url(#dp)"/><circle class="d" style="--i:4" cx="560" cy="150" r="22" fill="url(#dp)"/><circle class="d" style="--i:5" cx="640" cy="250" r="14" fill="url(#dp)"/>
+<circle class="d" style="--i:6" cx="120" cy="380" r="24" fill="url(#dp)"/><circle class="d" style="--i:7" cx="330" cy="370" r="14" fill="url(#dp)"/><circle class="d" style="--i:8" cx="540" cy="360" r="20" fill="url(#dp)"/><circle class="d" style="--i:9" cx="620" cy="110" r="13" fill="url(#dp)"/></g>
+<path class="trail lt" d="M150 120 C300 90 480 150 640 100" stroke="#d2e6ff" stroke-width="10" stroke-linecap="round"/>
+<circle class="roll" cx="150" cy="120" r="22" fill="url(#dp)"/>
+<g class="rev" text-anchor="middle"><text x="400" y="228" fill="#cbbf94" font-size="22" letter-spacing="6" font-weight="600">KERAMIK-AKTION</text><text x="400" y="288" fill="#f2f1ee" font-size="46" font-weight="700">Waschset geschenkt</text><text x="400" y="326" fill="#a3a5ad" font-size="20">bei Buchung bis 31.12.2026</text></g>
+</svg></div>
+<div><span class="tag">Idee A</span><h2>Wassertropfen</h2><p>Wasser perlt auf Lack ab, genau das, was Keramik kann. Ein Tropfen rollt über die Fläche und gibt den Text frei.</p>
+<table><tr><td>Wirkung</td><td>Erklärt den Nutzen im Bild und lenkt auf das Angebot. Sehr edel.</td></tr><tr><td>Aufwand</td><td>Mittel</td></tr><tr><td>Ladezeit</td><td>keine Bilder, nur Vektor</td></tr><tr><td>Risiko</td><td>Wirkt eher wie eine Szene als wie ein Angebot, die Aktion muss klar lesbar bleiben</td></tr></table></div></div></section>
+
+<section class="i" id="b"><div class="grid"><div class="stage B" id="sb"><button class="rp" data-t="sb">Nochmal</button>
+<svg viewBox="0 0 800 500" aria-label="Goldene Linie umrandet die Karte und bildet eine Schleife">
+<defs><clipPath id="cb"><rect x="90" y="70" width="620" height="360" rx="26"/></clipPath><linearGradient id="sg" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#cbbf94" stop-opacity="0"/><stop offset=".5" stop-color="#fff" stop-opacity=".5"/><stop offset="1" stop-color="#cbbf94" stop-opacity="0"/></linearGradient></defs>
+<rect x="90" y="70" width="620" height="360" rx="26" fill="#0d0d11"/>
+<g clip-path="url(#cb)"><rect class="shine" x="0" y="60" width="120" height="380" fill="url(#sg)" transform="skewX(-14)"/></g>
+<rect class="ln" pathLength="1" x="90" y="70" width="620" height="360" rx="26" fill="none" stroke="#cbbf94" stroke-width="2.6" stroke-linecap="round"/>
+<g class="bow" fill="none" stroke="#cbbf94" stroke-width="2.6" stroke-linecap="round"><path d="M400 70 C350 20 300 36 330 66 C350 84 392 70 400 70Z"/><path d="M400 70 C450 20 500 36 470 66 C450 84 408 70 400 70Z"/><circle cx="400" cy="70" r="7" fill="#cbbf94"/></g>
+<text x="400" y="140" text-anchor="middle" fill="#cbbf94" font-size="18" letter-spacing="6" font-weight="600">KERAMIK-AKTION BIS 31.12.</text>
+<text x="400" y="190" text-anchor="middle" fill="#f2f1ee" font-size="40" font-weight="700">Waschset geschenkt</text>
+<g fill="#f2f1ee" font-size="20" text-anchor="middle"><text class="it" style="--i:0" x="400" y="248">Wascheimer mit Schmutzsieb</text><text class="it" style="--i:1" x="400" y="280">Reactivating Shampoo</text><text class="it" style="--i:2" x="400" y="312">Reiniger für Scheiben und Reifen</text><text class="it" style="--i:3" x="400" y="344">Quick Detailer</text><text class="it" style="--i:4" x="400" y="376">Scrubpad</text></g></svg></div>
+<div><span class="tag">Idee B</span><h2>Goldene Schleife</h2><p>Eine feine Goldlinie zeichnet sich um die Karte und schließt sich oben zur Schleife. Danach erscheinen die Set-Inhalte Zeile für Zeile.</p>
+<table><tr><td>Wirkung</td><td>Sagt „Geschenk“ ohne Kitsch, hochwertig, sofort verständlich.</td></tr><tr><td>Aufwand</td><td>Gering</td></tr><tr><td>Ladezeit</td><td>kaum messbar, reines CSS</td></tr><tr><td>Risiko</td><td>Praktisch keins. Für Handy gut geeignet.</td></tr></table></div></div></section>
+
+<section class="i" id="c"><div class="grid"><div class="stage C" id="sc"><button class="rp" data-t="sc">Nochmal</button>
+<svg viewBox="0 0 800 500" aria-label="Fünf Produkte entstehen aus einem Lichtkreis">
+<defs><radialGradient id="lg" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#fff" stop-opacity=".9"/><stop offset=".4" stop-color="#cbbf94" stop-opacity=".5"/><stop offset="1" stop-color="#cbbf94" stop-opacity="0"/></radialGradient>
+<linearGradient id="bt" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f4ff3a"/><stop offset="1" stop-color="#b7c20e"/></linearGradient><linearGradient id="bd" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#34343f"/><stop offset="1" stop-color="#0e0e13"/></linearGradient></defs>
+<circle class="core" cx="400" cy="230" r="210" fill="url(#lg)"/>
+<g transform="translate(57 0)"><g stroke="#cbbf94" stroke-opacity=".6" stroke-width="2">
+<g class="p" style="--i:0;--fx:300px;--fy:30px"><path d="M110 230H210L200 330Q199 340 189 340H131Q121 340 120 330Z" fill="url(#bd)"/><path d="M118 230Q160 160 202 230" fill="none"/><rect x="132" y="262" width="56" height="34" rx="6" fill="url(#bt)" stroke="none"/></g>
+<g class="p" style="--i:1;--fx:180px;--fy:30px"><rect x="262" y="170" width="56" height="170" rx="16" fill="url(#bd)"/><rect x="278" y="140" width="24" height="34" rx="6" fill="#e8f320" stroke="none"/><rect x="268" y="230" width="44" height="60" rx="6" fill="url(#bt)" stroke="none"/></g>
+<g class="p" style="--i:2;--fx:60px;--fy:30px"><rect x="354" y="210" width="44" height="130" rx="12" fill="url(#bd)"/><rect x="362" y="184" width="28" height="30" rx="6" fill="#e8f320" stroke="none"/><rect x="358" y="250" width="36" height="40" rx="5" fill="url(#bt)" stroke="none"/></g>
+<g class="p" style="--i:3;--fx:-60px;--fy:30px"><rect x="426" y="220" width="44" height="120" rx="12" fill="url(#bd)"/><rect x="434" y="196" width="28" height="28" rx="6" fill="#e8f320" stroke="none"/><rect x="430" y="256" width="36" height="40" rx="5" fill="url(#bt)" stroke="none"/></g>
+<g class="p" style="--i:4;--fx:-180px;--fy:30px"><circle cx="560" cy="300" r="42" fill="url(#bt)" stroke="none"/><g fill="#07070a" opacity=".28" stroke="none"><circle cx="548" cy="288" r="4"/><circle cx="572" cy="290" r="4"/><circle cx="560" cy="306" r="4"/><circle cx="544" cy="316" r="4"/><circle cx="576" cy="318" r="4"/></g></g></g>
+</g><g class="lab" text-anchor="middle"><text x="400" y="400" fill="#cbbf94" font-size="18" letter-spacing="6" font-weight="600">KERAMIK-AKTION BIS 31.12.</text><text x="400" y="446" fill="#f2f1ee" font-size="38" font-weight="700">Waschset geschenkt</text></g></svg></div>
+<div><span class="tag">Idee C</span><h2>Set aus Licht</h2><p>Aus einem Lichtkreis fliegen die Teile des Sets heraus und ordnen sich nebeneinander. Das ist die Formverwandlung nach dem Motion-Design-Skill.</p>
+<table><tr><td>Wirkung</td><td>Der stärkste „Wow“-Effekt, zeigt, was drin steckt.</td></tr><tr><td>Aufwand</td><td>Hoch. Mit echten Produktfotos (Eimer, Shampoo, Flaschen) noch besser.</td></tr><tr><td>Ladezeit</td><td>Vektor ok, Fotos müssten klein komprimiert werden</td></tr><tr><td>Risiko</td><td>Bastel-Look, wenn die Formen zu simpel sind. Darum nur mit echten Fotos oder als kurzes Video.</td></tr></table></div></div></section>
+
+<section class="i" id="d"><div class="grid"><div class="stage D" id="sd"><button class="rp" data-t="sd">Nochmal</button>
+<svg viewBox="0 0 800 500" aria-label="Zähler: noch Tage bis 31.12.">
+<defs><clipPath id="cd"><rect x="150" y="90" width="500" height="320" rx="26"/></clipPath><linearGradient id="g2" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#fff" stop-opacity="0"/><stop offset=".5" stop-color="#fff" stop-opacity=".6"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient></defs>
+<rect x="150" y="90" width="500" height="320" rx="26" fill="#0d0d11" stroke="rgba(203,191,148,.4)"/>
+<g clip-path="url(#cd)"><rect class="sh" x="0" y="80" width="90" height="340" fill="url(#g2)" transform="skewX(-14)"/></g>
+<circle cx="400" cy="218" r="96" fill="none" stroke="rgba(255,255,255,.1)" stroke-width="9"/>
+<circle id="rg" class="rg" cx="400" cy="218" r="96" fill="none" stroke="#cbbf94" stroke-width="9" stroke-linecap="round" transform="rotate(-90 400 218)" style="--c:603.2;--off:200"/>
+<text id="dn" x="400" y="236" text-anchor="middle" fill="#f2f1ee" font-size="76" font-weight="700">42</text>
+<text x="400" y="266" text-anchor="middle" fill="#a3a5ad" font-size="18" letter-spacing="5">TAGE</text>
+<text x="400" y="372" text-anchor="middle" fill="#cbbf94" font-size="18" letter-spacing="5" font-weight="600">KERAMIK-AKTION</text>
+<text x="400" y="400" text-anchor="middle" fill="#f2f1ee" font-size="22" font-weight="600">Waschset geschenkt · bis 31.12.2026</text></svg></div>
+<div><span class="tag">Idee D</span><h2>Zähler</h2><p>Ein ruhiger Ring läuft herunter und zeigt, wie viele Tage die Aktion noch gilt. Die Zahl rechnet sich aus dem Datum, sie stimmt also jeden Tag von selbst.</p>
+<table><tr><td>Wirkung</td><td>Echte, ehrliche Dringlichkeit, kein Druck-Trick.</td></tr><tr><td>Aufwand</td><td>Gering</td></tr><tr><td>Ladezeit</td><td>kaum messbar</td></tr><tr><td>Risiko</td><td>Nur ein Hinweis: Nach dem 31.12. muss alles verschwinden. Das ist ohnehin so geplant (am 02.01. räume ich auf).</td></tr></table></div></div></section>
+
+<section class="i" id="e"><span class="tag r">Meine Empfehlung</span><div class="grid"><div class="stage E" id="se"><button class="rp" data-t="se">Nochmal</button>
+<svg viewBox="0 0 800 500" aria-label="Empfehlung: goldene Linie mit Zähler">
+<defs><clipPath id="ce"><rect x="90" y="80" width="620" height="340" rx="26"/></clipPath><linearGradient id="g3" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#cbbf94" stop-opacity="0"/><stop offset=".5" stop-color="#fff" stop-opacity=".55"/><stop offset="1" stop-color="#cbbf94" stop-opacity="0"/></linearGradient></defs>
+<rect x="90" y="80" width="620" height="340" rx="26" fill="#0d0d11"/><g clip-path="url(#ce)"><rect class="sh" x="0" y="70" width="110" height="360" fill="url(#g3)" transform="skewX(-14)"/></g>
+<rect class="ln" pathLength="1" x="90" y="80" width="620" height="340" rx="26" fill="none" stroke="#cbbf94" stroke-width="2.6" stroke-linecap="round"/>
+<g class="it" style="--i:0"><text x="130" y="140" fill="#cbbf94" font-size="16" letter-spacing="5" font-weight="600">KERAMIK-AKTION · BIS 31.12.2026</text></g>
+<g class="it" style="--i:1"><text x="130" y="200" fill="#f2f1ee" font-size="34" font-weight="700">Keramik buchen,</text><text x="130" y="244" fill="#f2f1ee" font-size="34" font-weight="700">Waschset geschenkt.</text></g>
+<g class="it" style="--i:2" font-size="18" fill="#a3a5ad"><text x="130" y="296">Wascheimer · Shampoo · Reiniger</text><text x="130" y="322">Quick Detailer · Scrubpad</text></g>
+<g class="it" style="--i:3"><rect x="130" y="348" width="230" height="46" rx="23" fill="#e8f320"/><text x="245" y="378" text-anchor="middle" fill="#07070a" font-size="18" font-weight="700">Termin vereinbaren</text></g>
+<g class="it" style="--i:4"><circle cx="632" cy="250" r="56" fill="none" stroke="rgba(255,255,255,.1)" stroke-width="7"/><circle cx="632" cy="250" r="56" fill="none" stroke="#cbbf94" stroke-width="7" stroke-linecap="round" stroke-dasharray="352" stroke-dashoffset="110" transform="rotate(-90 632 250)"/><text id="dn2" x="632" y="262" text-anchor="middle" fill="#f2f1ee" font-size="44" font-weight="700">42</text><text x="632" y="286" text-anchor="middle" fill="#a3a5ad" font-size="13" letter-spacing="4">TAGE</text></g></svg></div>
+<div class="rec"><h2>B plus D als Standard</h2><p>Die goldene Linie zeichnet die Karte und die Inhalte erscheinen, daneben läuft der Tage-Zähler. Das ist hochwertig, schnell, am Handy sauber und ehrlich, und es lässt sich in einer Stunde auf der Startseite einbauen.</p>
+<p>Idee C (Set aus Licht) setze ich zusätzlich als 6-Sekunden-Video um, für Instagram und die Keramik-Seite. Idee A nur, wenn wir echte Fotos haben.</p>
+<p><b style="color:var(--txt)">Offen von dir:</b> Beleg für den Waschset-Wert (sonst nenne ich keinen Betrag), und ob die Aktion auch auf der Gutschein-Seite diese Animation bekommen soll.</p></div></div></section>
+</main>
+<footer><div class="w"><p>Alle Aussagen: Aktion nur bei Terminvereinbarung bis 31.12.2026. Kein Preis für das Set, solange der Beleg fehlt. Animationen sind Entwürfe, noch nicht auf carcura.info.</p></div></footer>
+<script>
+(function(){
+var days=Math.max(0,Math.ceil((new Date(2027,0,1)-new Date())/864e5)),tot=61,frac=Math.min(1,days/tot);
+['dn','dn2'].forEach(function(id){var n=document.getElementById(id);if(n)n.textContent=days});
+var rg=document.getElementById('rg');if(rg)rg.style.setProperty('--off',(603.2*(1-frac)).toFixed(1));
+function go(el){el.classList.remove('go');void el.getBoundingClientRect();el.classList.add('go')}
+var st=document.querySelectorAll('.stage');
+var io=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting&&!e.target.dataset.s){e.target.dataset.s=1;go(e.target)}})},{threshold:.4});
+st.forEach(function(s){io.observe(s)});
+document.querySelectorAll('.rp').forEach(function(b){b.addEventListener('click',function(){go(document.getElementById(b.dataset.t))})});
+})();
+</script></body></html>
