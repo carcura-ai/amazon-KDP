@@ -134,6 +134,7 @@ var stage=document.getElementById('cxa-stage'),cv=document.getElementById('cxa-g
 var S={target:REDUCED?1:0,p:REDUCED?1:0,sel:-1,hoverItem:-1,hoverBucket:false,tail:0};
 if(TEST){S.p=TEST.p;S.target=TEST.p>0?1:0;S.sel=TEST.h;S.hoverBucket=TEST.hb}
 var chips=[],hot=[];
+window.cxaState=function(){return JSON.stringify({p:S.p,target:S.target,sel:S.sel,card:card.classList.contains('on'),nogl:root.classList.contains('nogl')})};
 function setTarget(v){S.target=v;if(!v){S.sel=-1;S.hoverItem=-1}need()}
 function select(i){S.target=1;S.sel=(S.sel===i)?-1:i;need()}
 DATA.forEach(function(d,i){
@@ -294,7 +295,6 @@ function loop(now){if(!vis){running=false;return}var dt=Math.min(.05,(now-lastT)
  // schwächere Geräte: Auflösung stufenweise senken
  perf.n++;if(!perf.start)perf.start=now;if(perf.n>=90){var avg=(now-perf.start)/perf.n;if(avg>32&&perf.dpr>1){perf.dpr=Math.max(1,perf.dpr-.5);R._w=0}perf.n=0;perf.start=now}
  if(moving||needRender){needRender=false;requestAnimationFrame(loop)}else{running=false}}
-window.cxaState=function(){return JSON.stringify({p:S.p,target:S.target,sel:S.sel,card:card.classList.contains('on'),nogl:root.classList.contains('nogl')})};
 window.__seek=function(t,p,h,hb){S.p=p;S.target=p>0?1:0;S.sel=h===undefined?-1:h;S.hoverBucket=!!hb;S.time=t;frame(.016,t);frame(.016,t)};
 if(TEST){window.__seek(Q.has('t')?parseFloat(Q.get('t')):6,TEST.p,TEST.h,TEST.hb)}
 else{new IntersectionObserver(function(es){es.forEach(function(e){vis=e.isIntersecting;if(vis){S.time=S.time||0;need()}})},{threshold:.1}).observe(stage);document.addEventListener('visibilitychange',function(){vis=!document.hidden;if(vis)need()});
