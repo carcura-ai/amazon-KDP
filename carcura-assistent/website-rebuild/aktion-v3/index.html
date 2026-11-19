@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Carcura · Waschset-Aktion · Entwurf v3</title>
+<style>
+:root{--ink:#07070a;--txt:#f2f1ee;--muted:#a3a5ad;--acc:#e8f320;--gold:#cbbf94;--ease:cubic-bezier(.16,1,.3,1);--out:cubic-bezier(.22,1,.36,1)}
+*{box-sizing:border-box}html,body{margin:0;background:var(--ink);color:var(--txt)}
+body{font:16px/1.55 system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;overflow-x:hidden}
+::selection{background:var(--acc);color:var(--ink)}
+:focus-visible{outline:2px solid var(--acc);outline-offset:3px}
+.pad{max-width:1280px;margin:0 auto;padding:0 clamp(14px,3vw,32px) clamp(28px,6vw,72px)}
+.note{max-width:68ch;color:var(--muted);font-size:.9rem;margin:28px auto 22px;padding:0 clamp(14px,3vw,32px)}
+.note b{color:var(--txt);font-weight:600}
+.aktion{position:relative;isolation:isolate;border-radius:28px;overflow:hidden;background:#09090c;border:1px solid rgba(203,191,148,.2);box-shadow:0 60px 140px -70px #000,inset 0 1px 0 rgba(255,255,255,.05)}
+.stage{position:relative;aspect-ratio:16/8.6;min-height:480px;background:radial-gradient(90% 110% at 68% 105%,#1a1a21 0%,#0c0c10 48%,#07070a 100%);touch-action:pan-y}
+#gl{position:absolute;inset:0;width:100%;height:100%;display:block}
+.fx{position:absolute;inset:0;pointer-events:none;z-index:1}
+.fx:before{content:"";position:absolute;inset:0;background:radial-gradient(120% 90% at 28% 0%,rgba(203,191,148,.07),transparent 55%),radial-gradient(140% 120% at 50% 50%,transparent 55%,rgba(0,0,0,.55) 100%)}
+.fx:after{content:"";position:absolute;inset:-50%;opacity:.07;mix-blend-mode:overlay;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 .9 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");animation:grain 1.2s steps(6) infinite}
+@keyframes grain{0%{transform:translate(0,0)}20%{transform:translate(-3%,2%)}40%{transform:translate(2%,-3%)}60%{transform:translate(-2%,-1%)}80%{transform:translate(3%,3%)}100%{transform:translate(0,0)}}
+/* Hotspots: echte Schaltflächen, per Tastatur und Touch erreichbar */
+.hots{position:absolute;inset:0;z-index:3;pointer-events:none}
+.hot{position:absolute;width:76px;height:76px;margin:-38px 0 0 -38px;border:0;border-radius:50%;background:transparent;padding:0;cursor:pointer;pointer-events:auto;opacity:0;visibility:hidden;-webkit-tap-highlight-color:transparent}
+.hot.on{visibility:visible}
+.hot:before{content:"";position:absolute;left:50%;top:50%;width:12px;height:12px;margin:-6px;border-radius:50%;background:var(--gold);box-shadow:0 0 0 0 rgba(203,191,148,.55);transition:transform .5s var(--ease),background-color .3s}
+.hot:after{content:"";position:absolute;left:50%;top:50%;width:12px;height:12px;margin:-6px;border-radius:50%;border:1px solid var(--gold);opacity:0;transform:scale(1)}
+.hot.pulse:after{animation:ping 2.4s var(--out) infinite}
+@keyframes ping{0%{opacity:.8;transform:scale(1)}70%,100%{opacity:0;transform:scale(3.6)}}
+.hot:hover:before,.hot.act:before,.hot:focus-visible:before{transform:scale(1.5);background:var(--acc)}
+.hot:focus-visible{outline:2px solid var(--acc);outline-offset:-6px}
+.hot.bucket:before{width:22px;height:22px;margin:-11px;background:var(--ink);border:2px solid var(--acc);box-shadow:0 0 0 5px rgba(7,7,10,.55)}.hot.bucket:after{width:22px;height:22px;margin:-11px;border-color:var(--acc)}
+.hint{position:absolute;z-index:4;transform:translate(-50%,0);font-size:.82rem;color:var(--txt);white-space:nowrap;pointer-events:none;padding:8px 14px 8px 12px;border-radius:999px;background:rgba(10,10,14,.7);border:1px solid rgba(232,243,32,.45);backdrop-filter:blur(8px);opacity:0;transition:opacity .6s var(--ease)}
+.hint.on{opacity:1}.hint svg{width:15px;height:15px;vertical-align:-3px;margin-right:6px;color:var(--acc)}
+/* Textfeld */
+.card{position:absolute;z-index:5;width:min(344px,calc(100% - 24px));padding:18px 20px 16px;border-radius:16px;background:rgba(12,12,16,.86);border:1px solid rgba(203,191,148,.32);box-shadow:0 30px 60px -28px #000,inset 0 1px 0 rgba(255,255,255,.06);backdrop-filter:blur(16px) saturate(1.2);pointer-events:none;opacity:0;transform:translateY(8px) scale(.98);filter:blur(6px);transition:opacity .35s var(--ease),transform .5s var(--ease),filter .35s var(--ease);will-change:transform,opacity}
+.card.on{opacity:1;transform:none;filter:none;pointer-events:auto}
+.card h3{margin:0 0 6px;font-size:1.02rem;line-height:1.25;font-weight:680;letter-spacing:-.012em}
+.card p{margin:0;font-size:.86rem;line-height:1.5;color:#c9cad1;text-wrap:pretty}
+.card .src{margin-top:12px;padding-top:11px;border-top:1px solid rgba(255,255,255,.1);font-size:.74rem;color:var(--muted);display:flex;gap:8px;flex-wrap:wrap;justify-content:space-between}
+.card .src a{color:var(--gold);text-underline-offset:3px}
+.card .tip{position:absolute;width:10px;height:10px;background:rgba(12,12,16,.95);border:1px solid rgba(203,191,148,.32);border-right:0;border-bottom:0;transform:rotate(45deg)}
+.reset{position:absolute;right:14px;top:14px;z-index:6;height:34px;padding:0 16px;border-radius:999px;font:inherit;font-size:.78rem;color:var(--txt);background:rgba(7,7,10,.6);border:1px solid rgba(255,255,255,.2);cursor:pointer;opacity:0;visibility:hidden;transition:opacity .5s,border-color .3s,color .3s}
+.reset.on{opacity:1;visibility:visible}.reset:hover{border-color:var(--gold);color:var(--gold)}
+.copy{position:absolute;left:clamp(22px,4.2vw,64px);bottom:clamp(22px,4.4vw,60px);max-width:min(430px,36%);z-index:3}
+h2{margin:0 0 16px;font-size:clamp(2rem,3.9vw,3.4rem);line-height:1.02;letter-spacing:-.036em;font-weight:760;text-wrap:balance}
+h2 .w{display:inline-block;opacity:0;filter:blur(10px);transform:translateY(.42em)}
+h2 em{font-style:normal;color:var(--gold)}
+.sub{margin:0 0 24px;color:#c9cad1;max-width:34ch;font-size:clamp(.92rem,1.2vw,1.04rem);text-wrap:pretty}
+.act{display:flex;flex-wrap:wrap;gap:12px;align-items:center}
+.btn{position:relative;display:inline-flex;align-items:center;justify-content:center;gap:12px;height:52px;padding:0 26px;border-radius:999px;font:inherit;font-weight:650;font-size:.95rem;letter-spacing:-.005em;text-decoration:none;border:1px solid transparent;overflow:hidden;transition:transform .5s var(--ease),background-color .3s,border-color .3s,color .3s,box-shadow .5s var(--ease);-webkit-tap-highlight-color:transparent}
+.btn:active{transform:scale(.97)}
+.btn.p{background:var(--acc);color:var(--ink);box-shadow:0 10px 30px -12px rgba(232,243,32,.55),inset 0 1px 0 rgba(255,255,255,.55)}
+.btn.p:hover{transform:translateY(-2px);background:#f2fe3a;box-shadow:0 16px 38px -12px rgba(232,243,32,.7),inset 0 1px 0 rgba(255,255,255,.6)}
+.btn.p:before{content:"";position:absolute;top:0;bottom:0;width:60%;left:-80%;background:linear-gradient(100deg,transparent,rgba(255,255,255,.65),transparent);transform:skewX(-18deg)}
+.btn.p:hover:before{animation:shine .9s var(--out) 1}
+@keyframes shine{to{left:130%}}
+.btn svg{width:18px;height:18px;flex:none;transition:transform .5s var(--ease)}
+.btn.p:hover svg{transform:translateX(4px)}
+.btn.g{color:var(--txt);border-color:rgba(255,255,255,.26);background:rgba(255,255,255,.02);backdrop-filter:blur(6px)}
+.btn.g:hover{border-color:var(--gold);color:var(--gold);background:rgba(203,191,148,.06)}
+.fine{margin:20px 0 0;font-size:.8rem;color:var(--muted);display:flex;flex-wrap:wrap;gap:6px 20px;align-items:center}
+.fine b{color:var(--txt);font-weight:650;font-variant-numeric:tabular-nums;display:inline-block;min-width:1.4em;text-align:right}
+.fine a{color:var(--gold);text-underline-offset:4px;text-decoration-thickness:1px;transition:color .3s}.fine a:hover{color:var(--txt)}
+.copy .rv{opacity:0;transform:translateY(14px);filter:blur(5px)}
+.list{display:none}
+@media (max-width:1100px) and (min-width:901px){.copy{max-width:38%}h2{font-size:clamp(1.8rem,3.6vw,2.6rem)}}
+@media (max-width:900px){
+ .aktion{display:flex;flex-direction:column}
+ .stage{order:1;aspect-ratio:1/.9;min-height:0}.copy{order:2;position:static;max-width:none;padding:28px 22px 22px}.list{order:3}
+ h2{font-size:clamp(2rem,9.2vw,3rem)}
+ .card{left:12px!important;right:12px;bottom:12px;top:auto!important;width:auto;transform:translateY(10px)}.card.on{transform:none}.card .tip{display:none}
+ .list{display:flex;flex-wrap:wrap;gap:10px 16px;padding:0 22px 28px;margin:0;list-style:none;font-size:.86rem;color:#c9cad1}
+ .list li{display:flex;align-items:center;gap:9px}.list li:before{content:"";width:5px;height:5px;background:var(--gold);transform:rotate(45deg);flex:none}
+ .btn{flex:1 1 220px}
+}
+@media (prefers-reduced-motion:reduce){.fx:after{animation:none}.hot.pulse:after{animation:none}}
+</style></head><body>
+<p class="note"><b>Entwurf v3, mit Bedienung.</b> Alle sechs Teile liegen im Eimer. Klick auf den Eimer: der Deckel hebt ab, die Produkte kommen heraus. Fahr dann mit der Maus über ein Teil (am Handy: antippen), dann blendet ein Textfeld auf, was es ist. Der Text zum Shampoo stammt von der Nanolex-Website, bei den anderen habe ich Hersteller-Texte sinngemäß zusammengefasst, bitte kurz prüfen. Das Produktdesign ist vereinfacht und ohne Markenlogo, das echte Set brauche ich als Fotos.</p>
+<div class="pad">
+<section class="aktion" id="aktion" aria-label="Aktion: Waschset zur Keramikversiegelung geschenkt, bis 31.12.2026">
+ <div class="stage" id="stage"><canvas id="gl" aria-hidden="true"></canvas><div class="fx" aria-hidden="true"></div>
+  <div class="hots" id="hots"></div>
+  <div class="hint" id="hint"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11V5a2 2 0 0 1 4 0v6l4 1a2 2 0 0 1 1.4 2.4l-1 4A3 3 0 0 1 14.5 21H12a4 4 0 0 1-3.2-1.6L5 14.500a1.700 1.700 0 0 1 2.600-2.100L9 14"/></svg>Eimer anklicken</div>
+  <div class="card" id="card" role="status" aria-live="polite"><div class="tip" id="tip"></div><h3 id="ct"></h3><p id="cp"></p><div class="src" id="cs"></div></div>
+  <button class="reset" id="reset" type="button">Eimer wieder schließen</button>
+ </div>
+ <div class="copy" id="copy">
+  <h2 id="h2"><span class="w">Keramik</span> <span class="w">buchen.</span><br><em><span class="w">Waschset</span> <span class="w">geschenkt.</span></em></h2>
+  <p class="sub rv">Bei jeder gebuchten Keramikversiegelung, auch als Gutschein zu Weihnachten. Gilt bei Terminvereinbarung bis 31.12.2026.</p>
+  <div class="act rv"><a class="btn p" href="#termin">Termin vereinbaren<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a><a class="btn g" href="#pflege"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20l1.3-4.2A8 8 0 1 1 8.2 18.7z"/></svg>Pflegeanleitung per WhatsApp</a></div>
+  <p class="fine rv"><span>Noch <b id="days">43</b> Tage</span><a href="#keramik">Mehr zur Keramikversiegelung</a></p>
+ </div>
+ <ul class="list" aria-label="Inhalt des Waschsets"><li>Wascheimer mit Schmutzsieb</li><li>Reactivating Shampoo</li><li>Reiniger für Scheiben</li><li>Reiniger für Reifen</li><li>Quick Detailer</li><li>Scrubpad</li></ul>
+</section></div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+(function(){
+var T3=THREE,Q=new URLSearchParams(location.search);
+var FIXED=Q.has('t')?parseFloat(Q.get('t')):null,OPEN_AT=Q.has('o')?parseFloat(Q.get('o')):null,HOVER=Q.has('h')?parseInt(Q.get('h')):-1;
+var REDUCED=matchMedia('(prefers-reduced-motion:reduce)').matches;
+var DAYS=Math.max(0,Math.ceil((new Date(2027,0,1)-new Date())/864e5));
+var cv=document.getElementById('gl'),stage=document.getElementById('stage'),sec=document.getElementById('aktion'),copy=document.getElementById('copy');
+var R=new T3.WebGLRenderer({canvas:cv,antialias:true,alpha:true,powerPreference:'high-performance',preserveDrawingBuffer:FIXED!==null||Q.has('rec')});
+R.outputEncoding=T3.sRGBEncoding;R.toneMapping=T3.ACESFilmicToneMapping;R.shadowMap.enabled=true;R.shadowMap.type=T3.PCFSoftShadowMap;R.setClearColor(0x000000,0);
+var scene=new T3.Scene(),cam=new T3.PerspectiveCamera(26,16/8.6,.1,60);scene.fog=new T3.Fog(0x08080b,11,26);
+function cl(v){return Math.max(0,Math.min(1,v))}
+function lerp(a,b,k){return a+(b-a)*k}
+function eo(k){k=cl(k);return k>=1?1:1-Math.pow(2,-10*k)}
+function eio(k){k=cl(k);return k<.5?4*k*k*k:1-Math.pow(-2*k+2,3)/2}
+function eob(k){k=cl(k);var c=1.25,d=c+1;return 1+d*Math.pow(k-1,3)+c*Math.pow(k-1,2)}
+/* ---------- Studio ---------- */
+(function(){var es=new T3.Scene();es.background=new T3.Color(0x030305);
+ function sb(w,h,x,y,z,c,k){var m=new T3.Mesh(new T3.PlaneGeometry(w,h),new T3.MeshBasicMaterial({color:new T3.Color(c).multiplyScalar(k),side:T3.DoubleSide}));m.position.set(x,y,z);m.lookAt(0,0,0);es.add(m)}
+ sb(9,4.5,-6,6.5,4,0xffffff,3.4);sb(13,.9,0,8,-4,0xcbbf94,2.8);sb(2.2,9,8,3,-2,0xdfe8ff,2);sb(6,2,3,2,8,0xffffff,.55);sb(3,3,-8,1,-3,0xfff0d8,1.2);
+ var pm=new T3.PMREMGenerator(R);scene.environment=pm.fromScene(es,.03).texture;pm.dispose()})();
+var key=new T3.SpotLight(0xfff1dc,0,34,.5,.75,1.1);key.position.set(-5.4,9,5.8);key.castShadow=true;key.shadow.mapSize.set(2048,2048);key.shadow.bias=-.0002;key.shadow.radius=7;key.shadow.camera.near=4;key.shadow.camera.far=30;scene.add(key);key.target.position.set(1,.4,0);scene.add(key.target);
+var rim=new T3.DirectionalLight(0xbcd2ff,0);rim.position.set(6,4,-7);scene.add(rim);
+var kick=new T3.PointLight(0xe8f320,0,9,2);kick.position.set(3.5,1.4,2.6);scene.add(kick);
+var GX=1.95,grp=new T3.Group();grp.position.set(GX,0,0);scene.add(grp);
+var graphite=new T3.MeshPhysicalMaterial({color:0x17171d,roughness:.44,metalness:.05,clearcoat:.4,clearcoatRoughness:.35,envMapIntensity:.4});
+var lime=new T3.MeshPhysicalMaterial({color:0xe8f320,roughness:.48,metalness:0,clearcoat:.25,clearcoatRoughness:.4,envMapIntensity:.5});
+var steel=new T3.MeshStandardMaterial({color:0xc7cad2,roughness:.28,metalness:1,envMapIntensity:.9});
+var goldM=new T3.MeshStandardMaterial({color:0xcbbf94,roughness:.26,metalness:1,envMapIntensity:1.1,emissive:0x3a3320,emissiveIntensity:0});
+var plinthM=new T3.MeshPhysicalMaterial({color:0x060609,roughness:.55,metalness:.6,clearcoat:.15,clearcoatRoughness:.4,envMapIntensity:.1,transparent:true,opacity:.92});
+var PR=2.7;
+var plinth=new T3.Mesh(new T3.CylinderGeometry(PR,PR+.1,.16,160),plinthM);plinth.position.y=-.08;plinth.receiveShadow=true;grp.add(plinth);
+var bevel=new T3.Mesh(new T3.TorusGeometry(PR+.02,.008,10,200),new T3.MeshStandardMaterial({color:0x2a2a31,roughness:.3,metalness:1}));bevel.rotation.x=Math.PI/2;bevel.position.y=-.16;grp.add(bevel);
+var floor=new T3.Mesh(new T3.CircleGeometry(40,64),new T3.MeshStandardMaterial({color:0x030304,roughness:.85,metalness:.1,envMapIntensity:.05}));floor.rotation.x=-Math.PI/2;floor.position.y=-.18;floor.receiveShadow=true;grp.add(floor);
+var rpts=[];for(var i=0;i<=256;i++){var a=i/256*Math.PI*2;rpts.push(new T3.Vector3(Math.cos(a)*PR,0,Math.sin(a)*PR))}
+var ringG=new T3.TubeGeometry(new T3.CatmullRomCurve3(rpts,true),256,.016,8,true),RIDX=ringG.index.count;grp.add(new T3.Mesh(ringG,goldM));
+/* ---------- Bausteine ---------- */
+function mesh(g,m,cast){var x=new T3.Mesh(g,m);x.castShadow=cast!==false;x.receiveShadow=true;return x}
+function lathe(pts,m,seg){return mesh(new T3.LatheGeometry(pts.map(function(p){return new T3.Vector2(p[0],p[1])}),seg||72),m)}
+function smooth(pts,n){var c=new T3.SplineCurve(pts.map(function(p){return new T3.Vector2(p[0],p[1])}));return c.getPoints(n||40).map(function(v){return [v.x,v.y]})}
+function knurl(r,h,n,depth,m){var g=new T3.CylinderGeometry(r,r*1.04,h,n*4,1),p=g.attributes.position;for(var i=0;i<p.count;i++){var x=p.getX(i),z=p.getZ(i),th=Math.atan2(z,x),s=1+depth*Math.max(0,Math.cos(th*n));p.setX(i,x*s);p.setZ(i,z*s)}g.computeVertexNormals();return mesh(g,m)}
+function label(lines,opt){opt=opt||{};var c=document.createElement('canvas');c.width=1024;c.height=512;var g=c.getContext('2d');
+ g.fillStyle='#0f0f14';g.fillRect(0,0,1024,512);var gr=g.createLinearGradient(0,0,1024,0);gr.addColorStop(0,'rgba(255,255,255,.06)');gr.addColorStop(.5,'rgba(255,255,255,0)');gr.addColorStop(1,'rgba(255,255,255,.04)');g.fillStyle=gr;g.fillRect(0,0,1024,512);
+ g.fillStyle='#e8f320';g.fillRect(0,0,52,512);g.fillStyle='rgba(203,191,148,.55)';g.fillRect(96,70,3,372);
+ g.fillStyle='#f2f1ee';var fs=opt.size||104;g.font='800 '+fs+'px system-ui,Arial,sans-serif';var y=lines.length>1?250-(lines.length-1)*fs*.46:290;
+ lines.forEach(function(l,i){g.fillText(l,128,y+i*fs*1.02)});g.fillStyle='#cbbf94';g.font='600 36px system-ui,Arial,sans-serif';g.fillText('C A R C U R A',128,452);
+ var t=new T3.CanvasTexture(c);t.encoding=T3.sRGBEncoding;t.anisotropy=8;return t}
+function lab(r,h,y,tex,arc){var m=new T3.Mesh(new T3.CylinderGeometry(r+.004,r+.004,h,64,1,true,-(arc||1.15),(arc||1.15)*2),new T3.MeshStandardMaterial({map:tex,roughness:.5,metalness:0,envMapIntensity:.35}));m.position.y=y;m.receiveShadow=true;return m}
+function bucket(){var o=new T3.Group();
+ var prof=[[0,0],[.37,0],[.40,.012],[.43,.02]].concat(smooth([[.43,.02],[.50,.4],[.54,.78]],12).slice(1)).concat([[.545,.80],[.55,.82],[.538,.838],[.52,.828],[.508,.80]]).concat(smooth([[.508,.80],[.45,.4],[.415,.07]],12).slice(1)).concat([[.40,.055],[0,.05]]);
+ o.add(lathe(prof,graphite,96));
+ [.22,.36,.5].forEach(function(h){var r=.43+(.54-.43)*(h/.78)+.003,t=mesh(new T3.TorusGeometry(r,.007,8,96),graphite);t.rotation.x=Math.PI/2;t.position.y=h;o.add(t)});
+ var rimT=mesh(new T3.TorusGeometry(.531,.016,12,96),lime);rimT.rotation.x=Math.PI/2;rimT.position.y=.825;o.add(rimT);
+ var gg=new T3.Group();gg.position.y=.47;var rg=mesh(new T3.TorusGeometry(.455,.016,8,80),lime);rg.rotation.x=Math.PI/2;gg.add(rg);
+ for(var i=0;i<12;i++){var f=mesh(new T3.BoxGeometry(.9,.012,.026),lime);f.rotation.y=i*Math.PI/12;gg.add(f)}
+ [.12,.22,.33].forEach(function(r){var t=mesh(new T3.TorusGeometry(r,.008,6,64),lime);t.rotation.x=Math.PI/2;gg.add(t)});o.add(gg);
+ var hd=mesh(new T3.TorusGeometry(.545,.012,10,80,Math.PI),steel);hd.position.y=.815;o.add(hd);
+ [-1,1].forEach(function(s){var e=mesh(new T3.BoxGeometry(.04,.07,.05),graphite);e.position.set(s*.548,.82,0);o.add(e)});
+ var bl=new T3.Mesh(new T3.CylinderGeometry(.485,.452,.3,64,1,true,-.95,1.9),new T3.MeshStandardMaterial({map:label(['CARCURA'],{size:120}),roughness:.5,envMapIntensity:.35}));bl.position.y=.3;o.add(bl);return o}
+function lid(){var o=new T3.Group();var prof=[[0,.05],[.52,.05],[.575,.045],[.585,.0],[.57,-.03],[.545,-.02],[.53,.015],[0,.015]];
+ var top=lathe(prof,graphite,96);o.add(top);var knob=mesh(new T3.CylinderGeometry(.07,.085,.07,32),lime);knob.position.y=.085;o.add(knob);
+ var bar=mesh(new T3.BoxGeometry(.3,.05,.07),lime);bar.position.y=.14;o.add(bar);var bt=new T3.Mesh(new T3.TorusGeometry(.545,.012,8,96),lime);bt.rotation.x=Math.PI/2;bt.position.y=.0;o.add(bt);return o}
+function bottle(h,r,name,opt){opt=opt||{};var o=new T3.Group();
+ var prof=[[0,0],[r*.94,0],[r,.012]].concat(smooth([[r,.012],[r,h*.55],[r*.97,h*.68],[r*.78,h*.8],[r*.5,h*.865],[r*.4,h*.9]],26).slice(1)).concat([[r*.4,h*.91],[r*.36,h*.915],[r*.36,h*.97],[0,h*.97]]);
+ o.add(lathe(prof,graphite,80));
+ for(var i=0;i<3;i++){var t=mesh(new T3.TorusGeometry(r*.37,.006,6,40),graphite);t.rotation.x=Math.PI/2;t.position.y=h*.925+i*.014;o.add(t)}
+ var cap=knurl(r*.42,h*.11,26,.045,lime);cap.position.y=h*.93+h*.055;o.add(cap);
+ var top=mesh(new T3.CylinderGeometry(r*.4,r*.42,.012,48),lime);top.position.y=h*.93+h*.11;o.add(top);
+ o.add(lab(r,h*.44,h*.36,label(name,opt)));return o}
+function spray(h,r,name){var o=new T3.Group();
+ var prof=[[0,0],[r*.94,0],[r,.012]].concat(smooth([[r,.012],[r,h*.5],[r*.96,h*.64],[r*.7,h*.8],[r*.42,h*.88]],22).slice(1)).concat([[r*.4,h*.9],[r*.4,h*.93],[0,h*.93]]);
+ o.add(lathe(prof,graphite,80));
+ var col=knurl(r*.44,h*.07,22,.04,lime);col.position.y=h*.93+h*.035;o.add(col);
+ var hs=new T3.Shape();hs.moveTo(-.14,0);hs.lineTo(-.14,.1);hs.quadraticCurveTo(-.1,.16,0,.165);hs.lineTo(.17,.15);hs.quadraticCurveTo(.23,.14,.23,.1);hs.lineTo(.23,.065);hs.lineTo(.12,.05);hs.lineTo(.1,0);hs.closePath();
+ var hg=new T3.ExtrudeGeometry(hs,{depth:r*.58,bevelEnabled:true,bevelSize:.012,bevelThickness:.012,bevelSegments:3,curveSegments:12});hg.translate(0,0,-r*.29);var head=mesh(hg,lime);head.rotation.y=-Math.PI/2;head.position.y=h*.93+h*.07;head.scale.set(r*4.2,r*4.2,r*4.2);o.add(head);
+ var nz=mesh(new T3.CylinderGeometry(r*.1,r*.12,r*.5,20),graphite);nz.rotation.x=Math.PI/2;nz.position.set(0,h*.93+h*.07+r*.42,r*1.03);o.add(nz);
+ var ts=new T3.Shape();ts.moveTo(0,0);ts.quadraticCurveTo(.05,-.01,.08,-.1);ts.lineTo(.1,-.19);ts.lineTo(.065,-.19);ts.lineTo(.04,-.1);ts.quadraticCurveTo(.02,-.045,-.01,-.035);ts.closePath();
+ var tg=new T3.ExtrudeGeometry(ts,{depth:r*.3,bevelEnabled:true,bevelSize:.006,bevelThickness:.006,bevelSegments:2});tg.translate(0,0,-r*.15);var trg=mesh(tg,graphite);trg.rotation.y=-Math.PI/2;trg.position.set(0,h*.93+h*.07+r*.5,r*.92);trg.scale.set(r*4.2,r*4.2,r*4.2);o.add(trg);
+ o.add(lab(r,h*.46,h*.34,label(name,{size:name.length>1?96:118})));return o}
+function pad(){var o=new T3.Group();o.add(lathe([[0,0],[.28,0],[.305,.016],[.312,.06],[.295,.1],[.24,.112],[0,.114]],lime,80));
+ var dm=new T3.MeshStandardMaterial({color:0x8a9600,roughness:.65}),n=110,inst=new T3.InstancedMesh(new T3.SphereGeometry(.015,10,8),dm,n),mx=new T3.Matrix4();
+ for(var i=0;i<n;i++){var a=i*2.399963,r=.265*Math.sqrt((i+.5)/n);mx.makeTranslation(Math.cos(a)*r,.112,Math.sin(a)*r);inst.setMatrixAt(i,mx)}inst.castShadow=true;o.add(inst);return o}
+var shTex=(function(){var c=document.createElement('canvas');c.width=c.height=128;var g=c.getContext('2d'),gr=g.createRadialGradient(64,64,4,64,64,62);gr.addColorStop(0,'rgba(0,0,0,.95)');gr.addColorStop(.55,'rgba(0,0,0,.42)');gr.addColorStop(1,'rgba(0,0,0,0)');g.fillStyle=gr;g.fillRect(0,0,128,128);return new T3.CanvasTexture(c)})();
+var P=[];
+function place(o,x,z,rot,foot,anchorY,i,start){var g=new T3.Group();g.add(o);grp.add(g);
+ var sh=new T3.Mesh(new T3.PlaneGeometry(foot*2.9,foot*2.9),new T3.MeshBasicMaterial({map:shTex,transparent:true,depthWrite:false,opacity:0}));sh.rotation.x=-Math.PI/2;sh.position.set(x+.03,.004,z+.02);grp.add(sh);
+ var mir=o.clone(true);mir.traverse(function(n){if(n.isMesh){n.material=n.material.clone();n.material.transparent=true;n.material.opacity=.2;n.material.depthWrite=false;n.castShadow=false;n.receiveShadow=false}});
+ var mg=new T3.Group();mg.add(mir);grp.add(mg);
+ P.push({g:g,mg:mg,sh:sh,x:x,z:z,rot:rot,anchorY:anchorY,i:i,start:start||0,hl:0,foot:foot})}
+var BX=-1.3,BZ=-.62;
+place(bucket(),BX,BZ,.55,.6,1.0,0,0);
+place(bottle(1.15,.27,['REACTIVATING','SHAMPOO'],{size:78}),-.28,-.9,-.2,.3,1.34,1,1);
+place(spray(.8,.23,['GLAS']),.6,.02,.3,.26,1.0,2,2);
+place(spray(.8,.23,['REIFEN']),1.28,-.3,-.25,.26,1.0,3,3);
+place(spray(.7,.21,['QUICK','DETAILER']),1.95,.15,-.45,.24,.9,4,4);
+place(pad(),.05,1.02,.4,.34,.26,5,5);
+var lidO=lid(),lidG=new T3.Group();lidG.add(lidO);lidG.position.set(BX,.82,BZ);grp.add(lidG);
+var lidMir=lidO.clone(true);lidMir.traverse(function(n){if(n.isMesh){n.material=n.material.clone();n.material.transparent=true;n.material.opacity=.2;n.material.depthWrite=false;n.castShadow=false}});var lidMG=new T3.Group();lidMG.add(lidMir);grp.add(lidMG);
+/* Auswahl-Ring auf dem Sockel unter dem aktiven Teil */
+var selR=new T3.Mesh(new T3.RingGeometry(.4,.43,64),new T3.MeshBasicMaterial({color:0xe8f320,transparent:true,opacity:0,depthWrite:false,side:T3.DoubleSide}));selR.rotation.x=-Math.PI/2;selR.position.y=.006;grp.add(selR);
+/* ---------- Texte ---------- */
+var INFO=[
+ {n:'Wascheimer mit Schmutzsieb',t:'Das Sieb am Boden fängt den Dreck ab. So nimmt der Waschhandschuh beim Eintauchen kaum Schmutz wieder auf, das schont den Lack.'},
+ {n:'Reactivating Shampoo von Nanolex',t:'Reinigt gründlich und frischt dabei den vorhandenen Lackschutz auf. Schonend auch für versiegelte und gewachste Lacke, bringt Wasser besser zum Abperlen und gibt bei jeder Wäsche mehr Glanz. Darum passt es genau zur Keramikversiegelung.',s:'Nach Angaben von Nanolex, entwickelt und produziert in Deutschland',l:'https://www.nanolexcarcare.com/car-care/reactivating-shampoo/',ln:'nanolexcarcare.com'},
+ {n:'Reiniger für Scheiben',t:'Löst Schmutz, Fingerabdrücke und Insektenreste, ohne Streifen zu hinterlassen. Innen und außen anwendbar, auch für Spiegel.'},
+ {n:'Reiniger für Reifen',t:'Reinigt Reifen und Gummi gründlich und bereitet sie für die Pflege vor, damit auch unten alles gepflegt aussieht.'},
+ {n:'Quick Detailer',t:'Zum schnellen Auffrischen zwischen den Wäschen: entfernt leichten Schmutz, Staub und Fingerabdrücke und bringt den Lack wieder zum Glänzen.'},
+ {n:'Scrubpad',t:'Für hartnäckige Stellen wie eingebrannte Insektenreste oder Wasserflecken, in kreisenden Bewegungen mit leichtem Druck.'}
+];
+/* ---------- Bedienung ---------- */
+var hots=document.getElementById('hots'),hint=document.getElementById('hint'),card=document.getElementById('card'),ct=document.getElementById('ct'),cp=document.getElementById('cp'),cs=document.getElementById('cs'),tip=document.getElementById('tip'),resetB=document.getElementById('reset');
+P.forEach(function(p){var b=document.createElement('button');b.type='button';b.className='hot'+(p.i===0?' bucket':'');b.setAttribute('aria-label',p.i===0?'Eimer öffnen':INFO[p.i].n);hots.appendChild(b);p.hot=b;
+ b.addEventListener('click',function(){if(p.i===0&&!S.open){openIt();return}if(S.open)toggle(p.i,true)});
+ b.addEventListener('pointerenter',function(e){if(S.open&&e.pointerType!=='touch')show(p.i)});b.addEventListener('pointerleave',function(e){if(e.pointerType!=='touch')hide(p.i)});
+ b.addEventListener('focus',function(){if(S.open)show(p.i)});b.addEventListener('blur',function(){hide(p.i)})});
+var S={open:false,tOpen:0,act:-1,sticky:-1},hideT=0;
+function show(i){clearTimeout(hideT);S.act=i}
+function hide(i){hideT=setTimeout(function(){if(S.sticky<0||S.sticky!==i){if(S.act===i)S.act=S.sticky}},120)}
+function toggle(i){S.sticky=S.sticky===i?-1:i;S.act=S.sticky<0?-1:i}
+document.addEventListener('keydown',function(e){if(e.key==='Escape'){S.sticky=-1;S.act=-1}});
+document.addEventListener('pointerdown',function(e){if(S.open&&!e.target.closest('.hot')&&!e.target.closest('.card')){S.sticky=-1;S.act=-1}});
+function openIt(){if(S.open)return;S.open=true;S.tOpen=NOW;S.sticky=-1;S.act=-1}
+resetB.addEventListener('click',function(){S.open=false;S.act=-1;S.sticky=-1;resetB.classList.remove('on')});
+var h2w=[].slice.call(document.querySelectorAll('#h2 .w')),rvs=[].slice.call(copy.querySelectorAll('.rv')),daysEl=document.getElementById('days');
+var ptr={x:0,y:0},ptrS={x:0,y:0};stage.addEventListener('pointermove',function(e){var b=stage.getBoundingClientRect();ptr.x=(e.clientX-b.left)/b.width-.5;ptr.y=(e.clientY-b.top)/b.height-.5});
+function resize(){var w=stage.clientWidth,h=stage.clientHeight,dpr=Math.min(window.devicePixelRatio||1,2);R.setPixelRatio(dpr);R.setSize(w,h,false);cam.aspect=w/h;cam.updateProjectionMatrix();key.shadow.mapSize.set(w<700?1024:2048,w<700?1024:2048);return [w,h]}
+var V=new T3.Vector3(),NOW=0,lastAct=-2;
+function put(i){var c=INFO[i];ct.textContent=c.n;cp.textContent=c.t;cs.innerHTML='';if(c.s){var s=document.createElement('span');s.textContent=c.s;cs.appendChild(s);if(c.l){var a=document.createElement('a');a.href=c.l;a.target='_blank';a.rel='noopener noreferrer';a.textContent=c.ln;cs.appendChild(a)}}cs.style.display=c.s?'flex':'none'}
+var TL={light:2.6,ring:[.35,2.4],head:1.2,copy:1.9,counter:[2.2,3.1]};
+function frame(t,live){
+ var d=resize(),w=d[0],h=d[1],narrow=w<900;NOW=t;
+ var to=S.open?(t-S.tOpen):-1;if(OPEN_AT!==null&&!live){to=t-OPEN_AT}
+ var L=eo(t/TL.light);key.intensity=L*2.2;rim.intensity=L*1.0;kick.intensity=L*.35;R.toneMappingExposure=.1+L*.55;
+ var rp=eio((t-TL.ring[0])/(TL.ring[1]-TL.ring[0]));ringG.setDrawRange(0,Math.floor(RIDX*rp/6)*6);goldM.emissiveIntensity=cl((t-TL.ring[1])/.4)*Math.max(0,1-(t-TL.ring[1])/1.6)*.9;
+ // Deckel: Hinweis-Hüpfer, beim Öffnen hebt er ab und löst sich auf
+ var hop=0;if(to<0&&t>2.6){var s=((t-2.6)%3.8);hop=Math.exp(-4*s)*Math.sin(s*14)*.035}
+ var lk=cl(to/1.1),le=eo(lk);lidG.position.set(BX+le*.5,.82+hop+le*1.7,BZ-le*.25);lidG.rotation.set(le*.5,le*1.6,le*-.55);lidG.scale.setScalar(1-le*.06);lidG.visible=lk<.999;lidMG.position.set(BX+le*.5,-(.82+hop+le*1.7),BZ-le*.25);lidMG.rotation.set(le*.5,le*1.6,le*-.55);lidMG.scale.set(1-le*.06,-(1-le*.06),1-le*.06);lidMG.visible=lidG.visible;
+ lidO.traverse(function(n){if(n.isMesh&&!n.userData.o){n.userData.o=1;n.material=n.material.clone();n.material.transparent=true}if(n.isMesh)n.material.opacity=1-cl((lk-.55)/.45)});
+ // Produkte: Eimer steht von Anfang an, die anderen steigen im Bogen aus dem Eimer
+ var done=true;
+ P.forEach(function(p){var x=p.x,z=p.z,y=0,sc=1,rot=p.rot,vis=true,sop=1,k=1;
+  if(p.i>0){k=cl((to-.6-(p.start-1)*.17)/1.5);vis=to>=0&&k>0;var e=eo(k);x=lerp(BX,p.x,e);z=lerp(BZ,p.z,e);y=lerp(.85,0,eob(k))+Math.sin(Math.PI*k)*(1.1+.12*p.i);sc=lerp(.45,1,eo(k*1.2));rot=p.rot+(1-eo(k))*(2.4+.3*p.i);sop=cl((k-.6)/.4);if(k<1)done=false}
+  p.cx=x;p.cz=z;p.cy=y;
+  var hl=p.hl=lerp(p.hl,(S.act===p.i&&S.open)?1:0,.14);y+=hl*.07;
+  p.g.visible=vis;p.mg.visible=vis;p.g.position.set(x,y,z);p.g.rotation.y=rot;p.g.scale.setScalar(sc*(1+hl*.03));p.mg.position.set(x,-y,z);p.mg.rotation.y=rot;p.mg.scale.set(sc*(1+hl*.03),-sc*(1+hl*.03),sc*(1+hl*.03));
+  p.sh.position.set(x+.03,.004,z+.02);p.sh.material.opacity=.85*sop*(p.i>0?cl(1-y/1.4):1);p.sh.scale.setScalar(sc)});
+ var ap=P[S.act]||null;if(ap&&S.open){selR.position.x=ap.cx;selR.position.z=ap.cz;selR.scale.setScalar(ap.foot*1.9);selR.material.opacity=lerp(selR.material.opacity,.8,.2)}else selR.material.opacity=lerp(selR.material.opacity,0,.2);
+ // Kamera: zu: nah am Eimer. Auf: zieht in einer Bewegung zurück, danach nur sehr langsame Drift
+ ptrS.x+=(ptr.x-ptrS.x)*.05;ptrS.y+=(ptr.y-ptrS.y)*.05;
+ var e1=eo(t/3.6),u=S.open||OPEN_AT!==null&&to>=0?eio(to/2.8):0;if(OPEN_AT!==null&&to<0)u=0;
+ var distC=(narrow?6.8:5.6)+(1-e1)*2.8,distO=(narrow?9.8:9.2),dist=lerp(distC,distO,u),th=lerp(-.32,-.04,u)+e1*.0+Math.min(t,60)*.0034+ptrS.x*.15,el=lerp(.34,.4,u)+ptrS.y*-.05;
+ var tgx=lerp(narrow?GX+BX:GX+BX-1.05,narrow?1.95:.7,u),tgy=lerp(.62,.9,u),tgz=lerp(BZ,0,u);
+ cam.position.set(tgx+Math.sin(th)*dist,Math.sin(el)*dist+tgy+.4,tgz+Math.cos(th)*dist);cam.lookAt(tgx,tgy,tgz);cam.updateMatrixWorld();
+ R.render(scene,cam);
+ // Hotspots
+ var opened=to>=0;P.forEach(function(p){V.set(p.cx,(p.i===0?1.0:p.anchorY)+p.cy*0,p.cz);V.y=(p.i===0?.9:p.anchorY*.55)+p.cy;grp.localToWorld(V);V.project(cam);var sx=(V.x*.5+.5)*w,sy=(-V.y*.5+.5)*h;p.sx=sx;p.sy=sy;
+  var ready=p.i===0?true:(to>=0&&cl((to-.6-(p.start-1)*.17)/1.5)>=.98);
+  p.hot.style.left=sx+'px';p.hot.style.top=sy+'px';p.hot.classList.toggle('on',ready&&(p.i>0||!opened||true));p.hot.style.opacity=ready?1:0;p.hot.classList.toggle('pulse',ready&&S.act<0&&(p.i>0||!opened));p.hot.classList.toggle('act',S.act===p.i);
+  p.hot.tabIndex=ready?0:-1});
+ // Hinweis am Eimer
+ var hp=P[0];hint.style.left=hp.sx+'px';hint.style.top=(hp.sy-h*.24)+'px';hint.classList.toggle('on',!opened&&t>2.4);
+ // Textfeld
+ if(S.act>=0&&S.open&&P[S.act]){var p=P[S.act];if(lastAct!==S.act){put(S.act);lastAct=S.act}
+  if(!narrow){var cw=card.offsetWidth||344,chh=card.offsetHeight||150,above=(p.sy-chh-34)>=10,left=Math.max(12,Math.min(w-cw-12,p.sx-cw/2)),top=above?p.sy-chh-34:p.sy+34;if(top<10){top=p.sy+34}if(top+chh>h-10){top=p.sy-chh-34}
+   card.style.left=left+'px';card.style.top=top+'px';var tp=Math.max(18,Math.min(cw-28,p.sx-left-5));tip.style.left=tp+'px';tip.style.top=(top>p.sy?-6:chh-6)+'px';tip.style.transform=top>p.sy?'rotate(45deg)':'rotate(225deg)'}
+  card.classList.add('on')}else{card.classList.remove('on');if(S.act<0)lastAct=-2}
+ resetB.classList.toggle('on',S.open&&done);
+ h2w.forEach(function(el,k){var a=eo((t-TL.head-k*.12)/.9);el.style.opacity=a;el.style.filter='blur('+((1-a)*10)+'px)';el.style.transform='translateY('+((1-a)*.42)+'em)'});
+ rvs.forEach(function(el,k){var a=eo((t-TL.copy-k*.14)/.9);el.style.opacity=a;el.style.filter='blur('+((1-a)*5)+'px)';el.style.transform='translateY('+((1-a)*14)+'px)'});
+ daysEl.textContent=Math.round(DAYS*eo((t-TL.counter[0])/(TL.counter[1]-TL.counter[0])));
+}
+/* ---------- Lauf ---------- */
+var started=false,t0=0,vis=true,running=false;
+function loop(now){if(!vis){running=false;return}frame((now-t0)/1000,true);requestAnimationFrame(loop)}
+function begin(){if(started)return;started=true;t0=performance.now();if(REDUCED){S.open=true;S.tOpen=-10;frame(9,true);running=false;return}running=true;requestAnimationFrame(loop)}
+window.__seek=function(t,open,hov){S.open=open!==undefined?open:S.open;if(hov!==undefined){S.act=hov;S.sticky=hov}frame(t,false)};
+if(FIXED!==null){if(OPEN_AT!==null){S.open=true;S.tOpen=OPEN_AT}if(HOVER>=0){S.act=HOVER;S.sticky=HOVER}frame(FIXED,false);if(HOVER>=0){frame(FIXED,false)}}
+else{new IntersectionObserver(function(es){es.forEach(function(e){vis=e.isIntersecting;if(vis&&!started&&e.intersectionRatio>.3)begin();else if(vis&&started&&!running&&!REDUCED){running=true;t0=performance.now()-NOW*1000;requestAnimationFrame(loop)}})},{threshold:[0,.3]}).observe(stage);frame(0,false)}
+})();
+</script></body></html>
