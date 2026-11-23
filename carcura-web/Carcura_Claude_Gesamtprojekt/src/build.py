@@ -157,7 +157,7 @@ def ld_business():
             "sameAs": [B["instagram"], REV["profile"]]}
 
 
-def page(path, title, desc, body, robots="index,follow", ld=None, js=(), crumbs=None, canonical=None):
+def page(path, title, desc, body, robots="index,follow", ld=None, js=(), crumbs=None, canonical=None, css=(), body_class=""):
     PAGES.append((path, title, robots))
     can = canonical or (SITE + path) if canonical is not False else ""
     lds = [ld_business()] + (ld or [])
@@ -183,9 +183,10 @@ def page(path, title, desc, body, robots="index,follow", ld=None, js=(), crumbs=
 <link rel="preload" href="/assets/fonts/bigshoulders.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="/assets/fonts/geist.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="/assets/css/site.css">
+{"".join(f'<link rel="stylesheet" href="/assets/css/{c}">' for c in css)}
 {ldtxt}
 </head>
-<body>
+<body{f' class="{body_class}"' if body_class else ""}>
 {nav(path)}
 <main id="main">
 {body}
@@ -299,32 +300,15 @@ FILM_PRICE = {"handwaesche": ("Handwäsche inkl. Felgen " + ab("handwaesche"), "
               "keramik": ("Keramik inkl. 1-stufiger Politur " + ab("keramik"), "/keramikversiegelung/", "Was enthalten ist")}
 
 
-def film_html():
-    data = []
+def film_frames():
+    out = []
     for src, lab, tit, txt, ch, tr, sid in FILM:
-        pr, href, link = FILM_PRICE.get(sid, ("Termin anfragen", "/anfragen/", "Zur Anfrage"))
-        data.append({"src": f"/assets/film/{src}.webp", "label": lab, "title": tit, "text": txt, "chapter": ch, "trans": tr, "price": E(pr), "href": href, "link": link})
-    nav = "".join(f'<button type="button" data-chapter="{c}" data-frame="{f}">{n}</button>' for c, f, n in [(0, 0, "Außen"), (1, 4, "Innen"), (2, 8, "Politur"), (3, 10, "Keramik")])
-    static = "".join(f'''<figure class="rv"><div class="photo ratio-32"><img src="/assets/film/{FILM[i][0]}.webp" alt="{E(FILM[i][2])}" loading="lazy"></div>
-<figcaption class="cap"><b>{E(FILM[i][2])}</b> {E(FILM[i][3])}{(" <a class=\"tlink\" href=\"" + FILM_PRICE[FILM[i][6]][1] + "\">" + E(FILM_PRICE[FILM[i][6]][0]) + "</a>") if i in (3, 7, 9, 13) else ""}</figcaption></figure>''' for i in [0, 1, 3, 6, 7, 8, 9, 10, 13])
-    f0 = data[0]
-    return f'''<section class="film" id="film" aria-labelledby="film-h" style="--frames:{len(FILM)}">
-<h2 class="sr" id="film-h">Die Aufbereitung im Film: Außenwäsche, Innenraum, Politur, Keramik</h2>
-<div class="film-stage">
- <img class="f-base" src="{f0["src"]}" alt="" width="762" height="506"><img class="f-top" alt="" width="762" height="506" style="opacity:0">
- <span class="film-spray" aria-hidden="true"></span><div class="shade" aria-hidden="true"></div>
- <p class="film-note">Inszenierung · KI-generierte Bilder · kein Kundenfahrzeug</p>
- <div class="film-copy" aria-live="polite"><p class="label f-label">{f0["label"]}</p><p class="h2 f-title" style="font:800 clamp(40px,6vw,88px)/.95 var(--head);text-transform:uppercase;margin:0 0 8px">{E(FILM[0][2])}</p>
- <p class="f-text">{E(FILM[0][3])}</p><p class="fprice f-price">{f0["price"]} · <a href="{f0["href"]}">{f0["link"]}</a></p></div>
- <div class="film-nav" role="group" aria-label="Kapitel des Films">{nav}<a class="skip-film" href="#nach-film">Film überspringen</a></div>
- <div class="film-bar" aria-hidden="true"></div>
-</div>
-<div class="film-static"><div class="wrap sec"><p class="label">Inszenierung mit KI-generierten Bildern · kein Kundenfahrzeug</p><h2>So läuft die Aufbereitung</h2><div class="grid g3">{static}</div></div></div>
-<script type="application/json" id="film-data">{json.dumps(data, ensure_ascii=False)}</script>
-</section>'''
+        out.append({"src": f"/assets/film/{src}.webp", "label": lab.split(" · ")[0], "title": tit, "text": txt})
+    return out
 
 
 def home():
+    FRAMES = film_frames()
     cards = "".join([
         price_card("innen-normal", "Innenreinigung", "Saugen, Cockpit, Scheiben innen, Fußmatten.",
                    ["Sitze, Fußraum und Kofferraum gesaugt", "Cockpit, Konsole, Türverkleidungen feucht gereinigt", "Scheiben und Spiegel innen",
@@ -347,17 +331,30 @@ def home():
         ("Muss ich Umsatzsteuer dazurechnen?", "Nein. Alle Preise sind Endpreise. Als Kleinunternehmer nach § 19 UStG weisen wir keine Umsatzsteuer aus."),
     ]
     body = f'''
-<section class="hero" aria-labelledby="h1">
- <div class="hero-media"><img src="/assets/film/14-ergebnis.webp" alt="Dunkler Sportwagen in einer Halle, KI-generierte Inszenierung" width="762" height="506" fetchpriority="high"></div>
- <div class="wrap">
+<section class="studio-opening" id="film" aria-labelledby="h1">
+ <div class="studio-picture" aria-hidden="true">
+  <img src="{FRAMES[0]["src"]}" width="762" height="506" alt="" fetchpriority="high">
+  <img width="762" height="506" alt="" style="opacity:0">
+ </div>
+ <div class="studio-shade" aria-hidden="true"></div>
+ <div class="studio-content">
   <p class="label">Carcura · Walterschen · Westerwald</p>
   <h1 id="h1">Fahrzeug&shy;aufbereitung in Walterschen bei Altenkirchen</h1>
   <p class="lead">Innenraumreinigung, Handwäsche, Lackpolitur und Keramikversiegelung. Wir bereiten dein Auto in unserer Halle von Hand auf und holen es auf Wunsch bei dir ab.</p>
   <div class="btns">{btn("#preise", "Leistungen & Preise", "acc", "arrow")}{btn(wa("Hi Carcura, ich möchte einen Preis anfragen. Mein Fahrzeug: "), "Preis per WhatsApp anfragen", "ghost", "wa", service="startseite", ext=True)}</div>
   <p class="trust"><span>{rating_line()}</span><span>Abholung bis 10 km kostenlos</span><a href="{B["phoneHref"]}" data-service="startseite">0170 6669516</a></p>
+  <div class="studio-controls" role="group" aria-label="Filmkapitel">
+   <button type="button" data-play>Film abspielen</button>
+   <button type="button" data-shot="0" aria-pressed="true">Außenwäsche</button>
+   <button type="button" data-shot="4" aria-pressed="false">Innenraum</button>
+   <button type="button" data-shot="8" aria-pressed="false">Politur</button>
+   <button type="button" data-shot="10" aria-pressed="false">Keramik</button>
+  </div>
+  <p class="studio-label" aria-live="polite">Außenwäsche · So kommt es oft an.</p>
+  <p class="hero-tag">KI-Inszenierung auf Basis unserer Hallenfotos · kein Kundenfahrzeug</p>
  </div>
- <p class="hero-tag">Bild: KI-generierte Inszenierung, kein Kundenfahrzeug</p>
 </section>
+<script type="application/json" id="studio-frames">{json.dumps(FRAMES, ensure_ascii=False)}</script>
 
 <section class="sec soft" id="preise" aria-labelledby="preise-h"><div class="wrap">
  <p class="label">Leistungen & Preise</p><h2 id="preise-h">Was kostet das?</h2>
@@ -372,7 +369,6 @@ def home():
  <p class="fine" style="margin-top:14px">Weitere Leistungen: <a class="tlink" href="/scheinwerfer-aufbereiten/">Scheinwerfer {ab('scheinwerfer')}</a> · <a class="tlink" href="/autositz-reinigen-flecken/">Fleck im Sitz {ab('sitz-fleck')}</a> · <a class="tlink" href="/geruch-im-auto-entfernen/">Ozon {ab('ozon')}</a> · <a class="tlink" href="/wohnmobil-aufbereitung/">Wohnmobil {ab('wohnmobil-basic')}</a> · <a class="tlink" href="/leistungen/#abos">Pflege-Abos</a> · <a class="tlink" href="/leistungen/">alle Preise</a></p>
 </div></section>
 
-{film_html()}
 
 <section class="sec light" id="nach-film"><div class="wrap two">
  <div><p class="label">Carcura</p><h2>Glanz ist Handarbeit.</h2></div>
@@ -416,7 +412,7 @@ def home():
 '''
     page("/", "Fahrzeugaufbereitung Westerwald mit Abholung | Carcura",
          f"Innenreinigung {ab('innen-normal')}, Handwäsche {ab('handwaesche')}, Politur {ab('politur-1')}, Keramik {ab('keramik')}. Von Hand in unserer Halle in Walterschen. Abholung bis 10 km gratis.",
-         body, ld=[faq_ld(faq)], js=("film.js",))
+         body, ld=[faq_ld(faq)], js=("carcura-finish.js",), css=("carcura-finish.css",), body_class="carcura-finish")
 
 
 def calc_html(start=15):
@@ -750,7 +746,7 @@ def leistungen():
     for g, rows in ABOS:
         r = "".join(f"<tr><td>{E(n)}</td><td>{E(t)}</td><td>{f}</td><td class=\"p\">{eur(p)} / Monat<br><span class=\"muted small\">12 Monate: {eur(p * 12)}</span></td></tr>" for n, t, f, p in rows)
         abo += f'<h3 style="margin-top:28px">{g}</h3><div class="tablewrap"><table class="prices"><thead><tr><th>Abo</th><th>Inhalt</th><th>Häufigkeit</th><th>Preis</th></tr></thead><tbody>{r}</tbody></table></div>'
-    worlds = "".join(f'''<a class="card rv" href="{h}" style="text-decoration:none"><div class="card-img"><img src="/assets/img/{img}" alt="{E(alt)}" loading="lazy"></div><h3>{n}</h3><p class="price">{ab(sid)}</p><p class="muted small">{t}</p></a>''' for h, n, sid, img, alt, t in [
+    worlds = "".join(f'''<a class="card rv" href="{h}" style="text-decoration:none"><h3>{n}</h3><p class="price">{ab(sid)}</p><p class="muted small">{t}</p></a>''' for h, n, sid, img, alt, t in [
         ("/auto-innenreinigung/", "Innenreinigung", "innen-normal", "carcura-innenreinigung-cockpit-hd.webp", "Cockpit nach der Innenreinigung", "Saugen, Cockpit, Scheiben. Extras einzeln buchbar."),
         ("/autopolitur/", "Politur", "politur-1", "carcura-schwarzer-lack-spiegelung-hd.webp", "Spiegelung im schwarzen Lack", "1- oder 2-stufig, Wäsche und Kneten inklusive."),
         ("/keramikversiegelung/", "Keramik", "keramik", "carcura-audi-tt-politur-keramik-walterschen.webp", "Audi TT nach Politur und Keramik", "Inklusive 1-stufiger Politur."),

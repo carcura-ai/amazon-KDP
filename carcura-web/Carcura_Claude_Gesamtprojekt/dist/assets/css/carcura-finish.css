@@ -1,0 +1,127 @@
+:root {
+  --studio-lime: #e8f320;
+  --studio-gutter: clamp(20px, 5vw, 88px);
+}
+.studio-opening {
+  position: relative;
+  isolation: isolate;
+  min-height: 100svh;
+  display: grid;
+  align-items: end;
+  overflow: hidden;
+  color: #fff;
+  background: #101113;
+}
+.studio-opening .studio-picture,
+.studio-opening .studio-shade {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+.studio-opening .studio-picture {
+  overflow: hidden;
+  z-index: -2;
+}
+.studio-opening .studio-picture img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 62%;
+}
+.studio-opening .studio-shade {
+  z-index: -1;
+  background: linear-gradient(0deg,#101113 0%,#101113d9 22%,transparent 68%),linear-gradient(180deg,#0b0c0da3,transparent 28%);
+}
+.studio-opening .studio-content {
+  width: min(100%, 1400px);
+  margin: 0 auto;
+  padding: clamp(360px, 49svh, 600px) var(--studio-gutter) 32px;
+}
+.studio-opening h1 {
+  margin: 0 0 12px;
+  max-width: 20ch;
+  font-size: clamp(2.4rem, 6vw, 6.5rem);
+  line-height: .96;
+  text-wrap: balance;
+  overflow-wrap: anywhere;
+}
+.studio-opening .lead { max-width: 57ch; color:#f1f1ee; }
+.studio-opening .studio-controls { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 20px; }
+.studio-opening .studio-controls button,
+.studio-opening .btn-ghost {
+  min-height: 44px;
+  padding: 8px 15px;
+  border: 1px solid #ffffff73;
+  border-radius: 999px;
+  background: #15181b94;
+  color: #fff;
+  backdrop-filter: blur(14px);
+}
+.studio-opening button[aria-pressed=true] {
+  border-color: var(--studio-lime);
+  color: var(--studio-lime);
+}
+.studio-opening .studio-label { min-height: 1.5em; margin: 10px 0 0; color: #deded8; }
+.studio-opening :focus-visible { outline: 2px solid var(--studio-lime); outline-offset: 3px; }
+.studio-opening .hero-tag { position: static; margin-top: 9px; font-size: .75rem; }
+body.carcura-finish #preise {
+  position: relative;
+  isolation: isolate;
+  color: #f2f1ee;
+  background: radial-gradient(ellipse at 12% 9%,#454c28 0%,transparent 52%),radial-gradient(ellipse at 90% 60%,#343944 0%,transparent 46%),#111315;
+}
+body.carcura-finish #preise .card {
+  color: #f2f1ee;
+  background: #181b1ed9;
+  border: 1px solid #ffffff28;
+  backdrop-filter: blur(16px);
+}
+body.carcura-finish #preise :is(.lead,.muted,.fine) { color: #d7d9d3; }
+@media(max-width:680px) {
+  .studio-opening .studio-picture { height: min(58svh, 410px); }
+  .studio-opening .studio-picture img { object-fit: contain; object-position: center 75%; }
+  .studio-opening .studio-shade { background: linear-gradient(0deg,#101113 43%,transparent 69%),linear-gradient(180deg,#0b0c0d8c,transparent 23%); }
+  .studio-opening .studio-content { padding-top: clamp(240px, 42svh, 380px); }
+  .studio-opening h1 { font-size: clamp(2.35rem, 9.5vw, 4rem); }
+}
+@media(prefers-reduced-motion:reduce) {
+  .studio-opening *, .studio-opening *::before { scroll-behavior: auto !important; }
+}
+body.carcura-finish header.nav {
+  background: #111317a8;
+  border-bottom: 1px solid #ffffff29;
+  backdrop-filter: blur(20px);
+}
+.studio-opening .studio-controls button:hover,
+.studio-opening .btn-ghost:hover {
+  background: #3a4045b0;
+  border-color: #ffffff9e;
+}
+
+/* ---- Anpassungen beim Einbau (23.11.2026): Buttons und Kapitelwahl im ersten Bildschirm ---- */
+.studio-opening .studio-content { padding-top: clamp(150px, 26svh, 320px); }
+.studio-opening h1 { font-size: clamp(2.4rem, 4.8vw, 5.2rem); }
+.studio-opening .label { text-shadow: 0 1px 8px #000c; }
+.studio-opening .trust { margin-top: 14px; }
+@media (max-width: 809px) {
+  .studio-opening { align-items: start; }
+  .studio-opening .studio-picture { top: 64px; bottom: auto; height: auto; aspect-ratio: 3 / 2; }
+  .studio-opening .studio-picture img { object-fit: cover; object-position: center; }
+  .studio-opening .studio-shade { top: 64px; bottom: auto; height: calc(100vw / 1.5); background: linear-gradient(0deg, #101113 0%, transparent 35%); }
+  .studio-opening .studio-content { padding: calc(64px + 100vw / 1.5 - 18px) 20px 28px; }
+  .studio-opening h1 { font-size: clamp(2.1rem, 9.6vw, 3rem); }
+  .studio-opening .btns .btn { flex: 1 1 100%; }
+}
+@media (max-width: 809px) and (max-height: 760px) {
+  .studio-opening .label { display: none; }
+  .studio-opening .studio-content { padding-top: calc(64px + 100vw / 1.5 - 10px); }
+  .studio-opening .lead { font-size: 15px; line-height: 1.45; margin-bottom: 12px; }
+  .studio-opening h1 { font-size: clamp(1.9rem, 8.6vw, 2.4rem); }
+  .studio-opening .btns { gap: 8px; }
+  .studio-opening .btns .btn { min-height: 46px; }
+}
+@media (min-width: 810px) {
+  .studio-opening .studio-shade { background: linear-gradient(90deg, #101113eb 0%, #101113a8 38%, transparent 66%), linear-gradient(0deg, #101113 0%, #101113d9 18%, transparent 55%), linear-gradient(180deg, #0b0c0da3, transparent 28%); }
+}

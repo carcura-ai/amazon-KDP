@@ -81,3 +81,14 @@ Quellen: Live-Abruf carcura.info am 23.11.2026, Google Search Console (25.08.–
 - **Fehlende Seiten ergänzt:** `/impressum/` (in der Live-Sitemap) und `/widerruf/` (live, noindex) fehlten im Paket. Beide sind ergänzt.
 - **Tippfehler korrigiert:** In der Live-Cookie-Richtlinie steht „carcura@ex.comweb.de“. Korrigiert in `/cookie-richtlinie-eu/`.
 - **Schriften:** WOFF2 lokal, keine externen Fonts, keine Tracking-Skripte in der Vorschau. Klick-Ereignisse `cc_whatsapp`, `cc_anruf` und `cc_anfrage` werden nur gesendet, wenn auf der Live-Seite ein Google-Tag mit Einwilligung existiert.
+
+## 11. Design-Update „carcura-finish“ (23.11.2026) – in die Templates übernommen
+- **Übernommen:** Film als Einstieg (`.studio-opening`) mit Kapitelwahl und „Film abspielen“. Der Scroll-Film (`film.js`) entfällt. Dunkleres Glas und weiche Lichter im Preisbereich. Leistungsübersicht ohne Bilder.
+- **Eingebaut in `src/build.py`, nicht als Patch auf `dist/`:** `home()` erzeugt den Einstieg, `page()` kann Zusatz-CSS und eine Body-Klasse setzen, die Bildkarten auf /leistungen/ sind ohne Bildcontainer. `apply-finish.py` liegt nur als Referenz in `src/design-update/`.
+- **/leistungen/ geprüft:** 0 `<img>`, 0 `<picture>`, 0 Bildunterschriften, 0 leere Bild- oder Foto-Container, keine CSS-Hintergrundbilder (`url()` nur für Schriften).
+- **Abweichungen vom Paket (mit Befund):**
+  1. Wasser (12) → Perlen (13) als harter Schnitt statt Wischübergang. Grund: Die Phasenkorrelation ergibt 0,034, also eine andere Perspektive. Eine Wischkante würde Doppelkanten erzeugen.
+  2. Die Kapitel-Buttons bleiben markiert, solange ein Bild aus ihrem Kapitel läuft. Im Paket war beim Abspielen zwischen den Kapitelanfängen kein Button aktiv.
+  3. Layout-Anpassungen, weil im Paket-Zustand bei 1440 × 900 die Buttons an der Unterkante und die Kapitelwahl außerhalb des Bildschirms lagen und bei 360 × 740 beide Buttons unter der Kontaktleiste. Außerdem gab es mobil einen leeren Streifen über dem Bild. Die Anpassungen stehen gekennzeichnet am Ende von `carcura-finish.css`.
+  4. Der Hinweis lautet „KI-Inszenierung auf Basis unserer Hallenfotos · kein Kundenfahrzeug“, ergänzt um „kein Kundenfahrzeug“.
+  5. Desktop: dunkler Verlauf von links, damit „Carcura · Walterschen · Westerwald“ vor dem hellen Rolltor lesbar ist.

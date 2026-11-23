@@ -117,3 +117,19 @@ Bestanden laut Prüfer: Vor-/Rückwärtsscrollen in 3 Durchgängen × 29 Messpun
 - Bewertungsanzahl (18) vor dem Livegang am Profil prüfen.
 - Lighthouse- und Felddaten nach dem Deploy messen.
 - 301-Weiterleitungen serverseitig einrichten.
+
+## Nachtest nach Design-Update (23.11.2026)
+| Prüfung | 390 × 844 | 360 × 740 | 768 × 1024 | 1440 × 900 |
+|---|---|---|---|---|
+| H1 sichtbar | ✔ | ✔ | ✔ | ✔ |
+| „Leistungen & Preise“ und „Preis per WhatsApp“ ohne Scrollen, nicht unter der Kontaktleiste | ✔ | ✔ | ✔ | ✔ |
+| Kapitelwahl im ersten Bildschirm | direkt unter den Buttons (kurzes Scrollen) | ebenso | ebenso | ✔ |
+| Kein horizontaler Überlauf | ✔ | ✔ | ✔ | ✔ |
+| Schnelle Kapitelwechsel (8, 0, 10, 4, 8 im 120-ms-Takt) enden auf Politur mit passendem Bild und Text | ✔ | ✔ | ✔ | ✔ |
+
+- **Reduzierte Bewegung:** Bei reduzierter Bewegung wird ohne Wischanimation direkt geschnitten ✔.
+- **Film abspielen und pausieren:** funktioniert (1440) ✔.
+- **Fehlerfreiheit:** keine JS-Fehler, keine 404.
+- **`src/check.py`:** keine Befunde.
+- **Offline-Fassung (`file://`):** Kapitelwahl funktioniert ✔.
+- **Screenshots:** `audit/screenshots/`.
