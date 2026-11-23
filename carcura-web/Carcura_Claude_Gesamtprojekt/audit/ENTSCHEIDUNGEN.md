@@ -92,3 +92,16 @@ Quellen: Live-Abruf carcura.info am 23.11.2026, Google Search Console (25.08.–
   3. Layout-Anpassungen, weil im Paket-Zustand bei 1440 × 900 die Buttons an der Unterkante und die Kapitelwahl außerhalb des Bildschirms lagen und bei 360 × 740 beide Buttons unter der Kontaktleiste. Außerdem gab es mobil einen leeren Streifen über dem Bild. Die Anpassungen stehen gekennzeichnet am Ende von `carcura-finish.css`.
   4. Der Hinweis lautet „KI-Inszenierung auf Basis unserer Hallenfotos · kein Kundenfahrzeug“, ergänzt um „kein Kundenfahrzeug“.
   5. Desktop: dunkler Verlauf von links, damit „Carcura · Walterschen · Westerwald“ vor dem hellen Rolltor lesbar ist.
+
+## 12. Startseite: Porsche zuerst, Aufbereitung beim Scrollen (23.11.2026)
+- **Erster Bildschirm:** Nur das Bild und die transparente Navigation, keine Überschrift, kein Preis, keine Karte. Der Einstieg „Fahrzeugaufbereitung in Walterschen bei Altenkirchen“ mit Buttons folgt als HTML direkt nach dem Film (`#einstieg`). Preise und Anfrage sind jederzeit über die Navigation, auf dem Handy zusätzlich über die Kontaktleiste erreichbar.
+- **Klein gehalten:** Die Hinweise „KI-Inszenierung“ und „Film überspringen“ bleiben klein am Bildrand. Grund: Ehrlichkeit über die Bildquelle und ein Ausweg für Tastatur- und Handynutzer.
+- **Vier Karten, Preise aus CARCURA-DATA.json:** Außenwäsche ab 69 €, Innenraumreinigung ab 90 €, Lackpolitur ab 349 €, Keramik ab 700 €.
+  - Jede Karte erscheint erst beim passenden Arbeitsschritt: Schaum sichtbar, Innenraum vorher, Polierpad, Applikator. Die Keramik-Karte bleibt bis zum Ende der Perlen-Szene.
+  - Die Karte folgt dem **tatsächlich angezeigten** Bild. Lädt ein Bild langsam, bleibt das letzte Bild ohne falsche Karte stehen.
+- **Kartenpositionen** nach Sichtprüfung, damit die Arbeit frei bleibt:
+  - Desktop: Außenwäsche oben rechts (Auto, Schaum und LED-Hauptleisten frei), Innen und Politur oben links, Keramik unten links (Applikator, Tuch, Wasser und Perlen frei).
+  - Handy und Tablet hochkant: Karte unter dem Bild.
+- **Struktur:** Szenen, Karten und Material stehen in `src/film-szenen.json`. Besseres Material wird pro Szene eingetragen, ohne Codeänderung (siehe FILM-MATERIAL.md).
+- **Assets:** Die Assets liegen jetzt in `src/assets/` und werden beim Build kopiert. Ein Build aus leerem Ordner wurde getestet.
+- **Nicht erfüllt, weil Material fehlt:** fotorealistische Sequenzen ≥ 1920 px, Hochformat-Fassung, echte Tür-, Wasser- und Pad-Bewegung, Halle aus Originalfotos. Pro Szene benannt in FILM-MATERIAL.md.

@@ -300,15 +300,35 @@ FILM_PRICE = {"handwaesche": ("Handwäsche inkl. Felgen " + ab("handwaesche"), "
               "keramik": ("Keramik inkl. 1-stufiger Politur " + ab("keramik"), "/keramikversiegelung/", "Was enthalten ist")}
 
 
-def film_frames():
-    out = []
-    for src, lab, tit, txt, ch, tr, sid in FILM:
-        out.append({"src": f"/assets/film/{src}.webp", "label": lab.split(" · ")[0], "title": tit, "text": txt})
-    return out
+FILMDATEN = json.load(open(os.path.join(HERE, "film-szenen.json"), encoding="utf8"))
+
+
+def film_section():
+    """Startseitenfilm aus src/film-szenen.json. Karten sind echtes HTML (auch ohne Animation lesbar)."""
+    K = FILMDATEN["kapitel"]
+    data = [{"id": z["id"], "ch": z["kapitel"], "w": z["gewicht"], "tr": z["uebergang"],
+             "d": z["sequenz"] or [z["desktop"]], "m": z.get("mobil_sequenz") or ([z["mobil"]] if z.get("mobil") else None)} for z in FILMDATEN["szenen"]]
+    cards = "".join(f'''<article class="fcard pos-{k["pos"]}"><p class="fcard-step">{n + 1} / {len(K)}</p><h2>{E(k["name"])}</h2>
+<p>{E(k["text"])}</p><p class="fcard-price">{ab(k["preis"])}</p><a class="tlink" href="{k["link"]}">{E(k["linktext"])}</a></article>''' for n, k in enumerate(K))
+    first = FILMDATEN["szenen"][0]
+    stills = "".join(f'''<figure><div class="photo ratio-32"><img src="{z["desktop"]}" alt="{E(z["inhalt"])}" loading="lazy"></div><figcaption class="cap">{E(z["inhalt"])}</figcaption></figure>'''
+                     for z in FILMDATEN["szenen"] if z["id"] in ("01-schaum", "06-innen-vorher", "08-politur-vorher", "13-perlen"))
+    return f'''<section class="film" id="film" aria-label="Film: so bereiten wir dein Auto auf" style="--w:{sum(d["w"] for d in data)}">
+<div class="film-stage">
+ <img class="f-base" src="{first["desktop"]}" alt="Porsche in der Carcura-Halle, verschmutzt vor der Aufbereitung (KI-Inszenierung)" width="762" height="506" fetchpriority="high">
+ <img class="f-top" alt="" width="762" height="506" style="opacity:0">
+ <span class="film-spray" aria-hidden="true"></span><div class="film-vignette" aria-hidden="true"></div>
+ <div class="fcards" aria-live="polite">{cards}</div>
+ <p class="film-ki">KI-Inszenierung</p>
+ <a class="film-skip" href="#einstieg">Film überspringen</a>
+ <div class="film-bar" aria-hidden="true"></div>
+</div>
+<div class="film-static"><div class="wrap"><p class="label">So bereiten wir dein Auto auf · KI-Inszenierung</p><div class="grid g4">{stills}</div></div></div>
+<script type="application/json" id="film-data">{json.dumps(data, ensure_ascii=False)}</script>
+</section>'''
 
 
 def home():
-    FRAMES = film_frames()
     cards = "".join([
         price_card("innen-normal", "Innenreinigung", "Saugen, Cockpit, Scheiben innen, Fußmatten.",
                    ["Sitze, Fußraum und Kofferraum gesaugt", "Cockpit, Konsole, Türverkleidungen feucht gereinigt", "Scheiben und Spiegel innen",
@@ -331,30 +351,15 @@ def home():
         ("Muss ich Umsatzsteuer dazurechnen?", "Nein. Alle Preise sind Endpreise. Als Kleinunternehmer nach § 19 UStG weisen wir keine Umsatzsteuer aus."),
     ]
     body = f'''
-<section class="studio-opening" id="film" aria-labelledby="h1">
- <div class="studio-picture" aria-hidden="true">
-  <img src="{FRAMES[0]["src"]}" width="762" height="506" alt="" fetchpriority="high">
-  <img width="762" height="506" alt="" style="opacity:0">
- </div>
- <div class="studio-shade" aria-hidden="true"></div>
- <div class="studio-content">
+{film_section()}
+
+<section class="sec intro studio" id="einstieg" aria-labelledby="h1"><div class="wrap">
   <p class="label">Carcura · Walterschen · Westerwald</p>
   <h1 id="h1">Fahrzeug&shy;aufbereitung in Walterschen bei Altenkirchen</h1>
   <p class="lead">Innenraumreinigung, Handwäsche, Lackpolitur und Keramikversiegelung. Wir bereiten dein Auto in unserer Halle von Hand auf und holen es auf Wunsch bei dir ab.</p>
-  <div class="btns">{btn("#preise", "Leistungen & Preise", "acc", "arrow")}{btn(wa("Hi Carcura, ich möchte einen Preis anfragen. Mein Fahrzeug: "), "Preis per WhatsApp anfragen", "ghost", "wa", service="startseite", ext=True)}</div>
+  <div class="btns">{btn("#preise", "Leistungen & Preise", "acc", "arrow")}{btn(wa("Hi Carcura, ich möchte einen Preis anfragen. Mein Fahrzeug: "), "Preis per WhatsApp anfragen", "ghost", "wa", service="startseite", ext=True)}{btn("/anfragen/", "Anfrage starten", "ghost")}</div>
   <p class="trust"><span>{rating_line()}</span><span>Abholung bis 10 km kostenlos</span><a href="{B["phoneHref"]}" data-service="startseite">0170 6669516</a></p>
-  <div class="studio-controls" role="group" aria-label="Filmkapitel">
-   <button type="button" data-play>Film abspielen</button>
-   <button type="button" data-shot="0" aria-pressed="true">Außenwäsche</button>
-   <button type="button" data-shot="4" aria-pressed="false">Innenraum</button>
-   <button type="button" data-shot="8" aria-pressed="false">Politur</button>
-   <button type="button" data-shot="10" aria-pressed="false">Keramik</button>
-  </div>
-  <p class="studio-label" aria-live="polite">Außenwäsche · So kommt es oft an.</p>
-  <p class="hero-tag">KI-Inszenierung auf Basis unserer Hallenfotos · kein Kundenfahrzeug</p>
- </div>
-</section>
-<script type="application/json" id="studio-frames">{json.dumps(FRAMES, ensure_ascii=False)}</script>
+</div></section>
 
 <section class="sec soft" id="preise" aria-labelledby="preise-h"><div class="wrap">
  <p class="label">Leistungen & Preise</p><h2 id="preise-h">Was kostet das?</h2>
@@ -412,7 +417,7 @@ def home():
 '''
     page("/", "Fahrzeugaufbereitung Westerwald mit Abholung | Carcura",
          f"Innenreinigung {ab('innen-normal')}, Handwäsche {ab('handwaesche')}, Politur {ab('politur-1')}, Keramik {ab('keramik')}. Von Hand in unserer Halle in Walterschen. Abholung bis 10 km gratis.",
-         body, ld=[faq_ld(faq)], js=("carcura-finish.js",), css=("carcura-finish.css",), body_class="carcura-finish")
+         body, ld=[faq_ld(faq)], js=("film.js",), css=("carcura-finish.css",), body_class="carcura-finish home-film")
 
 
 def calc_html(start=15):
@@ -1070,6 +1075,8 @@ def sitemap():
 
 
 if __name__ == "__main__":
+    import shutil
+    shutil.copytree(os.path.join(HERE, "assets"), os.path.join(DIST, "assets"), dirs_exist_ok=True)  # Assets-Quelle: src/assets
     home()
     leistungen()
     build_services()

@@ -133,3 +133,28 @@ Bestanden laut Prüfer: Vor-/Rückwärtsscrollen in 3 Durchgängen × 29 Messpun
 - **`src/check.py`:** keine Befunde.
 - **Offline-Fassung (`file://`):** Kapitelwahl funktioniert ✔.
 - **Screenshots:** `audit/screenshots/`.
+
+## Nachtest Startseitenfilm v2 (23.11.2026)
+- **Zustände geprüft** bei 390 × 844, 768 × 1024 und 1440 × 900 (Bild/Karte):
+  - Start und Haltephase: 00 ohne Karte ✔
+  - kurz vor dem Schaum: noch ohne Karte ✔
+  - Schaum, Sauber: Außenwäsche ✔
+  - Seite, Tür: ohne Karte ✔
+  - Innen vorher/nachher: Innenraum ✔
+  - Politur vorher/nachher: Lackpolitur ✔
+  - Keramik, Wasser, Perlen: Keramik ✔
+  - Ende: ohne Karte ✔
+  - zurück zu Innen: Innenraum ✔
+  - zurück zum Start: frei ✔
+- **Schnelles Scrollen:** 25 Zufallssprünge, danach Politur mit richtigem Bild und richtiger Karte ✔.
+- **Langsames Laden** (Filmbilder um 3 s verzögert): Das Bild bleibt bei 00 ohne Karte, nach dem Laden kommt Politur mit Karte ✔.
+- **Reduzierte Bewegung** (390/1440): statischer Einstieg mit Bild, allen vier Karten (Name, Text, Preis, Link) und Standbildern, kein Überlauf ✔.
+- **Direkteinstieg und Links:**
+  - `/#preise` landet bei 100 px ✔
+  - „Film überspringen“ führt zum Einstieg ✔
+  - „Leistungen & Preise“ führt zu #preise ✔
+  - Kartenlinks liefern alle 200 ✔
+  - Menü → /leistungen/ ✔
+- **Verdeckung:** Keine Karte über Schaum, Auto, Applikator, Tuch, Wasser oder Perlen (Desktop-Sichtprüfung). Mobil stehen die Karten unter dem Bild.
+- **Weitere Prüfungen:** Build aus leerem Ordner ✔; `src/check.py` ohne Befunde ✔; /leistungen/ ohne `<img>`, `<picture>`, Bildunterschriften, leere Container und CSS-Hintergrundbilder ✔.
+- **Nicht getestet:** echte Geräte und echte Mobilfunkverbindung.

@@ -321,3 +321,44 @@ h1,h2,h3{overflow-wrap:break-word}
 @media (min-width:810px){.film-copy{max-width:600px}.film-copy .f-title{font-size:clamp(40px,4.8vw,72px)!important}}
 .light table.prices th{color:#55565c}
 @media (max-width:809px) and (max-height:760px){.hero-media{aspect-ratio:16/9}.hero .label{display:none}.hero .lead{font-size:15.5px;line-height:1.5}.hero{padding-top:70px}}
+
+/* ===== Startseitenfilm v2 (Szenen aus src/film-szenen.json) ===== */
+body.home-film .nav{background:rgb(13 13 17/.34)}
+.film{height:calc(var(--w,17) * 58svh)}
+.film-stage{background:#0b0b0d}
+.film-stage img{object-position:50% 58%}
+.film-vignette{position:absolute;inset:0;pointer-events:none;background:linear-gradient(0deg,rgb(7 7 10/.55) 0%,transparent 16%),linear-gradient(180deg,rgb(7 7 10/.45) 0%,transparent 14%)}
+.fcards{position:absolute;inset:0;pointer-events:none;z-index:3}
+.fcard{position:absolute;width:min(380px,32vw);padding:22px 24px 20px;border-radius:22px;background:rgb(10 10 14/.56);border:1px solid rgb(255 255 255/.16);box-shadow:0 24px 60px -30px #000,inset 0 1px 0 rgb(255 255 255/.06);backdrop-filter:blur(18px) saturate(1.2);-webkit-backdrop-filter:blur(18px) saturate(1.2);color:var(--txt);opacity:0;transform:translateY(12px);transition:opacity .55s var(--ease),transform .7s var(--ease);pointer-events:none}
+.fcard.on{opacity:1;transform:none;pointer-events:auto}
+.fcard.pos-tl{left:var(--pad);top:104px}.fcard.pos-tr{right:var(--pad);top:104px}.fcard.pos-bl{left:var(--pad);bottom:72px}
+.fcard-step{font:500 12.5px/1 var(--mono);letter-spacing:.08em;color:var(--warm);margin:0 0 10px}
+.fcard h2{font-size:clamp(28px,2.6vw,40px);margin:0 0 8px}
+.fcard p{margin:0 0 10px;color:#e3e4e8;font-size:16px;line-height:1.5}
+.fcard .fcard-price{font:800 clamp(30px,2.6vw,40px)/1 var(--head);color:var(--acc);margin:6px 0 12px}
+.film-ki{position:absolute;right:var(--pad);bottom:22px;margin:0;font:500 11px/1 var(--mono);letter-spacing:.06em;color:rgb(255 255 255/.62);z-index:3}
+.film-skip{position:absolute;left:var(--pad);bottom:16px;z-index:3;display:flex;align-items:center;min-height:40px;padding:0 14px;border-radius:999px;font:600 13px/1 var(--body);color:var(--muted);text-decoration:none;background:rgb(7 7 10/.45);border:1px solid rgb(255 255 255/.18);backdrop-filter:blur(10px)}
+.film-skip:hover{color:var(--acc)}
+.intro{padding-top:clamp(64px,8vw,110px)}
+.intro h1{font-size:clamp(40px,5.2vw,80px);max-width:16ch}
+@media (max-width:809px){
+ .film{height:calc(var(--w,17) * 44svh)}
+ .film-stage img{top:64px;bottom:auto;height:auto;aspect-ratio:3/2;object-fit:cover;object-position:50% 50%}
+ .film-vignette{top:64px;bottom:auto;height:calc(100vw / 1.5);background:linear-gradient(0deg,#0b0b0d 0%,transparent 22%)}
+ .fcard,.fcard.pos-tl,.fcard.pos-tr,.fcard.pos-bl{left:14px;right:14px;top:calc(64px + 100vw / 1.5 + 14px);bottom:auto;width:auto;padding:18px 18px 14px}
+ .fcard h2{font-size:30px}.fcard p{font-size:15.5px}
+ .film-ki{top:calc(64px + 100vw / 1.5 - 22px);bottom:auto;right:12px}
+ .film-skip{bottom:86px}
+ .film-spray{display:none}
+}
+@media (max-width:809px) and (orientation:landscape){.film-stage img{top:0;height:100%;aspect-ratio:auto}.fcard,.fcard.pos-tl{top:auto;bottom:12px;left:auto;right:12px;width:min(340px,46vw)}.film-vignette{display:none}}
+/* Ohne Animation (reduzierte Bewegung, kein JS): statischer Einstieg mit Bild und allen Karten */
+html.no-film .film,html:not(.js) .film{height:auto}
+html.no-film .film-stage,html:not(.js) .film-stage{display:block;position:relative;height:auto;padding-bottom:20px}
+html.no-film .film-stage .f-base,html:not(.js) .film-stage .f-base{position:relative;inset:auto;height:auto;max-height:86svh;aspect-ratio:3/2;top:auto}
+html.no-film .f-top,html.no-film .film-spray,html.no-film .film-bar,html.no-film .film-vignette,html.no-film .film-skip,html:not(.js) .f-top,html:not(.js) .film-skip{display:none}
+html.no-film .fcards,html:not(.js) .fcards{position:static;display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px;padding:18px var(--pad) 0;max-width:1300px;margin:0 auto}
+html.no-film .fcard,html:not(.js) .fcard{position:static;width:auto;opacity:1;transform:none;pointer-events:auto}
+html.no-film .film-ki,html:not(.js) .film-ki{position:static;display:block;padding:12px var(--pad) 0}
+html.no-film .film-static,html:not(.js) .film-static{display:block;padding:30px 0 10px}
+@media (min-width:810px){.fcard.pos-tr{width:min(330px,24vw);top:96px}.fcard.pos-bl{bottom:76px}}

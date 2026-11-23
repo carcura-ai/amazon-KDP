@@ -11,7 +11,8 @@ Dann im Browser http://localhost:8080/ öffnen. Die Seite braucht einen Server, 
 - Preise, Kontakt, Öffnungszeiten, Aktion: `CARCURA-DATA.json`
 - Texte und Seiten: `src/build.py`
 - Danach `python3 src/build.py` (erzeugt dist/ neu) und `python3 src/check.py` (prüft Links, Anker, Preise, H1, Titel, Canonicals, Sitemap).
-- Design: `dist/assets/css/site.css`. Skripte: `dist/assets/js/` (site.js, film.js, anfrage.js).
+- Design und Skripte: `src/assets/` (css, js, fonts, img, film). Der Build kopiert sie nach `dist/assets/`, Änderungen nur in `src/assets/` vornehmen.
+- Startseitenfilm: Szenen, Karten, Gewichte und Material in `src/film-szenen.json`, Austausch pro Szene siehe `audit/FILM-MATERIAL.md`.
 - Die Aktion „Waschset zur Keramik“ verschwindet nach dem 31.12.2026 automatisch, beim nächsten Build und im Browser.
 
 ## Aufbau
