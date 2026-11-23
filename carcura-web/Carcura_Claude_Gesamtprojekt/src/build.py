@@ -306,12 +306,12 @@ def film_html():
         data.append({"src": f"/assets/film/{src}.webp", "label": lab, "title": tit, "text": txt, "chapter": ch, "trans": tr, "price": E(pr), "href": href, "link": link})
     nav = "".join(f'<button type="button" data-chapter="{c}" data-frame="{f}">{n}</button>' for c, f, n in [(0, 0, "Außen"), (1, 4, "Innen"), (2, 8, "Politur"), (3, 10, "Keramik")])
     static = "".join(f'''<figure class="rv"><div class="photo ratio-32"><img src="/assets/film/{FILM[i][0]}.webp" alt="{E(FILM[i][2])}" loading="lazy"></div>
-<figcaption class="cap"><b>{E(FILM[i][2])}</b> {E(FILM[i][3])}</figcaption></figure>''' for i in [0, 1, 3, 6, 7, 8, 9, 10, 13])
+<figcaption class="cap"><b>{E(FILM[i][2])}</b> {E(FILM[i][3])}{(" <a class=\"tlink\" href=\"" + FILM_PRICE[FILM[i][6]][1] + "\">" + E(FILM_PRICE[FILM[i][6]][0]) + "</a>") if i in (3, 7, 9, 13) else ""}</figcaption></figure>''' for i in [0, 1, 3, 6, 7, 8, 9, 10, 13])
     f0 = data[0]
     return f'''<section class="film" id="film" aria-labelledby="film-h" style="--frames:{len(FILM)}">
 <h2 class="sr" id="film-h">Die Aufbereitung im Film: Außenwäsche, Innenraum, Politur, Keramik</h2>
 <div class="film-stage">
- <img class="f-base" src="{f0["src"]}" alt="" width="762" height="506"><img class="f-top" src="{data[1]["src"]}" alt="" width="762" height="506" style="opacity:0" loading="lazy">
+ <img class="f-base" src="{f0["src"]}" alt="" width="762" height="506"><img class="f-top" alt="" width="762" height="506" style="opacity:0">
  <span class="film-spray" aria-hidden="true"></span><div class="shade" aria-hidden="true"></div>
  <p class="film-note">Inszenierung · KI-generierte Bilder · kein Kundenfahrzeug</p>
  <div class="film-copy" aria-live="polite"><p class="label f-label">{f0["label"]}</p><p class="h2 f-title" style="font:800 clamp(40px,6vw,88px)/.95 var(--head);text-transform:uppercase;margin:0 0 8px">{E(FILM[0][2])}</p>

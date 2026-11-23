@@ -91,8 +91,23 @@ Lokal **nicht** verfügbar: Lighthouse, echte Mobilgeräte, Felddaten. Darum gib
 ## Formular und Anfragewege
 Siehe TEXTE-UND-ANFRAGEN.md. Alle Tests liefen mit abgefangenem Endpunkt (Testumgebung). **Es wurde keine Anfrage an carcura.info oder echte Empfänger gesendet.**
 
-## Befunde Prüfer „Animation und Mobilansicht“
-Siehe Abschnitt unten.
+## Befunde Prüfer „Animation und Mobilansicht“ (12) und Korrekturen
+| # | Befund | Korrektur | Nachtest |
+|---|---|---|---|
+| 1 hoch | 768 × 1024: Film schnitt das Auto auf die halbe Breite (cover-Regel griff im Hochformat) | Regel nur noch im Querformat | 768 × 1024: `contain`, ganzes Auto ✔ |
+| 2 | Fehlendes Zielbild: alter Frame wurde eingeblendet, Text wechselte trotzdem | Übergang und Textwechsel nur bei gültigem Zielbild; kein Start-src am oberen Bild | 08 mit 404: Bild und Text bleiben bei „Nachher: gesaugt und gewischt“, Deckkraft 0 ✔ |
+| 3 | 360 × 740: WhatsApp-Button unter der Kontaktleiste | bei niedrigen Mobil-Viewports kompakteres Bild, kein Label, kleinere Einleitung | Buttons enden bei 558/620 px, Leiste ab 671 px ✔ |
+| 4 | „Film überspringen“ mobil ausgeblendet | mobil als kleiner Link über der Kapitelleiste | sichtbar, springt zu #nach-film ✔ |
+| 5 | CLS 0,143 im Film (Sprühkante über `left`, springender Text) | Sprühkante per `transform`, Mindesthöhen für Titel/Text (Desktop) | CLS über den ganzen Film 0,006 bei 1440 ✔ |
+| 6 | Filmbilder 762 px, auf dem Desktop weich | **offen** – braucht Neurenderings ≥ 1920 px | – |
+| 7 | Lightbox ohne Fokusfalle | Tab-Fokusfalle wie im Menü | Fokus bleibt nach 5× Tab in der Lightbox ✔ |
+| 8 | Pfeiltasten ignorierten den Filter | Blättern nur durch sichtbare Bilder | Filter „Innen“: nur 3 Bilder im Kreis ✔ |
+| 9 | Escape am „Mehr“-Menü ließ aria-expanded=true, Fokus ging verloren | aria-expanded=false, Fokus zurück auf „Mehr“ | ✔ |
+| 10 | Tabellenkopf auf hellem Grund 2,82:1 | #55565c (≈ 7:1) | ✔ |
+| 11 | Desktop: Titel im Film verdeckte Teile des Autos | Titel max. 72 px, Textblock max. 600 px | ✔ (Screenshot 1440) |
+| 12 | Statische Fassung ohne Preiszeilen | Preis und Link je Kapitel in den Bildunterschriften | ✔ |
+
+Bestanden laut Prüfer: Vor-/Rückwärtsscrollen in 3 Durchgängen × 29 Messpunkten identisch, Kapitel-Buttons in 4 Viewports, Achse 00–03 ≤ 1 px, keine Doppelkanten, KI-Hinweis sichtbar, Unterseiten ohne Überlauf, CLS 0, keine 404/JS-Fehler.
 
 ## Offene Punkte
 - Die Filmbilder haben nur 762 px. Auf großen Desktops wirken sie weich. Für scharfe Bilder ab 1440 px braucht es Neurenderings mit mindestens 1920 px.

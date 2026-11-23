@@ -227,10 +227,10 @@ html.no-film .film-static{display:block}
  .film-nav{bottom:86px;gap:6px}
  .film-spray{display:none}
  .film-nav button{font-size:13px;min-height:44px}
- .film-nav .skip-film{display:none}
+ .film-nav .skip-film{position:absolute;right:0;bottom:calc(100% + 8px);min-height:36px;padding:0 12px;font-size:12.5px;background:rgb(7 7 10/.7)}
  .film-note{top:80px;left:var(--pad);right:auto;font-size:11px}
 }
-@media (max-width:809px) and (min-aspect-ratio:3/4){.film-stage img{object-fit:cover;object-position:50% 40%}}
+@media (max-width:809px) and (orientation:landscape){.film-stage img{object-fit:cover;object-position:50% 40%}}
 /* Holservice-Rechner */
 .calc{border-radius:var(--r);padding:26px;border:1px solid var(--line);background:rgb(21 21 26/.55)}
 .calc label{font-weight:600}
@@ -315,3 +315,9 @@ h1,h2,h3{overflow-wrap:break-word}
 .field input[aria-invalid=true]{border-color:#ff6b6b}
 @media (max-width:809px){html{scroll-padding-bottom:96px}}
 .prose h2,.prose h3{hyphens:auto}
+.film-spray{left:0!important;will-change:transform}
+@media (min-width:810px){.film-copy .f-title{min-height:1.9em}.film-copy .f-text{min-height:3.2em}.film-copy .f-price{min-height:1.5em}}
+@media (max-width:809px){.film-copy{bottom:186px}.film-copy .f-text{min-height:4.8em}}
+@media (min-width:810px){.film-copy{max-width:600px}.film-copy .f-title{font-size:clamp(40px,4.8vw,72px)!important}}
+.light table.prices th{color:#55565c}
+@media (max-width:809px) and (max-height:760px){.hero-media{aspect-ratio:16/9}.hero .label{display:none}.hero .lead{font-size:15.5px;line-height:1.5}.hero{padding-top:70px}}

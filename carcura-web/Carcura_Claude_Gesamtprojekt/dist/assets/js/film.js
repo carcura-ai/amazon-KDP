@@ -39,19 +39,20 @@
   function render(prog) {
     var i = Math.min(N - 1, Math.floor(prog)), mix = prog - i, j = Math.min(N - 1, i + 1);
     setImg(base, i, "b"); setImg(top, j, "t");
-    var wipe = F[i].trans === "wipe" && j !== i;
+    var ok = !F[j].broken && ct === j;
+    var wipe = F[i].trans === "wipe" && j !== i && ok;
     /* Ruhephase am Anfang jedes Bildes, dann Übergang */
     var k = Math.max(0, Math.min(1, (mix - 0.32) / 0.5));
     if (wipe) {
       top.style.opacity = "1";
       top.style.clipPath = "inset(0 " + (100 - k * 100).toFixed(2) + "% 0 0)";
       spray.style.opacity = k > 0 && k < 1 ? "1" : "0";
-      spray.style.left = (k * 100).toFixed(2) + "%";
+      spray.style.transform = "translateX(" + (k * stage.clientWidth).toFixed(1) + "px)";
     } else {
-      var cut = mix >= 0.62 && j !== i;
+      var cut = mix >= 0.62 && j !== i && ok;
       top.style.clipPath = "none"; top.style.opacity = cut ? "1" : "0"; spray.style.opacity = "0";
     }
-    text(wipe ? (k > 0.5 ? j : i) : (mix >= 0.62 ? j : i));
+    text(wipe ? (k > 0.5 ? j : i) : ((mix >= 0.62 && ok) ? j : i));
     bar.style.width = (prog / (N - 1) * 100).toFixed(2) + "%";
   }
   function length() { return film.offsetHeight - window.innerHeight; }
