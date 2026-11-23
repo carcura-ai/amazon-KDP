@@ -85,6 +85,7 @@ MORE = [("/hol-und-bringservice/", "Hol- & Bringservice"), ("/firmenkunde/", "H�
 
 
 def nav(path):
+    cta = "#anfrage" if path == "/anfragen/" else "/anfragen/"
     def cur(h):
         return ' aria-current="page"' if h.split("#")[0] == path and "#" not in h else ""
     links = "".join(f'<li><a href="{h}"{cur(h)}>{E(t)}</a></li>' for h, t in NAV)
@@ -96,7 +97,7 @@ def nav(path):
  <a class="nav-logo" href="/" aria-label="Carcura Startseite"><img src="/assets/img/carcura-logo-weiss.webp" alt="Carcura Fahrzeugaufbereitung" width="92" height="46"></a>
  <nav aria-label="Seiten"><ul class="nav-links">{links}</ul></nav>
  <div class="nav-more"><button type="button" aria-expanded="false" aria-haspopup="true">Mehr</button><ul>{more}</ul></div>
- {btn("/anfragen/", "Termin anfragen")}
+ {btn(cta, "Termin anfragen")}
  <button class="menu-btn" type="button" aria-expanded="false" aria-controls="drawer" aria-label="Menü öffnen">{ICON["menu"]}</button>
 </header>
 <div class="drawer" id="drawer" role="dialog" aria-modal="true" aria-label="Menü"><button class="drawer-close" type="button" aria-label="Menü schließen">×</button>
@@ -114,7 +115,8 @@ def hours_html():
     return "<br>".join(out)
 
 
-def footer():
+def footer(path="/"):
+    cta = "#anfrage" if path == "/anfragen/" else "/anfragen/"
     cols = [
         ("Leistungen", [("/leistungen/", "Alle Leistungen & Preise"), ("/auto-innenreinigung/", "Auto-Innenreinigung"), ("/autopolitur/", "Autopolitur"),
                          ("/keramikversiegelung/", "Keramikversiegelung"), ("/leasingrueckgabe-aufbereitung/", "Leasingrückgabe & Verkauf"),
@@ -136,10 +138,10 @@ def footer():
  <a href="{B["instagram"]}" target="_blank" rel="noopener">Instagram @_carcura_</a></address>
  <p class="fine" style="margin-top:14px">{hours_html()}<br>{E(B["hoursNote"])}</p></div>{c}</div>
  <div class="legal"><span>© {TODAY.year} Carcura GbR · Fahrzeugaufbereitung in Walterschen bei Altenkirchen</span><a href="/impressum/">Impressum</a><a href="/datenschutz/">Datenschutz</a>
- <a href="/cookie-richtlinie-eu/">Cookie-Richtlinie</a><a href="/abo-bedingungen/">Abo-Bedingungen</a><a href="/kuendigen/">Vertrag kündigen</a><a href="/widerruf/">Widerruf</a></div>
+ <a href="/cookie-richtlinie-eu/">Cookie-Richtlinie</a><a href="/abo-bedingungen/">Abo-Bedingungen</a><a href="/kuendigen/">Verträge hier kündigen</a><a href="/widerruf/">Widerruf</a></div>
  <p class="fine" style="margin-top:14px">Alle Preise sind Endpreise. Als Kleinunternehmer nach § 19 UStG weisen wir keine Umsatzsteuer aus.</p></div>
 </footer>
-<div class="mbar" aria-label="Schnellkontakt"><a href="{B["phoneHref"]}" data-service="mbar">{ICON["tel"]}Anrufen</a><a href="{wa("Hi Carcura, ")}" target="_blank" rel="noopener" data-service="mbar">{ICON["wa"]}WhatsApp</a><a class="acc" href="/anfragen/">Anfragen</a></div>'''
+<div class="mbar" aria-label="Schnellkontakt"><a href="{B["phoneHref"]}" data-service="mbar">{ICON["tel"]}Anrufen</a><a href="{wa("Hi Carcura, ")}" target="_blank" rel="noopener" data-service="mbar">{ICON["wa"]}WhatsApp</a><a class="acc" href="{cta}">{"Zum Formular" if cta == "#anfrage" else "Anfragen"}</a></div>'''
 
 
 def ld_business():
@@ -157,7 +159,7 @@ def ld_business():
 
 def page(path, title, desc, body, robots="index,follow", ld=None, js=(), crumbs=None, canonical=None):
     PAGES.append((path, title, robots))
-    can = canonical or (SITE + path)
+    can = canonical or (SITE + path) if canonical is not False else ""
     lds = [ld_business()] + (ld or [])
     if crumbs:
         lds.append({"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [
@@ -172,7 +174,7 @@ def page(path, title, desc, body, robots="index,follow", ld=None, js=(), crumbs=
 <title>{E(title)}</title>
 <meta name="description" content="{E(desc)}">
 <meta name="robots" content="{robots}">
-<link rel="canonical" href="{E(can)}">
+{"" if canonical is False else f'<link rel="canonical" href="{E(can)}">'}
 <meta property="og:type" content="website"><meta property="og:locale" content="de_DE"><meta property="og:site_name" content="Carcura">
 <meta property="og:title" content="{E(title)}"><meta property="og:description" content="{E(desc)}"><meta property="og:url" content="{E(can)}">
 <meta property="og:image" content="{SITE}/assets/img/carcura-team-alexander-richy.webp">
@@ -188,7 +190,7 @@ def page(path, title, desc, body, robots="index,follow", ld=None, js=(), crumbs=
 <main id="main">
 {body}
 </main>
-{footer()}
+{footer(path)}
 {scripts}
 </body>
 </html>
@@ -203,7 +205,7 @@ def redirect(path, target):
     out = os.path.join(DIST, path.strip("/"), "index.html")
     os.makedirs(os.path.dirname(out), exist_ok=True)
     open(out, "w", encoding="utf8").write(f'''<!doctype html><html lang="de"><head><meta charset="utf-8"><title>Weiterleitung</title>
-<meta name="robots" content="noindex,follow"><link rel="canonical" href="{SITE}{target}"><meta http-equiv="refresh" content="0;url={target}"></head>
+<meta name="robots" content="noindex,follow"><link rel="canonical" href="{SITE}{target}"><meta http-equiv="refresh" content="0;url={target}"><script>location.replace("{target.split('#')[0]}"+location.search+"{('#' + target.split('#')[1]) if '#' in target else ''}")</script></head>
 <body><p>Diese Seite ist umgezogen: <a href="{target}">{target}</a></p></body></html>''')
 
 
@@ -265,8 +267,11 @@ def price_card(i, title, result, bullets, href, extra="", tag=""):
 
 
 def cta_band(title, text, service_id, service_name):
+    ids = service_id if isinstance(service_id, (list, tuple)) else ([service_id] if service_id else [])
+    href = anf(*ids) if ids else "/anfragen/"
+    label = "Anfrage mit Leistung starten" if ids else "Anfrage starten"
     return f'''<section class="sec studio"><div class="wrap two"><div><p class="label">Nächster Schritt</p><h2>{title}</h2></div>
-<div><p class="lead">{text}</p><div class="btns">{btn(anf(service_id), "Anfrage mit Leistung starten", "acc", "arrow")}{wa_btn(service_name)}{btn(B["phoneHref"], "0170 6669516", "ghost", "tel", service=service_name)}</div>
+<div><p class="lead">{text}</p><div class="btns">{btn(href, label, "acc", "arrow")}{wa_btn(service_name)}{btn(B["phoneHref"], "0170 6669516", "ghost", "tel", service=service_name)}</div>
 <p class="fine" style="margin-top:14px">Bis 10 km um Walterschen holen wir kostenlos ab, darüber 2 € pro Kilometer (einfache Strecke, hin und zurück inklusive).</p></div></div></section>'''
 
 
@@ -281,12 +286,12 @@ FILM = [
     ("06-innen-vorher", "Innenraum · 2/4", "Vorher: Sand und Krümel.", "Typisch nach Winter, Kindern oder Baustelle.", 1, "wipe", "innen-normal"),
     ("07-innen-nachher", "Innenraum · 2/4", "Nachher: gesaugt und gewischt.", "Flecken im Stoff, Tierhaare und Geruch sind Zusatzleistungen mit eigenem Preis.", 1, "cut", "innen-normal"),
     ("08-politur-vorher", "Politur · 3/4", "Swirls unter Prüflicht.", "Feine Kringel im Klarlack. Die Maschinenpolitur trägt eine hauchdünne Schicht ab.", 2, "wipe", "politur-1"),
-    ("09-politur-nachher", "Politur · 3/4", "Mehr Klarheit. Mehr Tiefenglanz.", "Waschkratzer verschwinden oder werden deutlich milder. Kratzer bis in die Farbe bleiben sichtbar, das sagen wir dir vorher.", 2, "cut", "politur-1"),
+    ("09-politur-nachher", "Politur · 3/4", "Nach der Politur.", "Waschkratzer verschwinden oder werden deutlich milder. Kratzer bis in die Farbe bleiben sichtbar, das sagen wir dir vorher.", 2, "cut", "politur-1"),
     ("10-keramik-auftrag", "Keramik · 4/4", "Keramik auftragen.", "Auf den polierten und entfetteten Lack, Bauteil für Bauteil.", 3, "cut", "keramik"),
     ("11-keramik-abnehmen", "Keramik · 4/4", "Überschuss abnehmen.", "Nach kurzem Ablüften wird nachpoliert. Dann härtet die Schicht in unserer Halle aus.", 3, "cut", "keramik"),
     ("12-wasser", "Keramik · 4/4", "Wasser auf dem Lack.", "Der Test nach der Aushärtung: Wasser läuft über die versiegelte Fläche.", 3, "cut", "keramik"),
     ("13-perlen", "Keramik · 4/4", "Wasser perlt ab.", "Schmutz haftet schlechter, die nächste Wäsche geht leichter. Die Haltbarkeit hängt von Pflege und Nutzung ab.", 3, "cut", "keramik"),
-    ("14-ergebnis", "Ergebnis", "Dein Auto. Wieder sauber.", "Von Hand in unserer Halle in Walterschen, auf Wunsch mit Abholung.", -1, "cut", None),
+    ("14-ergebnis", "Ergebnis", "Dein Auto. Wieder sauber.", "Ende der Inszenierung. Echte Fotos aus unserer Halle siehst du weiter unten.", -1, "cut", None),
 ]
 FILM_PRICE = {"handwaesche": ("Handwäsche inkl. Felgen " + ab("handwaesche"), "/leistungen/#preise", "Preise"),
               "innen-normal": ("Innenreinigung " + ab("innen-normal") + " · Polster-Tiefenreinigung als Zusatz +59 €", "/auto-innenreinigung/", "Umfang"),
@@ -335,7 +340,7 @@ def home():
     ])
     team_alt = "Richy Schumacher (links) und Alexander Fuchs (rechts), Gründer von Carcura, in ihrer Halle in Walterschen"
     faq = [
-        ("Was kostet eine Fahrzeugaufbereitung bei Carcura?", f"Die Innenreinigung beginnt {ab('innen-normal')}, die Handwäsche inklusive Felgen {ab('handwaesche')}, innen und außen zusammen {ab('basic')}. Politur gibt es {ab('politur-1')}, Keramik inklusive Politur {ab('keramik')}. Alle Preise gelten für PKW, Kombi und Van bei normaler Verschmutzung. Den Endpreis bestätigen wir dir vor dem Termin."),
+        ("Was kostet eine Fahrzeugaufbereitung bei Carcura?", f"Die Innenreinigung beginnt {ab('innen-normal')}, die Handwäsche inklusive Felgen {ab('handwaesche')}, innen und außen zusammen {ab('basic')}. Politur gibt es {ab('politur-1')}, Keramik inklusive Politur {ab('keramik')}. Die Preise gelten bei normaler Verschmutzung, Innen- und Waschleistungen für PKW, Kombi und Van, Politur und Keramik für PKW und Kombi. Den Endpreis bestätigen wir dir vor dem Termin. Ab 500 € Auftragswert sind 50 % Anzahlung bei Terminbestätigung fällig."),
         ("Wo ist eure Halle?", f"In der {B['street']}, {B['postcode']} {B['city']}, zwischen Altenkirchen und Weyerbusch im Westerwald. Termine nach Vereinbarung."),
         ("Holt ihr mein Auto ab?", "Ja. Bis 10 km um Walterschen kostenlos, zum Beispiel in Altenkirchen, Weyerbusch oder Flammersfeld. Darüber kostet jeder weitere Kilometer der einfachen Strecke 2 €, Hin- und Rückfahrt sind damit abgegolten."),
         ("Wie schnell bekomme ich einen Preis?", "Am schnellsten mit Fotos per WhatsApp. Wir antworten persönlich mit einer Einschätzung und einem fairen Angebot."),
@@ -343,7 +348,7 @@ def home():
     ]
     body = f'''
 <section class="hero" aria-labelledby="h1">
- <div class="hero-media"><img src="/assets/film/14-ergebnis.webp" alt="Sauberer dunkler Sportwagen in der Carcura-Halle (Inszenierung)" width="762" height="506" fetchpriority="high"></div>
+ <div class="hero-media"><img src="/assets/film/14-ergebnis.webp" alt="Dunkler Sportwagen in einer Halle, KI-generierte Inszenierung" width="762" height="506" fetchpriority="high"></div>
  <div class="wrap">
   <p class="label">Carcura · Walterschen · Westerwald</p>
   <h1 id="h1">Fahrzeug&shy;aufbereitung in Walterschen bei Altenkirchen</h1>
@@ -351,12 +356,12 @@ def home():
   <div class="btns">{btn("#preise", "Leistungen & Preise", "acc", "arrow")}{btn(wa("Hi Carcura, ich möchte einen Preis anfragen. Mein Fahrzeug: "), "Preis per WhatsApp anfragen", "ghost", "wa", service="startseite", ext=True)}</div>
   <p class="trust"><span>{rating_line()}</span><span>Abholung bis 10 km kostenlos</span><a href="{B["phoneHref"]}" data-service="startseite">0170 6669516</a></p>
  </div>
- <p class="hero-tag">Bild: Inszenierung, kein Kundenfahrzeug</p>
+ <p class="hero-tag">Bild: KI-generierte Inszenierung, kein Kundenfahrzeug</p>
 </section>
 
 <section class="sec soft" id="preise" aria-labelledby="preise-h"><div class="wrap">
  <p class="label">Leistungen & Preise</p><h2 id="preise-h">Was kostet das?</h2>
- <p class="lead">Ab-Preise für PKW, Kombi und Van bei normaler Verschmutzung. Größe und Zustand können den Preis erhöhen. Den Endpreis bestätigen wir dir vor dem Termin, bezahlt wird nach der Übergabe.</p>
+ <p class="lead">Ab-Preise bei normaler Verschmutzung: Innen- und Waschleistungen für PKW, Kombi und Van, Politur und Keramik für PKW und Kombi. Größe und Zustand können den Preis erhöhen. Den Endpreis bestätigen wir dir vor dem Termin. Bezahlt wird nach der Übergabe, ab 500 € Auftragswert sind 50 % bei Terminbestätigung fällig.</p>
  <div class="grid g4" style="margin-top:28px">{cards}</div>
  <div class="grid g3" style="margin-top:18px">
   <a class="card rv" href="/auto-innenreinigung/#pakete" style="text-decoration:none"><h3>Basic innen & außen</h3><p class="price">{ab('basic')}</p><p class="muted small">Innenreinigung plus Handwäsche mit Felgen in einem Termin.</p></a>
@@ -371,7 +376,7 @@ def home():
 
 <section class="sec light" id="nach-film"><div class="wrap two">
  <div><p class="label">Carcura</p><h2>Glanz ist Handarbeit.</h2></div>
- <div><p class="lead">Wir sind Alexander und Richy. Jedes Auto bereiten wir beide selbst auf, in unserer eigenen Halle in Walterschen. Kein Callcenter, keine Waschstraße. Du sprichst mit denen, die auch an deinem Auto arbeiten.</p>
+ <div><p class="lead">Wir sind Alexander und Richy. Wir bereiten jedes Auto selbst auf, in unserer eigenen Halle in Walterschen. Kein Callcenter, keine Waschstraße. Du sprichst mit denen, die auch an deinem Auto arbeiten.</p>
  <p><a class="tlink" href="/ueber-uns/">Mehr über uns</a></p></div>
 </div></section>
 <div class="marquee" aria-hidden="true"><div><span>Innenreinigung</span><span>Handwäsche</span><span>Politur</span><span>Keramik</span><span>Felgen</span><span>Innenreinigung</span><span>Handwäsche</span><span>Politur</span><span>Keramik</span><span>Felgen</span></div></div>
@@ -390,7 +395,7 @@ def home():
 <section class="sec soft"><div class="wrap two">
  <div>{photo("carcura-team-alexander-richy.webp", team_alt, "Richy (links) und Alexander (rechts)", "ratio-45")}</div>
  <div><p class="label">Persönlich statt anonym</p><h2>Alex & Richy.</h2>
- <p class="lead">Wir haben Carcura als GbR gegründet und machen jede Aufbereitung selbst. Alexander kümmert sich um Anfragen, Termine und die passende Leistung, Richy um die Detailarbeit an Innenraum, Lack und Felgen.</p>
+ <p class="lead">Wir haben Carcura als GbR gegründet und arbeiten selbst an den Fahrzeugen. Alexander kümmert sich um Anfragen, Termine und die passende Leistung, Richy um die Detailarbeit an Innenraum, Lack und Felgen.</p>
  <p>Für Reinigung, Pflege und Schutz setzen wir bei ausgewählten Schritten auf Produkte von <a class="tlink" href="/partner/">Nanolex</a>.</p>
  <div class="btns">{btn("/anfragen/", "Termin anfragen", "acc", "arrow")}{btn(B["phoneHref"], "0170 6669516", "ghost", "tel", service="team")}</div></div>
 </div></section>
@@ -407,16 +412,16 @@ def home():
  <ul class="chips">{"".join(f'<li><a href="{h}" style="text-decoration:none">{n}</a></li>' for h, n in [("/fahrzeugaufbereitung-altenkirchen/", "Altenkirchen · Abholung gratis"), ("/fahrzeugaufbereitung-asbach/", "Asbach"), ("/fahrzeugaufbereitung-hachenburg/", "Hachenburg"), ("/fahrzeugaufbereitung-wissen/", "Wissen & Betzdorf"), ("/fahrzeugaufbereitung-neuwied/", "Neuwied"), ("/fahrzeugaufbereitung-westerwald/", "Alle Orte im Westerwald")])}</ul>
 </div></section>
 {faq_html(faq)}
-{cta_band("Dein Auto. Wieder sauber.", "Wähle eine Leistung, schick uns Fotos oder ruf an. Du bekommst ein faires Angebot, bevor wir loslegen.", "basic", "Fahrzeugaufbereitung")}
+{cta_band("Dein Auto. Wieder sauber.", "Wähle eine Leistung, schick uns Fotos oder ruf an. Du bekommst ein faires Angebot, bevor wir loslegen.", None, "Fahrzeugaufbereitung")}
 '''
-    page("/", "Fahrzeugaufbereitung bei Altenkirchen im Westerwald | Carcura",
+    page("/", "Fahrzeugaufbereitung Westerwald mit Abholung | Carcura",
          f"Innenreinigung {ab('innen-normal')}, Handwäsche {ab('handwaesche')}, Politur {ab('politur-1')}, Keramik {ab('keramik')}. Von Hand in unserer Halle in Walterschen. Abholung bis 10 km gratis.",
          body, ld=[faq_ld(faq)], js=("film.js",))
 
 
 def calc_html(start=15):
     return f'''<div class="calc" data-calc><label for="km">Entfernung zu unserer Halle (Straße, einfache Strecke): <span data-km>{start} km</span></label>
-<input id="km" type="range" min="1" max="50" value="{start}" step="1"><p class="muted small" style="margin:0">Deine Abholkosten</p><output for="km">10 €</output>
+<input id="km" type="range" min="1" max="50" value="{start}" step="1"><p class="muted small" style="margin:0">Deine Abholkosten</p><output for="km">{"0 € – kostenlos" if start <= 10 else eur((start - 10) * 2)}</output>
 <p class="fine">Formel: (Kilometer − 10) × 2 €, mindestens 0 €. Beispiele: 10 km = 0 €, 15 km = 10 €, 20 km = 20 €, 30 km = 40 €. Den genauen Betrag bestätigen wir vor dem Termin.</p></div>'''
 
 
@@ -454,10 +459,10 @@ def service_page(slug, d):
 {cases}
 {faq_html(d["faq"], light=True)}
 {f'<section class="sec soft"><div class="wrap"><p class="label">Passt oft dazu</p><h2>Weitere Leistungen.</h2><div class="grid g3" style="margin-top:22px">{related}</div></div></section>' if related else ""}
-{cta_band(d["cta_title"], d["cta_text"], d["anf"][0], d["wa"])}
+{cta_band(d["cta_title"], d["cta_text"], d["anf"], d["wa"])}
 '''
     page(f"/{slug}/", d["title"], d["desc"], body, ld=[faq_ld(d["faq"]), {"@context": "https://schema.org", "@type": "Service", "name": d["crumb"], "provider": {"@id": SITE + "/#business"}, "areaServed": "Westerwald",
-         "offers": {"@type": "Offer", "priceCurrency": "EUR", "price": d.get("offer", 0), "priceSpecification": {"@type": "PriceSpecification", "minPrice": d.get("offer", 0), "priceCurrency": "EUR"}}}],
+         "offers": {"@type": "Offer", "priceCurrency": "EUR", "priceSpecification": {"@type": "PriceSpecification", "minPrice": d.get("offer", 0), "priceCurrency": "EUR"}}}],
          crumbs=[("/leistungen/", "Leistungen"), (f"/{slug}/", d["crumb"])])
 
 
@@ -472,8 +477,8 @@ def case_section(title, items):
 def build_services():
     service_page("auto-innenreinigung", dict(
         title=f"Auto-Innenreinigung im Westerwald {ab('innen-normal')} | Carcura Walterschen",
-        desc=f"Auto-Innenreinigung von Hand in Walterschen bei Altenkirchen: Normal {ab('innen-normal')}, detailliert {ab('innen-detail')}. Was enthalten ist, was extra kostet. Abholung bis 10 km gratis.",
-        crumb="Auto-Innenreinigung", label="Auto-Innenreinigung · Walterschen", h1="Auto-Innen&shy;reinigung. Wieder gerne einsteigen.",
+        desc=f"Auto-Innenreinigung von Hand in Walterschen: Normal {ab('innen-normal')}, detailliert {ab('innen-detail')}. Was enthalten ist, was extra kostet. Abholung bis 10 km gratis.",
+        crumb="Auto-Innenreinigung", label="Auto-Innenreinigung · Walterschen", h1=f"Auto-Innen&shy;reinigung {ab('innen-normal')}: was drin ist.",
         lead="Saugen, Cockpit, Scheiben, Fußmatten, Kofferraum: von Hand in unserer Halle, meist in 1–2 Stunden. Flecken, Tierhaare und Geruch buchst du gezielt dazu.",
         price=ab("innen-normal"), price_note=f"Normal · detailliert {ab('innen-detail')}", anf=["innen-normal"], wa="Auto-Innenreinigung", offer=90,
         chips=["Tierhaare +29 €", "Polster-Tiefenreinigung +59 €", "Ozon +39 €", f"Innen + außen {ab('basic')}"],
@@ -506,12 +511,12 @@ def build_services():
              ("Holt ihr das Auto ab?", "Ja. Bis 10 km um Walterschen kostenlos, darüber 2 € pro Kilometer der einfachen Strecke."),
              ("Gibt es die Innenreinigung regelmäßig?", 'Ja, als <a href="/leistungen/#abos">Pflege-Abo</a>: Innenraum Basic ab 80 € im Monat, 12 Monate Mindestlaufzeit, danach monatlich kündbar.')],
         related=[rel("autositz-reinigen-flecken", "Fleck im Sitz", "sitz-fleck", "Sprühextraktion für einen Sitz oder eine Stelle."), rel("tierhaare-auto-entfernen", "Tierhaare", "tierhaare", "Aus Teppich, Sitzen und Kofferraum."), rel("geruch-im-auto-entfernen", "Geruch entfernen", "ozon", "Ozon gegen Rauch und Hund.")],
-        cta_title="Innen wieder wie neu.", cta_text="Sag uns kurz, was dich stört, gern mit Fotos. Du bekommst einen Preis, bevor wir anfangen."))
+        cta_title="Innenraum sauber bekommen.", cta_text="Sag uns kurz, was dich stört, gern mit Fotos. Du bekommst einen Preis, bevor wir anfangen."))
 
     service_page("autopolitur", dict(
         title=f"Auto polieren lassen im Westerwald {ab('politur-1')} | Carcura",
         desc=f"Autopolitur in Walterschen bei Altenkirchen: 1-stufig {ab('politur-1')}, 2-stufige Lackkorrektur {ab('politur-2')}. Wäsche und Kneten inklusive. Wann welche Stufe passt.",
-        crumb="Autopolitur", label="Autopolitur · Walterschen", h1="Auto polieren lassen. Glanz statt Swirls.",
+        crumb="Autopolitur", label="Autopolitur · Walterschen", h1=f"Auto polieren lassen: 1- oder 2-stufig {ab('politur-1')}.",
         lead="Waschkratzer, Kringel im Sonnenlicht, matter Lack: Eine Maschinenpolitur holt die Farbtiefe zurück. Handwäsche, Flugrost- und Teerentfernung und Kneten sind immer dabei.",
         price=ab("politur-1"), price_note=f"1-stufig · 2-stufig {ab('politur-2')}", anf=["politur-1"], wa="Autopolitur", offer=349,
         chips=["Wäsche und Kneten inklusive", "Maschinell, Bauteil für Bauteil", "Wachs nach Politur +30 €"],
@@ -536,14 +541,14 @@ def build_services():
     k = S["keramik"]
     service_page("keramikversiegelung", dict(
         title=f"Keramikversiegelung Westerwald {ab('keramik')} inkl. Politur | Carcura",
-        desc=f"Keramikversiegelung mit XPERTCOAT HYBRID in Walterschen bei Altenkirchen: {ab('keramik')} inkl. Handwäsche, Kneten und 1-stufiger Politur. Nachkontrolle nach 6 Monaten.",
-        crumb="Keramikversiegelung", label="Keramikversiegelung · Westerwald", h1="Keramik&shy;versiegelung mit offenen Karten.",
+        desc=f"Keramikversiegelung mit XPERTCOAT HYBRID in Walterschen: {ab('keramik')} inkl. Handwäsche, Kneten und 1-stufiger Politur. Nachkontrolle nach 6 Monaten.",
+        crumb="Keramikversiegelung", label="Keramikversiegelung · Westerwald", h1=f"Keramik&shy;versiegelung {ab('keramik')} inklusive Politur.",
         lead="Erst polieren, dann versiegeln, dann in der Halle aushärten. Wir verwenden XPERTCOAT HYBRID. Laut Hersteller bis zu 5 Jahre oder 70.000 km Standzeit, je nach Pflege und Nutzung.",
         price=ab("keramik"), price_note="inkl. Handwäsche, Kneten und 1-stufiger Politur", anf=["keramik"], wa="Keramikversiegelung", offer=700, cta="Keramik anfragen",
         promo=promo_html().replace('href="/keramikversiegelung/#aktion"', 'href="#aktion"'),
-        chips=["Nachkontrolle nach 6 Monaten", f"mit 2-stufiger Politur {eur(k['from'] + k['twoStagePolishSurcharge'])}", "Auto meist 3 Tage in der Halle"],
+        chips=["Nachkontrolle nach 6 Monaten", f"mit 2-stufiger Politur ab {eur(k['from'] + k['twoStagePolishSurcharge'])}", "Auto meist 3 Tage in der Halle"],
         img=("carcura-audi-tt-politur-keramik-walterschen.webp", "Roter Audi TT nach Politur und Keramikversiegelung bei Carcura", "Echtes Kundenfahrzeug: Audi TT nach Politur und Keramik", "ratio-916"),
-        inc_title="Was in den 700 € steckt.",
+        inc_title=f"Was im Preis {ab('keramik')} steckt.",
         inc=["Handwäsche, Flugrost- und Teerentfernung, Kneten", "Abkleben von Gummis und Kunststoff", "1-stufige Politur", "Entfetten und Auftrag XPERTCOAT HYBRID (eine Schicht)",
              "Erste Aushärtung 12 Stunden in der Halle", "Pflegehinweise und Nachkontrolle nach 6 Monaten"],
         exc=[f"2-stufige Politur bei vielen Swirls: Aufpreis {eur(k['twoStagePolishSurcharge'])} (dann {ab('keramik').replace('700', str(k['from'] + k['twoStagePolishSurcharge']))})",
@@ -577,8 +582,8 @@ def build_services():
 
     service_page("leasingrueckgabe-aufbereitung", dict(
         title=f"Auto vor Leasingrückgabe & Verkauf aufbereiten {ab('leasing')} | Carcura",
-        desc=f"Verkaufs- und Leasingrückgabe-Paket {ab('leasing')}: detaillierte Innenreinigung, Flecken, Handwäsche, Schnellversiegelung. In Walterschen bei Altenkirchen, mit Abholung.",
-        crumb="Leasingrückgabe & Verkauf", label="Leasingrückgabe & Verkauf", h1="Vor Rückgabe oder Verkauf. Der erste Eindruck zählt.",
+        desc=f"Verkaufs- und Leasingrückgabe-Paket {ab('leasing')}: detaillierte Innenreinigung, Flecken, Handwäsche, Schnellversiegelung. In Walterschen, mit Abholung.",
+        crumb="Leasingrückgabe & Verkauf", label="Leasingrückgabe & Verkauf", h1="Auto vor Leasing&shy;rückgabe oder Verkauf aufbereiten.",
         lead="Ein gepflegtes Auto macht beim Gutachter und beim Käufer mehr her. Unser Paket bringt Innenraum und Lack in einen gepflegten Zustand. Eilig? Fotos per WhatsApp, Antwort meist am selben Tag.",
         price=ab("leasing"), price_note="Paket innen und außen", anf=["leasing"], wa="Leasingrückgabe-Paket", offer=229, cta="Paket anfragen",
         chips=["Tierhaare +29 €", "Ozon +39 €", f"Politur {ab('politur-1')}", f"Scheinwerfer {ab('scheinwerfer')}"],
@@ -596,10 +601,10 @@ def build_services():
         cta_title="Gepflegt abgeben.", cta_text="Sag uns den Rückgabe- oder Verkaufstermin. Wir planen rückwärts und nennen dir den Preis vorab."))
 
     service_page("scheinwerfer-aufbereiten", dict(
-        title=f"Scheinwerfer aufbereiten lassen: Kosten {eur(S['scheinwerfer']['from'])} für beide | Carcura",
+        title=f"Scheinwerfer aufbereiten: Kosten {ab('scheinwerfer')} für beide | Carcura",
         desc=f"Was kostet eine Scheinwerferaufbereitung? Bei Carcura {ab('scheinwerfer')} für beide Scheinwerfer: abkleben, schleifen, polieren, UV-Schutz. Walterschen bei Altenkirchen.",
         crumb="Scheinwerfer aufbereiten", label="Scheinwerferaufbereitung · Walterschen", h1="Scheinwerfer aufbereiten. Was kostet das?",
-        lead=f"{ab('scheinwerfer')} für beide Scheinwerfer zusammen. Matte, vergilbte Gläser streuen das Licht. Wir schleifen, polieren klar und versiegeln mit UV-Schutz.",
+        lead=f"Matte, vergilbte Gläser streuen das Licht. Wir schleifen, polieren klar und versiegeln mit UV-Schutz.",
         price=ab("scheinwerfer"), price_note="für beide Scheinwerfer zusammen", anf=["scheinwerfer"], wa="Scheinwerferaufbereitung", offer=69,
         chips=["Beide Seiten", "Mit UV-Schutzversiegelung", "Mit Wäsche kombinierbar"],
         img=("carcura-weisser-lack-halle-glanz.webp", "Fahrzeug in der Carcura-Halle", "Unsere Halle in Walterschen", "ratio-916"),
@@ -622,7 +627,7 @@ def SIMPLE_SERVICES():
     return {
         "autositz-reinigen-flecken": dict(
             title=f"Autositz reinigen & Flecken entfernen {ab('sitz-fleck')} | Westerwald", desc=f"Fleck im Autositz? Sprühextraktion {ab('sitz-fleck')} pro Sitz, alle Polster {ab('polster')}, Fleck + Geruch {ab('fleck-geruch')}. Foto schicken, Preis bekommen.",
-            crumb="Flecken im Sitz", label="Polster- & Sitzreinigung", h1="Fleck im Autositz? Wir holen ihn raus.",
+            crumb="Flecken im Sitz", label="Polster- & Sitzreinigung", h1=f"Autositz reinigen und Flecken entfernen {ab('sitz-fleck')}.",
             lead="Kaffee, Kakao, Saft oder Essen: Wir reinigen mit Sprühextraktion tief aus dem Stoff und saugen das Schmutzwasser direkt wieder ab.",
             price=ab("sitz-fleck"), price_note="einzelner Sitz oder Stelle", anf=["sitz-fleck"], wa="Fleckentfernung im Autositz", offer=49,
             chips=[f"Alle Sitze {ab('polster')}", f"Fleck + Geruch {ab('fleck-geruch')}", "Notfall Erbrochenes ab 179 €"],
@@ -634,7 +639,7 @@ def SIMPLE_SERVICES():
             cta_title="Fleck weg.", cta_text="Schick ein Foto vom Fleck und vom ganzen Sitz."),
         "tierhaare-auto-entfernen": dict(
             title=f"Tierhaare im Auto entfernen {ab('tierhaare')} | Westerwald | Carcura", desc=f"Hundehaare im Auto? Mit Innenreinigung nur +29 € (Golf/Touran ab 119 €). Familienpaket innen + außen + Tierhaare {ab('familie')}. Walterschen.",
-            crumb="Tierhaare entfernen", label="Tierhaare · Westerwald", h1="Hundehaare im Auto? Wir kriegen sie raus.",
+            crumb="Tierhaare entfernen", label="Tierhaare · Westerwald", h1="Tierhaare im Auto entfernen lassen.",
             lead="Aus Teppich, Sitzen, Ritzen und Kofferraum, auch die feinen, festsitzenden Haare. Mit Spezialbürsten und dem Tornador.",
             price="+29 €", price_note=f"zur Innenreinigung · einzeln {ab('tierhaare')}", anf=["innen-normal", "tierhaare"], wa="Tierhaarentfernung", offer=29,
             chips=["Innen + Tierhaare ab 119 €", f"Familienpaket {ab('familie')}", "Ozon gegen Hundegeruch +39 €"],
@@ -646,12 +651,12 @@ def SIMPLE_SERVICES():
             cta_title="Haarfrei einsteigen.", cta_text="Ein Foto vom Kofferraum und der Rückbank reicht."),
         "geruch-im-auto-entfernen": dict(
             title=f"Geruch im Auto entfernen: Ozon {ab('ozon')} | Westerwald", desc=f"Rauch, Hund, Essen: Innenreinigung plus Ozon ab 129 €, Ozon einzeln {ab('ozon')}. Ursache raus, dann Ozon. Carcura in Walterschen.",
-            crumb="Geruch entfernen", label="Geruch entfernen · Walterschen", h1="Geruch im Auto entfernen. Rauch, Hund, Essen.",
+            crumb="Geruch entfernen", label="Geruch entfernen · Walterschen", h1="Geruch im Auto entfernen: Rauch, Hund, Essen.",
             lead="Duftbäume überdecken nur. Wir reinigen zuerst Polster, Teppich und Ritzen, dann zersetzt Ozon die Geruchsmoleküle, auch in Dachhimmel und Lüftung.",
             price=ab("ozon"), price_note="Ozon einzeln · mit Innenreinigung ab 129 €", anf=["innen-normal", "ozon"], wa="Geruchsentfernung mit Ozon", offer=59,
             chips=["Ursache statt Duftbaum", "Auch Lüftung und Polster", f"Fleck + Geruch {ab('fleck-geruch')}"],
             img=("carcura-innenreinigung-cockpit-hd.webp", "Innenraum nach der Reinigung", "Echtes Kundenfahrzeug nach der Innenreinigung", "ratio-916"),
-            inc=["Innenraum aussaugen, Fußmatten reinigen, Flecken vorbehandeln", "Ozongerät im geschlossenen, leeren Fahrzeug", "Gründliches Auslüften"],
+            inc_title="Ozon einzeln oder mit Innenreinigung.", inc=[f"<b>Ozon einzeln {ab('ozon')}:</b> Ozongerät im geschlossenen, leeren Fahrzeug, danach gründliches Auslüften", "<b>Innenreinigung + Ozon ab 129 €:</b> zusätzlich Innenraum aussaugen, Fußmatten reinigen, Flecken vorbehandeln, damit die Ursache rausgeht"],
             exc=["Polster-Tiefenreinigung: +59 €", "Ursachen wie Feuchtigkeit muss die Werkstatt beheben"],
             limits="<b>Ehrlich:</b> Sehr alter Rauchgeruch wird stark reduziert, aber nicht immer ganz entfernt. Das sagen wir dir vorher.",
             steps=[("Ursache raus.", "Saugen, Flecken vorbehandeln, bei Bedarf Polster tief reinigen."), ("Ozon.", "Im geschlossenen Fahrzeug, auch durch die Lüftung."), ("Auslüften.", "Danach bekommst du dein Auto zurück.")],
@@ -667,11 +672,11 @@ def SIMPLE_SERVICES():
             inc=["Dampfreinigung von Polstern, Kunststoff und Ritzen", "Schimmelentfernung im Innenraum", "Ölflecken, z. B. im Kofferraum", "Motorraumreinigung", "Leder reinigen und pflegen", "Himmelreinigung", "Cabrio-Verdeck, auf Wunsch mit Imprägnierung"],
             exc=["Ursache von Schimmel (meist Undichtigkeit) behebt die Werkstatt", "Ob ein Ölfleck ganz verschwindet, hängt von Material und Alter ab"],
             steps=[("2–3 Fotos.", "Wir sagen dir ehrlich, was realistisch ist."), ("Angebot.", "Bevor du den Termin bestätigst."), ("Reinigung.", "In unserer Halle.")],
-            faq=[("Was kostet eine Spezialreinigung?", "Das hängt stark vom Fall ab. Nach 2–3 Fotos nennen wir dir einen festen Preis vor dem Termin."), ("Entfernt ihr Schimmel dauerhaft?", "Wir reinigen den Schimmel. Wenn die Ursache, meist Feuchtigkeit, bleibt, kann er wiederkommen.")],
+            faq=[("Was kostet eine Spezialreinigung?", "Das hängt stark vom Fall ab. Nach 2–3 Fotos machen wir dir vor dem Termin ein Angebot."), ("Entfernt ihr Schimmel dauerhaft?", "Wir reinigen den Schimmel. Wenn die Ursache, meist Feuchtigkeit, bleibt, kann er wiederkommen.")],
             cta_title="Schwieriger Fall?", cta_text="Schick uns Fotos. Wir sagen dir, ob und wie wir helfen können."),
         "wohnmobil-aufbereitung": dict(
             title=f"Wohnmobil-Aufbereitung Westerwald {ab('wohnmobil-basic')} | Carcura", desc=f"Wohnmobil innen und außen: Basic {ab('wohnmobil-basic')}, Komplettreinigung {ab('wohnmobil-komplett')}. Halle bis 4 m Höhe und 7 m Länge. Walterschen.",
-            crumb="Wohnmobil", label="Wohnmobil · Walterschen", h1="Wohnmobil-Aufbereitung. Bis zur letzten Schublade.",
+            crumb="Wohnmobil", label="Wohnmobil · Walterschen", h1="Wohnmobil-Aufbereitung innen und außen.",
             lead="Vor der Saison oder vor dem Verkauf: innen und außen, vom Dach bis zum Kühlschrank. Unsere Halle passt bis 4 m Höhe und 7 m Länge.",
             price=ab("wohnmobil-basic"), price_note=f"Basic innen & außen · komplett {ab('wohnmobil-komplett')}", anf=["wohnmobil-komplett"], wa="Wohnmobil-Aufbereitung", offer=245,
             chips=["Halle bis 4 m × 7 m", "Keramik fürs Wohnmobil nach Fotos"],
@@ -706,19 +711,34 @@ PRICE_GROUPS = [
 ]
 
 
+SCOPE = {"innen-detail": "Alles aus Normal plus Sitze und Polster intensiv, Ritzen und Lüftung, Lederreinigung, Kunststoffpflege",
+         "handwaesche-wachs": "Handwäsche mit von Hand aufgetragenem Wachs", "basic": "Innenreinigung plus Handwäsche mit Felgen",
+         "familie": "Innen und außen plus Tierhaare", "leasing": "Detaillierte Innenreinigung, Flecken, Handwäsche, Schnellversiegelung",
+         "politur-2": "Schleif- und Hochglanzpolitur bei Swirls und Hologrammen, Wäsche und Kneten inklusive",
+         "keramik": "Handwäsche, Dekontamination, Kneten, 1-stufige Politur, Keramikauftrag, Pflegehinweise, Nachkontrolle nach 6 Monaten",
+         "felgen-keramik": "Alle Felgen versiegelt (XPERTCOAT WHEEL)", "scheiben-keramik": "Alle Scheiben versiegelt",
+         "spruehversiegelung": "Handwäsche plus Sprühversiegelung, ohne Politur", "keramik-pflege": "Alle 2 Monate Handwäsche plus Auffrischung, für Fahrzeuge mit Carcura-Keramik",
+         "sitz-fleck": "Ein Sitz oder eine Stelle, Sprühextraktion", "polster": "Alle Sitze tiefengereinigt (Sprühextraktion)",
+         "tierhaare": "Haare aus Teppich, Sitzen und Kofferraum", "ozon": "Gegen Rauch-, Hunde- und Essensgeruch", "fleck-geruch": "Polster tiefengereinigt plus Ozon",
+         "leder": "Ledersitze, Lenkrad, Schaltknauf; in der detaillierten Innenreinigung enthalten", "leder-versiegeln": "Nur als Zusatz zur Leder- oder Innenreinigung",
+         "scheinwerfer": "Beide Scheinwerfer: abkleben, schleifen, polieren, UV-Schutz", "wohnmobil-basic": "Innen gesaugt und gewischt, Fahrerhaus, außen Handwäsche",
+         "wohnmobil-komplett": "Innen und außen komplett, inklusive Küche, Bad, Schränke und Dach"}
+ZUSATZ = {"polster": "mit Innenreinigung", "tierhaare": "mit Innenreinigung", "ozon": "mit Innenreinigung", "leder": "zur Innenreinigung Normal"}
+
+
 def price_cell(s):
     p = ab(s["id"])
     if "bundleSurcharge" in s:
-        p += f" · als Zusatz +{eur(s['bundleSurcharge'])}"
+        p = f"einzeln {p} · {ZUSATZ.get(s['id'], 'als Zusatz')} +{eur(s['bundleSurcharge'])}"
     if "bundlePrice" in s:
-        p += f" · zusammen {eur(s['bundlePrice'])}"
+        p = f"einzeln {p} · mit Wäsche, Politur oder Keramik {eur(s['bundlePrice'])}"
     return p
 
 
 def scope(s):
-    if "includes" in s:
-        return ", ".join(s["includes"])
-    return s.get("note") or s.get("bundleCondition") or ""
+    if s["id"] in SCOPE:
+        return SCOPE[s["id"]]
+    return ", ".join(s.get("includes", []))
 
 
 def leistungen():
@@ -749,15 +769,15 @@ def leistungen():
 <section class="sec soft"><div class="wrap"><p class="label">Leistungswelten</p><h2>Was wir machen.</h2><div class="grid g3" style="margin-top:22px">{worlds}</div>
 <p class="fine" style="margin-top:16px">Außerdem: <a class="tlink" href="/autositz-reinigen-flecken/">Flecken im Sitz</a> · <a class="tlink" href="/tierhaare-auto-entfernen/">Tierhaare</a> · <a class="tlink" href="/geruch-im-auto-entfernen/">Geruch</a> · <a class="tlink" href="/spezialreinigung-auto/">Dampf- & Spezialreinigung</a> · <a class="tlink" href="/firmenkunde/">Händler & Firmen</a></p></div></section>
 <section class="sec light" id="preise"><div class="wrap"><p class="label">Preisliste</p><h2>Alle Preise.</h2>
-<p class="lead">Ab-Preise für PKW, Kombi und Van bei normaler Verschmutzung. „Als Zusatz“ gilt zusammen mit der Grundleistung.</p>{promo_html()}{tables}
+<p class="lead">Ab-Preise bei normaler Verschmutzung. Innen- und Waschleistungen gelten für PKW, Kombi und Van, Politur und Keramik für PKW und Kombi. SUV, Transporter und Wohnmobil: Angebot nach Fotos.</p>{promo_html()}{tables}
 <p class="fine" style="margin-top:16px">Alle Preise sind Endpreise nach § 19 UStG. Ab 500 €: 50 % Anzahlung bei Terminbestätigung, Absage bis 48 Stunden vorher kostenlos.</p></div></section>
 <section class="sec" id="abos"><div class="wrap"><p class="label">Regelmäßige Pflege</p><h2>Pflege-Abos.</h2>
 <p class="lead">Alle Abos haben 12 Monate Mindestlaufzeit und sind danach monatlich kündbar. Angegeben sind Monatspreis und Gesamtbetrag über die Mindestlaufzeit.</p>{abo}
 <p class="fine" style="margin-top:14px">Ab-Preise für PKW und Kombi bei normaler Verschmutzung. Größere Fahrzeuge, starke Verschmutzung oder Tierhaare: Angebot vor Vertragsbeginn. <a class="tlink" href="/abo-bedingungen/">Abo-Bedingungen</a> · <a class="tlink" href="/kuendigen/">Vertrag kündigen</a></p>
 <div class="btns" style="margin-top:16px">{btn(anf("abo"), "Abo anfragen", "acc", "arrow")}</div></div></section>
 {faq_html(faq, light=True)}
-{cta_band("Preis für dein Auto.", "Wähle die Leistung im Formular oder schick Fotos per WhatsApp.", "basic", "Fahrzeugaufbereitung")}'''
-    page("/leistungen/", f"Autoaufbereitung Westerwald: Leistungen & Preise ab {eur(S['sitz-fleck']['from'])} | Carcura",
+{cta_band("Preis für dein Auto.", "Wähle die Leistung im Formular oder schick Fotos per WhatsApp.", None, "Fahrzeugaufbereitung")}'''
+    page("/leistungen/", "Autoaufbereitung Westerwald: Leistungen & Preise | Carcura",
          f"Alle Leistungen und Preise: Innenreinigung {ab('innen-normal')}, Handwäsche {ab('handwaesche')}, Politur {ab('politur-1')}, Keramik {ab('keramik')}, Pflege-Abos. Walterschen bei Altenkirchen.",
          body, ld=[faq_ld(faq)], crumbs=[("/leistungen/", "Leistungen")])
 
@@ -771,19 +791,24 @@ ORTE = {
     "fahrzeugaufbereitung-altenkirchen": dict(ort="Altenkirchen", km=None, title="Fahrzeugaufbereitung Altenkirchen – Abholung gratis | Carcura",
         h1="Fahrzeug&shy;aufbereitung für Altenkirchen. Abholung gratis.", lead="Unsere Halle steht in Walterschen, direkt vor den Toren von Altenkirchen. Altenkirchen liegt in unserem kostenlosen Abholgebiet: Wir holen dein Auto zu Hause oder am Arbeitsplatz ab und bringen es gepflegt zurück.",
         fact="Altenkirchen liegt im Umkreis von 10 km um Walterschen. Abholung und Rückgabe sind kostenlos.", near="Auch für Weyerbusch, Flammersfeld und die Orte drumherum gilt: bis 10 km kostenlos.",
+        extra=("Kurz vor die Tür", "Aus Altenkirchen ist der Weg so kurz, dass sich auch kleine Aufträge mit Abholung lohnen, etwa eine Innenreinigung vor dem Wochenende oder die Scheinwerfer vor dem TÜV-Termin. Lieber selbst vorbeikommen? Die Halle ist nach Absprache auch abends und samstags offen."),
         quote="tobias"),
     "fahrzeugaufbereitung-asbach": dict(ort="Asbach", km=16, title="Fahrzeugaufbereitung Asbach – 16 km entfernt | Carcura",
         h1="Fahrzeug&shy;aufbereitung für Asbach. Gleich nebenan.", lead="Von Asbach bis zu unserer Halle in Walterschen sind es rund 16 km, knapp 20 Minuten über die L 272. Du bringst dein Auto vorbei oder wir holen es ab, zum Beispiel in Asbach, Buchholz oder Windhagen.",
-        fact="", near="Abgeben am Morgen, abholen am Abend: Die Strecke ist kurz genug."),
+        fact="", near="Abgeben am Morgen, abholen am Abend: Die Strecke ist kurz genug.",
+        extra=("Asbach, Buchholz, Windhagen", "Über die L 272 bist du in knapp 20 Minuten in Walterschen. Viele bringen ihr Auto morgens auf dem Weg zur Arbeit vorbei. Abholung geht auch, ab Ortsmitte rund 6 Kilometer über dem kostenlosen Umkreis.")),
     "fahrzeugaufbereitung-hachenburg": dict(ort="Hachenburg", km=24, title="Fahrzeugaufbereitung Hachenburg – mit Abholung | Carcura",
         h1="Fahrzeug&shy;aufbereitung für Hachenburg. Wir holen ab.", lead="Von der Hachenburger Innenstadt bis zu unserer Halle in Walterschen sind es knapp 24 km, rund 25 Minuten über die B 414 und Altenkirchen. Die Strecke musst du nicht fahren.",
-        fact="", near="Auch aus Bad Marienberg und Westerburg kommen Kunden zu uns."),
+        fact="", near="Auch aus Bad Marienberg und Westerburg kommen Kunden zu uns.",
+        extra=("Über die B 414", "Von Hachenburg führt die B 414 über Altenkirchen zu uns. Für eine Politur oder Keramik, bei der das Auto ohnehin mehrere Tage in der Halle bleibt, spart dir die Abholung zwei Fahrten.")),
     "fahrzeugaufbereitung-wissen": dict(ort="Wissen", km=25, title="Fahrzeugaufbereitung Wissen & Betzdorf – mit Abholung | Carcura",
         h1="Fahrzeug&shy;aufbereitung für Wissen und Betzdorf.", lead="Von Wissen bis zu unserer Halle in Walterschen sind es gut 25 km, knapp 30 Minuten über die B 62 und B 256 via Altenkirchen. Wir holen in Wissen, Hamm (Sieg), Betzdorf oder Kirchen ab.",
-        fact="", near="Für Betzdorf und Kirchen nennen wir dir den genauen Betrag nach Adresse."),
+        fact="", near="Aus Betzdorf sind es rund 40 km, die Abholung kostet dann ca. 60 €. Für Kirchen nennen wir dir den Betrag nach Adresse.",
+        extra=("Aus dem Siegtal", "Wissen, Hamm (Sieg), Betzdorf, Kirchen: Die Strecke führt über die B 62 und B 256 durch Altenkirchen. Bei größeren Aufträgen wie dem Leasingrückgabe-Paket oder einer Politur rechnet sich die Abholung eher als bei einer einzelnen Innenreinigung.")),
     "fahrzeugaufbereitung-neuwied": dict(ort="Neuwied", km=36, title="Fahrzeugaufbereitung Neuwied – mit Abholung | Carcura",
         h1="Fahrzeug&shy;aufbereitung für Neuwied. Mit Abholung.", lead="Von Neuwied bis zu unserer Halle in Walterschen sind es rund 36 km, etwa 40 Minuten über die B 256. Ehrlich gerechnet lohnt sich die Abholung vor allem bei größeren Aufträgen wie Politur, Keramik oder dem Leasingrückgabe-Paket.",
-        fact="", near="Für kleine Aufträge ist Selbstbringen oft günstiger."),
+        fact="", near="Für kleine Aufträge ist Selbstbringen oft günstiger.",
+        extra=("Ehrlich gerechnet", "36 Kilometer sind eine Strecke. Für eine Innenreinigung ab 90 € wären ca. 52 € Abholung viel. Bei Keramik ab 700 € oder einer 2-stufigen Politur fällt die Abholung kaum ins Gewicht, und dein Auto bleibt ohnehin mehrere Tage bei uns.")),
 }
 
 
@@ -812,6 +837,7 @@ def ort_page(slug, o):
 <div>{photo("carcura-team-alexander-richy.webp", "Richy Schumacher und Alexander Fuchs von Carcura", "Alex & Richy, eure Ansprechpartner", "ratio-45", eager=True)}</div></div></section>
 <section class="sec light"><div class="wrap two"><div><p class="label">So läuft es</p><h2>Aus {ort} in drei Schritten.</h2><p class="lead">{fact} {o["near"]}</p></div>
 <ol class="steps"><li><b>Anfragen.</b>Leistung wählen oder Fotos per WhatsApp schicken.</li><li><b>Bringen oder abholen lassen.</b>Zu Hause oder am Arbeitsplatz.</li><li><b>Gepflegt zurück.</b>Aufbereitung von Hand in unserer Halle. Bezahlt wird bei Übergabe.</li></ol></div></section>
+<section class="sec"><div class="wrap two"><div><p class="label">{ort}</p><h2>{o["extra"][0]}.</h2></div><p class="lead">{o["extra"][1]}</p></div></section>
 <section class="sec soft"><div class="wrap"><p class="label">Leistungen & Preise</p><h2>Für {ort}.</h2><p class="lead">Ab-Preise für PKW und Kombi bei normaler Verschmutzung. Endpreise nach § 19 UStG.</p><div class="grid g3" style="margin-top:22px">{cards}</div>
 {'<div style="margin-top:22px">' + quote_html(o["quote"]) + "</div>" if o.get("quote") else ""}</div></section>
 <section class="sec studio"><div class="wrap two"><div><p class="label">Abholkosten</p><h2>Rechne selbst.</h2><p class="lead">Bis 10 km kostenlos, darüber 2 € pro Kilometer der einfachen Strecke. Hin- und Rückfahrt sind damit abgegolten.</p></div>{calc_html(o["km"] or 8)}</div></section>
@@ -835,7 +861,8 @@ def westerwald():
 <section class="sec light"><div class="wrap"><p class="label">Entfernungen</p><h2>Was kostet die Abholung?</h2>
 <div class="tablewrap" style="margin-top:18px"><table class="prices"><thead><tr><th>Ort</th><th>Straße ab Walterschen</th><th>Abholung & Rückgabe</th><th><span class="sr">Ortsseite</span></th></tr></thead><tbody>{rows}</tbody></table></div>
 <p class="fine" style="margin-top:12px">Richtwerte ab Ortsmitte. Den genauen Betrag nach deiner Adresse bestätigen wir vor dem Termin.</p></div></section>
-<section class="sec studio"><div class="wrap two"><div><p class="label">Rechner</p><h2>Deine Strecke.</h2></div>{calc_html()}</div></section>
+<section class="sec studio"><div class="wrap"><p class="label">Leistungen & Preise</p><h2>Was wir machen.</h2><div class="grid g3" style="margin-top:22px">{"".join(f'<a class="card rv" href="{h}" style="text-decoration:none"><h3>{n}</h3><p class="price">{ab(i)}</p><p class="muted small">{t}</p></a>' for h, n, i, t in [("/auto-innenreinigung/", "Innenreinigung", "innen-normal", "Saugen, Cockpit, Scheiben, Fußmatten."), ("/autopolitur/", "Politur", "politur-1", "Wäsche und Kneten inklusive."), ("/keramikversiegelung/", "Keramik", "keramik", "Inklusive 1-stufiger Politur.")])}</div>
+<p style="margin-top:18px"><a class="tlink" href="/leistungen/">Alle Leistungen und Preise</a> · <a class="tlink" href="/hol-und-bringservice/">Abholung mit Rechner</a></p></div></section>
 <section class="sec soft"><div class="wrap two"><div><p class="label">Selbst vorbeikommen</p><h2>Unsere Halle.</h2><p class="lead">{E(B["street"])}, {B["postcode"]} {E(B["city"])}. {hours_html().replace("<br>", ", ")}. {E(B["hoursNote"])}.</p></div>
 <div>{photo("carcura-ford-schaum-vorwaesche.webp", "Fahrzeug bei der Vorwäsche in der Carcura-Halle in Walterschen", "Unsere Halle in Walterschen", "ratio-916")}</div></div></section>
 {faq_html(faq, light=True)}'''
@@ -844,16 +871,22 @@ def westerwald():
 
 
 # ---------------------------------------------------------------- weitere Seiten
+CRUMB = {"/hol-und-bringservice/": "Hol- & Bringservice", "/firmenkunde/": "Händler & Firmen", "/partner/": "Partner", "/ueber-uns/": "Über uns", "/galerie/": "Galerie",
+         "/gutschein/": "Gutschein", "/anfragen/": "Anfragen", "/kuendigen/": "Vertrag kündigen", "/impressum/": "Impressum", "/datenschutz/": "Datenschutz",
+         "/cookie-richtlinie-eu/": "Cookie-Richtlinie", "/abo-bedingungen/": "Abo-Bedingungen", "/widerruf/": "Widerrufsbelehrung"}
+
+
 def simple(path, title, desc, h1, lead, inner, label="", crumbs=None, robots="index,follow", ld=None, js=()):
-    body = f'''<section class="phead studio"><div class="wrap">{crumb(crumbs or [(None, re.sub("<[^>]+>|&shy;", "", h1)[:40])])}<p class="label">{label}</p><h1>{h1}</h1><p class="lead">{lead}</p></div></section>{inner}'''
-    page(path, title, desc, body, robots=robots, ld=ld, js=js, crumbs=[(path, re.sub("<[^>]+>|&shy;", "", h1)[:40])])
+    cn = CRUMB.get(path, re.sub("<[^>]+>|&shy;", "", h1).rstrip("."))
+    body = f'''<section class="phead studio"><div class="wrap">{crumb(crumbs or [(None, cn)])}<p class="label">{label}</p><h1>{h1}</h1>{f'<p class="lead">{lead}</p>' if lead else ""}</div></section>{inner}'''
+    page(path, title, desc, body, robots=robots, ld=ld, js=js, crumbs=[(path, cn)])
 
 
 def holservice():
     inner = f'''<section class="sec light"><div class="wrap two"><div><p class="label">Abholkosten</p><h2>So einfach rechnen wir.</h2>
 <p class="lead">Im Umkreis von 10 km um unsere Halle holen wir kostenlos ab. Für jeden Kilometer darüber berechnen wir 2 €, gemessen als Straßenentfernung, einfache Strecke. Hin- und Rückfahrt sind damit abgegolten.</p>
 <div class="tablewrap"><table class="prices"><tbody><tr><td>bis 10 km</td><td class="p">0 € – kostenlos</td></tr><tr><td>15 km</td><td class="p">10 €</td></tr><tr><td>20 km</td><td class="p">20 €</td></tr><tr><td>30 km</td><td class="p">40 €</td></tr></tbody></table></div></div>{calc_html(8)}</div></section>
-<section class="sec"><div class="wrap two"><div><p class="label">Ablauf</p><h2>Schlüssel abgeben. Fertig.</h2></div><ol class="steps"><li><b>Anfragen.</b>Leistung, Adresse und Wunschtag nennen.</li><li><b>Preis vorab.</b>Aufbereitung und Abholung, verbindlich vor dem Termin.</li><li><b>Abholung.</b>Zu Hause oder am Arbeitsplatz.</li><li><b>Persönliche Übergabe.</b>Bezahlt wird nach der Rückgabe.</li></ol></div></section>
+<section class="sec"><div class="wrap two"><div><p class="label">Ablauf</p><h2>Schlüssel abgeben. Fertig.</h2></div><ol class="steps"><li><b>Anfragen.</b>Leistung, Adresse und Wunschtag nennen.</li><li><b>Preis vorab.</b>Aufbereitung und Abholung, verbindlich vor dem Termin.</li><li><b>Abholung.</b>Zu Hause oder am Arbeitsplatz.</li><li><b>Persönliche Übergabe.</b>Bezahlt wird nach der Rückgabe. Ab 500 € Auftragswert 50 % Anzahlung bei Terminbestätigung.</li></ol></div></section>
 <section class="sec soft"><div class="wrap">{quote_html("tobias")}</div></section>
 {cta_band("Wir holen dein Auto ab.", "Sag uns, wo das Auto steht und welche Leistung du möchtest.", "innen-normal", "Aufbereitung mit Hol- und Bringservice")}'''
     inner = inner.replace(anf("innen-normal"), anf("innen-normal", pickup=True))
@@ -884,7 +917,7 @@ def partner():
 <div class="card"><p class="label">Regional · Nümbrecht</p><h3>HF Reifenservice</h3><p>Ein regionaler Partner für Reifen- und Radservice. Kurze Wege und direkte Kommunikation ergänzen unsere Fahrzeugpflege.</p></div>
 </div><div class="wrap"><p class="fine" style="margin-top:18px">Wir verkaufen keine Produkte über die Website. Kooperationsanfragen gerne per <a class="tlink" href="mailto:{B["email"]}">E-Mail</a>.</p></div></section>'''
     simple("/partner/", "Partner von Carcura | Nanolex & HF Reifenservice", "Mit wem Carcura zusammenarbeitet: Nanolex Car Care für Reinigung, Pflege und Schutz, HF Reifenservice für Reifen- und Radservice.",
-           "Starke Partner. Ein Anspruch.", "Gute Fahrzeugpflege entsteht im Detail. Wir verbinden gründliche Arbeit in Walterschen mit ausgewählten Produkten und regionaler Zusammenarbeit.", inner, "Partner")
+           "Unsere Partner: Nanolex und HF Reifenservice.", "Gute Fahrzeugpflege entsteht im Detail. Wir verbinden gründliche Arbeit in Walterschen mit ausgewählten Produkten und regionaler Zusammenarbeit.", inner, "Partner")
 
 
 def ueber_uns():
@@ -894,12 +927,12 @@ def ueber_uns():
 <div class="card"><h3>Richy Schumacher</h3><p class="muted small" style="margin:0">Mitgründer. Detailarbeit an Innenraum, Lack und Felgen.</p></div></div></div></div></section>
 <section class="sec"><div class="wrap"><p class="label">Wofür wir stehen</p><h2>Drei Dinge.</h2><div class="grid g3" style="margin-top:22px">
 <div class="card"><h3>Handarbeit</h3><p class="muted small" style="margin:0">Keine Waschstraße. Wir arbeiten in unserer Halle mit Zeit fürs Detail.</p></div>
-<div class="card"><h3>Offene Preise</h3><p class="muted small" style="margin:0">Ab-Preise online, Endpreis vor dem Termin, bezahlt wird nach der Übergabe.</p></div>
+<div class="card"><h3>Offene Preise</h3><p class="muted small" style="margin:0">Ab-Preise online, Endpreis vor dem Termin. Bezahlt wird nach der Übergabe, ab 500 € mit 50 % Anzahlung.</p></div>
 <div class="card"><h3>Ehrliche Einschätzung</h3><p class="muted small" style="margin:0">Was eine Politur oder Keramik nicht kann, sagen wir dir vorher.</p></div></div>
 <p style="margin-top:22px">Der Name: Car und cura, lateinisch für Sorgfalt. {rating_line()}</p></div></section>
-{cta_band("Lern uns kennen.", "Ruf an, schreib per WhatsApp oder komm nach Absprache in Walterschen vorbei.", "basic", "Fahrzeugaufbereitung")}'''
+{cta_band("Lern uns kennen.", "Ruf an, schreib per WhatsApp oder komm nach Absprache in Walterschen vorbei.", None, "Fahrzeugaufbereitung")}'''
     simple("/ueber-uns/", "Über uns | Carcura Fahrzeugaufbereitung Walterschen", "Carcura ist die inhabergeführte Fahrzeugaufbereitung von Alexander Fuchs und Richy Schumacher in Walterschen bei Altenkirchen. Handarbeit, offene Preise.",
-           "Wir sind Carcura. Autoaufbereitung mit Handschrift.", "Inhabergeführte Fahrzeugaufbereitung in Walterschen im Westerwald, zwischen Altenkirchen und Asbach. Jedes Auto machen wir beide selbst.", inner, "Über Carcura · Walterschen")
+           "Über Carcura: Alexander Fuchs und Richy Schumacher.", "Inhabergeführte Fahrzeugaufbereitung in Walterschen im Westerwald, zwischen Altenkirchen und Weyerbusch. Die Aufbereitung machen wir selbst.", inner, "Über Carcura · Walterschen")
 
 
 GAL = [("carcura-bmw-m2-front-nachher-hd.webp", "BMW M2 Front nach der Keramikversiegelung", "BMW M2 · Keramik · nachher", "keramik"),
@@ -922,7 +955,7 @@ def galerie():
 <div class="btns" role="group" aria-label="Filter">{filt}</div><div class="gal" style="margin-top:22px">{figs}</div>
 <p style="margin-top:22px">Mehr Fahrzeuge zeigen wir laufend auf <a class="tlink" href="{B["instagram"]}" target="_blank" rel="noopener">Instagram @_carcura_</a>.</p></div></section>
 <div class="lb" id="lb" role="dialog" aria-modal="true" aria-label="Bildansicht"><img alt=""><button class="lb-x" type="button" aria-label="Schließen">×</button><button class="lb-p" type="button" aria-label="Vorheriges Bild">‹</button><button class="lb-n" type="button" aria-label="Nächstes Bild">›</button><p></p></div>
-{cta_band("Dein Auto als Nächstes?", "Schick uns Fotos, wir sagen dir, was möglich ist.", "basic", "Fahrzeugaufbereitung")}'''
+{cta_band("Dein Auto als Nächstes?", "Schick uns Fotos, wir sagen dir, was möglich ist.", None, "Fahrzeugaufbereitung")}'''
     simple("/galerie/", "Galerie: Ergebnisse unserer Fahrzeugaufbereitung | Carcura", "Echte Ergebnisse aus unserer Halle in Walterschen: Innenreinigung, Politur, Keramik, Vorher-Nachher. Keine Symbolbilder.",
            "Ergebnisse sehen.", "Alle Fotos sind bei uns in Walterschen an Fahrzeugen unserer Kunden entstanden. Keine Symbolbilder, keine Renderings.", inner, "Galerie")
 
@@ -957,7 +990,7 @@ def anfragen():
     inner = f'''<section class="sec soft"><div class="wrap" style="max-width:980px">
 <form id="anfrage" class="form" data-endpoint="/wp-json/ccrr/v1/lead" novalidate>
 <fieldset class="fs"><legend><span>1</span>Leistung und Fahrzeug</legend><p class="muted small">Mehrfachauswahl möglich. Extras werden nicht doppelt berechnet, den Endpreis bestätigen wir dir.</p>
-<div class="opts">{opts}</div><p id="selsum" class="selsum" aria-live="polite" style="margin-top:12px"></p>
+<p id="err-leistung" class="ferr" hidden></p><div class="opts" role="group" aria-label="Leistungen" aria-describedby="err-leistung">{opts}</div><p id="selsum" class="selsum" aria-live="polite" style="margin-top:12px"></p>
 <div class="fgrid"><div class="field"><label for="vehicle">Fahrzeug (Marke, Modell)</label><input id="vehicle" name="vehicle" autocomplete="off" placeholder="z. B. VW Touran"></div>
 <div class="field"><label for="condition">Zustand</label><select id="condition" name="condition"><option value="">Bitte wählen</option><option>normal verschmutzt</option><option>stark verschmutzt</option><option>Tierhaare</option><option>Flecken</option><option>Geruch</option><option>weiß ich nicht</option></select></div></div></fieldset>
 <fieldset class="fs"><legend><span>2</span>Wann und wo</legend><div class="fgrid">
@@ -968,11 +1001,11 @@ def anfragen():
 <fieldset class="fs"><legend><span>3</span>Kontakt</legend><div class="fgrid">
 <div class="field"><label for="name">Name *</label><input id="name" name="name" required autocomplete="name"></div>
 <div class="field"><label for="customer_type">Ich bin</label><select id="customer_type" name="customer_type"><option value="privat">Privatkunde</option><option value="firma">Firma / Händler</option></select></div>
-<div class="field"><label for="phone">Telefon (für Rückruf oder WhatsApp)</label><input id="phone" name="phone" type="tel" autocomplete="tel" inputmode="tel"></div>
-<div class="field"><label for="email">E-Mail</label><input id="email" name="email" type="email" autocomplete="email"></div>
+<div class="field"><label for="phone">Telefon (für Rückruf oder WhatsApp)</label><input id="phone" name="phone" type="tel" autocomplete="tel" inputmode="tel" aria-describedby="err-kontakt"></div>
+<div class="field"><label for="email">E-Mail</label><input id="email" name="email" type="email" autocomplete="email" aria-describedby="err-kontakt"></div>
 <div class="field"><label for="kontaktweg">Am liebsten erreichbar per</label><select id="kontaktweg" name="kontaktweg"><option value="">egal</option><option>WhatsApp</option><option>Anruf</option><option>E-Mail</option></select></div></div>
 <div class="field" style="margin-top:12px"><label for="message">Nachricht (optional)</label><textarea id="message" name="message" placeholder="Was stört dich? Fotos kannst du danach per WhatsApp schicken."></textarea></div>
-<p class="fine">Telefon oder E-Mail genügt. * Pflichtfeld.</p>
+<p class="fine">Telefon oder E-Mail genügt. * Pflichtfeld.</p><p id="err-kontakt" class="ferr" hidden></p>
 <div class="hp" aria-hidden="true"><label for="website">Website</label><input id="website" name="website" tabindex="-1" autocomplete="off"></div>
 <label class="opt" style="margin-top:8px"><input type="checkbox" name="privacy" required><span>Ich bin einverstanden, dass Carcura meine Angaben zur Bearbeitung der Anfrage verwendet. Mehr in der <a class="tlink" href="/datenschutz/">Datenschutzerklärung</a>. *</span></label></fieldset>
 <div class="btns"><button class="btn btn-acc" type="submit">Anfrage senden</button><span class="fine">Das ist eine unverbindliche Terminanfrage, keine Buchung.</span></div>
@@ -992,7 +1025,7 @@ def kuendigen():
 <form class="form" method="post" action="/kuendigen/" id="kform"><input type="hidden" name="cck_action" value="kuendigen">
 <fieldset class="fs"><legend>Art der Kündigung *</legend><label class="opt"><input type="radio" name="cck_art" value="ordentlich" checked><span>Ordentliche Kündigung</span></label>
 <label class="opt"><input type="radio" name="cck_art" value="ausserordentlich"><span>Außerordentliche Kündigung (aus wichtigem Grund)</span></label>
-<div class="field" style="margin-top:10px"><label for="cck_grund">Kündigungsgrund (nur bei außerordentlicher Kündigung)</label><textarea id="cck_grund" name="cck_grund" rows="3"></textarea></div></fieldset>
+<div class="field" style="margin-top:10px"><label for="cck_grund">Kündigungsgrund (Pflicht bei außerordentlicher Kündigung)</label><textarea id="cck_grund" name="cck_grund" rows="3"></textarea></div></fieldset>
 <fieldset class="fs"><legend>Ihre Angaben</legend><div class="fgrid">
 <div class="field"><label for="cck_name">Vor- und Nachname bzw. Firma *</label><input id="cck_name" name="cck_name" required autocomplete="name"></div>
 <div class="field"><label for="cck_email">E-Mail für die Bestätigung *</label><input id="cck_email" name="cck_email" type="email" required autocomplete="email"></div>
@@ -1007,7 +1040,8 @@ def kuendigen():
 <p class="fine" style="margin-top:18px">Alternativ per E-Mail an <a class="tlink" href="mailto:{B["email"]}?subject=K%C3%BCndigung">{B["email"]}</a>.</p></div></section>
 <script>
 /* Vorschau-Schutz: außerhalb von carcura.info wird nichts gesendet. Auf carcura.info verarbeitet das bestehende Kündigungs-Plugin das Formular. */
-document.getElementById("kform").addEventListener("submit",function(e){{if(location.hostname!=="carcura.info"){{e.preventDefault();var s=document.getElementById("kstatus");s.className="status err";s.textContent="Lokale Vorschau: Die Kündigung wird hier nicht gesendet. Auf carcura.info übernimmt das bestehende Kündigungs-Formular den Versand.";s.focus();}}}});
+var kf=document.getElementById("kform");function kreq(){{var a=kf.querySelector("input[name=cck_art]:checked").value,z=kf.querySelector("input[name=cck_zeitpunkt]:checked").value;kf.cck_grund.required=a==="ausserordentlich";kf.cck_datum.required=z==="datum";}}kf.addEventListener("change",kreq);kreq();var td=new Date();kf.cck_datum.min=new Date(td.getTime()-td.getTimezoneOffset()*6e4).toISOString().slice(0,10);
+kf.addEventListener("submit",function(e){{if(location.hostname!=="carcura.info"){{e.preventDefault();var s=document.getElementById("kstatus");s.className="status err";s.textContent="Lokale Vorschau: Die Kündigung wird hier nicht gesendet. Auf carcura.info übernimmt das bestehende Kündigungs-Formular den Versand.";s.focus();}}}});
 </script>'''
     simple("/kuendigen/", "Vertrag kündigen | Carcura", "Hier können Sie Ihren Vertrag oder Ihr Pflege-Abo mit der Carcura GbR online kündigen und erhalten eine Bestätigung per E-Mail.", "Vertrag kündigen.",
            "Hier können Sie Ihren Vertrag mit der Carcura GbR kündigen. Sie erhalten eine Eingangsbestätigung per E-Mail. Felder mit * sind Pflichtfelder.", inner, "Kündigung", robots="noindex,follow")
@@ -1022,7 +1056,7 @@ def legal(slug, title, h1, desc, robots="index,follow"):
 def notfound():
     body = f'''<section class="phead studio"><div class="wrap"><p class="label">Fehler 404</p><h1>Seite nicht gefunden.</h1><p class="lead">Die Adresse gibt es nicht (mehr). Hier geht es weiter:</p>
 <div class="btns">{btn("/", "Zur Startseite", "acc", "arrow")}{btn("/leistungen/", "Leistungen & Preise", "ghost")}{btn("/anfragen/", "Anfragen", "ghost")}</div></div></section>'''
-    page("/404/", "Seite nicht gefunden | Carcura", "Diese Seite gibt es nicht. Zur Startseite, zu Leistungen und Preisen oder direkt zur Anfrage bei Carcura.", body, robots="noindex,follow")
+    page("/404/", "Seite nicht gefunden | Carcura", "Diese Seite gibt es nicht. Zur Startseite, zu Leistungen und Preisen oder direkt zur Anfrage bei Carcura.", body, robots="noindex,follow", canonical=False)
     os.replace(os.path.join(DIST, "404", "index.html"), os.path.join(DIST, "404.html"))
     os.rmdir(os.path.join(DIST, "404"))
     PAGES.pop()

@@ -28,15 +28,28 @@
   }
   form.addEventListener("change", refresh); refresh();
 
-  function show(kind, html) { status.className = "status " + kind; status.innerHTML = html; status.focus(); }
+  function show(kind, html) { status.className = "status " + kind; status.innerHTML = html; status.focus({ preventScroll: true }); status.scrollIntoView({ block: "center" }); }
   function esc(s) { return s.replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
-  function gclid() { try { return q.get("gclid") || sessionStorage.getItem("cc_gclid") || ""; } catch (e) { return ""; } }
-  try { if (q.get("gclid")) sessionStorage.setItem("cc_gclid", q.get("gclid")); } catch (e) {}
+  /* gclid: aus der URL oder seitenweit gespeichert (gleiches Format wie das bisherige Live-Skript: localStorage ccrr_gclid {v,t}, 90 Tage) */
+  function gclid() {
+    if (q.get("gclid")) return q.get("gclid");
+    try { var o = JSON.parse(localStorage.getItem("ccrr_gclid") || "null"); if (o && o.v && Date.now() - o.t < 90 * 864e5) return o.v; } catch (e) {}
+    return "";
+  }
+  if (wanted.indexOf("haendler") > -1 && form.elements.customer_type) form.elements.customer_type.value = "firma";
+  var wt = form.elements.wunschtag; if (wt) { var td = new Date(); wt.min = new Date(td.getTime() - td.getTimezoneOffset() * 6e4).toISOString().slice(0, 10); }
+  var errL = document.getElementById("err-leistung"), errK = document.getElementById("err-kontakt");
+  function fieldErr(el, box, msg, focusEl) { box.textContent = msg; box.hidden = false; if (el) el.setAttribute("aria-invalid", "true"); box.scrollIntoView({ block: "center" }); if (focusEl) focusEl.focus({ preventScroll: true }); }
+  function clearErr() { [errL, errK].forEach(function (b) { if (b) { b.hidden = true; b.textContent = ""; } }); ["phone", "email"].forEach(function (n) { form.elements[n].removeAttribute("aria-invalid"); }); status.className = "status"; status.innerHTML = ""; }
+  function phoneOk(v) { return (v.match(/\d/g) || []).length >= 6; }
+  function mailOk(v) { return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v); }
 
   form.addEventListener("submit", function (e) {
     e.preventDefault();
-    if (!selected().length) { show("err", "<b>Bitte wähle mindestens eine Leistung.</b> Oder beschreibe deinen Wunsch unter „Andere Wünsche“."); boxes[0].focus(); return; }
-    if (!val("phone") && !val("email")) { show("err", "<b>Bitte gib eine Telefonnummer oder E-Mail an,</b> damit wir dir antworten können."); form.elements.phone.focus(); return; }
+    clearErr();
+    if (!selected().length) { fieldErr(null, errL, "Bitte wähle mindestens eine Leistung. Oder wähle „Andere Wünsche“ und beschreibe dein Anliegen.", boxes[0]); return; }
+    var ph = val("phone"), em = val("email");
+    if (!(ph && phoneOk(ph)) && !(em && mailOk(em))) { fieldErr(form.elements.phone, errK, "Bitte gib eine Telefonnummer (mindestens 6 Ziffern) oder eine gültige E-Mail-Adresse an, damit wir dir antworten können.", form.elements.phone); if (!ph) form.elements.email.setAttribute("aria-invalid", "true"); return; }
     if (!form.checkValidity()) { form.reportValidity(); return; }
     send();
   });
@@ -58,13 +71,13 @@
     submit.disabled = true; var label = submit.textContent; submit.textContent = "Wird gesendet …";
     var ctrl = "AbortController" in window ? new AbortController() : null, to = setTimeout(function () { if (ctrl) ctrl.abort(); }, 30000);
     fetch(ENDPOINT, { method: "POST", credentials: "same-origin", headers: { "Content-Type": "application/json", Accept: "application/json" }, body: JSON.stringify(payload), signal: ctrl ? ctrl.signal : undefined })
-      .then(function (r) { if (!r.ok) throw new Error("http_" + r.status); return r.json().catch(function () { return {}; }); })
+      .then(function (r) { if (!r.ok) throw new Error("http_" + r.status); var js = (r.headers.get("content-type") || "").indexOf("json") > -1; return r.json().catch(function () { return {}; }).then(function (d) { d = d || {}; d._json = js; return d; }); })
       .then(function (data) {
         /* Wie das bisherige Formular: HTTP 2xx vom Endpunkt und kein ok:false = angenommen */
         if (data && data.ok === false) throw new Error("abgelehnt");
         if (typeof window.gtag === "function") window.gtag("event", "cc_anfrage", { cc_services: services.join("|") });
         show("ok", "<b>Danke, deine Anfrage ist bei uns angekommen.</b> Wir prüfen deine Angaben persönlich und melden uns mit Einschätzung, Preis und Terminvorschlag. Das ist noch keine Terminbestätigung.");
-        form.reset(); refresh();
+        if (data._json) { form.reset(); refresh(); } /* Antwort ohne JSON: Eingaben sicherheitshalber stehen lassen */
       })
       .catch(function () {
         var t = "Hallo Carcura, ich möchte anfragen: " + services.join(", ") + (val("vehicle") ? ". Fahrzeug: " + val("vehicle") : "") + (val("message") ? ". " + val("message") : "");

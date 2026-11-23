@@ -311,3 +311,7 @@ h1,h2,h3{overflow-wrap:break-word}
  table.prices td.p{white-space:normal;color:inherit}
 }
 .phead h1{font-size:clamp(40px,5.4vw,80px)}
+.ferr{margin:10px 0 0;padding:10px 14px;border-radius:12px;background:rgb(255 90 90/.12);border:1px solid rgb(255 90 90/.55);color:var(--txt);font-size:15px}
+.field input[aria-invalid=true]{border-color:#ff6b6b}
+@media (max-width:809px){html{scroll-padding-bottom:96px}}
+.prose h2,.prose h3{hyphens:auto}

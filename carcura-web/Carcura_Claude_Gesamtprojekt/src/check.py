@@ -13,7 +13,7 @@ allowed_prices = set()
 for s in D["pricing"]["services"]:
     for k in ("from", "price", "bundlePrice", "bundleSurcharge", "surcharge"):
         if k in s: allowed_prices.add(s[k])
-allowed_prices |= {12, 29, 39, 40, 59, 30, 50, 129, 179, 200, 900, 10, 20, 2, 0, 11, 28, 31, 51, 52, 100, 120, 230, 265, 399, 439, 55, 190, 75, 140, 260, 80, 150, 285, 95, 175, 330, 1440, 2760, 3180, 4788, 5268, 660, 1200, 2280, 900, 1680, 3120, 960, 1800, 3420, 1140, 2100, 3960, 500, 40}
+allowed_prices |= {12, 60, 29, 39, 40, 59, 30, 50, 129, 179, 200, 900, 10, 20, 2, 0, 11, 28, 31, 51, 52, 100, 120, 230, 265, 399, 439, 55, 190, 75, 140, 260, 80, 150, 285, 95, 175, 330, 1440, 2760, 3180, 4788, 5268, 660, 1200, 2280, 900, 1680, 3120, 960, 1800, 3420, 1140, 2100, 3960, 500, 40}
 for p, h in docs.items():
     redirect = 'http-equiv="refresh"' in h
     t = re.search(r"<title>(.*?)</title>", h).group(1)
@@ -22,12 +22,14 @@ for p, h in docs.items():
         h1 = re.findall(r"<h1[\s>]", h)
         if len(h1) != 1: prob.append(f"{p}: {len(h1)} H1")
         rob = re.search(r'name="robots" content="([^"]+)"', h).group(1)
-        can = re.search(r'rel="canonical" href="([^"]+)"', h).group(1)
-        if p not in ("/404.html",) and can != "https://carcura.info" + p: prob.append(f"{p}: canonical {can}")
+        m = re.search(r'rel="canonical" href="([^"]+)"', h)
+        if p == "/404.html":
+            if m: prob.append("404 hat canonical")
+        elif not m or m.group(1) != "https://carcura.info" + p: prob.append(f"{p}: canonical {m and m.group(1)}")
         if "noindex" in rob and p not in ("/kuendigen/", "/abo-bedingungen/", "/widerruf/", "/404.html"): prob.append(f"{p}: noindex!")
         d = re.search(r'name="description" content="([^"]*)"', h).group(1)
-        if not 70 <= len(html.unescape(d)) <= 170: prob.append(f"{p}: description {len(html.unescape(d))} Zeichen")
-        if len(html.unescape(t)) > 70: prob.append(f"{p}: title {len(html.unescape(t))} Zeichen")
+        if not 70 <= len(html.unescape(d)) <= 160: prob.append(f"{p}: description {len(html.unescape(d))} Zeichen")
+        if len(html.unescape(t)) > 65: prob.append(f"{p}: title {len(html.unescape(t))} Zeichen")
         for m in re.findall(r"(\d[\d.]*)\s?€", re.sub(r"<[^>]+>", " ", h)):
             v = int(m.replace(".", "")) if m.replace(".", "").isdigit() else None
             if v is not None and v not in allowed_prices: prob.append(f"{p}: unbekannter Preis {m} €")

@@ -73,6 +73,9 @@
     });
   }
 
+  /* gclid seitenweit merken (Format wie bisher live: localStorage ccrr_gclid {v,t}) */
+  try { var g = new URLSearchParams(location.search).get("gclid"); if (g) localStorage.setItem("ccrr_gclid", JSON.stringify({ v: g, t: Date.now() })); } catch (e) {}
+
   /* Aktionen nach Enddatum ausblenden (zusätzlich zum Build-Datum) */
   var now = new Date();
   d.querySelectorAll("[data-ende]").forEach(function (el) { if (now >= new Date(el.getAttribute("data-ende"))) el.remove(); });

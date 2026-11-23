@@ -1,0 +1,104 @@
+# Qualitätsprüfung · eigene Fehler, Korrekturen, erneute Tests (23.11.2026)
+
+Werkzeuge: Playwright/Chromium (headless, SwiftShader), `src/check.py` (Crawler für den Build), Python/PIL für Bildvergleiche.
+Lokal **nicht** verfügbar: Lighthouse, echte Mobilgeräte, Felddaten. Darum gibt es keine Lighthouse-Werte.
+
+## Geprüfte Viewports
+390 × 844, 768 × 1024 und 1440 × 900. Zusätzlich 360 × 740 durch den Mobil-Prüfer. Reduzierte Bewegung über `reducedMotion: 'reduce'`.
+
+## Selbst gefundene Fehler (vor den Prüfern)
+| Fehler | Korrektur | Nachtest |
+|---|---|---|
+| Desktop-H1 der Startseite zu groß, Buttons unterhalb der ersten Ansicht | H1 auf clamp(44px, 5,4vw, 82px), 15ch | 1440 × 900: Buttons sichtbar ✔ |
+| Mobil verdeckte die Kontaktleiste die Kapitel-Buttons des Films | Film-Navigation 86 px über dem Boden, Text höher | 390 × 844: alle vier Kapitel sichtbar ✔ |
+| Sprühkante des Films lief mobil über den schwarzen Bereich | Sprühkante mobil ausgeblendet | ✔ |
+| „Keramikversiegelung“ lief aus der Preiskarte (1440 px) | Trennstelle `Keramik&shy;versiegelung`, kleinere Kartentitel | ✔ |
+| Preistabellen mobil 200–300 px breiter als der Bildschirm | Tabellen unter 640 px als gestapelte Zeilen | /leistungen/ 390 px: kein Überlauf ✔ |
+| Anfrageformular mobil mit 28 Optionen sehr lang | 10 Hauptleistungen sichtbar, Rest aufklappbar; öffnet sich automatisch bei Vorauswahl | ✔ |
+| Doppelte Aktionsbox auf /keramikversiegelung/ | entfernt | ✔ |
+| Erstansicht der Startseite 607 KB (Logo 218 KB, volle Schriften) | Logo 240 px (10 KB), Schriften auf Latein reduziert (74/31/33 KB) | 365 KB ✔ |
+| `/widerruf/` (live, noindex) fehlte | ergänzt | Crawl ✔ |
+| Leder-Versiegelung fehlte im Formular | ergänzt | Crawl ✔ |
+| Überschriften der Unterseiten auf dem Desktop zu groß | `.phead h1` clamp(40px, 5,4vw, 80px) | ✔ |
+
+## Befunde Prüfer „Anfragewege“ (13) und Korrekturen
+| # | Befund | Korrektur | Nachtest |
+|---|---|---|---|
+| 1 hoch | Auf /anfragen/ luden „Anfragen“ (Leiste) und „Termin anfragen“ die Seite neu, Eingaben gingen verloren | Auf /anfragen/ zeigen beide auf `#anfrage`, die Leiste heißt dort „Zum Formular“ | href = `#anfrage` ✔ |
+| 2 | Fehlerbox nach Sendefehler unter der Kontaktleiste | `scrollIntoView({block:'center'})`, mobil `scroll-padding-bottom: 96px` | ✔ |
+| 3 | Pflichtfehler weit unter dem Button, ohne aria | Fehler direkt an der Leistungsgruppe bzw. am Kontakt, `aria-invalid`/`aria-describedby` | Fehler bei 377–471 px sichtbar ✔ |
+| 4 | Alte Fehlermeldung blieb stehen | wird bei jedem Absenden zurückgesetzt | ✔ |
+| 5 | gclid ging auf anderen Zielseiten verloren | seitenweit in `localStorage ccrr_gclid {v,t}` (Format wie live), Weiterleitungen behalten Parameter | gclid TESTG aus /keramikversiegelung/ im Datensatz ✔; /preise/?gclid=ABC → /leistungen/?gclid=ABC#preise ✔ |
+| 6 | 200 mit HTML galt als Erfolg und leerte das Formular | Erfolgsmeldung bleibt (wie live), Formular wird nur bei JSON-Antwort geleert | Name bleibt bei HTML-Antwort ✔ |
+| 7 | Telefon „x“ akzeptiert | mind. 6 Ziffern oder gültige E-Mail (wie Live-Schnellformular) | „x“ abgelehnt ✔ |
+| 8 | Unterer CTA auf Tierhaare/Geruch ohne Zusatzleistung | CTA-Band übernimmt alle Leistungen der Seite | `?service=innen-normal,tierhaare` ✔ |
+| 9 | Galerie/Über uns wählten „Basic“ ohne Bezug vor | „Anfrage starten“ ohne Vorauswahl | ✔ |
+| 10 | Händler-Link ließ „Privatkunde“ stehen | `?service=haendler` setzt „Firma / Händler“ | ✔ |
+| 11 | Fokus unter der Kontaktleiste | `scroll-padding-bottom` mobil | ✔ |
+| 12 | Kündigung: Grund und Datum nicht Pflicht trotz Auswahl | `required` je nach Auswahl, Datum ab heute | Grund Pflicht bei außerordentlicher Kündigung ✔ |
+| 13 | `min` beim Wunschtag fest im Build | per JS auf das heutige Datum | ✔ |
+
+## Befunde Prüfer „SEO und Texte“ (22) und Korrekturen
+| # | Befund | Korrektur |
+|---|---|---|
+| 1 hoch | Interne Notizen („laut Startseite“, „laut Website“) in der Preistabelle | eigene Kundentexte (`SCOPE` in build.py); `note` wird nie ausgegeben; geprüft: 0 Treffer |
+| 2 hoch | Zusatzpreise vertauscht („Zusammen mit … ab 79 €“) | „einzeln ab 79 € · mit Innenreinigung +59 €“, Felgen und Scheiben analog |
+| 3 | KI-Hinweis am Heldbild fehlte, Alt-Text nannte die Carcura-Halle | „KI-generierte Inszenierung, kein Kundenfahrzeug“; Alt ohne Hallenbehauptung |
+| 4 | Letzter Filmtext „in unserer Halle“ zum KI-Bild | „Ende der Inszenierung. Echte Fotos … weiter unten.“ |
+| 5 | Anzahlungsregel fehlte auf der Startseite und im Holservice | ergänzt (Preisabschnitt, FAQ, Holservice, Über uns) |
+| 6 | Fahrzeugklassen widersprüchlich | Innen/Wäsche: PKW, Kombi, Van; Politur/Keramik: PKW, Kombi |
+| 7 | „900 €“ / „700 €“ ohne „ab“ | überall „ab“ |
+| 8 | „festen Preis“ (Spezialreinigung) | „ein Angebot“ |
+| 9 | Rechner zeigte ohne JS 10 € für alle Strecken | Startwert im Build nach Formel |
+| 10 | Brotkrumen mitten im Wort abgeschnitten | feste Kurznamen je Seite |
+| 11 | Startseite und Altenkirchen-Seite zielten beide auf „Fahrzeugaufbereitung Altenkirchen“ | Startseiten-Title wieder „Fahrzeugaufbereitung Westerwald mit Abholung \| Carcura“ (bisheriger Live-Title), H1 nennt Walterschen bei Altenkirchen als Standort |
+| 12 | Westerwald-Seite doppelte die Abholseite | Rechner entfernt, Leistungen mit Preisen und Links ergänzt |
+| 13 | Ortsseiten zu 89–90 % gleich | je Ort ein eigener Abschnitt (Strecke, wann sich Abholung lohnt) |
+| 14 | „Betzdorf“ im H1 ohne Kosten | „aus Betzdorf rund 40 km, ca. 60 €“ |
+| 15 | Ozon-Umfang unklar | getrennt: Ozon einzeln ab 59 € / Innenreinigung + Ozon ab 129 € |
+| 16 | Einige Zahlen nur in research/, nicht in CARCURA-DATA.json | **offen:** Daten nachtragen (Wachs +30 €, Notfall 179 €, Abo-Preise, Entfernungen) |
+| 17 | Scheinwerfer-Title ohne „ab“, Preis doppelt im Einstieg | korrigiert |
+| 18 | „zwischen Altenkirchen und Asbach“, „beide selbst“ | einheitlich Weyerbusch, Formulierung abgeschwächt |
+| 19 | Lange Wörter in Rechtstexten brachen ohne Bindestrich | weiche Trennstellen, `hyphens:auto` |
+| 20 | Du/Sie in Rechtstexten gemischt; Kündigungsbutton heißt in den Abo-Bedingungen anders | Rechtstexte bleiben wörtlich wie live (**offen:** rechtlich prüfen lassen); Footer-Link heißt jetzt „Verträge hier kündigen“ (§ 312k BGB) |
+| 21 | Title/Description-Längen, 404-Canonical, `price` im Service-Schema | gekürzt; 404 ohne Canonical; nur `minPrice` |
+| 22 | Floskelhafte H1 („X. Slogan.“, „wie neu“) | Haupt-H1 mit Suchbegriff und konkreter Aussage, „wie neu“ entfernt |
+
+## Automatische Prüfung nach den Korrekturen (`python3 src/check.py`)
+36 Dateien, 32 verschiedene WhatsApp-Links (alle +49 170 6669516), 1 Telefonziel. **Keine Befunde.** Geprüft werden:
+- interne Links und Anker
+- Bilder
+- genau eine H1 je Seite
+- doppelte Titel
+- Title ≤ 65, Description 70–160 Zeichen
+- Canonical = https://carcura.info + Pfad
+- noindex nur auf /kuendigen/, /abo-bedingungen/, /widerruf/, 404
+- Sitemap = indexierbare Seiten
+- jede €-Zahl gegen CARCURA-DATA.json oder belegte Werte aus research/
+- jede Vorauswahl-ID
+
+## Film und Bildachse
+- **Waschzustände 00–03 und Endbild 14:** Verschiebung per Phasenkorrelation 0 px auf der ganzen Fläche, in der Halle oben und im Fahrzeugbereich. Die Scheinwerfer-Mittelpunkte weichen höchstens 7 px bei 762 px Breite ab (unter 1 %). Die Felgen- und Schaumgeometrie im Schaumbild weicht leicht ab, weil die Bilder generiert sind. Das ist sichtbar nur in der Nahansicht des Übergangs.
+- **Innen- und Politurpaar:** gleiche Bildmaße, 0 px Verschiebung.
+- **Bewegung:**
+  - Freilegung per Clip-Kante bei Wäsche (00→01→02→03), Innenraum (06→07) und Politur (08→09).
+  - Harter Schnitt bei abweichenden Blickwinkeln (03→04→05→06, 07→08, 09→10…14).
+  - Keine echte 3D-Kamerafahrt, keine Türanimation, keine Blender-Renderings.
+- **Vorwärts und rückwärts:** Bei den Werten 0, 0,6, 1, 2,7, 4,7, 6,55, 8,6, 10, 13,2, 14, dann zurück zu 6,6 und 0,2 stimmen Bild, Titel und aktives Kapitel überein (Desktop und Mobil).
+- **Kapitel-Klicks:** Politur → „Swirls unter Prüflicht“, Außen → „So kommt es oft an“, Keramik → „Keramik auftragen“, Innen → „Wieder gerne einsteigen“ ✔.
+- **Reduzierte Bewegung:** Der Film wird zur statischen Bildfolge mit allen Texten, kein leerer Scrollbereich ✔.
+
+## Formular und Anfragewege
+Siehe TEXTE-UND-ANFRAGEN.md. Alle Tests liefen mit abgefangenem Endpunkt (Testumgebung). **Es wurde keine Anfrage an carcura.info oder echte Empfänger gesendet.**
+
+## Befunde Prüfer „Animation und Mobilansicht“
+Siehe Abschnitt unten.
+
+## Offene Punkte
+- Die Filmbilder haben nur 762 px. Auf großen Desktops wirken sie weich. Für scharfe Bilder ab 1440 px braucht es Neurenderings mit mindestens 1920 px.
+- Keine echte 3D-Sequenz (Tür, Kamerafahrt, Pad, Applikator). Das Blender-Paket enthält nur ein Konzeptauto, kein Porsche-Modell mit Innenraum.
+- Das Porsche-Wappen ist auf den KI-Bildern sichtbar. Markenrechtlich prüfen lassen oder Bilder ohne Logo neu erzeugen.
+- Rechtstexte (Datenschutz, Cookie, Abo, Widerruf) sind wörtlich übernommen. Die Du/Sie-Mischung und die Inhalte prüft ein Anwalt bzw. Datenschutzberater.
+- Bewertungsanzahl (18) vor dem Livegang am Profil prüfen.
+- Lighthouse- und Felddaten nach dem Deploy messen.
+- 301-Weiterleitungen serverseitig einrichten.
