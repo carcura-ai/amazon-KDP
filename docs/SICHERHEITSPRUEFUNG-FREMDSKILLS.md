@@ -464,3 +464,11 @@ Behalten, weil in CLAUDE.md genannt oder Carcura-/KDP-Kern: godmode, l99, ooda, 
 - **Entscheidung:** Installiert nach `.claude/skills/motion-design/`, Dateien unverändert (`cmp` auf `SKILL.md` identisch), dazu `HERKUNFT.md`.
   Lizenz unbekannt: nur für den eigenen Gebrauch, nicht weitergeben. Fehlende Verweise im Paket: `engine-2d-puppet.md`, `blender.md`, `tracks.py`.
 - **Voraussetzungen im Container:** Node 22 ✅, ffmpeg 6.1 ✅, Chromium unter `/opt/pw-browsers/chromium-1243/chrome-linux64/chrome` ✅ (`CHROME=` setzen), Pillow ✅, numpy ✅, **scipy ❌, opencv-python ❌** (nur für Ton-Mischung bzw. Cutouts nötig).
+
+## ai-3d-generator (vonzellu, über dvcrn/openclaw-skills-marketplace) – 23.11.2026
+
+- **Quelle:** `npx skillfish add dvcrn/openclaw-skills-marketplace ai-3d-generator`. **Nicht ausgeführt:** Dateien stattdessen per Sparse-Clone in einen Prüfordner geholt (5 Dateien, 21 KB, Plugin `vonzellu--ai-3d-generator`, Version 1.0.0, Herkunft laut plugin.json: openclaw/skills).
+- skill-security-auditor: **PASS (0 Befunde)**. Alle Dateien vollständig gelesen: kein Netzwerkzugriff, keine Zugangsdaten, keine Hooks, keine Prompt-Injection.
+- **Funktionale Mängel:** Das Skript erzeugt nur eine Kugel und simuliert den LLM-Aufruf („en vrai, appeler l'API“). Feste Pfade eines fremden Rechners (`/home/celluloid/...`). Das Beispiel `model_generator.py` ruft `add_cylinder(..., rotation_angle=...)` auf, das es nicht gibt, und bricht ab. Im Shell-Skript wird die Eingabe ungeprüft per `sed` in ein Python-Skript eingesetzt (Eingaben mit `|` oder `"""` brechen oder verändern den Code).
+- **Zweck:** STL-Dateien für den 3D-Druck (Trimesh). Carcura braucht Web-3D (three.js) und Video (Blender, motion-design).
+- **Entscheidung:** **Nicht installiert.** Kein Nutzen für Carcura/KDP, funktional unfertig. Prüfordner: `/home/user/dvcrn/` (außerhalb des Projekts).
