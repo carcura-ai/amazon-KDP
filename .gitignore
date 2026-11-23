@@ -56,3 +56,4 @@ reel-studio/pipeline/daten/*.task
 
 # 3D-Studio: Render-Ausgaben (gross, jederzeit neu erzeugbar)
 3d-studio/out/
+carcura-web/Carcura_Claude_Gesamtprojekt/dist-offline/
