@@ -1,0 +1,1 @@
+Die HTML-Vorschau und der Website-Auftrag sind vollständig in dieser ZIP. Die optionalen Ordner assets/blender, assets/models und assets/environment liegen in Carcura_Blender_Zusatz.zip. Für 3D beide Archive am selben Ort entpacken. Fehlende 3D-Dateien blockieren den HTML-Auftrag nicht.

@@ -1,0 +1,107 @@
+[
+  {
+    "url": "https://carcura.info/abo-bedingungen/",
+    "status": 200,
+    "file": "research/carcura-abo-bedingungen.json"
+  },
+  {
+    "url": "https://carcura.info/auto-innenreinigung/",
+    "status": 200,
+    "file": "research/carcura-auto-innenreinigung.json"
+  },
+  {
+    "url": "https://carcura.info/autopolitur/",
+    "status": 200,
+    "file": "research/carcura-autopolitur.json"
+  },
+  {
+    "url": "https://carcura.info/autositz-reinigen-flecken/",
+    "status": 200,
+    "file": "research/carcura-autositz-reinigen-flecken.json"
+  },
+  {
+    "url": "https://carcura.info/fahrzeugaufbereitung-altenkirchen/",
+    "status": 200,
+    "file": "research/carcura-fahrzeugaufbereitung-altenkirchen.json"
+  },
+  {
+    "url": "https://carcura.info/fahrzeugaufbereitung-asbach/",
+    "status": 200,
+    "file": "research/carcura-fahrzeugaufbereitung-asbach.json"
+  },
+  {
+    "url": "https://carcura.info/fahrzeugaufbereitung-hachenburg/",
+    "status": 200,
+    "file": "research/carcura-fahrzeugaufbereitung-hachenburg.json"
+  },
+  {
+    "url": "https://carcura.info/fahrzeugaufbereitung-neuwied/",
+    "status": 200,
+    "file": "research/carcura-fahrzeugaufbereitung-neuwied.json"
+  },
+  {
+    "url": "https://carcura.info/fahrzeugaufbereitung-westerwald/",
+    "status": 200,
+    "file": "research/carcura-fahrzeugaufbereitung-westerwald.json"
+  },
+  {
+    "url": "https://carcura.info/fahrzeugaufbereitung-wissen/",
+    "status": 200,
+    "file": "research/carcura-fahrzeugaufbereitung-wissen.json"
+  },
+  {
+    "url": "https://carcura.info/geruch-im-auto-entfernen/",
+    "status": 200,
+    "file": "research/carcura-geruch-im-auto-entfernen.json"
+  },
+  {
+    "url": "https://carcura.info/gutschein/",
+    "status": 200,
+    "file": "research/carcura-gutschein.json"
+  },
+  {
+    "url": "https://carcura.info/keramikversiegelung/",
+    "status": 200,
+    "file": "research/carcura-keramikversiegelung.json"
+  },
+  {
+    "url": "https://carcura.info/kuendigen/",
+    "status": 200,
+    "file": "research/carcura-kuendigen.json"
+  },
+  {
+    "url": "https://carcura.info/leasingrueckgabe-aufbereitung/",
+    "status": 200,
+    "file": "research/carcura-leasingrueckgabe-aufbereitung.json"
+  },
+  {
+    "url": "https://carcura.info/scheinwerfer-aufbereiten/",
+    "status": 200,
+    "file": "research/carcura-scheinwerfer-aufbereiten.json"
+  },
+  {
+    "url": "https://carcura.info/spezialreinigung-auto/",
+    "status": 200,
+    "file": "research/carcura-spezialreinigung-auto.json"
+  },
+  {
+    "url": "https://carcura.info/tierhaare-auto-entfernen/",
+    "status": 200,
+    "file": "research/carcura-tierhaare-auto-entfernen.json"
+  },
+  {
+    "url": "https://carcura.info/wohnmobil-aufbereitung/",
+    "status": 200,
+    "file": "research/carcura-wohnmobil-aufbereitung.json"
+  },
+  {
+    "url": "https://carcura.info/datenschutz/",
+    "status": 200,
+    "file": "research/carcura-datenschutz.json"
+  },
+  {
+    "url": "https://carcura.info/cookie-richtlinie-eu/",
+    "status": 200,
+    "file": "research/carcura-cookie-richtlinie-eu.json"
+  }
+]

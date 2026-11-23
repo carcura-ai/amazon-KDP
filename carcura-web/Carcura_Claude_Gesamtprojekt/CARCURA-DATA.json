@@ -1,0 +1,113 @@
+{
+  "verifiedAt": "2026-11-23",
+  "source": "https://carcura.info/",
+  "priceSource": "https://carcura.info/leistungen/",
+  "status": "Websiteangaben gelesen; keine unabhängige Bestätigung der Werbeaussagen",
+  "business": {
+    "name": "Carcura GbR",
+    "brand": "Carcura",
+    "owners": ["Alexander Fuchs", "Richy Schumacher"],
+    "street": "Hauptstr. 7",
+    "postcode": "57632",
+    "city": "Walterschen",
+    "region": "Westerwald",
+    "country": "DE",
+    "phoneDisplay": "+49 170 6669516",
+    "phoneHref": "tel:+491706669516",
+    "whatsappBase": "https://wa.me/491706669516",
+    "email": "carcura@web.de",
+    "instagram": "https://www.instagram.com/_carcura_/",
+    "hours": [
+      {"days": ["Monday", "Tuesday", "Wednesday", "Thursday"], "opens": "17:00", "closes": "22:00"},
+      {"days": ["Friday"], "opens": "14:00", "closes": "21:00"},
+      {"days": ["Saturday"], "opens": "08:00", "closes": "20:00"}
+    ],
+    "hoursNote": "Besuch nach Terminabsprache",
+    "teamPhotoOrder": "Richy links, Alexander rechts",
+    "googleReviews": {
+      "displayedRating": 4.8,
+      "displayedCount": 18,
+      "source": "https://carcura.info/",
+      "profile": "https://maps.google.com/maps?cid=13912678674450594421",
+      "note": "Stand der Website, vor Veröffentlichung erneut prüfen; keine erfundenen neuen Bewertungen"
+    }
+  },
+  "brand": {
+    "accent": "#E8F320",
+    "background": "#07070A",
+    "backgroundSoft": "#0D0D11",
+    "panel": "#15151A",
+    "text": "#F2F1EE",
+    "muted": "#CFD0D4",
+    "subtle": "#8F9096",
+    "warmSecondary": "#CBBF94",
+    "logo": "assets/brand/carcura-logo-weiss.webp",
+    "teamPhoto": "assets/brand/carcura-team-alexander-richy.webp",
+    "fontHeading": "Big Shoulders",
+    "fontBody": "Geist",
+    "fontLabel": "Geist Mono"
+  },
+  "pricing": {
+    "currency": "EUR",
+    "priceMode": "ab",
+    "note": "Aktuelle Websiteangaben. Endangebot nach Fahrzeugzustand und vereinbartem Umfang; keine Preisänderung beauftragt.",
+    "taxDisplay": "Endpreise; als Kleinunternehmer nach § 19 UStG wird keine Umsatzsteuer ausgewiesen.",
+    "services": [
+      {
+        "id": "innen-normal", "title": "Innenraumreinigung Normal", "from": 90,
+        "url": "/auto-innenreinigung/", "animation": "interior",
+        "includes": ["Aussaugen von Sitzen, Fußraum und Kofferraum", "Fußmatten", "Cockpit, Mittelkonsole und Türverkleidungen", "Scheiben und Spiegel innen", "Einstiege und Türgriffe"],
+        "excludes": ["Polster-Nassreinigung", "gesonderte Fleckentfernung", "Tierhaarentfernung", "Geruchsbehandlung"]
+      },
+      {"id": "innen-detail", "title": "Innenraumreinigung Detailliert", "from": 150, "url": "/auto-innenreinigung/", "note": "Zusätzliche intensive Sitz-/Polster-/Leder- und Detailreinigung laut Leistungsseite"},
+      {"id": "handwaesche", "title": "Schonende Handwäsche", "from": 69, "url": "/leistungen/", "animation": "exterior", "includes": ["Schaumvorwäsche", "Handwäsche", "Felgen und Reifen", "Scheiben außen", "Trocknung"]},
+      {"id": "handwaesche-wachs", "title": "Handwäsche mit Wachs", "from": 99, "url": "/leistungen/"},
+      {"id": "basic", "title": "Basic Innen & Außen", "from": 145, "url": "/auto-innenreinigung/#pakete"},
+      {"id": "familie", "title": "Familienpaket", "from": 169, "url": "/leistungen/", "note": "Innen und außen plus Tierhaare"},
+      {"id": "leasing", "title": "Verkaufs- & Leasingrückgabe-Paket", "from": 229, "url": "/leasingrueckgabe-aufbereitung/"},
+      {"id": "politur-1", "title": "1-stufige Politur", "from": 349, "url": "/autopolitur/", "animation": "polish", "includes": ["Handwäsche", "Dekontamination und Kneten", "1-stufige Maschinenpolitur", "Endkontrolle"], "excludes": ["Keramikversiegelung", "Garantie auf Entfernung tiefer Kratzer"]},
+      {"id": "politur-2", "title": "2-stufige Politur", "from": 549, "url": "/autopolitur/"},
+      {"id": "keramik", "title": "Keramikversiegelung", "from": 700, "url": "/keramikversiegelung/", "animation": "ceramic", "includes": ["Handwäsche", "Dekontamination und Kneten", "1-stufige Politur", "Entfetten und Keramikauftrag", "Pflegehinweise", "Nachkontrolle nach 6 Monaten laut Startseite"], "twoStagePolishSurcharge": 200, "product": "XPERTCOAT HYBRID", "claimNote": "Haltbarkeitsaussagen nur mit Herstellerbezug und aktuellen Bedingungen"},
+      {"id": "felgen-keramik", "title": "Felgen-Keramikversiegelung", "from": 200, "bundlePrice": 170, "url": "/leistungen/", "bundleCondition": "Zusammen mit Wäsche, Politur oder Keramik"},
+      {"id": "scheiben-keramik", "title": "Scheiben-Keramikversiegelung", "from": 100, "bundlePrice": 80, "url": "/leistungen/", "bundleCondition": "Zusammen mit Wäsche, Politur oder Keramik"},
+      {"id": "spruehversiegelung", "title": "Handwäsche + Sprühversiegelung", "from": 119, "url": "/leistungen/"},
+      {"id": "keramik-pflege", "title": "Keramik-Pflege", "price": 79, "url": "/leistungen/", "note": "Laut Website alle 2 Monate, für Fahrzeuge mit Carcura-Keramik"},
+      {"id": "sitz-fleck", "title": "Einzelner Sitz / Fleck", "from": 49, "url": "/autositz-reinigen-flecken/"},
+      {"id": "polster", "title": "Polster- & Sitzreinigung", "from": 79, "bundleSurcharge": 59, "url": "/autositz-reinigen-flecken/", "bundleCondition": "Zusammen mit einer Innenreinigung"},
+      {"id": "tierhaare", "title": "Tierhaarentfernung", "from": 69, "bundleSurcharge": 29, "url": "/tierhaare-auto-entfernen/", "bundleCondition": "Zusammen mit einer Innenreinigung"},
+      {"id": "ozon", "title": "Ozonbehandlung", "from": 59, "bundleSurcharge": 39, "url": "/geruch-im-auto-entfernen/", "bundleCondition": "Zusammen mit einer Innenreinigung"},
+      {"id": "fleck-geruch", "title": "Fleck + Geruch", "from": 119, "url": "/autositz-reinigen-flecken/"},
+      {"id": "leder", "title": "Lederreinigung & -pflege", "from": 49, "bundleSurcharge": 39, "url": "/leistungen/", "bundleCondition": "Zur Innenreinigung Normal; bei Detailliert bereits enthalten"},
+      {"id": "leder-versiegeln", "title": "Lederversiegelung", "surcharge": 40, "url": "/leistungen/", "note": "Nur als Zusatz zur Innen-/Lederreinigung"},
+      {"id": "scheinwerfer", "title": "Scheinwerferaufbereitung", "from": 69, "url": "/scheinwerfer-aufbereiten/"},
+      {"id": "wohnmobil-basic", "title": "Wohnmobil Basic Innen & Außen", "from": 245, "url": "/wohnmobil-aufbereitung/"},
+      {"id": "wohnmobil-komplett", "title": "Wohnmobil-Komplettreinigung", "from": 800, "url": "/wohnmobil-aufbereitung/"}
+    ],
+    "subscriptionsVerifiedSubset": [
+      {"name": "Kombi Basic", "monthly": 120, "frequency": "1× pro Monat", "minimumMonths": 12, "minimumTotal": 1440},
+      {"name": "Kombi Care", "monthly": 230, "frequency": "2× pro Monat", "minimumMonths": 12, "minimumTotal": 2760},
+      {"name": "Kombi Protect", "monthly": 265, "frequency": "2× pro Monat", "minimumMonths": 12, "minimumTotal": 3180}
+    ],
+    "subscriptionNote": "Nur hier vollständig gelesene Abowerte; weitere vorhandene Abos aus research/carcura-leistungen.json übernehmen, nicht mit alten Werten ergänzen. Vertragsinhalt unverändert prüfen."
+  },
+  "pickup": {
+    "freeUntilKm": 10, "perAdditionalKm": 2,
+    "distanceBasis": "einfache Straßenentfernung ab Walterschen",
+    "roundTripIncluded": true,
+    "formula": "max(0, distanceKm - 10) * 2",
+    "examples": [{"km": 10, "price": 0}, {"km": 15, "price": 10}, {"km": 20, "price": 20}, {"km": 30, "price": 40}]
+  },
+  "promotion": {
+    "title": "Nanolex-Waschset zur Keramikversiegelung",
+    "validUntil": "2026-12-31",
+    "condition": "Terminvereinbarung bis 31.12.2026 laut aktueller Website",
+    "expiryAction": "Nach Ablauf automatisch ausblenden; keine dauerhafte Gratiszusage"
+  },
+  "technical": {
+    "cms": "WordPress",
+    "currentThemeBuilder": "Kubio",
+    "newImplementation": "Eigenständiges WordPress-Theme, lokal entwickeln",
+    "productionChangesAuthorized": false,
+    "formBackend": "Bestehende Anbindung prüfen; keine Formular-ID oder Mailzustellung erfinden"
+  }
+}

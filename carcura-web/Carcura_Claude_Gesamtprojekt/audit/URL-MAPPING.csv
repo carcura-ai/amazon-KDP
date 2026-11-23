@@ -1,0 +1,38 @@
+bestand_url;ziel_url;geplanter_status;indexierung;begruendung
+https://carcura.info/;/;200;index;Startseite, H1/Einstieg neu, Preise direkt unter dem Einstieg
+https://carcura.info/leistungen/;/leistungen/;200;index;Übersicht + vollständige Preisliste (#preise) + Abos (#abos)
+https://carcura.info/auto-innenreinigung/;/auto-innenreinigung/;200;index;Leistungsseite neu gegliedert
+https://carcura.info/autopolitur/;/autopolitur/;200;index;Leistungsseite neu gegliedert
+https://carcura.info/keramikversiegelung/;/keramikversiegelung/;200;index;Leistungsseite, Aktion mit Enddatum
+https://carcura.info/leasingrueckgabe-aufbereitung/;/leasingrueckgabe-aufbereitung/;200;index;Leistungsseite
+https://carcura.info/scheinwerfer-aufbereiten/;/scheinwerfer-aufbereiten/;200;index;H1 auf Kostenfrage ausgerichtet (Suchdaten)
+https://carcura.info/autositz-reinigen-flecken/;/autositz-reinigen-flecken/;200;index;Leistungsseite
+https://carcura.info/tierhaare-auto-entfernen/;/tierhaare-auto-entfernen/;200;index;Leistungsseite
+https://carcura.info/geruch-im-auto-entfernen/;/geruch-im-auto-entfernen/;200;index;Leistungsseite
+https://carcura.info/spezialreinigung-auto/;/spezialreinigung-auto/;200;index;Leistungsseite
+https://carcura.info/wohnmobil-aufbereitung/;/wohnmobil-aufbereitung/;200;index;Leistungsseite
+https://carcura.info/fahrzeugaufbereitung-altenkirchen/;/fahrzeugaufbereitung-altenkirchen/;200;index;Ortsseite (kostenlose Abholung)
+https://carcura.info/fahrzeugaufbereitung-westerwald/;/fahrzeugaufbereitung-westerwald/;200;index;neu ausgerichtet auf Einzugsgebiet/Abholkosten statt Dublette der Startseite
+https://carcura.info/fahrzeugaufbereitung-asbach/;/fahrzeugaufbereitung-asbach/;200;index;Ortsseite
+https://carcura.info/fahrzeugaufbereitung-hachenburg/;/fahrzeugaufbereitung-hachenburg/;200;index;Ortsseite
+https://carcura.info/fahrzeugaufbereitung-wissen/;/fahrzeugaufbereitung-wissen/;200;index;Ortsseite
+https://carcura.info/fahrzeugaufbereitung-neuwied/;/fahrzeugaufbereitung-neuwied/;200;index;Ortsseite
+https://carcura.info/hol-und-bringservice/;/hol-und-bringservice/;200;index;mit Rechner
+https://carcura.info/firmenkunde/;/firmenkunde/;200;index;Sie-Ansprache
+https://carcura.info/partner/;/partner/;200;index;
+https://carcura.info/ueber-uns/;/ueber-uns/;200;index;enthält Team (#team)
+https://carcura.info/galerie/;/galerie/;200;index;Filter, Lightbox, Vorher/Nachher
+https://carcura.info/gutschein/;/gutschein/;200;index;
+https://carcura.info/anfragen/;/anfragen/;200;index;gleicher Endpunkt /wp-json/ccrr/v1/lead; ?leistung= und ?service= Vorauswahl
+https://carcura.info/impressum/;/impressum/;200;index;im Paket nicht erfasst, in Sitemap live vorhanden – ergänzt
+https://carcura.info/datenschutz/;/datenschutz/;200;index;
+https://carcura.info/cookie-richtlinie-eu/;/cookie-richtlinie-eu/;200;index;Tippfehler in E-Mail korrigiert (carcura@ex.comweb.de -> carcura@web.de)
+https://carcura.info/abo-bedingungen/;/abo-bedingungen/;200;noindex,follow;wie live
+https://carcura.info/kuendigen/;/kuendigen/;200;noindex,follow;wie live; Formularfelder identisch (cck_*), Versand durch bestehendes Plugin
+https://carcura.info/widerruf/;/widerruf/;200;noindex,follow;live vorhanden, im Paket nicht erfasst – ergänzt
+https://carcura.info/firmenkunde-werden/;/firmenkunde/;301;-;besteht live bereits als 301, beibehalten (15 Impressionen in GSC)
+https://carcura.info/https-carcura-info-leistungen/;/leistungen/;301;-;besteht live bereits als 301, beibehalten
+https://carcura.info/preise/;/leistungen/#preise;301;-;Briefing wünschte /preise/; als eigene Seite verworfen (Dublette zu /leistungen/), daher nur Weiterleitung
+https://carcura.info/team/;/ueber-uns/#team;301;-;keine eigene Teamseite (nur 2 Gründer, 1 Foto), daher Weiterleitung
+https://carcura.info/?kubio_recommend_page=*;/;301 oder 410;-;Kubio-Parameter-URLs mit GSC-Impressionen; nach Theme-Wechsel prüfen
+https://carcura.info/?utm_source=google&utm_medium=organic&utm_campaign=gbp_profil;/;200;canonical /;GBP-Link mit UTM: canonical auf / ist gesetzt, so lassen

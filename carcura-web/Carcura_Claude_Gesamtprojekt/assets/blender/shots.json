@@ -1,0 +1,137 @@
+[
+  {
+    "frame": 1,
+    "position": [
+      6.5,
+      -7.0,
+      2.3
+    ],
+    "target": [
+      0,
+      0,
+      0.65
+    ],
+    "lens": 55,
+    "label": "Exterior / establishing"
+  },
+  {
+    "frame": 60,
+    "position": [
+      6.2,
+      -6.8,
+      2.2
+    ],
+    "target": [
+      0,
+      0,
+      0.65
+    ],
+    "lens": 55,
+    "label": "Exterior / cleaned"
+  },
+  {
+    "frame": 95,
+    "position": [
+      4.2,
+      1.6,
+      1.9
+    ],
+    "target": [
+      0.2,
+      0.0,
+      0.8
+    ],
+    "lens": 48,
+    "label": "Door opens"
+  },
+  {
+    "frame": 135,
+    "position": [
+      1.35,
+      0.3,
+      1.65
+    ],
+    "target": [
+      -0.2,
+      0.05,
+      0.7
+    ],
+    "lens": 24,
+    "label": "Interior / dirty to clean"
+  },
+  {
+    "frame": 180,
+    "position": [
+      1.35,
+      0.3,
+      1.65
+    ],
+    "target": [
+      -0.2,
+      0.05,
+      0.7
+    ],
+    "lens": 24,
+    "label": "Interior / hold"
+  },
+  {
+    "frame": 220,
+    "position": [
+      3.9,
+      -4.6,
+      2.5
+    ],
+    "target": [
+      0.0,
+      -1.25,
+      0.8
+    ],
+    "lens": 65,
+    "label": "Paint / polishing close-up"
+  },
+  {
+    "frame": 270,
+    "position": [
+      3.9,
+      -4.6,
+      2.5
+    ],
+    "target": [
+      0.0,
+      -1.25,
+      0.8
+    ],
+    "lens": 65,
+    "label": "Paint / coating close-up"
+  },
+  {
+    "frame": 320,
+    "position": [
+      6.2,
+      -6.8,
+      2.2
+    ],
+    "target": [
+      0,
+      0,
+      0.65
+    ],
+    "lens": 55,
+    "label": "Finished / hero"
+  },
+  {
+    "frame": 360,
+    "position": [
+      6.5,
+      -7.0,
+      2.3
+    ],
+    "target": [
+      0,
+      0,
+      0.65
+    ],
+    "lens": 55,
+    "label": "Finished / hold"
+  }
+]

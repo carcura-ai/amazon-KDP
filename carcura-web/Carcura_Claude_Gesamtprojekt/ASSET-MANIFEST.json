@@ -1,0 +1,239 @@
+[
+  {
+    "path": "assets/models/CarConcept.glb",
+    "url": "https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Assets/main/Models/CarConcept/glTF-Binary/CarConcept.glb",
+    "license": "CC BY 4.0; logo rights separate",
+    "bytes": 11778688,
+    "status": "downloaded",
+    "sha256": "c272098089d78c5cd9fd9f24ff50ee8acf8d932c55f2d55fc10adb6c8998966b"
+  },
+  {
+    "path": "assets/licenses/car-LICENSE.md",
+    "url": "https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Assets/main/Models/CarConcept/LICENSE.md",
+    "license": "upstream documentation",
+    "bytes": 943,
+    "status": "downloaded",
+    "sha256": "e11477f29eab33d1a5c9fc8534f931556faeb2e11a7fee9e4723d917fcfaee50"
+  },
+  {
+    "path": "assets/licenses/car-README.md",
+    "url": "https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Assets/main/Models/CarConcept/README.md",
+    "license": "upstream documentation",
+    "bytes": 20382,
+    "status": "downloaded",
+    "sha256": "af5f76ead54a5039288924f37081d6e1fcd5ccc5b2628faedb926325a73099cd"
+  },
+  {
+    "path": "assets/fonts/BigShoulders-variable.ttf",
+    "url": "https://raw.githubusercontent.com/google/fonts/main/ofl/bigshoulders/BigShoulders%5Bopsz%2Cwght%5D.ttf",
+    "license": "SIL OFL 1.1",
+    "bytes": 320800,
+    "status": "downloaded",
+    "sha256": "4b4b24aa6f799aa73cdcd5b6fa840cbcbbb38b81fa9fa82c25126a4530c1ba44"
+  },
+  {
+    "path": "assets/licenses/BigShoulders-OFL.txt",
+    "url": "https://raw.githubusercontent.com/google/fonts/main/ofl/bigshoulders/OFL.txt",
+    "license": "SIL OFL 1.1",
+    "bytes": 4397,
+    "status": "downloaded",
+    "sha256": "fbc746aabf0eb1847dfd92e2efc4596d79fa897d60b8e64062a22f585508fb3f"
+  },
+  {
+    "path": "assets/environment/studio_small_09_1k.hdr",
+    "url": "https://dl.polyhaven.org/file/ph-assets/HDRIs/hdr/1k/studio_small_09_1k.hdr",
+    "license": "CC0",
+    "bytes": 1615248,
+    "status": "downloaded",
+    "sha256": "e7cfda5f4e98e623db12b8bfd0184e048488e4855d9c83e2751fb44a32e80c45"
+  },
+  {
+    "path": "assets/brand/carcura-logo-weiss.webp",
+    "url": "https://carcura.info/wp-content/uploads/2026/11/carcura-logo-weiss.webp",
+    "license": "Carcura source; owner supplied task",
+    "bytes": 218326,
+    "status": "downloaded",
+    "sha256": "411b7cbacdb96f8bd227e6d1aa567e3709852043f74f151e771473aedee16ad0"
+  },
+  {
+    "path": "assets/brand/carcura-team-alexander-richy.webp",
+    "url": "https://carcura.info/wp-content/uploads/2026/10/carcura-team-alexander-richy.webp",
+    "license": "Carcura source; owner supplied task",
+    "bytes": 41122,
+    "status": "downloaded",
+    "sha256": "6dcd0b57da1d3505f2b030de2e5a510c55e9fc6aa1f59c5ad37de14609b42886"
+  },
+  {
+    "path": "assets/fonts/geist-variable.ttf",
+    "url": "https://raw.githubusercontent.com/google/fonts/main/ofl/geist/Geist%5Bwght%5D.ttf",
+    "license": "SIL OFL 1.1",
+    "bytes": 169056,
+    "status": "downloaded",
+    "sha256": "73894e0448cae90a92b6c2f8732b7bb9acb7b94c418bff559dad4a18e1de9659"
+  },
+  {
+    "path": "assets/licenses/geist-OFL.txt",
+    "url": "https://raw.githubusercontent.com/google/fonts/main/ofl/geist/OFL.txt",
+    "license": "SIL OFL 1.1",
+    "bytes": 4387,
+    "status": "downloaded",
+    "sha256": "1781d2806a07d91c4edf4740b88449fab7d0eadad53f7c351b94cd4d4eb8c00f"
+  },
+  {
+    "path": "assets/fonts/geistmono-variable.ttf",
+    "url": "https://raw.githubusercontent.com/google/fonts/main/ofl/geistmono/GeistMono%5Bwght%5D.ttf",
+    "license": "SIL OFL 1.1",
+    "bytes": 171948,
+    "status": "downloaded",
+    "sha256": "d00e590b8eb3a59acc329b2d044fd143ae935090b7da33199ebee27cc7de8196"
+  },
+  {
+    "path": "assets/licenses/geistmono-OFL.txt",
+    "url": "https://raw.githubusercontent.com/google/fonts/main/ofl/geistmono/OFL.txt",
+    "license": "SIL OFL 1.1",
+    "bytes": 4387,
+    "status": "downloaded",
+    "sha256": "1781d2806a07d91c4edf4740b88449fab7d0eadad53f7c351b94cd4d4eb8c00f"
+  },
+  {
+    "path": "assets/photos/carcura-tankklappe-vorher.webp",
+    "url": "https://carcura.info/wp-content/uploads/2026/11/carcura-tankklappe-vorher.webp",
+    "alt": "Tankklappe eines Ford, vorher",
+    "license": "Carcura website asset; not stock",
+    "status": "downloaded",
+    "bytes": 71014,
+    "sha256": "8b459c2d97ee426b5217959a651054df52b876002ca92fb6d08b519660e180e3"
+  },
+  {
+    "path": "assets/photos/carcura-tankklappe-nachher.webp",
+    "url": "https://carcura.info/wp-content/uploads/2026/11/carcura-tankklappe-nachher.webp",
+    "alt": "Tankklappe eines Ford, nachher",
+    "license": "Carcura website asset; not stock",
+    "status": "downloaded",
+    "bytes": 54062,
+    "sha256": "ea3e70780690155e1502991f7b648ff1d520323bf6b2faa256713d4484776917"
+  },
+  {
+    "path": "assets/photos/carcura-audi-tt-politur-keramik-walterschen.webp",
+    "url": "https://carcura.info/wp-content/uploads/2026/11/carcura-audi-tt-politur-keramik-walterschen.webp",
+    "alt": "Audi TT nach Politur und Keramikversiegelung in Walterschen",
+    "license": "Carcura website asset; not stock",
+    "status": "downloaded",
+    "bytes": 221406,
+    "sha256": "d2199b0e66e0f6fad0ac9fa975fd0d98f8890c486d863af894b8eed34a89e453"
+  },
+  {
+    "path": "assets/photos/carcura-bmw-m2-front-vorher-hd.webp",
+    "url": "https://carcura.info/wp-content/uploads/2026/10/carcura-bmw-m2-front-vorher-hd.webp",
+    "alt": "Front eines BMW M2, vorher",
+    "license": "Carcura website asset; not stock",
+    "status": "downloaded",
+    "bytes": 131976,
+    "sha256": "e10868274308fc6c0013e72537823d6d5e3704fe69342846433cd98f245bc62e"
+  },
+  {
+    "path": "assets/photos/carcura-bmw-m2-front-nachher-hd.webp",
+    "url": "https://carcura.info/wp-content/uploads/2026/10/carcura-bmw-m2-front-nachher-hd.webp",
+    "alt": "Front eines BMW M2, nachher",
+    "license": "Carcura website asset; not stock",
+    "status": "downloaded",
+    "bytes": 72734,
+    "sha256": "9c4112b77c90489781c9e2672385f0dc83c4d8d52aaec5d2417d6b31f0e40e5a"
+  },
+  {
+    "path": "assets/photos/carcura-weisser-lack-halle-glanz.webp",
+    "url": "https://carcura.info/wp-content/uploads/2026/11/carcura-weisser-lack-halle-glanz.webp",
+    "alt": "Glänzender weißer Lack in der Halle",
+    "license": "Carcura website asset; not stock",
+    "status": "downloaded",
+    "bytes": 58846,
+    "sha256": "d2a8bcfc6a6e62593c559c24205cd92c79fdd9e28f3e35d194f0d5cb1527191a"
+  },
+  {
+    "path": "assets/photos/carcura-ford-schaum-vorwaesche.webp",
+    "url": "https://carcura.info/wp-content/uploads/2026/11/carcura-ford-schaum-vorwaesche.webp",
+    "alt": "Ford in Schaum bei der Vorwäsche",
+    "license": "Carcura website asset; not stock",
+    "status": "downloaded",
+    "bytes": 189228,
+    "sha256": "6d7d8abdebaec4672c9187d4cb5433a59fbda247318734c054d4ac2dd2d6f0b9"
+  },
+  {
+    "path": "assets/photos/carcura-innenreinigung-cockpit-hd.webp",
+    "url": "https://carcura.info/wp-content/uploads/2026/10/carcura-innenreinigung-cockpit-hd.webp",
+    "alt": "Cockpit nach der Innenreinigung",
+    "license": "Carcura website asset; not stock",
+    "status": "downloaded",
+    "bytes": 92232,
+    "sha256": "130e4db171c9de3ae5d4ca9ac1db93859493d4cf550c445df0cba171048f6b66"
+  },
+  {
+    "path": "assets/photos/carcura-felge-felgenreiniger-schaum.webp",
+    "url": "https://carcura.info/wp-content/uploads/2026/11/carcura-felge-felgenreiniger-schaum.webp",
+    "alt": "Felge mit Felgenreiniger-Schaum",
+    "license": "Carcura website asset; not stock",
+    "status": "downloaded",
+    "bytes": 278680,
+    "sha256": "b9090d52f87228c68103ffdb935942b5a85b3e5673c5b85f576b1144760bef24"
+  },
+  {
+    "path": "assets/photos/carcura-schwarzer-lack-spiegelung-hd.webp",
+    "url": "https://carcura.info/wp-content/uploads/2026/10/carcura-schwarzer-lack-spiegelung-hd.webp",
+    "alt": "Spiegelung im schwarzen Lack",
+    "license": "Carcura website asset; not stock",
+    "status": "downloaded",
+    "bytes": 115266,
+    "sha256": "fefe0087e95b20a918aed14a7dfa821f3b84cc3204cb90d6240f2c39d9022d56"
+  },
+  {
+    "path": "assets/photos/carcura-audi-a6-westerwald-hd.webp",
+    "url": "https://carcura.info/wp-content/uploads/2026/10/carcura-audi-a6-westerwald-hd.webp",
+    "alt": "Audi A6 nach der Aufbereitung im Westerwald",
+    "license": "Carcura website asset; not stock",
+    "status": "downloaded",
+    "bytes": 99608,
+    "sha256": "3e97c3c3e8c8daa253b3279a50886fbc2167a5da329d121fc54136b07fa38871"
+  },
+  {
+    "path": "assets/photos/img_1689.webp",
+    "url": "https://carcura.info/wp-content/uploads/2026/10/img_1689.webp",
+    "alt": "Sitzrahmen und Fußraum, vorher",
+    "license": "Carcura website asset; not stock",
+    "status": "downloaded",
+    "bytes": 83086,
+    "sha256": "442c7ea4c161b4e1f4497e21fd2efa833b11085bf405141d0b2bb8c0ea703e5d"
+  },
+  {
+    "path": "assets/photos/img_1690.webp",
+    "url": "https://carcura.info/wp-content/uploads/2026/10/img_1690.webp",
+    "alt": "Sitzrahmen und Fußraum, nachher",
+    "license": "Carcura website asset; not stock",
+    "status": "downloaded",
+    "bytes": 62130,
+    "sha256": "10a11e85ac5b22eebcdba51b1680652895d81197c240d62bb2496cc893ef71be"
+  },
+  {
+    "path": "assets/photos/IMG_1962-1-scaled.jpeg",
+    "url": "https://carcura.info/wp-content/uploads/2026/06/IMG_1962-1-scaled.jpeg",
+    "alt": "Porsche Heck mit rosa Schaum bei der Vorwäsche",
+    "license": "Carcura website asset; not stock",
+    "status": "downloaded",
+    "bytes": 449289,
+    "sha256": "0b3c33b686f42d4a2b422cdeaceb58760cd333a9c6774e370d34dff1dd015235"
+  },
+  {
+    "url": "https://carcura.info/wp-content/uploads/2026/10/carcura-halle-walterschen-hd.jpg",
+    "status": "failed",
+    "error": "HTTP Error 404: Not Found"
+  },
+  {
+    "url": "https://carcura.info/wp-content/uploads/2026/10/carcura-bmw-m2-halle-walterschen-hd.webp",
+    "status": "failed",
+    "error": "HTTP Error 404: Not Found"
+  },
+  {
+    "url": "https://carcura.info/wp-content/uploads/2026/11/carcura-felge-reinigung-walterschen.webp",
+    "status": "failed",
+    "error": "HTTP Error 404: Not Found"
+  }
+]
