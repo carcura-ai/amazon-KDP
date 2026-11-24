@@ -8,7 +8,7 @@ fleckig). Es entstehen keine neuen Details, keine echte Fluidsimulation und kein
 Ersatz: ein echtes Rendering oder eine Aufnahme gleicher Länge unter demselben Dateinamen ablegen.
 
 Aufruf: python3 src/video/build_preview_video.py   (aus Carcura_Claude_Gesamtprojekt)
-Ausgabe: src/assets/video/ (MP4 H.264 + WebM VP9, Desktop 1920×1080 und Mobil 1080×718, Posterbilder)
+Ausgabe: src/video/out/ (nur Vorschau/Social Media, nicht auf der Website; MP4 H.264 + WebM VP9, Desktop 1920×1080 und Mobil 1080×718, Posterbilder)
 """
 import os, subprocess
 import numpy as np
@@ -16,7 +16,7 @@ from PIL import Image, ImageFilter
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 SRC = os.path.join(os.path.dirname(HERE), "assets")
-OUT = os.path.join(SRC, "video")
+OUT = os.path.join(HERE, "out")
 os.makedirs(OUT, exist_ok=True)
 FPS, W = 30, 1920
 NAMES = ["00-dreckig", "01-schaum", "02-gespuelt", "03-sauber"]

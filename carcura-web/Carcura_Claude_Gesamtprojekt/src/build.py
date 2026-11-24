@@ -300,33 +300,20 @@ FILM_PRICE = {"handwaesche": ("Handwäsche inkl. Felgen " + ab("handwaesche"), "
               "keramik": ("Keramik inkl. 1-stufiger Politur " + ab("keramik"), "/keramikversiegelung/", "Was enthalten ist")}
 
 
-VIDEO = {"d_mp4": "/assets/video/carcura-aussenwaesche-1920x1080.mp4", "d_webm": "/assets/video/carcura-aussenwaesche-1920x1080.webm",
-         "m_mp4": "/assets/video/carcura-aussenwaesche-mobil.mp4", "m_webm": "/assets/video/carcura-aussenwaesche-mobil.webm",
-         "d_poster": "/assets/video/carcura-aussenwaesche-1920x1080-poster.jpg", "m_poster": "/assets/video/carcura-aussenwaesche-mobil-poster.jpg"}
-PHASEN = [("Verschmutzt", 0.0), ("Schaum", 2.0), ("Abspülen", 5.8), ("Nass", 8.4), ("Sauber", 11.7)]
-
-
-def video_section():
-    """Außenwäsche-Film als echtes <video>. Dateien: src/assets/video (Vorschau, erzeugt mit src/video/build_preview_video.py)."""
-    size = round(os.path.getsize(os.path.join(HERE, "assets", VIDEO["d_mp4"].replace("/assets/", ""))) / 1048576, 1)
-    chips = "".join(f'<button type="button" class="vchip" data-t="{t}" aria-pressed="{"true" if k == 0 else "false"}">{n}</button>' for k, (n, t) in enumerate(PHASEN))
-    return f'''<section class="hero-video" id="film" aria-labelledby="film-h">
- <h2 class="sr" id="film-h">Film: Außenwäsche in der Carcura-Halle</h2>
- <figure class="vframe">
-  <div class="vbox"><video id="wash" autoplay muted loop playsinline preload="auto" width="1920" height="1080" poster="{VIDEO["d_poster"]}" data-poster-mobil="{VIDEO["m_poster"]}" aria-describedby="vcap">
-   <source src="{VIDEO["m_mp4"]}" type="video/mp4" media="(max-width: 809px)">
-   <source src="{VIDEO["m_webm"]}" type="video/webm" media="(max-width: 809px)">
-   <source src="{VIDEO["d_mp4"]}" type="video/mp4">
-   <source src="{VIDEO["d_webm"]}" type="video/webm">
-   <a href="{VIDEO["d_mp4"]}" download>Film als MP4 herunterladen</a>
-  </video></div>
-  <div class="vctl" role="group" aria-label="Filmsteuerung">
-   <button type="button" class="vplay" aria-pressed="false" aria-label="Film pausieren"><span class="vplay-i" aria-hidden="true"></span><span class="vplay-t">Pause</span></button>
-   <div class="vchips" role="group" aria-label="Zu Phase springen">{chips}</div>
-   <a class="vdl" href="{VIDEO["d_mp4"]}" download>MP4 herunterladen <span>({str(size).replace(".", ",")} MB)</span></a>
-  </div>
-  <figcaption id="vcap" class="vcap">Außenwäsche in unserer Halle: verschmutzt, Schaumvorwäsche, Abspülen, nass, sauber. Vorschau aus KI-generierten Bildzuständen, kein Kundenfahrzeug.</figcaption>
- </figure>
+def wash_section():
+    """Außenwäsche als Scroll-Effekt (src/assets/js/wash.js). Bausteine: src/assets/wash (src/video/build_scroll_assets.py).
+    Ohne JavaScript oder bei reduzierter Bewegung steht das saubere Ergebnis als Standbild."""
+    return '''<section class="wash" id="film" aria-labelledby="film-h" data-base="/assets/wash/">
+ <h2 class="sr" id="film-h">Außenwäsche in unserer Halle</h2>
+ <div class="wash-stage">
+  <figure class="wash-fig">
+   <picture><source media="(max-width: 809px)" srcset="/assets/wash/m/3.webp" width="1080" height="717"><img class="wash-img" src="/assets/wash/d/3.webp" width="1600" height="1062" alt="Außenwäsche eines Autos in der Carcura-Halle, KI-generierte Inszenierung" fetchpriority="high"></picture>
+   <canvas class="wash-cv" aria-hidden="true"></canvas>
+  </figure>
+  <div class="wash-hud" aria-hidden="true"><span class="wash-step">5/5</span><span class="wash-lbl">Sauber</span><span class="wash-bar"><i></i></span></div>
+  <p class="wash-cue" aria-hidden="true"><span>Scrollen</span></p>
+  <p class="wash-note">Inszenierung aus KI-generierten Bildern, kein Kundenfahrzeug.</p>
+ </div>
 </section>'''
 
 
@@ -353,7 +340,7 @@ def home():
         ("Muss ich Umsatzsteuer dazurechnen?", "Nein. Alle Preise sind Endpreise. Als Kleinunternehmer nach § 19 UStG weisen wir keine Umsatzsteuer aus."),
     ]
     body = f'''
-{video_section()}
+{wash_section()}
 
 <section class="sec intro studio" id="einstieg" aria-labelledby="h1"><div class="wrap">
   <p class="label">Carcura · Walterschen · Westerwald</p>
@@ -419,7 +406,7 @@ def home():
 '''
     page("/", "Fahrzeugaufbereitung Westerwald mit Abholung | Carcura",
          f"Innenreinigung {ab('innen-normal')}, Handwäsche {ab('handwaesche')}, Politur {ab('politur-1')}, Keramik {ab('keramik')}. Von Hand in unserer Halle in Walterschen. Abholung bis 10 km gratis.",
-         body, ld=[faq_ld(faq)], js=("video.js",), css=("carcura-finish.css",), body_class="carcura-finish home-video")
+         body, ld=[faq_ld(faq)], js=("wash.js",), css=("carcura-finish.css",), body_class="carcura-finish home-wash")
 
 
 def calc_html(start=15):

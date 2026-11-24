@@ -1,4 +1,4 @@
-# Carcura Website · lokale Fassung (Stand 23.11.2026)
+# Carcura Website · lokale Fassung (Stand 24.11.2026)
 
 ## Starten
 ```bash
@@ -11,8 +11,8 @@ Dann im Browser http://localhost:8080/ öffnen. Die Seite braucht einen Server, 
 - Preise, Kontakt, Öffnungszeiten, Aktion: `CARCURA-DATA.json`
 - Texte und Seiten: `src/build.py`
 - Danach `python3 src/build.py` (erzeugt dist/ neu) und `python3 src/check.py` (prüft Links, Anker, Preise, H1, Titel, Canonicals, Sitemap).
-- Design und Skripte: `src/assets/` (css, js, fonts, img, film). Der Build kopiert sie nach `dist/assets/`, Änderungen nur in `src/assets/` vornehmen.
-- Startseiten-Video: `src/assets/video/` (Vorschau, erzeugt mit `python3 src/video/build_preview_video.py`). Austausch und fehlendes Material: `audit/FILM-MATERIAL.md`. Zum Testen des Springens im Video: `python3 src/video/testserver.py dist 8080` (unterstützt HTTP-Range).
+- Design und Skripte: `src/assets/` (css, js, fonts, img, wash, film). Der Build kopiert sie nach `dist/assets/`, Änderungen nur in `src/assets/` vornehmen.
+- Startseite, Außenwäsche beim Scrollen: `src/assets/js/wash.js` mit den Bausteinen in `src/assets/wash/` (vier Zustände + Verlaufskarte, erzeugt mit `python3 src/video/build_scroll_assets.py`). Kein Video, keine Bedienelemente. Der Zeitplan steht oben in `wash.js` (`T`, `LBL`). Austausch und fehlendes Material: `audit/FILM-MATERIAL.md`.
 - Die Aktion „Waschset zur Keramik“ verschwindet nach dem 31.12.2026 automatisch, beim nächsten Build und im Browser.
 
 ## Aufbau

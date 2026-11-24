@@ -179,3 +179,24 @@ Bestanden laut Prüfer: Vor-/Rückwärtsscrollen in 3 Durchgängen × 29 Messpun
   - keine abgeschnittenen Überschriften
 - **Alle 31 Seiten** bei 1440 und 1920 px: keine JS-Fehler, keine Konsolenfehler, keine 4xx/5xx, kein Überlauf ✔.
 - **Nicht getestet:** echte iPhone/Android-Geräte, Safari, langsame Mobilfunkverbindung.
+
+## Nachtest Außenwäsche als Scroll-Effekt (24.11.2026)
+Playwright mit Chromium, WebGL über SwiftShader.
+
+| Prüfung | Ergebnis |
+|---|---|
+| 390 × 844, 768 × 1024, 1440 × 900, 1920 × 1080: Phasen bei 0/20/30/45/55/70/85/100 % der Strecke | Vorher → Schaumvorwäsche → Abspülen → Trocknen → Sauber, passend zur Position |
+| Zurückscrollen an den Anfang | wieder „Vorher“ (verschmutzt) |
+| Schnelles Hin- und Herscrollen (30 Mausrad-Stöße), danach Sprung nach oben | kein Hängenbleiben. Die Nachlaufglättung ist zeitbasiert, bei 60 fps ca. 0,3 s, in der Testumgebung mit 17 fps 0,5–1 s |
+| Langsames Netz (Bilder 2,5 s verzögert) | Bühne steht dunkel, das Bild erscheint nach dem Laden, keine Fehler |
+| Ohne WebGL | 2D-Überblendung, Fortschritt korrekt |
+| Offline-Fassung (`file://`, Doppelklick) | WebGL verweigert fremde Bilder, deshalb 2D-Überblendung, läuft |
+| Reduzierte Bewegung | keine Scrollstrecke, sauberes Standbild |
+| Ohne JavaScript | sauberes Standbild, KI-Hinweis darunter, Seite normal |
+| Übertragung | Desktop 0,87 MB, Handy 0,67 MB (zuvor Video 2,1 MB bzw. 1,2 MB, eine Bildfolge wären 20 MB) |
+| Bedienelemente | keine. Kein Video, kein Download, keine Buttons. Die Phasenanzeige ist ohne Funktion und `aria-hidden` |
+| Alle 28 Seiten der Sitemap × 4 Breiten | kein horizontaler Überlauf, keine JS-Fehler |
+| `src/check.py` | keine Befunde |
+
+Screenshots: `audit/screenshots/scroll-waesche-1440.jpg`, `scroll-waesche-390.jpg`, `scroll-waesche-mobil-tablet.jpg`.
+Nicht geprüft: echte Geräte (iPhone Safari, Android Chrome). Prüfen lassen, ob die Adressleiste beim Scrollen (svh) ruckelt.
