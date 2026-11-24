@@ -12,7 +12,7 @@ Der Nutzer hat beide Adressen in Apple Kalender (iPhone) abonniert. Neue Termine
 Private Einträge neutral formulieren (z. B. „Privat: Arzttermin“, keine Diagnosen, Beträge oder Zugangsdaten), weil die Datei über ihre Adresse erreichbar ist und `termine-privat.json` im Repository liegt.
 
 ## Neue Erinnerung eintragen (ohne Rückfrage, siehe CLAUDE.md)
-1. Termin in `termine.json` ergänzen (uid eindeutig, start `JJJJ-MM-TTTHH:MM`, `minuten` = Dauer, titel beginnt mit „Carcura:“, optional `erinnern_min` = Hinweis so viele Minuten vorher). Vergangene Termine dürfen drinbleiben.
+1. Termin in `termine.json` ergänzen (uid eindeutig, start `JJJJ-MM-TTTHH:MM`, `minuten` = Dauer, titel beginnt mit „Carcura:“, optional `erinnern_min` = Hinweis so viele Minuten vorher). Vergangene Termine dürfen drinbleiben. Nennt der Nutzer nur den Tag ohne Uhrzeit: start 18:00, `minuten` 60.
    **Kundenaufträge:** Titel nur „Carcura: Auftrag – <Fahrzeug>, <Leistung> (Abholung)“, **keine** Namen, Telefonnummern oder Kennzeichen (die Datei ist öffentlich erreichbar). `erinnern_min` 60. Details ins Auftragsbuch `../auftraege/AUFTRAEGE.md`.
 2. `python3 build_ics.py` → `carcura-erinnerungen.ics`
 3. Hochladen: `wp_upload_media` (filename `cal-1d9dad6f1b082a1f.ics` bzw. `cal-a0bc309d2176a0e6.ics`, content_base64, size, sha256) → neue Medien-ID und URL. Sofort auf privat stellen (siehe Sicherheit).
