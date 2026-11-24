@@ -202,4 +202,13 @@ Punkt 1 (Bewertungen) und Punkt 2 (Verzeichnisse) erledigt Alex selbst. Bing Pla
 ## 13. Search-Console-Lücken an die Website-Session (24.11.2026)
 
 Alex hat alle Punkte aus `docs/SEO-SEARCH-CONSOLE-LUECKEN-2026-11.md` freigegeben. Entfernung nach Waldbröl laut Alex ca. 25 km, Abholung damit ca. 30 €. Übergeben: Scheinwerfer-Kostenabschnitt, Bad Marienberg auf der Hachenburg-Seite, neue Seite /fahrzeugaufbereitung-waldbroel/, Fuhrparkpflege auf /firmenkunde/, interne Links „Fahrzeugaufbereitung im Westerwald“ und „Keramikversiegelung im Westerwald“, Prüfung der Index-Adressen und Canonical für rwg_token.
-**Offen:** Bestätigung der Website-Session hier eintragen.
+**Erledigt 24.11.2026 (Website-Session), von der 3D-Session gegengeprüft (ohne Cache):**
+- Scheinwerfer: Die H2 „Was kostet es, Scheinwerfer aufbereiten zu lassen?“ ersetzt die alte Preis-H2, dazu ein UV-Absatz und 2 FAQ. Preis „ab 69 €“, das Wort „Festpreis“ ist wegen der Projektregel gestrichen.
+- Hachenburg: Titel „… & Bad Marienberg“, Absatz und FAQ. Das Pflegeset ist weggelassen, weil es nicht in CARCURA-DATA steht.
+- Neue Seite /fahrzeugaufbereitung-waldbroel/ (ID 1864): 25 km, Abholung ≈ 30 €, Schema, in der Sitemap, verlinkt von Hol- & Bringservice, der Westerwald-Seite und allen Ortsseiten.
+- /firmenkunde/: H2 „Fuhrparkpflege im Westerwald“ in Sie-Form.
+- Ankerlinks „Fahrzeugaufbereitung im Westerwald“ und „Keramikversiegelung im Westerwald“ auf allen Leistungs- und Ortsseiten.
+- Index-Adressen waren schon sauber (404/noindex/301, Canonical für rwg_token).
+- Zusätzlich repariert: 13 gelöschte Mediendateien auf 8 Seiten, Startseite mobil ruhiger.
+**Abweichung zum Entwurf, zu klären:** Laut MARKE.md gehört das Nanolex-Pflegeset zum Keramik-Paket (ab 700 €), in CARCURA-DATA fehlt es laut Website-Session. Die Daten sollten abgeglichen werden.
+**Nächste Prüfung:** Search-Console-Positionen in etwa 6 Wochen (Anfang Januar).
