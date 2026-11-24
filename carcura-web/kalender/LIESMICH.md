@@ -7,7 +7,8 @@ Aktuelle Datei: Medien-ID **1815**, https://carcura.info/wp-content/uploads/2026
 Der Nutzer hat die Adresse in Apple Kalender (iPhone) abonniert. Neue Termine erscheinen ohne sein Zutun.
 
 ## Neue Erinnerung eintragen (ohne Rückfrage, siehe CLAUDE.md)
-1. Termin in `termine.json` ergänzen (uid eindeutig, start `JJJJ-MM-TTTHH:MM`, titel beginnt mit „Carcura:“). Vergangene Termine dürfen drinbleiben.
+1. Termin in `termine.json` ergänzen (uid eindeutig, start `JJJJ-MM-TTTHH:MM`, `minuten` = Dauer, titel beginnt mit „Carcura:“, optional `erinnern_min` = Hinweis so viele Minuten vorher). Vergangene Termine dürfen drinbleiben.
+   **Kundenaufträge:** Titel nur „Carcura: Auftrag – <Fahrzeug>, <Leistung> (Abholung)“, **keine** Namen, Telefonnummern oder Kennzeichen (die Datei ist öffentlich erreichbar). `erinnern_min` 60. Details ins Auftragsbuch `../auftraege/AUFTRAEGE.md`.
 2. `python3 build_ics.py` → `carcura-erinnerungen.ics`
 3. Hochladen: `wp_upload_media` (filename `cal-1d9dad6f1b082a1f.ics`, content_base64, size, sha256) → neue Medien-ID und URL.
 4. `wp_rm_update_redirect` id 4, target = neue URL. Danach alte Medien-ID mit `wp_delete_media` löschen und die IDs oben aktualisieren.

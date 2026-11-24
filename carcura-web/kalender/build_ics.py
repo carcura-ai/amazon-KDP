@@ -31,7 +31,7 @@ for t in json.load(open(os.path.join(HERE, "termine.json"), encoding="utf8")):
     L += ["BEGIN:VEVENT", f"UID:{t['uid']}@carcura.info", f"DTSTAMP:{stamp}",
           f"DTSTART;TZID=Europe/Berlin:{s:%Y%m%dT%H%M%S}", f"DTEND;TZID=Europe/Berlin:{e:%Y%m%dT%H%M%S}",
           f"SUMMARY:{esc(t['titel'])}", f"DESCRIPTION:{esc(t['text'])}",
-          "BEGIN:VALARM", "ACTION:DISPLAY", f"DESCRIPTION:{esc(t['titel'])}", "TRIGGER:PT0M", "END:VALARM", "END:VEVENT"]
+          "BEGIN:VALARM", "ACTION:DISPLAY", f"DESCRIPTION:{esc(t['titel'])}", f"TRIGGER:-PT{int(t.get('erinnern_min', 0))}M", "END:VALARM", "END:VEVENT"]
 L.append("END:VCALENDAR")
 open(os.path.join(HERE, "carcura-erinnerungen.ics"), "w", encoding="utf8", newline="").write("\r\n".join(fold(x) for x in L) + "\r\n")
 print("ok", sum(1 for x in L if x == "BEGIN:VEVENT"), "Termine")

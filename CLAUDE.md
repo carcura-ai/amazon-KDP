@@ -82,3 +82,7 @@ Termin hat Vorrang, Billigpreise zeitlich begrenzen, Anzahlung bei großen Auftr
   2. Muss Claude selbst etwas tun (z. B. Anzeige pausieren), außerdem `send_later` in dieser Sitzung.
   3. Für Erinnerungen am selben Tag zusätzlich PushNotification, weil Abo-Kalender verzögert laden.
 - Titel beginnt mit „Carcura:“, Text sagt in einem Satz, was zu tun ist.
+- **Kundenaufträge** („Freitag 10 Uhr Golf Innenreinigung“): ohne Rückfrage in den Abo-Kalender
+  (ohne Namen, Telefon, Kennzeichen; Hinweis 60 Min. vorher) **und** ins Auftragsbuch
+  `carcura-web/auftraege/AUFTRAEGE.md`. Fehlt etwas (Preis, Dauer), sinnvoll annehmen und kennzeichnen.
+  Bei Fragen zu Auslastung, Umsatz oder „was steht an“ zuerst das Auftragsbuch lesen.
