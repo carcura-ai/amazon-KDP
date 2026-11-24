@@ -11,3 +11,4 @@ Preis = vereinbarter Endpreis (Kleinunternehmer, keine USt). Direkte Kosten (Spr
 
 | Nr. | Termin | Kunde (Vorname) | Fahrzeug | Leistung | Preis | Abholung | Direkte Kosten | Status | Notiz |
 |---|---|---|---|---|---|---|---|---|---|
+| 001 | Di 01.12.2026, 17:30–20:00 | ? | ? | Motorwäsche | 80 € | ? | ? | geplant | Kunde, Fahrzeug, Abholung noch nachtragen |
