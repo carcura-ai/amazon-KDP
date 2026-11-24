@@ -191,4 +191,10 @@ Alex hat freigegeben, die Website-Punkte aus `docs/SEO-KI-SICHTBARKEIT-2026-11.m
 6. Gutscheinseite: FAQ „Ist ein Carcura-Gutschein ein gutes Weihnachtsgeschenk?“
 
 Punkt 1 (Bewertungen) und Punkt 2 (Verzeichnisse) erledigt Alex selbst. Bing Places, Apple Business Connect, Das Örtliche, Gelbe Seiten und 11880 sind laut Alex angelegt.
-**Offen:** Bestätigung der Website-Session hier eintragen.
+**Erledigt 24.11.2026 (Website-Session), von der 3D-Session gegengeprüft (nur lesend, ohne Cache):**
+- 3) Startseite: genau ein AutomotiveBusiness „Carcura“ (im Kubio-Template „front-header“, wp_id 28) mit 4 sameAs. Daneben steht nur noch eine schlichte Organization als Herausgeber (Rank Math). validator.schema.org laut Website-Session ohne Fehler.
+- 4) Bewertungszahl überall 18 (vorher 17 auf 10 Seiten). Die Zahl stammt aus dem Google-Profil, abgefragt über Windsor.
+- 5) /keramikversiegelung/: „… in unserer Halle in Walterschen, direkt bei Altenkirchen“ steht im Lead.
+- 6) /gutschein/: FAQ „Ist ein Carcura-Gutschein ein gutes Weihnachtsgeschenk?“ in HTML und FAQPage, ohne Gültigkeitsdauer.
+- llms.txt bewusst nicht angelegt.
+**Hinweis:** Die Bewertungszahl steht fest im Text. Bei neuen Bewertungen muss sie auf allen Seiten nachgezogen werden, sonst entsteht wieder ein Widerspruch.
