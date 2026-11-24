@@ -41,16 +41,16 @@ Neue FAQ: **Macht ihr auch Keramikversiegelung für Bad Marienberg?** – Ja. Di
 
 ### Nr. 5: Neue Seite /fahrzeugaufbereitung-waldbroel/
 
-Vorlage: die Wissen-Seite (gleicher Aufbau, gleiche Bausteine). **Vor dem Veröffentlichen die Entfernung Walterschen–Waldbröl und die Abholkosten eintragen. Ich habe sie nicht nachgemessen.**
+Vorlage: die Wissen-Seite (gleicher Aufbau, gleiche Bausteine). Entfernung laut Alex ca. 25 km (24.11.) → Abholung (25 − 10) × 2 € = **ca. 30 €**. Gleiche Rechnung wie bei Hachenburg (24 km → ca. 28 €).
 
 - **Seitentitel:** Fahrzeugaufbereitung Waldbröl – mit Abholung | Carcura
 - **Beschreibung:** Autoaufbereitung für Waldbröl und das Oberbergische: Innenreinigung ab 90 €, Politur ab 349 €, Keramik ab 700 €. Wir holen dein Auto ab.
 - **H1:** Fahrzeugaufbereitung für Waldbröl. Wir holen ab.
-- **Einleitung:** Du wohnst in Waldbröl, Morsbach oder Nümbrecht und suchst jemanden, der dein Auto richtig sauber macht? Wir sind Carcura, eine kleine Aufbereitung mit eigener Halle in Walterschen, [X] km von Waldbröl. Wir holen dein Auto bei dir ab, bereiten es von Hand auf und bringen es zurück.
+- **Einleitung:** Du wohnst in Waldbröl, Morsbach oder Nümbrecht und suchst jemanden, der dein Auto richtig sauber macht? Wir sind Carcura, eine kleine Aufbereitung mit eigener Halle in Walterschen, rund 25 km von Waldbröl. Wir holen dein Auto bei dir ab, bereiten es von Hand auf und bringen es zurück.
 - **Leistungen (Karten wie auf den anderen Ortsseiten):** Innenreinigung ab 90 € · Autopolitur ab 349 € · Keramikversiegelung ab 700 € · Scheinwerfer aufbereiten 69 € · Geruch entfernen (Ozon) ab 59 €
-- **Abholung:** Bis 10 km kostenlos, darüber 2 € pro km. Aus Waldbröl sind das ca. [X] €.
+- **Abholung:** Bis 10 km kostenlos, darüber 2 € pro km. Aus Waldbröl sind das ca. 30 €.
 - **FAQ:**
-  1. *Lohnt sich der Weg von Waldbröl nach Walterschen?* – Du musst ihn nicht fahren: Wir holen ab und bringen zurück. Die Abholung kostet aus Waldbröl ca. [X] €, und den Preis nennen wir dir vorher.
+  1. *Lohnt sich der Weg von Waldbröl nach Walterschen?* – Du musst ihn nicht fahren: Wir holen ab und bringen zurück. Die Abholung kostet aus Waldbröl ca. 30 €, und den Preis nennen wir dir vorher.
   2. *Was kostet eine Innenreinigung?* – Normal ab 90 €, detailliert ab 150 €. Schick uns Fotos per WhatsApp, dann bekommst du einen festen Preis.
   3. *Wie lange ist mein Auto weg?* – [aus der Wissen-Seite übernehmen]
 - **Strukturierte Daten:** wie die anderen Ortsseiten (Service, FAQPage, BreadcrumbList, City „Waldbröl“).
@@ -82,3 +82,5 @@ FAQ neu:
 2. **Diese Woche:** Nr. 6 (Scheinwerfer, steht schon auf Position 8, ist also nah an Seite 1) und Nr. 4 (Bad Marienberg).
 3. **Danach:** Nr. 5 (Waldbröl-Seite, sobald die Entfernung eingetragen ist), Nr. 1 und Nr. 2 (interne Verlinkung), Nr. 7.
 4. **In 6 Wochen:** dieselbe Auswertung wiederholen und Positionen vergleichen.
+
+**Freigabe:** Alex hat am 24.11.2026 alle Punkte freigegeben und an die Website-Session übergeben.

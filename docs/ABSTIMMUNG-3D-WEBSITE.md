@@ -198,3 +198,8 @@ Punkt 1 (Bewertungen) und Punkt 2 (Verzeichnisse) erledigt Alex selbst. Bing Pla
 - 6) /gutschein/: FAQ „Ist ein Carcura-Gutschein ein gutes Weihnachtsgeschenk?“ in HTML und FAQPage, ohne Gültigkeitsdauer.
 - llms.txt bewusst nicht angelegt.
 **Hinweis:** Die Bewertungszahl steht fest im Text. Bei neuen Bewertungen muss sie auf allen Seiten nachgezogen werden, sonst entsteht wieder ein Widerspruch.
+
+## 13. Search-Console-Lücken an die Website-Session (24.11.2026)
+
+Alex hat alle Punkte aus `docs/SEO-SEARCH-CONSOLE-LUECKEN-2026-11.md` freigegeben. Entfernung nach Waldbröl laut Alex ca. 25 km, Abholung damit ca. 30 €. Übergeben: Scheinwerfer-Kostenabschnitt, Bad Marienberg auf der Hachenburg-Seite, neue Seite /fahrzeugaufbereitung-waldbroel/, Fuhrparkpflege auf /firmenkunde/, interne Links „Fahrzeugaufbereitung im Westerwald“ und „Keramikversiegelung im Westerwald“, Prüfung der Index-Adressen und Canonical für rwg_token.
+**Offen:** Bestätigung der Website-Session hier eintragen.
