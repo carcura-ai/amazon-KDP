@@ -58,6 +58,8 @@ describe('Zwei-Faktor-Anmeldung', () => {
     expect([400, 401]).toContain(bad.statusCode);
     const en = await app.inject(as(admin, { method: 'POST', url: '/api/auth/2fa/enable', payload: { code: totpCode(secret) } }));
     expect(en.statusCode).toBe(200);
+    expect((await app.inject(as(admin, { url: '/api/auth/me' }))).statusCode).toBe(401);
+    admin.cookie = cookieFrom(en);
     backup = en.json().backupCodes;
     expect(backup).toHaveLength(10);
     const me = await app.inject(as(admin, { method: 'GET', url: '/api/auth/me' }));
@@ -96,9 +98,15 @@ describe('Zwei-Faktor-Anmeldung', () => {
     const me2 = await app.inject(as(admin, { method: 'GET', url: '/api/auth/me' }));
     expect(me2.json().twoFactorEnabled).toBe(false);
     expect(me2.json().mustSetup2fa).toBe(true);
+    expect((await app.inject(as(admin, { url: '/api/customers' }))).json().error).toBe('two_factor_required');
     const login = await app.inject({ method: 'POST', url: '/api/auth/login', payload: { email: ADMIN.email, password: ADMIN.password } });
     expect(login.json().requires2fa).toBeUndefined();
     expect(cookieFrom(login)).toContain('cm_sid=');
+    const setup = await app.inject(as(admin, { method: 'POST', url: '/api/auth/2fa/setup', payload: {} }));
+    expect(setup.statusCode).toBe(200);
+    const enabled = await app.inject(as(admin, { method: 'POST', url: '/api/auth/2fa/enable', payload: { code: totpCode(setup.json().secret) } }));
+    expect(enabled.statusCode).toBe(200);
+    admin.cookie = cookieFrom(enabled);
   });
 });
 

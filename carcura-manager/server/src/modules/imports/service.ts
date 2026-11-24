@@ -2,7 +2,7 @@ import fs from 'node:fs';
 import type { FastifyInstance } from 'fastify';
 import { and, eq, inArray, sql } from 'drizzle-orm';
 import { z } from 'zod';
-import { companies, customers, documentImports, expenses, invoiceItems, invoices, payments, files, aiUsageLog } from '../../db/schema.js';
+import { flatpayReceipts, companies, customers, documentImports, expenses, invoiceItems, invoices, payments, files, aiUsageLog } from '../../db/schema.js';
 import { newId, nowIso } from '../../core/ids.js';
 import { nextNumber } from '../../core/numbering.js';
 import { normalizeEmail, normalizeName, normalizePhone } from '../../core/normalize.js';
@@ -419,6 +419,7 @@ const IMPORT_ACTIVITY_SUBJECTS = ['Kunde aus importierter Rechnung angelegt'];
 /** Grund, warum eine Übernahme nicht mehr zurückgenommen werden darf (null = möglich). */
 export function undoBlocker(app: FastifyInstance, row: ImportRow): string | null {
   if (!row.invoiceId) return null;
+  if (app.db.select({ id: flatpayReceipts.id }).from(flatpayReceipts).where(and(eq(flatpayReceipts.companyId, row.companyId), eq(flatpayReceipts.invoiceId, row.invoiceId))).get()) return 'Die Rechnung ist mit einem Flatpay-Bon verknüpft.';
   const inv = app.db.select().from(invoices).where(and(eq(invoices.id, row.invoiceId), eq(invoices.companyId, row.companyId))).get();
   if (!inv) return null;
   if (inv.sentAt) return 'Die Rechnung wurde bereits aus dieser Software versendet.';

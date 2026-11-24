@@ -7,7 +7,7 @@ import { parse } from '../../core/validation.js';
 import { badRequest, unauthorized, notFound } from '../../core/errors.js';
 import { verifyPassword } from '../../core/password.js';
 import { generateTotpSecret, verifyTotp, otpauthUrl, generateBackupCodes, hashBackupCode } from '../../core/totp.js';
-import { createSession } from '../../core/session.js';
+import { activeCompany, createSession, revokeAllUserSessions } from '../../core/session.js';
 import { SESSION_COOKIE, ctxOf } from '../../plugins/auth.js';
 import { writeAudit } from '../../core/audit.js';
 import { nowIso } from '../../core/ids.js';
@@ -36,7 +36,7 @@ export default async function twoFactorRoutes(app: FastifyInstance) {
     try { payload = JSON.parse(app.secrets.decrypt(challenge)) as { uid: string; exp: number }; } catch { throw unauthorized('Anmeldung abgelaufen. Bitte erneut anmelden.'); }
     if (payload.exp < Date.now()) throw unauthorized('Anmeldung abgelaufen. Bitte erneut anmelden.');
     const user = getUser(payload.uid);
-    if (!user || !user.isActive || !user.totpSecretEnc || !user.totpEnabledAt) throw unauthorized('Anmeldung nicht möglich.');
+    if (!user || !user.isActive || !user.totpSecretEnc || !user.totpEnabledAt || !activeCompany(app.db, user.companyId)) throw unauthorized('Anmeldung nicht möglich.');
     if (user.lockedUntil && new Date(user.lockedUntil).getTime() > Date.now()) {
       throw new AppError(423, 'locked', `Konto vorübergehend gesperrt. Bitte in ${LOCK_MINUTES} Minuten erneut anmelden.`);
     }
@@ -77,7 +77,7 @@ export default async function twoFactorRoutes(app: FastifyInstance) {
   });
 
   /** Einrichtung abschließen: ersten Code prüfen, dann aktivieren und Wiederherstellungscodes ausgeben. */
-  app.post('/api/auth/2fa/enable', { preHandler: app.requireAuth() }, async (req) => {
+  app.post('/api/auth/2fa/enable', { preHandler: app.requireAuth() }, async (req, reply) => {
     const ctx = ctxOf(req);
     const { code } = parse(z.object({ code: z.string().trim().min(6).max(8) }), req.body);
     const user = getUser(ctx.userId)!;
@@ -86,6 +86,8 @@ export default async function twoFactorRoutes(app: FastifyInstance) {
     if (!verifyTotp(app.secrets.decrypt(user.totpSecretEnc), code)) throw badRequest('Der Code ist ungültig. Uhrzeit des Handys prüfen und erneut versuchen.');
     const codes = generateBackupCodes();
     app.db.update(users).set({ totpEnabledAt: nowIso(), backupCodesJson: JSON.stringify(codes.hashes) }).where(eq(users.id, user.id)).run();
+    revokeAllUserSessions(app.db, user.id);
+    reply.setCookie(SESSION_COOKIE, createSession(app.db, app.config, user, { ip: req.ip, userAgent: req.headers['user-agent'] }), app.cookieOptions);
     writeAudit(app.db, ctx, { action: 'auth.2fa_enabled', entityType: 'user', entityId: user.id });
     return { ok: true, backupCodes: codes.plain };
   });

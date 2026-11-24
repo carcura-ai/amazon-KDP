@@ -5,7 +5,7 @@ import { users, companies, supportSessions } from '../../db/schema.js';
 import { parse, zEmail } from '../../core/validation.js';
 import { hashPassword, verifyPassword, validatePasswordPolicy } from '../../core/password.js';
 import { AppError, badRequest, unauthorized } from '../../core/errors.js';
-import { createSession, revokeSession, revokeAllUserSessions } from '../../core/session.js';
+import { activeCompany, createSession, revokeSession, revokeAllUserSessions } from '../../core/session.js';
 import { nowIso } from '../../core/ids.js';
 import { writeAudit } from '../../core/audit.js';
 import { SESSION_COOKIE, ctxOf } from '../../plugins/auth.js';
@@ -63,6 +63,7 @@ export default async function authRoutes(app: FastifyInstance) {
       writeAudit(app.db, { companyId: user.companyId, userId: user.id, ip: req.ip }, { action: 'auth.login_failed', entityType: 'user', entityId: user.id });
       throw generic;
     }
+    if (!activeCompany(app.db, user.companyId)) throw generic;
     if (user.totpEnabledAt && user.totpSecretEnc) {
       // Zweiter Faktor erforderlich: noch keine Sitzung, nur eine kurzlebige Challenge. Der Fehlversuchszähler wird
       // erst nach bestandenem zweiten Faktor zurückgesetzt (sonst ließe sich der Code unbegrenzt durchprobieren).

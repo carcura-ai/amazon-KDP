@@ -35,7 +35,7 @@ let app: FastifyInstance;
 let admin: Session;
 beforeAll(async () => {
   const dataDir = `/tmp/cm-test/rp-${process.pid}`;
-  const config = loadConfig({ dbPath: ':memory:', appSecret: 'test-secret-test-secret-test-secret-1234', dataDir, filesDir: `${dataDir}/files`, backupsDir: `${dataDir}/backups`, logLevel: 'silent', chromiumPath: '/opt/pw-browsers/chromium' });
+  const config = loadConfig({ dbPath: ':memory:', appSecret: 'test-secret-test-secret-test-secret-1234', dataDir, filesDir: `${dataDir}/files`, backupsDir: `${dataDir}/backups`, logLevel: 'silent', chromiumPath: process.env.CHROMIUM_PATH ?? '/opt/pw-browsers/chromium' });
   app = await buildApp({ config, dbHandle: openDatabase(':memory:'), logger: false, fetchFn: fakeFetch });
   admin = await setupCompany(app);
   const c = (await app.inject(as(admin, { method: 'POST', url: '/api/customers', payload: { firstName: 'Rita', lastName: 'Report', email: 'rita@example.de' } }))).json().customer;

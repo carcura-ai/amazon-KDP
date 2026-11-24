@@ -8,7 +8,7 @@ import { writeAudit } from '../../core/audit.js';
 import { PERMISSIONS, ROLES, DEFAULT_ROLE_PERMISSIONS } from '../../core/permissions.js';
 import { ctxOf } from '../../plugins/auth.js';
 import { publicCompany } from '../auth/routes.js';
-import { badRequest } from '../../core/errors.js';
+import { badRequest, forbidden } from '../../core/errors.js';
 import { FeatureError } from '../../plugins/entitlements.js';
 import { desc, sql } from 'drizzle-orm';
 
@@ -91,6 +91,7 @@ export default async function companyRoutes(app: FastifyInstance) {
 
   app.put('/api/company/role-permissions/:role', { preHandler: app.requireAuth('users:manage') }, async (req) => {
     const ctx = ctxOf(req);
+    if (ctx.role !== 'admin') throw forbidden('Nur Administratoren können Rollenrechte ändern.');
     const { role } = req.params as { role: string };
     if (!(ROLES as readonly string[]).includes(role)) throw badRequest('Unbekannte Rolle.');
     if (role === 'admin') throw badRequest('Die Administrator-Rolle behält immer alle Rechte.');

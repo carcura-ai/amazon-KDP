@@ -1,6 +1,6 @@
 import { and, eq, isNotNull, lt, sql } from 'drizzle-orm';
 import type { Db } from '../../db/index.js';
-import { customers, vehicles, leads, appointments, orders, orderItems, offers, offerItems, invoices, invoiceItems, payments, protocols, protocolDamages, files, tasks, activities, deletionLog, companies, documentImports } from '../../db/schema.js';
+import { flatpayReceipts, customers, vehicles, leads, appointments, orders, orderItems, offers, offerItems, invoices, invoiceItems, payments, protocols, protocolDamages, files, tasks, activities, deletionLog, companies, documentImports } from '../../db/schema.js';
 import type { FileStorage } from '../../integrations/storage.js';
 import { newId, nowIso } from '../../core/ids.js';
 import { privacySettings } from './settings.js';
@@ -25,6 +25,7 @@ export function logDeletion(db: Db, entry: { companyId: string; subjectType: str
 export function retentionEnd(db: Db, companyId: string, customerId: string, years: number): { until: string; reason: string } | null {
   const latest = db.get<{ d: string | null }>(sql`select max(d) as d from (
     select coalesce(issue_date, created_at) as d from invoices where company_id = ${companyId} and customer_id = ${customerId} and status != 'draft'
+    union all select fp.paid_on from flatpay_receipts fp join orders o on o.id = fp.order_id where fp.company_id = ${companyId} and o.company_id = ${companyId} and o.customer_id = ${customerId}
     union all select coalesce(issue_date, created_at) from offers where company_id = ${companyId} and customer_id = ${customerId} and status = 'accepted'
     union all select created_at from orders where company_id = ${companyId} and customer_id = ${customerId} and status not in ('planned','cancelled')
   )`)?.d;
@@ -54,6 +55,7 @@ export function purgeCustomer(db: Db, storage: FileStorage, companyId: string, c
   const ordIds = db.select({ id: orders.id }).from(orders).where(and(eq(orders.companyId, companyId), eq(orders.customerId, customerId))).all();
   const protIds = db.select({ id: protocols.id }).from(protocols).where(and(eq(protocols.companyId, companyId), eq(protocols.customerId, customerId))).all();
   const counts = db.transaction((tx) => {
+    for (const o of ordIds) tx.delete(flatpayReceipts).where(and(eq(flatpayReceipts.companyId, companyId), eq(flatpayReceipts.orderId, o.id))).run();
     for (const i of invIds) { tx.delete(invoiceItems).where(eq(invoiceItems.invoiceId, i.id)).run(); tx.delete(payments).where(eq(payments.invoiceId, i.id)).run(); }
     for (const o of offIds) tx.delete(offerItems).where(eq(offerItems.offerId, o.id)).run();
     for (const o of ordIds) tx.delete(orderItems).where(eq(orderItems.orderId, o.id)).run();

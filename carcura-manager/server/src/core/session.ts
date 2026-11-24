@@ -81,6 +81,10 @@ export function syncNewPermissions(db: Db): number {
   return added;
 }
 
+export function activeCompany(db: Db, companyId: string) {
+  return db.select().from(companies).where(and(eq(companies.id, companyId), eq(companies.isActive, true))).get();
+}
+
 /** Lädt und validiert eine Session (Leerlauf- und Absolut-Timeout), verlängert den Leerlaufzähler. */
 export function resolveSession(db: Db, cfg: AppConfig, sessionId: string, ip?: string): SessionInfo | null {
   const row = db.select().from(sessions).where(and(eq(sessions.id, sessionId), isNull(sessions.revokedAt))).get();
@@ -92,7 +96,7 @@ export function resolveSession(db: Db, cfg: AppConfig, sessionId: string, ip?: s
     return null;
   }
   const user = db.select().from(users).where(eq(users.id, row.userId)).get();
-  if (!user || !user.isActive) return null;
+  if (!user || !user.isActive || !activeCompany(db, row.companyId) || !activeCompany(db, user.companyId)) return null;
   // Supportzugriff: nur solange freigegeben und nicht abgelaufen; Rechte je nach Modus
   let support: typeof supportSessions.$inferSelect | undefined;
   if (row.supportSessionId) {

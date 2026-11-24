@@ -13,7 +13,7 @@ export const PERMISSIONS = [
   'documents:read', 'documents:write',
   'protocols:read', 'protocols:write',
   'inventory:read', 'inventory:write',
-  'finance:read', 'finance:write',
+  'finance:read', 'finance:write', 'flatpay:intake',
   'marketing:read',
   'reports:read',
   'tasks:read', 'tasks:write',

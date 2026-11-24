@@ -13,6 +13,7 @@ import { ctxOf } from '../../plugins/auth.js';
 import { privacySettings } from '../privacy/settings.js';
 import { EXPENSE_CATEGORIES } from '../finance/routes.js';
 import type { NormalizedInvoice } from '../../integrations/einvoice/model.js';
+import { flatpayRoutes, intakeFlatpay } from './flatpay.js';
 import { type ImportQueue, undoBlocker, applyImport, checkInvoice, emptyInvoice, finishWith, matchCustomer, normalizedInvoiceSchema, summarize, undoImport, categoryFor, type ImportDirection } from './service.js';
 
 declare module 'fastify' {
@@ -44,7 +45,7 @@ export default async function importRoutes(app: FastifyInstance) {
   };
   const getRow = (companyId: string, id: string) => {
     const row = app.db.select().from(documentImports).where(and(eq(documentImports.id, id), eq(documentImports.companyId, companyId))).get();
-    if (!row) throw notFound('Beleg');
+    if (!row || !DIRECTIONS.some((direction) => direction === row.direction)) throw notFound('Beleg');
     return row;
   };
   const company = (id: string) => app.db.select().from(companies).where(eq(companies.id, id)).get()!;
@@ -58,6 +59,7 @@ export default async function importRoutes(app: FastifyInstance) {
     return {
       directions,
       canWrite: DIRECTIONS.filter((d) => can(ctx, d, 'write')),
+      flatpayEnabled: app.hasFeature(ctx.companyId, 'LEXWARE') && ctx.permissions.has('orders:read') && ctx.permissions.has('finance:write'),
       aiEnabled: p.aiDocumentRecognition,
       aiConfigured: Boolean(app.integrations.get(ctx.companyId, 'claude')),
       canManageAi: ctx.permissions.has('privacy:manage'),
@@ -79,25 +81,56 @@ export default async function importRoutes(app: FastifyInstance) {
     return { aiEnabled: enabled };
   });
 
-  /** Belege hochladen (PDF, Foto, XML). Jede Datei wird einzeln verarbeitet; identische Dateien werden erkannt. */
-  app.post('/api/document-imports', { preHandler: app.requireAuth(), config: { rateLimit: { max: 120, timeWindow: '1 minute' } } }, async (req) => {
+  flatpayRoutes(app);
+  interface Upload {
+    buffer: Buffer;
+    filename: string;
+    mimetype: string;
+    truncated: boolean;
+  }
+  async function receive(req: FastifyRequest, maxFiles: number) {
     const fields: Record<string, string> = {};
-    const uploaded: Array<{ buffer: Buffer; filename: string; mimetype: string; truncated: boolean }> = [];
+    const uploaded: Upload[] = [];
     for await (const part of req.parts()) {
       if (part.type === 'file') {
-        if (uploaded.length >= MAX_FILES_PER_UPLOAD) throw badRequest(`Höchstens ${MAX_FILES_PER_UPLOAD} Dateien auf einmal.`);
+        if (uploaded.length >= maxFiles) throw badRequest(`Höchstens ${maxFiles} Dateien auf einmal.`);
         const buffer = await part.toBuffer();
         uploaded.push({ buffer, filename: part.filename || 'Beleg', mimetype: part.mimetype, truncated: part.file.truncated });
       } else fields[part.fieldname] = String(part.value);
     }
+    return { fields, uploaded };
+  }
+
+  app.post('/api/document-imports/flatpay', { preHandler: app.requireAuth('finance:write', 'orders:read') }, async (req) => {
+    if (!app.hasFeature(ctxOf(req).companyId, 'LEXWARE')) throw forbidden('Das Lexware-Modul ist pausiert.');
+    const { fields, uploaded } = await receive(req, 1);
+    return intakeFlatpay(app, ctxOf(req), fields.caption, uploaded[0]);
+  });
+
+  app.post('/api/document-imports/whatsapp', { preHandler: app.requireAuth('flatpay:intake'), config: { rateLimit: { max: 30, timeWindow: '1 minute' } } }, async (req) => {
+    const ctx = ctxOf(req);
+    const { fields, uploaded } = await receive(req, 1);
+    if (fields.direction === 'flatpay') return intakeFlatpay(app, ctx, fields.caption, uploaded[0]);
+    if (fields.direction !== 'incoming') throw badRequest('Bitte Flatpay oder Lieferantenbeleg wählen.');
+    if (!app.hasFeature(ctx.companyId, 'FINANCE')) throw forbidden('Das Modul Finanzen ist pausiert.');
+    return uploadInvoices(ctx, 'incoming', false, uploaded);
+  });
+
+  /** Belege hochladen (PDF, Foto, XML). Jede Datei wird einzeln verarbeitet; identische Dateien werden erkannt. */
+  app.post('/api/document-imports', { preHandler: app.requireAuth(), config: { rateLimit: { max: 120, timeWindow: '1 minute' } } }, async (req) => {
+    const { fields, uploaded } = await receive(req, MAX_FILES_PER_UPLOAD);
     const { direction, markPaid } = parse(z.object({ direction: z.enum(DIRECTIONS), markPaid: z.enum(['true', 'false']).default('false') }), fields);
-    const ctx = assertAccess(req, direction, 'write');
+    return uploadInvoices(assertAccess(req, direction, 'write'), direction, markPaid === 'true', uploaded);
+  });
+
+  async function uploadInvoices(ctx: Ctx, direction: ImportDirection, markPaid: boolean, uploaded: Upload[]) {
     if (uploaded.length === 0) throw badRequest('Keine Datei übermittelt.');
     const results: Array<{ fileName: string; status: 'queued' | 'duplicate' | 'rejected'; id?: string; existingId?: string; message?: string }> = [];
     for (const u of uploaded) {
       if (u.truncated) { results.push({ fileName: u.filename, status: 'rejected', message: 'Datei ist größer als 25 MB.' }); continue; }
       const sha = crypto.createHash('sha256').update(u.buffer).digest('hex');
-      const existing = app.db.select({ id: documentImports.id, createdAt: documentImports.createdAt }).from(documentImports).where(and(eq(documentImports.companyId, ctx.companyId), eq(documentImports.sha256, sha), eq(documentImports.direction, direction), notInArray(documentImports.status, ['discarded', 'undone', 'failed']))).get();
+      const findExisting = () => app.db.select({ id: documentImports.id, createdAt: documentImports.createdAt }).from(documentImports).where(and(eq(documentImports.companyId, ctx.companyId), eq(documentImports.sha256, sha), eq(documentImports.direction, direction), notInArray(documentImports.status, ['discarded', 'undone', 'failed']))).get();
+      const existing = findExisting();
       if (existing) { results.push({ fileName: u.filename, status: 'duplicate', existingId: existing.id, message: `Bereits hochgeladen am ${new Date(existing.createdAt).toLocaleDateString('de-DE')}.` }); continue; }
       let file;
       try {
@@ -106,14 +139,20 @@ export default async function importRoutes(app: FastifyInstance) {
         results.push({ fileName: u.filename, status: 'rejected', message: err instanceof Error ? err.message : 'Datei abgelehnt.' });
         continue;
       }
+      const concurrent = findExisting();
+      if (concurrent) {
+        app.storage.remove(ctx.companyId, file.id);
+        results.push({ fileName: u.filename, status: 'duplicate', existingId: concurrent.id });
+        continue;
+      }
       const id = newId();
-      app.db.insert(documentImports).values({ id, companyId: ctx.companyId, direction, status: 'queued', fileId: file.id, fileName: u.filename.slice(0, 200), sha256: sha, optionsJson: JSON.stringify({ markPaid: markPaid === 'true' }), createdByUserId: ctx.userId }).run();
+      app.db.insert(documentImports).values({ id, companyId: ctx.companyId, direction, status: 'queued', fileId: file.id, fileName: u.filename.slice(0, 200), sha256: sha, optionsJson: JSON.stringify({ markPaid }), createdByUserId: ctx.userId }).run();
       writeAudit(app.db, ctx, { action: 'import.upload', entityType: 'document_import', entityId: id, after: { direction, file: u.filename, size: u.buffer.length } });
       queue.enqueue(id);
       results.push({ fileName: u.filename, status: 'queued', id });
     }
     return { items: results };
-  });
+  }
 
   app.get('/api/document-imports', { preHandler: app.requireAuth() }, async (req) => {
     const ctx = ctxOf(req);

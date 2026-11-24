@@ -27,6 +27,7 @@ export const FEATURES = {
   TASKS: 'Aufgaben',
   INVENTORY: 'Lager',
   FINANCE: 'Finanzen',
+  LEXWARE: 'Lexware',
   MARGINS: 'Preis- und Margenanalyse',
   SERVICE_PLANS: 'Pflegeabos und wiederkehrende Leistungen',
   REMINDERS: 'Erinnerungen und Automationen',
@@ -55,7 +56,7 @@ export const FEATURE_KEYS = Object.keys(FEATURES) as FeatureKey[];
 const START: FeatureKey[] = ['CUSTOMERS', 'VEHICLES', 'CALENDAR', 'ORDERS', 'OFFERS', 'INVOICES', 'PROTOCOLS', 'REPORTS_BASIC', 'BACKUPS'];
 const BUSINESS: FeatureKey[] = [...START, 'CRM_LEADS', 'TASKS', 'INVENTORY', 'FINANCE', 'MARGINS', 'SERVICE_PLANS', 'REMINDERS', 'MARKETING', 'REPORTS_ADVANCED', 'TIME_TRACKING'];
 const PRO: FeatureKey[] = [...BUSINESS, 'DEALER_PORTAL', 'CUSTOMER_PORTAL', 'ONLINE_BOOKING', 'PAINT_MEASUREMENT', 'E_INVOICE', 'ANALYTICS_ADVANCED', 'COMPETITORS', 'AI_ASSISTANT', 'API_ACCESS', 'GRANULAR_PERMISSIONS', 'WHITE_LABEL'];
-const ENTERPRISE: FeatureKey[] = [...FEATURE_KEYS];
+const ENTERPRISE: FeatureKey[] = FEATURE_KEYS.filter((key) => key !== 'LEXWARE');
 
 /** Startwerte. Preise sind Platzhalter aus der Planung und werden im Betreiberbereich gepflegt. */
 export const DEFAULT_PLANS = [
@@ -113,7 +114,10 @@ function isEffectivelyEnded(sub: typeof tenantSubscriptions.$inferSelect, now: D
 }
 
 export function computeEntitlements(db: Db, companyId: string, mode: 'selfhosted' | 'saas', now = new Date()): Entitlements {
+  const overrideRows = db.select().from(tenantFeatureOverrides).where(eq(tenantFeatureOverrides.companyId, companyId)).all();
   const all = new Set(FEATURE_KEYS);
+  all.delete('LEXWARE');
+  if (overrideRows.some((o) => o.featureKey === 'LEXWARE' && o.enabled)) all.add('LEXWARE');
   if (mode === 'selfhosted') return { mode, source: 'selfhosted', plan: null, status: null, canWrite: true, features: all, limits: { maxUsers: null, maxLocations: null } };
   const sub = db.select().from(tenantSubscriptions).where(eq(tenantSubscriptions.companyId, companyId)).get();
   if (!sub) return { mode, source: 'legacy', plan: null, status: null, canWrite: true, features: all, limits: { maxUsers: null, maxLocations: null } };
@@ -127,7 +131,7 @@ export function computeEntitlements(db: Db, companyId: string, mode: 'selfhosted
     if (maxUsers !== null && a.extraUsers) maxUsers += a.extraUsers * qty;
     if (maxLocations !== null && a.extraLocations) maxLocations += a.extraLocations * qty;
   }
-  for (const o of db.select().from(tenantFeatureOverrides).where(eq(tenantFeatureOverrides.companyId, companyId)).all()) {
+  for (const o of overrideRows) {
     if (o.enabled) features.add(o.featureKey as FeatureKey);
     else features.delete(o.featureKey as FeatureKey);
   }

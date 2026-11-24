@@ -3,7 +3,8 @@ import { openDatabase } from './db/index.js';
 import { BackupService, applyPendingRestore } from './integrations/backup.js';
 import { createRequire } from 'node:module';
 import { createApiKey } from './core/apikeys.js';
-import { apiKeys, companies, users } from './db/schema.js';
+import { newId } from './core/ids.js';
+import { apiKeys, companies, tenantFeatureOverrides, users } from './db/schema.js';
 import { and, asc, eq, isNull } from 'drizzle-orm';
 
 /**
@@ -42,16 +43,33 @@ async function main() {
     console.log(ok ? 'Wiederherstellung abgeschlossen. Server kann gestartet werden.' : 'Wiederherstellung fehlgeschlagen.');
     process.exit(ok ? 0 : 1);
   }
-  if (cmd === 'api-key-create') {
+  if (cmd === 'lexware-enable' || cmd === 'lexware-pause') {
+    if (!arg) throw new Error('Mandanten-ID fehlt.');
+    const handle = openDatabase(config.dbPath);
+    const { db } = handle;
+    if (!db.select().from(companies).where(eq(companies.id, arg)).get()) {
+      handle.close();
+      throw new Error('Betrieb nicht gefunden.');
+    }
+    db.insert(tenantFeatureOverrides).values({ id: newId(), companyId: arg, featureKey: 'LEXWARE', enabled: cmd === 'lexware-enable' })
+      .onConflictDoUpdate({ target: [tenantFeatureOverrides.companyId, tenantFeatureOverrides.featureKey], set: { enabled: cmd === 'lexware-enable' } }).run();
+    handle.close();
+    return;
+  }
+  if (cmd === 'api-key-create' || cmd === 'receipt-key-create') {
     const handle = openDatabase(config.dbPath);
     const db = handle.db;
-    const company = db.select().from(companies).orderBy(asc(companies.createdAt)).get();
+    const receiptOnly = cmd === 'receipt-key-create';
+    if (receiptOnly && !arg) { handle.close(); throw new Error('Mandanten-ID fehlt.'); }
+    const company = receiptOnly ? db.select().from(companies).where(eq(companies.id, arg!)).get() : db.select().from(companies).orderBy(asc(companies.createdAt)).get();
     const admin = company && db.select().from(users).where(and(eq(users.companyId, company.id), eq(users.role, 'admin'), eq(users.isActive, true))).orderBy(asc(users.createdAt)).get();
     if (!company || !admin) { handle.close(); throw new Error('Keine Firma bzw. kein aktiver Administrator gefunden – erst die Ersteinrichtung abschließen.'); }
-    const k = createApiKey(db, { companyId: company.id, name: arg || 'API', createdByUserId: admin.id });
+    const name = receiptOnly ? 'WhatsApp-Belegimport' : arg || 'API';
+    const k = createApiKey(db, { companyId: company.id, name, createdByUserId: admin.id, receiptOnly });
     handle.close();
-    console.log(`API-Schlüssel „${arg || 'API'}“ für ${company.name} angelegt (Kennung ${k.prefix}).`);
-    console.log('Rechte: Kunden, Fahrzeuge, Aufträge, Leads, Termine lesen/anlegen/ändern – kein Löschen, keine Rechnungen.');
+    console.log(`API-Schlüssel „${name}“ für ${company.name} angelegt (Kennung ${k.prefix}).`);
+    if (receiptOnly) console.log('Rechte: WhatsApp-Belege entgegennehmen.');
+    else console.log('Rechte: Kunden, Fahrzeuge, Aufträge, Leads, Termine lesen/anlegen/ändern – kein Löschen, keine Rechnungen.');
     console.log('Der Schlüssel wird nur JETZT angezeigt:');
     console.log(k.key);
     return;
@@ -70,6 +88,6 @@ async function main() {
     console.log(r.changes ? `Schlüssel ${arg} gesperrt.` : `Kein aktiver Schlüssel ${arg} gefunden.`);
     return;
   }
-  console.log('Befehle: backup [manual|pre-update] | list | restore <datei.zip> | api-key-create <name> | api-key-list | api-key-revoke <kennung>');
+  console.log('Befehle: backup [manual|pre-update] | list | restore <datei.zip> | api-key-create <name> | receipt-key-create <Mandanten-ID> | lexware-enable <Mandanten-ID> | lexware-pause <Mandanten-ID> | api-key-list | api-key-revoke <kennung>');
 }
 main().catch((err) => { console.error(err instanceof Error ? err.message : err); process.exit(1); });

@@ -2,9 +2,9 @@ import type { FastifyInstance } from 'fastify';
 import { z } from 'zod';
 import fs from 'node:fs';
 import { and, asc, eq } from 'drizzle-orm';
-import { files, companies } from '../../db/schema.js';
+import { documentImports, files, companies } from '../../db/schema.js';
 import { parse, zOptionalText } from '../../core/validation.js';
-import { badRequest, notFound } from '../../core/errors.js';
+import { conflict, badRequest, notFound } from '../../core/errors.js';
 import { writeAudit } from '../../core/audit.js';
 import { nowIso } from '../../core/ids.js';
 import { ctxOf } from '../../plugins/auth.js';
@@ -76,6 +76,9 @@ export default async function fileRoutes(app: FastifyInstance) {
     const { id } = req.params as { id: string };
     const row = app.storage.get(ctx.companyId, id);
     if (!row) throw notFound('Datei');
+    if (app.db.select({ id: documentImports.id }).from(documentImports).where(and(eq(documentImports.companyId, ctx.companyId), eq(documentImports.fileId, id), eq(documentImports.direction, 'flatpay'))).get()) {
+      throw conflict('Der Originalbon gehört zu einem Flatpay-Vorgang.');
+    }
     app.storage.remove(ctx.companyId, id);
     writeAudit(app.db, ctx, { action: 'file.delete', entityType: 'file', entityId: id, before: { name: row.originalName } });
     return { ok: true };

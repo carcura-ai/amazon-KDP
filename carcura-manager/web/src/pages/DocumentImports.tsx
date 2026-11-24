@@ -17,7 +17,7 @@ interface InvoiceData { kind: 'invoice' | 'credit_note' | 'correction' | 'receip
 interface ImportSummary { id: string; direction: Direction; status: Status; fileName: string; fileId: string | null; method: string | null; number: string | null; issueDate: string | null; grossCents: number | null; kind: string | null; partyName: string | null; error: string | null; warnings: string[]; invoiceId: string | null; customerId: string | null; customerCreated: boolean; expenseIds: string[]; createdAt: string; processedAt: string | null; appliedAt: string | null }
 interface Candidate { id: string; customerNumber: string; label: string; score: number; reasons: string[] }
 interface ImportDetail { import: ImportSummary; data: InvoiceData | null; file: { id: string; mimeType: string; originalName: string; sizeBytes: number } | null; candidates: Candidate[]; suggestedCustomerId: string | null; matchDecision: 'matched' | 'uncertain' | 'ambiguous' | 'new' | null; undoBlockedReason: string | null; suggestedCategory: string | null; customer: { id: string; customerNumber: string; firstName: string; lastName: string; companyName: string | null } | null; invoice: { id: string; invoiceNumber: string; status: string; totalCents: number } | null; expenses: Array<{ id: string; date: string; category: string; grossCents: number; vatBp: number; isPaid: boolean }>; options: { markPaid?: boolean } }
-interface ImportStatusInfo { directions: Direction[]; canWrite: Direction[]; aiEnabled: boolean; aiConfigured: boolean; canManageAi: boolean; counts: Array<{ direction: Direction; status: Status; n: number }>; categories: string[] }
+interface ImportStatusInfo { flatpayEnabled: boolean; directions: Direction[]; canWrite: Direction[]; aiEnabled: boolean; aiConfigured: boolean; canManageAi: boolean; counts: Array<{ direction: Direction; status: Status; n: number }>; categories: string[] }
 interface UploadResult { fileName: string; status: 'queued' | 'duplicate' | 'rejected'; id?: string; existingId?: string; message?: string }
 
 const STATUS: Record<Status, { label: string; tone: string }> = {
@@ -61,17 +61,21 @@ async function uploadOne(file: File, direction: Direction, markPaid: boolean): P
 
 export function DocumentImportsPage() {
   const status = useQuery({ queryKey: ['document-imports', 'status'], queryFn: () => get<ImportStatusInfo>('/api/document-imports/status') });
-  const [tab, setTab] = useState<Direction | null>(null);
+  const [tab, setTab] = useState<Direction | 'flatpay' | null>(null);
   const dirs = status.data?.directions ?? [];
-  const active = tab ?? dirs[0] ?? null;
+  const flatpayEnabled = status.data?.flatpayEnabled ?? false;
+  const active = tab === 'flatpay' && flatpayEnabled ? tab : dirs.find((dir) => dir === tab) ?? dirs[0] ?? (flatpayEnabled ? 'flatpay' : null);
   if (status.isLoading) return <><PageHead title="Belege importieren" /><Card><Skeleton /></Card></>;
   if (!active) return <><PageHead title="Belege importieren" /><Empty title="Keine Berechtigung" text="Für den Belegimport sind Rechte für Rechnungen oder Finanzen nötig." /></>;
   const open = (d: Direction) => (status.data?.counts ?? []).filter((c) => c.direction === d && (c.status === 'needs_review' || c.status === 'failed')).reduce((s, c) => s + c.n, 0);
   return (
     <>
       <PageHead title="Belege importieren" sub="Rechnungen als PDF, Foto oder E-Rechnung hochladen – Kunde, Rechnung bzw. Ausgabe werden automatisch angelegt, ausgefüllt und abgelegt." />
-      <Tabs value={active} onChange={setTab} items={dirs.map((d) => ({ id: d, label: <span className="row" style={{ gap: 6 }}>{d === 'outgoing' ? 'Ausgangsrechnungen (z. B. Lexware Office)' : 'Eingangsrechnungen (Händler, Lieferanten)'}{open(d) ? <span className="count">{open(d)}</span> : null}</span> }))} />
-      <ImportArea key={active} direction={active} info={status.data!} />
+      <Tabs value={active} onChange={setTab} items={[
+        ...dirs.map((d) => ({ id: d, label: <span className="row" style={{ gap: 6 }}>{d === 'outgoing' ? 'Ausgangsrechnungen (z. B. Lexware Office)' : 'Eingangsrechnungen (Händler, Lieferanten)'}{open(d) ? <span className="count">{open(d)}</span> : null}</span> })),
+        ...(flatpayEnabled ? [{ id: 'flatpay' as const, label: 'Flatpay-Zahlungen' }] : []),
+      ]} />
+      {active === 'flatpay' ? <FlatpayArea /> : <ImportArea key={active} direction={active} info={status.data!} />}
     </>
   );
 }
@@ -387,4 +391,166 @@ function ReviewModal({ id, direction, categories, canWrite, onClose }: { id: str
       {confirm === 'undo' ? <Confirm title="Übernahme rückgängig machen?" text={direction === 'outgoing' ? 'Die importierte Rechnung wird entfernt. Ein nur dafür neu angelegter Kunde ohne weitere Daten wird ebenfalls entfernt. Der Beleg bleibt erhalten und steht wieder unter „Prüfen“ – dort korrigieren und erneut übernehmen oder verwerfen.' : 'Die erfassten Ausgaben werden entfernt. Der Beleg bleibt erhalten und steht wieder unter „Prüfen“.'} confirmLabel="Rückgängig machen" danger loading={undo.isPending} onConfirm={() => undo.mutate()} onClose={() => setConfirm(null)} /> : null}
     </Modal>
   );
+}
+
+const flatpayPath = '/api/document-imports/flatpay';
+interface FlatpayItem {
+  id: string;
+  fileId: string | null;
+  fileName: string;
+  caption: string;
+  orderId: string | null;
+  candidateOrderId: string | null;
+  invoiceId: string | null;
+  amountCents: number | null;
+  paidOn: string | null;
+  reference: string | null;
+  service: string | null;
+  lexwareState: string;
+  payoutId: string | null;
+  message: string;
+}
+interface FlatpayData {
+  items: FlatpayItem[];
+  configured: boolean;
+  canConfigure: boolean;
+  payouts: Array<{ id: string; reportReference: string; grossCents: number; feeCents: number; netCents: number }>;
+}
+
+function FlatpayArea() {
+  const [caption, setCaption] = useState('');
+  const [key, setKey] = useState('');
+  const [selected, setSelected] = useState<string[]>([]);
+  const [report, setReport] = useState('');
+  const [fees, setFees] = useState('');
+  const [net, setNet] = useState('');
+  const camera = useRef<HTMLInputElement>(null);
+  const fileInput = useRef<HTMLInputElement>(null);
+  const toast = useToast();
+  const qc = useQueryClient();
+  const query = useQuery({ queryKey: ['flatpay'], queryFn: () => get<FlatpayData>(flatpayPath) });
+  const refresh = () => qc.invalidateQueries({ queryKey: ['flatpay'] });
+  const upload = useMutation({
+    mutationFn: async (file: File) => {
+      const body = new FormData();
+      body.set('caption', caption);
+      body.set('file', file);
+      const response = await fetch(flatpayPath, { method: 'POST', body });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.message || 'Bon konnte nicht gespeichert werden.');
+      return data as { message: string };
+    },
+    onSuccess: async (data) => { setCaption(''); toast.ok(data.message); await refresh(); },
+    onError: (error) => toast.fromError(error),
+  });
+  const configure = useMutation({
+    mutationFn: () => put(flatpayPath + '/settings', { apiKey: key }),
+    onSuccess: async () => { setKey(''); await refresh(); },
+    onError: (error) => toast.fromError(error),
+  });
+  const selection = query.data?.items.filter((item) => selected.includes(item.id) && item.orderId && !item.payoutId) ?? [];
+  const gross = selection.reduce((sum, item) => sum + (item.amountCents ?? 0), 0);
+  const payout = useMutation({
+    mutationFn: () => post(flatpayPath + '/payouts', { reportReference: report, receiptIds: selection.map((item) => item.id), grossCents: gross, feeCents: parseMoney(fees), netCents: parseMoney(net) }),
+    onSuccess: async () => { setSelected([]); setReport(''); setFees(''); setNet(''); await refresh(); },
+    onError: (error) => toast.fromError(error),
+  });
+  const pickFile = (input: HTMLInputElement) => {
+    const file = input.files?.[0];
+    input.value = '';
+    if (file) upload.mutate(file);
+  };
+
+  return <div className="stack">
+    <Card>
+      <div className="stack">
+        <Field label="Auftragshinweis"><Input aria-label="Auftragshinweis" value={caption} maxLength={500} onChange={(event) => setCaption(event.target.value)} placeholder="Golf, Innenreinigung, 90 €" /></Field>
+        <input ref={fileInput} type="file" hidden accept="image/jpeg,image/png,application/pdf" onChange={(event) => pickFile(event.currentTarget)} />
+        <input ref={camera} type="file" hidden accept="image/jpeg,image/png" capture="environment" onChange={(event) => pickFile(event.currentTarget)} />
+        <div className="row wrap">
+          <Button disabled={upload.isPending} onClick={() => camera.current?.click()}><Camera size={16} /> Bon fotografieren</Button>
+          <Button disabled={upload.isPending} onClick={() => fileInput.current?.click()}><Upload size={16} /> Bon hochladen</Button>
+        </div>
+      </div>
+    </Card>
+    {query.isLoading && <Card><Skeleton /></Card>}
+    {query.isError && <Empty title="Flatpay-Belege konnten nicht geladen werden" text={query.error.message} />}
+    {query.data?.canConfigure && <Card>
+      <form className="stack" onSubmit={(event) => { event.preventDefault(); configure.mutate(); }}>
+        <Field label={query.data.configured ? 'Lexware-Schlüssel ersetzen' : 'Lexware-API-Schlüssel'}>
+          <Input aria-label="Lexware-API-Schlüssel" value={key} type="password" autoComplete="off" onChange={(event) => setKey(event.target.value)} />
+        </Field>
+        <div><Button type="submit" disabled={!key.trim()} loading={configure.isPending}>Schlüssel speichern</Button></div>
+      </form>
+    </Card>}
+    {query.data?.items.map((item) => <FlatpayReceiptCard key={item.id} item={item} configured={query.data.configured}
+      report={query.data.payouts.find((row) => row.id === item.payoutId)?.reportReference}
+      selected={selected.includes(item.id)} onSelect={(checked) => setSelected((ids) => checked ? [...ids, item.id] : ids.filter((id) => id !== item.id))}
+      refresh={refresh} />)}
+    {selection.length > 0 && <Card>
+      <form className="stack" onSubmit={(event) => { event.preventDefault(); payout.mutate(); }}>
+        <strong>Flatpay-Auszahlungsbericht</strong>
+        <p>Kundenzahlungen brutto {fmtMoney(gross)}. Den Bankabgleich bitte in Lexware vornehmen.</p>
+        <Field label="Berichtsreferenz"><Input aria-label="Berichtsreferenz" required value={report} onChange={(event) => setReport(event.target.value)} /></Field>
+        <Field label="Gebühren laut Bericht in Euro"><Input aria-label="Gebühren laut Bericht in Euro" required inputMode="decimal" value={fees} onChange={(event) => setFees(event.target.value)} /></Field>
+        <Field label="Nettoauszahlung laut Bericht in Euro"><Input aria-label="Nettoauszahlung laut Bericht in Euro" required inputMode="decimal" value={net} onChange={(event) => setNet(event.target.value)} /></Field>
+        <div><Button type="submit" loading={payout.isPending}>Bericht zuordnen</Button></div>
+      </form>
+    </Card>}
+    {query.data?.payouts.map((row) => <Card key={row.id}>
+      <strong>{row.reportReference}</strong>
+      <p>Kundenzahlungen {fmtMoney(row.grossCents)} · Gebühren {fmtMoney(row.feeCents)} · Auszahlung {fmtMoney(row.netCents)}</p>
+    </Card>)}
+  </div>;
+}
+
+function FlatpayReceiptCard({ item, configured, report, selected, onSelect, refresh }: {
+  item: FlatpayItem;
+  configured: boolean;
+  report?: string;
+  selected: boolean;
+  onSelect: (checked: boolean) => void;
+  refresh: () => Promise<unknown>;
+}) {
+  const toast = useToast();
+  const { can } = useAuth();
+  const [order, setOrder] = useState('');
+  const [amount, setAmount] = useState(money(item.amountCents));
+  const [date, setDate] = useState('');
+  const [invoice, setInvoice] = useState('');
+  const confirm = useMutation({
+    mutationFn: () => post<{ message: string }>(`${flatpayPath}/${item.id}/confirm`, { orderNumber: order.trim() || undefined, amountCents: parseMoney(amount), paidOn: date, existingInvoiceNumber: invoice.trim() || undefined }),
+    onSuccess: async (data) => { toast.ok(data.message); await refresh(); },
+    onError: (error) => toast.fromError(error),
+  });
+  const transfer = useMutation({
+    mutationFn: () => post<{ message: string }>(`${flatpayPath}/${item.id}/transfer`, {}),
+    onSuccess: async (data) => { toast.ok(data.message); await refresh(); },
+    onError: (error) => toast.fromError(error),
+  });
+  return <Card>
+    <div className="stack">
+      {item.fileId && can('documents:read') ? <a href={`/files/${item.fileId}`} target="_blank" rel="noreferrer">{item.fileName}</a> : <strong>{item.fileName}</strong>}
+      {item.caption && <span className="muted">{item.caption}</span>}
+      <span>{item.message}</span>
+      {item.orderId ? <>
+        <span>{item.service} · {fmtMoney(item.amountCents ?? 0)} · {fmtDate(item.paidOn)} · Kartenzahlung</span>
+        {item.reference && <span>Lexware-Referenz {item.reference}</span>}
+        {item.invoiceId && <span>Eine vorhandene Kundenrechnung ist zugeordnet.</span>}
+        {configured && can('invoices:write') && !['review', 'invoice'].includes(item.lexwareState) && <div>
+          <Button loading={transfer.isPending} onClick={() => transfer.mutate()}>
+            {item.lexwareState === 'pending' ? 'An Lexware zur Prüfung übertragen' : 'Lexware abgleichen'}
+          </Button>
+        </div>}
+        {report ? <span>Flatpay-Auszahlungsbericht {report} · Bankabgleich in Lexware</span> :
+          <label><input type="checkbox" checked={selected} onChange={(event) => onSelect(event.target.checked)} /> Für Auszahlungsbericht auswählen</label>}
+      </> : <form className="stack" onSubmit={(event) => { event.preventDefault(); confirm.mutate(); }}>
+        <Field label="Auftragsnummer"><Input aria-label="Auftragsnummer" value={order} required={!item.candidateOrderId} placeholder={item.candidateOrderId ? 'Vorgeschlagenen Auftrag verwenden' : ''} onChange={(event) => setOrder(event.target.value)} /></Field>
+        <Field label="Bonbetrag in Euro"><Input aria-label="Bonbetrag in Euro" required value={amount} inputMode="decimal" onChange={(event) => setAmount(event.target.value)} /></Field>
+        <Field label="Zahlungsdatum laut Bon"><Input aria-label="Zahlungsdatum laut Bon" type="date" required value={date} onChange={(event) => setDate(event.target.value)} /></Field>
+        <Field label="Vorhandene Rechnungsnummer"><Input aria-label="Vorhandene Rechnungsnummer" value={invoice} onChange={(event) => setInvoice(event.target.value)} /></Field>
+        <div><Button type="submit" loading={confirm.isPending}>Kartenzahlung bestätigen</Button></div>
+      </form>}
+    </div>
+  </Card>;
 }

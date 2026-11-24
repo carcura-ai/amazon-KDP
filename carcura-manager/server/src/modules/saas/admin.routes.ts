@@ -152,8 +152,10 @@ export default async function saasAdminRoutes(app: FastifyInstance) {
     const { id } = req.params as { id: string };
     companyOr404(id);
     const input = parse(z.object({ featureKey: featureEnum, enabled: z.boolean().nullable(), reason: zOptionalText(300) }), req.body);
-    app.db.delete(tenantFeatureOverrides).where(and(eq(tenantFeatureOverrides.companyId, id), eq(tenantFeatureOverrides.featureKey, input.featureKey))).run();
-    if (input.enabled !== null) app.db.insert(tenantFeatureOverrides).values({ id: newId(), companyId: id, featureKey: input.featureKey, enabled: input.enabled, reason: input.reason, createdByUserId: ctx.userId }).run();
+    app.db.transaction((tx) => {
+      tx.delete(tenantFeatureOverrides).where(and(eq(tenantFeatureOverrides.companyId, id), eq(tenantFeatureOverrides.featureKey, input.featureKey))).run();
+      if (input.enabled !== null) tx.insert(tenantFeatureOverrides).values({ id: newId(), companyId: id, featureKey: input.featureKey, enabled: input.enabled, reason: input.reason, createdByUserId: ctx.userId }).run();
+    });
     logEvent(app.db, id, null, 'feature_override', input, { userId: ctx.userId, source: 'admin' });
     writeAudit(app.db, ctx, { action: 'platform.feature_override', entityType: 'company', entityId: id, after: input });
     return { ok: true, features: [...app.entitlementsFor(id).features] };

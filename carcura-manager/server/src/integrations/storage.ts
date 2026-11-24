@@ -65,6 +65,7 @@ export interface StoreInput {
   companyId: string;
   buffer: Buffer;
   originalName: string;
+  preserveOriginal?: boolean;
   mimeType: string;
   kind?: 'image' | 'document' | 'pdf' | 'signature' | 'logo';
   category?: string;
@@ -123,12 +124,13 @@ export class FileStorage {
       try { meta = await img.metadata(); } catch { throw badRequest('Das Bild ist beschädigt oder kein gültiges Bildformat.'); }
       width = meta.width ?? null;
       height = meta.height ?? null;
-      buffer = await img.toBuffer();
+      const cleaned = await img.toBuffer();
+      if (!input.preserveOriginal) buffer = cleaned;
       if (kind === 'image') {
         thumbPath = path.join(relDir, `${id}.thumb.jpg`);
         displayPath = path.join(relDir, `${id}.display.jpg`);
-        await sharp(buffer).resize({ width: 480, height: 480, fit: 'inside', withoutEnlargement: true }).jpeg({ quality: 78 }).toFile(this.absolute(thumbPath));
-        await sharp(buffer).resize({ width: 1600, height: 1600, fit: 'inside', withoutEnlargement: true }).jpeg({ quality: 84 }).toFile(this.absolute(displayPath));
+        await sharp(cleaned).resize({ width: 480, height: 480, fit: 'inside', withoutEnlargement: true }).jpeg({ quality: 78 }).toFile(this.absolute(thumbPath));
+        await sharp(cleaned).resize({ width: 1600, height: 1600, fit: 'inside', withoutEnlargement: true }).jpeg({ quality: 84 }).toFile(this.absolute(displayPath));
       }
     }
     const storagePath = path.join(relDir, `${id}.${ext}`);

@@ -1366,3 +1366,31 @@ export const webhookDeliveries = sqliteTable(
   },
   (t) => [index('webhook_deliveries_due_idx').on(t.status, t.nextAttemptAt), index('webhook_deliveries_company_idx').on(t.companyId, t.createdAt)],
 );
+
+/** Beleg einer bestätigten Flatpay-Kundenzahlung mit separatem Lexware- und Auszahlungsstatus. */
+export const flatpayReceipts = sqliteTable('flatpay_receipts', {
+  id: text('id').primaryKey().references(() => documentImports.id),
+  companyId: text('company_id').notNull().references(() => companies.id),
+  sha256: text('sha256').notNull(),
+  caption: text('caption').notNull(),
+  amountCents: integer('amount_cents'),
+  paidOn: text('paid_on'),
+  orderId: text('order_id').references(() => orders.id),
+  candidateOrderId: text('candidate_order_id'),
+  service: text('service'),
+  invoiceId: text('invoice_id').references(() => invoices.id),
+  reference: text('reference'),
+  lexwareState: text('lexware_state').notNull().default('pending'),
+  lexwareId: text('lexware_id'),
+  lexwareFileId: text('lexware_file_id'),
+  payoutId: text('payout_id'),
+}, (t) => [uniqueIndex('flatpay_receipt_hash').on(t.companyId, t.sha256), uniqueIndex('flatpay_receipt_order').on(t.companyId, t.orderId)]);
+
+export const flatpayPayouts = sqliteTable('flatpay_payouts', {
+  id: text('id').primaryKey(),
+  companyId: text('company_id').notNull().references(() => companies.id),
+  reportReference: text('report_reference').notNull(),
+  grossCents: integer('gross_cents').notNull(),
+  feeCents: integer('fee_cents').notNull(),
+  netCents: integer('net_cents').notNull(),
+}, (t) => [uniqueIndex('flatpay_payout_reference').on(t.companyId, t.reportReference)]);

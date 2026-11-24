@@ -4,12 +4,15 @@ import type { Db } from '../db/index.js';
 import { apiKeys, users } from '../db/schema.js';
 import type { Ctx } from './context.js';
 import type { Permission } from './permissions.js';
+import { activeCompany, loadPermissions } from './session.js';
+import { privacySettings } from '../modules/privacy/settings.js';
 import { newId } from './ids.js';
 
 /**
  * API-Schlüssel für Programme (z. B. Carcura-Assistent, Claude): Lesen und Anlegen/Ändern von
  * Kunden, Fahrzeugen, Aufträgen, Leads und Terminen. Kein Löschen, keine Rechnungen, keine Verwaltung.
  */
+const RECEIPT_SCOPES: Permission[] = ['flatpay:intake'];
 export const API_KEY_SCOPES: Permission[] = [
   'customers:read', 'customers:write',
   'vehicles:read', 'vehicles:write',
@@ -28,7 +31,7 @@ export function isApiKeyToken(token: string | undefined): token is string {
 }
 
 /** Legt einen Schlüssel an und gibt ihn einmalig im Klartext zurück. Gespeichert wird nur der Hash. */
-export function createApiKey(db: Db, opts: { companyId: string; name: string; createdByUserId: string }): { id: string; key: string; prefix: string } {
+export function createApiKey(db: Db, opts: { companyId: string; name: string; createdByUserId: string; receiptOnly?: boolean }): { id: string; key: string; prefix: string } {
   const visible = crypto.randomBytes(4).toString('hex');
   const key = `${PREFIX}${visible}_${crypto.randomBytes(32).toString('base64url')}`;
   const id = newId();
@@ -38,7 +41,7 @@ export function createApiKey(db: Db, opts: { companyId: string; name: string; cr
     name: opts.name,
     prefix: `${PREFIX}${visible}`,
     keyHash: hashApiKey(key),
-    scopesJson: JSON.stringify(API_KEY_SCOPES),
+    scopesJson: JSON.stringify(opts.receiptOnly ? RECEIPT_SCOPES : API_KEY_SCOPES),
     createdByUserId: opts.createdByUserId,
   }).run();
   return { id, key, prefix: `${PREFIX}${visible}` };
@@ -52,8 +55,11 @@ export function resolveApiKey(db: Db, token: string, ip?: string): (Ctx & { apiK
   if (!row.createdByUserId) return null;
   const user = db.select().from(users).where(eq(users.id, row.createdByUserId)).get();
   if (!user || !user.isActive || user.companyId !== row.companyId) return null;
+  const company = activeCompany(db, row.companyId);
+  if (!company || (user.role === 'admin' && privacySettings(company).require2faForAdmins && !user.totpEnabledAt)) return null;
+  const allowed = loadPermissions(db, row.companyId, user.role);
   let scopes: Permission[] = [];
-  try { scopes = (JSON.parse(row.scopesJson) as Permission[]).filter((p) => API_KEY_SCOPES.includes(p)); } catch { scopes = []; }
+  try { scopes = (JSON.parse(row.scopesJson) as Permission[]).filter((p) => allowed.has(p) && (API_KEY_SCOPES.includes(p) || RECEIPT_SCOPES.includes(p))); } catch { scopes = []; }
   db.update(apiKeys).set({ lastUsedAt: new Date().toISOString(), lastUsedIp: ip ?? null }).where(eq(apiKeys.id, row.id)).run();
   return {
     companyId: row.companyId,

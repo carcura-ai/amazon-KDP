@@ -2,7 +2,7 @@ import type { FastifyInstance } from 'fastify';
 import fs from 'node:fs';
 import { z } from 'zod';
 import { and, asc, desc, eq, gte, like, or, sql } from 'drizzle-orm';
-import { invoices, invoiceItems, payments, customers, vehicles, orders, orderItems } from '../../db/schema.js';
+import { flatpayReceipts, invoices, invoiceItems, payments, customers, vehicles, orders, orderItems } from '../../db/schema.js';
 import { parse, zOptionalText, zPagination, zEmail } from '../../core/validation.js';
 import { newId, nowIso } from '../../core/ids.js';
 import { badRequest, conflict, notFound } from '../../core/errors.js';
@@ -145,6 +145,9 @@ export default async function invoiceRoutes(app: FastifyInstance) {
     if (!o) throw notFound('Auftrag');
     const existing = app.db.select({ id: invoices.id, invoiceNumber: invoices.invoiceNumber }).from(invoices).where(and(eq(invoices.orderId, orderId), sql`${invoices.status} != 'cancelled'`, sql`${invoices.cancelsInvoiceId} is null`)).get();
     if (existing) throw conflict('Zu diesem Auftrag existiert bereits eine Rechnung.', { invoiceId: existing.id });
+    if (app.db.select({ id: flatpayReceipts.id }).from(flatpayReceipts).where(and(eq(flatpayReceipts.companyId, ctx.companyId), eq(flatpayReceipts.orderId, orderId))).get()) {
+      throw conflict('Zu diesem Auftrag ist bereits eine Flatpay-Zahlung erfasst. Bitte den verknüpften Beleg prüfen.');
+    }
     const its = app.db.select().from(orderItems).where(eq(orderItems.orderId, orderId)).orderBy(asc(orderItems.sortOrder)).all();
     const id = newId();
     app.db.insert(invoices).values({ id, companyId: ctx.companyId, customerId: o.customerId, vehicleId: o.vehicleId, orderId, title: o.title, notes: o.notes, serviceDate: (o.finishedAt ?? o.startedAt ?? o.scheduledAt ?? nowIso()).slice(0, 10), createdByUserId: ctx.userId }).run();
@@ -249,6 +252,7 @@ export default async function invoiceRoutes(app: FastifyInstance) {
     const inv = getOne(ctx.companyId, id);
     const p = app.db.select().from(payments).where(and(eq(payments.id, pid), eq(payments.invoiceId, id))).get();
     if (!p) throw notFound('Zahlung');
+    if (p.note?.startsWith('Flatpay ')) throw conflict('Diese Zahlung ist mit einem Flatpay-Bon verknüpft.');
     app.db.delete(payments).where(eq(payments.id, pid)).run();
     const paid = inv.paidCents - p.amountCents;
     app.db.update(invoices).set({ paidCents: paid, status: inv.status === 'paid' ? (inv.dueDate && inv.dueDate < today() ? 'overdue' : 'open') : inv.status, paidAt: null, updatedAt: nowIso() }).where(eq(invoices.id, id)).run();

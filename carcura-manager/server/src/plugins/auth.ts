@@ -3,7 +3,8 @@ import type { FastifyReply, FastifyRequest } from 'fastify';
 import type { Ctx } from '../core/context.js';
 import type { Permission } from '../core/permissions.js';
 import { forbidden, unauthorized } from '../core/errors.js';
-import { resolveSession } from '../core/session.js';
+import { activeCompany, resolveSession } from '../core/session.js';
+import { privacySettings } from '../modules/privacy/settings.js';
 import { isApiKeyToken, resolveApiKey } from '../core/apikeys.js';
 import { writeAudit } from '../core/audit.js';
 import { users } from '../db/schema.js';
@@ -30,10 +31,12 @@ export default fp(async (app) => {
 
   app.addHook('onRequest', async (req, reply) => {
     // API-Schlüssel (Authorization: Bearer cm_…) – nur ohne Sitzungs-Cookie, nur für /api/, nie zum Löschen.
+    const path = req.url.split('?')[0] ?? '';
+    const receiptIntake = req.method === 'POST' && path === '/api/document-imports/whatsapp';
     const authz = req.headers.authorization;
     if (!req.cookies[SESSION_COOKIE] && typeof authz === 'string' && authz.startsWith('Bearer ')) {
       const token = authz.slice(7).trim();
-      if (!isApiKeyToken(token) || !API_KEY_PATHS.some((pfx) => req.url.startsWith(pfx))) return reply.status(401).send({ error: 'unauthorized', message: 'Ungültiger API-Schlüssel.' });
+      if (!isApiKeyToken(token) || !receiptIntake && !API_KEY_PATHS.some((pfx) => path === pfx || path.startsWith(pfx + '/'))) return reply.status(401).send({ error: 'unauthorized', message: 'Ungültiger API-Schlüssel.' });
       const ctx = resolveApiKey(app.db, token, req.ip);
       if (!ctx) return reply.status(401).send({ error: 'unauthorized', message: 'API-Schlüssel ungültig, gesperrt oder abgelaufen.' });
       if (req.method === 'DELETE') return reply.status(403).send({ error: 'forbidden', message: 'Löschen ist mit API-Schlüsseln nicht erlaubt.' });
@@ -46,6 +49,14 @@ export default fp(async (app) => {
     if (!unsigned.valid || !unsigned.value) return;
     const info = resolveSession(app.db, app.config, unsigned.value, req.ip);
     if (!info) return;
+    const setupPaths = ['/api/health', '/api/auth/me', '/api/auth/logout', '/api/auth/2fa/setup', '/api/auth/2fa/enable'];
+    const company = activeCompany(app.db, info.user.companyId)!;
+    const required = (info.user.role === 'admin' && privacySettings(company).require2faForAdmins)
+      || (app.config.deploymentMode === 'saas' && info.user.isPlatformAdmin);
+    const routePath = req.routeOptions.url ?? path;
+    if (required && !info.user.totpEnabledAt && (routePath.startsWith('/api/') || routePath.startsWith('/files/')) && !setupPaths.includes(routePath)) {
+      return reply.status(403).send({ error: 'two_factor_required', message: 'Bitte zuerst die Zwei-Faktor-Anmeldung einrichten.' });
+    }
     req.auth = { ...info.ctx, requestId: req.id };
     req.sessionId = info.sessionId;
   });

@@ -1,7 +1,7 @@
 import type { FastifyInstance } from 'fastify';
 import { z } from 'zod';
 import { and, asc, desc, eq, like, or, sql } from 'drizzle-orm';
-import { orders, orderItems, customers, vehicles, appointments, companies, users, services } from '../../db/schema.js';
+import { flatpayReceipts, orders, orderItems, customers, vehicles, appointments, companies, users, services } from '../../db/schema.js';
 import { parse, zOptionalText, zPagination } from '../../core/validation.js';
 import { newId, nowIso } from '../../core/ids.js';
 import { badRequest, conflict, notFound } from '../../core/errors.js';
@@ -149,6 +149,7 @@ export default async function orderRoutes(app: FastifyInstance) {
     const ctx = ctxOf(req);
     const { id } = req.params as { id: string };
     const before = getOne(ctx.companyId, id);
+    if (app.db.select({ id: flatpayReceipts.id }).from(flatpayReceipts).where(and(eq(flatpayReceipts.companyId, ctx.companyId), eq(flatpayReceipts.orderId, id))).get()) throw conflict('Der Auftrag hat eine bestätigte Flatpay-Zahlung.');
     if (!['planned', 'cancelled'].includes(before.status)) throw badRequest('Nur geplante oder stornierte Aufträge können gelöscht werden. Andernfalls bitte stornieren.');
     app.db.transaction((tx) => {
       tx.delete(orderItems).where(eq(orderItems.orderId, id)).run();
