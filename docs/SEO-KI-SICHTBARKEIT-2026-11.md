@@ -46,7 +46,7 @@ Grenzen der Prüfung: Ich konnte die Google-KI-Antworten (AI Overviews) nicht se
 **Carcura GbR – Fahrzeugaufbereitung** · Hauptstr. 7, 57632 Walterschen · +49 170 6669516 · https://carcura.info
 Kategorie: Fahrzeugaufbereitung / Autopflege
 
-Reihenfolge nach Wirkung: Bing Places, Apple Business Connect (Apple Karten und Siri), Das Örtliche und Gelbe Seiten, 11880, Cylex, golocal, werkenntdenbesten. Alle kostenlos in der Grundversion. Bezahl-Upgrades nicht nötig.
+**Erledigt laut Alex (24.11.):** Bing Places, Apple Business Connect, Das Örtliche, Gelbe Seiten, 11880. Offen und optional: Cylex, golocal, werkenntdenbesten. Alle kostenlos in der Grundversion, Bezahl-Upgrades nicht nötig. Prüfen: Steht die Schreibweise überall exakt gleich wie oben?
 
 ### 3. Strukturierte Daten Startseite (für die Website-Session)
 
@@ -89,6 +89,6 @@ Vor dem Einbau Preise und Zeiten gegen `docs/WEBSITE-REBUILD-MASTERPLAN.md` §4 
 ## Reihenfolge
 
 1. **Jetzt (Alex):** Bewertungslink holen, WhatsApp-Text ab sofort nach jedem Auftrag schicken.
-2. **Diese Woche (Alex, 2–3 Std.):** Bing Places und Apple Business Connect anlegen, danach die Verzeichnisse.
+2. ~~Bing Places, Apple Business Connect, Das Örtliche, Gelbe Seiten, 11880~~ erledigt (24.11.). Optional noch Cylex, golocal, werkenntdenbesten.
 3. **Website-Session, nach Freigabe:** Punkte 3 bis 6.
 4. **In 4 Wochen:** erneut prüfen (Bewertungszahl, Einträge, Suchtreffer).
