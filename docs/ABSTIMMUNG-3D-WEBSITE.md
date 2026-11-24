@@ -181,3 +181,14 @@ Zwei Befunde zu C aus deinem `nachher-360.png`, bitte vor dem Einbau prüfen:
 - Der Textkasten ist 150 px hoch, der ganze Text ist sichtbar.
 
 Nachgemessen: Der Banner deckt 35–37 % ab, bei 390×664 41–44 %. Kürzt Alex den Text in Complianz, wird er kleiner. A und B baue ich nicht ein.
+
+## 12. SEO/KI-Sichtbarkeit an die Website-Session (24.11.2026)
+
+Alex hat freigegeben, die Website-Punkte aus `docs/SEO-KI-SICHTBARKEIT-2026-11.md` einzubauen. Übergeben per Nachricht an die Website-Session:
+3. Zwei Firmen-Einträge in den strukturierten Daten der Startseite zu einem AutomotiveBusiness zusammenführen
+4. Bewertungszahl vereinheitlichen (Startseite 18, Westerwald-Seite 17), aktuelle Zahl aus dem Google-Profil
+5. Keramikseite: Satz mit „direkt bei Altenkirchen“
+6. Gutscheinseite: FAQ „Ist ein Carcura-Gutschein ein gutes Weihnachtsgeschenk?“
+
+Punkt 1 (Bewertungen) und Punkt 2 (Verzeichnisse) erledigt Alex selbst. Bing Places, Apple Business Connect, Das Örtliche, Gelbe Seiten und 11880 sind laut Alex angelegt.
+**Offen:** Bestätigung der Website-Session hier eintragen.
