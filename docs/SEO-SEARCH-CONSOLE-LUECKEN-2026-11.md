@@ -15,7 +15,7 @@ Daten direkt aus der Search-Console-Schnittstelle, ohne CSV-Umweg. **Nichts live
 |---|---|---|---|---|---|
 | 1 | fahrzeugaufbereitung westerwald · autoaufbereitung westerwald | 242 | 25–27 | Der wichtigste Begriff. 9 eigene Seiten konkurrieren darum, keine steht vorn. Die Westerwald-Seite liegt bei 31–45. | Eine Seite bündeln: interne Links mit dem Wort „Fahrzeugaufbereitung Westerwald“ von allen Seiten auf /fahrzeugaufbereitung-westerwald/. Startseite bleibt für „carcura“. |
 | 2 | keramikversiegelung westerwald | 65 | 15–48 | 6 Seiten konkurrieren, die Keramikseite steht bei 15 | Interne Links „Keramikversiegelung im Westerwald“ auf /keramikversiegelung/. Der Begriff gehört in deren Seitentitel (steht schon drin) und in die H2. |
-| 3 | **/https-carcura-info-leistungen/** (Fehlseite) | 89 | 21–48 | Eine doppelte Preisseite mit kaputter Adresse wird von Google angezeigt und nimmt /leistungen/ Gewicht weg | **301-Weiterleitung auf /leistungen/** (Rank Math → Weiterleitungen). Kleinster Aufwand, sofortige Wirkung. |
+| 3 | **/https-carcura-info-leistungen/** (Fehlseite) | 89 | 21–48 | Eine doppelte Preisseite mit kaputter Adresse wird von Google angezeigt und nimmt /leistungen/ Gewicht weg | **Erledigt:** leitet schon per 301 auf /leistungen/ weiter (geprüft 24.11.). Google zeigt noch alte Daten, verschwindet von selbst. |
 | 4 | keramikversiegelung bad marienberg | 33 | 35 | Keine Seite nennt Bad Marienberg | Bad Marienberg auf der Hachenburg-Seite mit aufnehmen (8 km auseinander), keine eigene dünne Seite. Text unten. |
 | 5 | fahrzeugaufbereitung / autoaufbereitung waldbröl | 18 | 6–7 | Keine Waldbröl-Seite. Die Startseite rankt trotzdem schon auf 6 bis 7, die Nachfrage ist also da. | Neue Ortsseite /fahrzeugaufbereitung-waldbroel/ nach dem Muster der anderen Ortsseiten. Entwurf unten. |
 | 6 | was kostet (eine) scheinwerfer aufbereitung · scheinwerfer polieren kosten/preis · scheinwerferaufbereitung kosten | 59 | 8–18 | Die Seite gibt es, aber keine Antwort auf genau diese Frage im Wortlaut | Neuer Abschnitt „Was kostet Scheinwerfer aufbereiten?“ als H2 plus FAQ. Entwurf unten. |
@@ -78,7 +78,7 @@ FAQ neu:
 
 ## Reihenfolge
 
-1. **Sofort (5 Min., Website-Session):** Nr. 3, die 301-Weiterleitung der Fehlseite.
+1. ~~Nr. 3~~ ist schon erledigt (301 auf /leistungen/).
 2. **Diese Woche:** Nr. 6 (Scheinwerfer, steht schon auf Position 8, ist also nah an Seite 1) und Nr. 4 (Bad Marienberg).
 3. **Danach:** Nr. 5 (Waldbröl-Seite, sobald die Entfernung eingetragen ist), Nr. 1 und Nr. 2 (interne Verlinkung), Nr. 7.
 4. **In 6 Wochen:** dieselbe Auswertung wiederholen und Positionen vergleichen.
