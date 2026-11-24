@@ -76,7 +76,9 @@ Termin hat Vorrang, Billigpreise zeitlich begrenzen, Anzahlung bei großen Auftr
 
 ## Erinnerungen (vom Nutzer festgelegt, 24.11.2026)
 
-- **Jede Erinnerung ohne Rückfrage eintragen.** Der Nutzer hat das dauerhaft erlaubt.
+- **Jede Erinnerung ohne Rückfrage eintragen.** Der Nutzer hat das dauerhaft erlaubt („wenn ich sage eintragen, dann einfach machen“).
+  Auch keine Bestätigungsfragen zu Annahmen: sinnvoll annehmen, eintragen, Annahme in einem Satz nennen.
+- Arbeitsort des Nutzers (Hauptjob): Wenden, **NRW** → Feiertage nach NRW. Böckelt-Arbeitszeiten stehen im Privat-Kalender.
 - Ziel ist immer der **Apple Kalender** auf dem iPhone des Nutzers (TimeTree nicht, auf Wunsch des Nutzers):
   1. Termin in den Abo-Kalender „Carcura Erinnerungen“ eintragen. Ablauf: `carcura-web/kalender/LIESMICH.md`.
   2. Muss Claude selbst etwas tun (z. B. Anzeige pausieren), außerdem `send_later` in dieser Sitzung.
