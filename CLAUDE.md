@@ -56,3 +56,33 @@ Zeit nicht voll bezahlen. Bewertet wird nach Deckungsbeitrag (Umsatz minus
 Sprit und Material, Beitrag zu 1.040 € Fixkosten/Monat). Weiterhin offen
 nennen: Untergrenze knapp über den direkten Kosten, besserer Auftrag am selben
 Termin hat Vorrang, Billigpreise zeitlich begrenzen, Anzahlung bei großen Aufträgen.
+
+## Carcura – Werbeanzeigen (Meta, Google) (vom Nutzer festgelegt, 24.11.2026)
+
+- **Standort immer: 35 km Umkreis um die Halle in Walterschen** (50.685111, 7.561778),
+  Einstellung „Personen, die dort wohnen“, automatische Standorterweiterung aus.
+  Nie ganz Deutschland oder ein ganzes Bundesland. Grund: Kunden kamen schon
+  aus Siegburg, Olpe und Düsseldorf.
+- Im 35-km-Radius liegen Altenkirchen, Siegburg, Bonn und Neuwied. Siegen (39 km), Olpe (43 km),
+  Köln (51 km) und Düsseldorf (82 km) liegen außerhalb. Einzelne Orte nur auf
+  ausdrücklichen Wunsch als Zusatz-Standort aufnehmen.
+- Nachrichten-Anzeigen: Button „Nachricht senden“ oder „WhatsApp-Nachricht
+  senden“, nie „Jetzt buchen“. Begrüßung mit Antippfragen hinterlegen.
+- Platzierungen: Feeds und Instagram Stories; Facebook Reels und Marketplace
+  nur nach Test, da dort viele Fehlklicks entstehen.
+- Budget erhöhen nur nach Freigabe des Nutzers.
+- Ablauf und weitere Regeln: Skill `meta-werbung` (`/meta-werbung` oder „Werbung: …“).
+  Ziel nur Instant-Formular oder Chat, nie Profilbesuche, Interaktionen oder Videoaufrufe.
+
+## Erinnerungen (vom Nutzer festgelegt, 24.11.2026)
+
+- **Jede Erinnerung ohne Rückfrage eintragen.** Der Nutzer hat das dauerhaft erlaubt.
+- Ziel ist immer der **Apple Kalender** auf dem iPhone des Nutzers (TimeTree nicht, auf Wunsch des Nutzers):
+  1. Termin in den Abo-Kalender „Carcura Erinnerungen“ eintragen. Ablauf: `carcura-web/kalender/LIESMICH.md`.
+  2. Muss Claude selbst etwas tun (z. B. Anzeige pausieren), außerdem `send_later` in dieser Sitzung.
+  3. Für Erinnerungen am selben Tag zusätzlich PushNotification, weil Abo-Kalender verzögert laden.
+- Titel beginnt mit „Carcura:“, Text sagt in einem Satz, was zu tun ist.
+- **Kundenaufträge** („Freitag 10 Uhr Golf Innenreinigung“): ohne Rückfrage in den Abo-Kalender
+  (ohne Namen, Telefon, Kennzeichen; Hinweis 60 Min. vorher) **und** ins Auftragsbuch
+  `carcura-web/auftraege/AUFTRAEGE.md`. Fehlt etwas (Preis, Dauer), sinnvoll annehmen und kennzeichnen.
+  Bei Fragen zu Auslastung, Umsatz oder „was steht an“ zuerst das Auftragsbuch lesen.
