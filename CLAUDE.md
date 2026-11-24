@@ -82,6 +82,7 @@ Termin hat Vorrang, Billigpreise zeitlich begrenzen, Anzahlung bei großen Auftr
   2. Muss Claude selbst etwas tun (z. B. Anzeige pausieren), außerdem `send_later` in dieser Sitzung.
   3. Für Erinnerungen am selben Tag zusätzlich PushNotification, weil Abo-Kalender verzögert laden.
 - Titel beginnt mit „Carcura:“, Text sagt in einem Satz, was zu tun ist.
+- **Nur ein Tag, keine Uhrzeit genannt:** Eintrag immer **18:00–19:00 Uhr** (eine Stunde), damit er beim Durchsehen auffällt.
 - **Private Erledigungen** gehören in den eigenen Kalender „Privat“ (blau, `termine-privat.json`),
   nie ins Auftragsbuch. Neutral formulieren, keine Diagnosen, Beträge oder Zugangsdaten.
 - **Kundenaufträge** („Freitag 10 Uhr Golf Innenreinigung“): ohne Rückfrage in den Abo-Kalender
