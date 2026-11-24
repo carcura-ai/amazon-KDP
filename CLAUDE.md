@@ -73,3 +73,12 @@ Termin hat Vorrang, Billigpreise zeitlich begrenzen, Anzahlung bei großen Auftr
 - Budget erhöhen nur nach Freigabe des Nutzers.
 - Ablauf und weitere Regeln: Skill `meta-werbung` (`/meta-werbung` oder „Werbung: …“).
   Ziel nur Instant-Formular oder Chat, nie Profilbesuche, Interaktionen oder Videoaufrufe.
+
+## Erinnerungen (vom Nutzer festgelegt, 24.11.2026)
+
+- **Jede Erinnerung ohne Rückfrage eintragen.** Der Nutzer hat das dauerhaft erlaubt.
+- Ziel ist immer das Handy des Nutzers:
+  1. Ist der Connector **Google Kalender** verbunden: Termin mit Benachrichtigung direkt eintragen.
+  2. Sonst: zusätzlich eine `.ics`-Datei erzeugen und per SendUserFile schicken (ein Tipp, dann steht sie im Handy-Kalender).
+  3. Muss Claude selbst etwas tun (z. B. Anzeige pausieren), außerdem `send_later` in dieser Sitzung.
+- Titel beginnt mit „Carcura:“, Text sagt in einem Satz, was zu tun ist.
