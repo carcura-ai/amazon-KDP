@@ -56,3 +56,18 @@ Zeit nicht voll bezahlen. Bewertet wird nach Deckungsbeitrag (Umsatz minus
 Sprit und Material, Beitrag zu 1.040 € Fixkosten/Monat). Weiterhin offen
 nennen: Untergrenze knapp über den direkten Kosten, besserer Auftrag am selben
 Termin hat Vorrang, Billigpreise zeitlich begrenzen, Anzahlung bei großen Aufträgen.
+
+## Carcura – Werbeanzeigen (Meta, Google) (vom Nutzer festgelegt, 24.11.2026)
+
+- **Standort immer: 35 km Umkreis um die Halle in Walterschen** (50.685111, 7.561778),
+  Einstellung „Personen, die dort wohnen“, automatische Standorterweiterung aus.
+  Nie ganz Deutschland oder ein ganzes Bundesland. Grund: Kunden kamen schon
+  aus Siegburg, Olpe und Düsseldorf.
+- Im 35-km-Radius liegen Altenkirchen, Siegburg, Bonn und Neuwied. Siegen (39 km), Olpe (43 km),
+  Köln (51 km) und Düsseldorf (82 km) liegen außerhalb. Einzelne Orte nur auf
+  ausdrücklichen Wunsch als Zusatz-Standort aufnehmen.
+- Nachrichten-Anzeigen: Button „Nachricht senden“ oder „WhatsApp-Nachricht
+  senden“, nie „Jetzt buchen“. Begrüßung mit Antippfragen hinterlegen.
+- Platzierungen: Feeds und Instagram Stories; Facebook Reels und Marketplace
+  nur nach Test, da dort viele Fehlklicks entstehen.
+- Budget erhöhen nur nach Freigabe des Nutzers.
