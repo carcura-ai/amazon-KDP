@@ -1,1 +1,46 @@
-[]
+[
+ {
+  "uid": "privat-arbeit-boeckelt-mo-do",
+  "start": "2026-11-23T07:15",
+  "minuten": 540,
+  "alarm": false,
+  "titel": "Arbeit Böckelt",
+  "rrule": "FREQ=WEEKLY;BYDAY=MO,TU,WE,TH;UNTIL=20271125T225959Z",
+  "exdate": [
+   "2026-12-21T07:15",
+   "2026-12-22T07:15",
+   "2026-12-23T07:15",
+   "2026-12-24T07:15",
+   "2026-12-28T07:15",
+   "2026-12-29T07:15",
+   "2026-12-30T07:15",
+   "2026-12-31T07:15",
+   "2027-03-29T07:15",
+   "2027-05-06T07:15",
+   "2027-05-17T07:15",
+   "2027-05-27T07:15",
+   "2027-11-01T07:15"
+  ]
+ },
+ {
+  "uid": "privat-arbeit-boeckelt-fr",
+  "start": "2026-11-27T07:15",
+  "minuten": 375,
+  "alarm": false,
+  "titel": "Arbeit Böckelt",
+  "rrule": "FREQ=WEEKLY;BYDAY=FR;UNTIL=20271126T225959Z",
+  "exdate": [
+   "2026-12-25T07:15",
+   "2027-01-01T07:15",
+   "2027-03-26T07:15"
+  ]
+ },
+ {
+  "uid": "privat-urlaub-20261221",
+  "ganztag": true,
+  "start": "2026-12-21",
+  "ende": "2027-01-03",
+  "alarm": false,
+  "titel": "Urlaub"
+ }
+]

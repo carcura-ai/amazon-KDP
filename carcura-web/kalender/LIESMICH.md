@@ -4,7 +4,7 @@
 → Rank-Math-Weiterleitung **ID 4** (302) auf die aktuelle Datei in der Mediathek.
 Aktuelle Datei: Medien-ID **1817**, https://carcura.info/wp-content/uploads/2026/11/cal-1d9dad6f1b082a1f-1.ics
 
-**Privat-Kalender** (blau): https://carcura.info/kalender-a0bc309d2176a0e6.ics → Weiterleitung **ID 5**, Medien-ID **1816**, Quelle `termine-privat.json`, bauen mit `python3 build_ics.py privat`, hochladen als `cal-a0bc309d2176a0e6.ics`.
+**Privat-Kalender** (blau): https://carcura.info/kalender-a0bc309d2176a0e6.ics → Weiterleitung **ID 5**, Medien-ID **1818** (…/cal-a0bc309d2176a0e6-1.ics), Quelle `termine-privat.json`, bauen mit `python3 build_ics.py privat`, hochladen als `cal-a0bc309d2176a0e6.ics`.
 
 Der Nutzer hat beide Adressen in Apple Kalender (iPhone) abonniert. Neue Termine erscheinen ohne sein Zutun.
 
@@ -14,7 +14,10 @@ Private Einträge neutral formulieren (z. B. „Privat: Arzttermin“, keine Dia
 ## Neue Erinnerung eintragen (ohne Rückfrage, siehe CLAUDE.md)
 1. Termin in `termine.json` ergänzen (uid eindeutig, start `JJJJ-MM-TTTHH:MM`, `minuten` = Dauer, titel beginnt mit „Carcura:“, optional `erinnern_min` = Hinweis so viele Minuten vorher). Vergangene Termine dürfen drinbleiben. Nennt der Nutzer nur den Tag ohne Uhrzeit: start 18:00, `minuten` 60.
    **Kundenaufträge:** Titel nur „Carcura: Auftrag – <Fahrzeug>, <Leistung> (Abholung)“, **keine** Namen, Telefonnummern oder Kennzeichen (die Datei ist öffentlich erreichbar). `erinnern_min` 60. Details ins Auftragsbuch `../auftraege/AUFTRAEGE.md`.
-2. `python3 build_ics.py` → `carcura-erinnerungen.ics`
+2. `python3 build_ics.py` → `carcura-erinnerungen.ics` (bzw. `python3 build_ics.py privat`)
+   Weitere Felder: `ganztag` true mit `start`/`ende` als JJJJ-MM-TT (einschließlich), `rrule` (z. B. `FREQ=WEEKLY;BYDAY=MO,TU;UNTIL=…Z`),
+   `exdate` (Liste ausgelassener Termine, gleiche Uhrzeit wie start), `alarm` false für Dauertermine ohne Hinweis.
+   Prüfen: `pip install icalendar recurring-ical-events`, Termine eines Zeitraums auflösen und zählen.
 3. Hochladen: `wp_upload_media` (filename `cal-1d9dad6f1b082a1f.ics` bzw. `cal-a0bc309d2176a0e6.ics`, content_base64, size, sha256) → neue Medien-ID und URL. Sofort auf privat stellen (siehe Sicherheit).
 4. `wp_rm_update_redirect` id 4 (Carcura) bzw. 5 (Privat), target = neue URL. Danach alte Medien-ID mit `wp_delete_media` löschen und die IDs oben aktualisieren.
 5. Prüfen: `curl -sL https://carcura.info/kalender-1d9dad6f1b082a1f.ics` enthält den neuen Termin.
