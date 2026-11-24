@@ -105,3 +105,12 @@ Quellen: Live-Abruf carcura.info am 23.11.2026, Google Search Console (25.08.–
 - **Struktur:** Szenen, Karten und Material stehen in `src/film-szenen.json`. Besseres Material wird pro Szene eingetragen, ohne Codeänderung (siehe FILM-MATERIAL.md).
 - **Assets:** Die Assets liegen jetzt in `src/assets/` und werden beim Build kopiert. Ein Build aus leerem Ordner wurde getestet.
 - **Nicht erfüllt, weil Material fehlt:** fotorealistische Sequenzen ≥ 1920 px, Hochformat-Fassung, echte Tür-, Wasser- und Pad-Bewegung, Halle aus Originalfotos. Pro Szene benannt in FILM-MATERIAL.md.
+
+## 13. Startseite mit Außenwäsche-Video statt Scroll-Film (24.11.2026, Zweig `claude/carcura-aussenwaesche-video`)
+- **Auftrag:** nur Außenwäsche, echtes `<video>`. Daher entfallen Scroll-Film, Leistungskarten im Film, Tür-, Innenraum-, Politur- und Keramikbilder (`film.js`, `film-szenen.json` und die Bilder 04–14 sind entfernt).
+- **Video:** `autoplay muted loop playsinline`, Posterbild, Quellen für Handy (Media-Query ≤ 809 px) und Desktop jeweils als MP4 und WebM. Dazu Pause/Abspielen, Sprungmarken zu den fünf Phasen und ein direkter MP4-Download.
+- **Reduzierte Bewegung:** kein Autoplay, Poster bleibt stehen, Abspielen auf Wunsch. Das Video pausiert außerhalb des Sichtbereichs.
+- **Layout:** Das Video steht unter der Navigation und überlagert sie nicht. Desktop 16:9, höchstens so hoch, dass Steuerleiste und Hinweis in den ersten Bildschirm passen. Mobil im ganzen 3:2-Bild, damit Front und Heck sichtbar bleiben.
+- **Glas:** einheitliches Material für Navigation, Karten, Formulare, Buttons und Videosteuerung mit Verlauf, heller Oberkante, feinem Rand und Blur. `@supports`-Fallback mit deckenden Flächen für Browser ohne `backdrop-filter`.
+- **Lesbarkeit:** Fließtext, Listen, FAQ, Formular-Labels und Aktionshinweis mindestens 16 px. Preistabellen sind bis 900 px gestapelt, vorher lief /leistungen/ bei 768 px 63 px über.
+- **Ehrlich ausgewiesen:** Das Video ist eine Vorschau aus KI-Zuständen und erfüllt die Abnahme nicht. Fehlendes Material und der Austauschweg stehen in FILM-MATERIAL.md, der Hallenvergleich in HALLENVERGLEICH.md.

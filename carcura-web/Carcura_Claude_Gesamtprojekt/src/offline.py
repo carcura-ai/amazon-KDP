@@ -30,7 +30,7 @@ for root, _, files in os.walk(OUT):
         fp = os.path.join(root, f)
         depth = len(os.path.relpath(fp, OUT).split(os.sep)) - 1
         h = open(fp, encoding="utf8").read()
-        h = re.sub(r'((?:href|src|data-full|content="0;url)=?"?)(/[^"\s]*)', lambda m: m.group(1) + rel(m.group(2), depth) if not m.group(2).startswith("//") else m.group(0), h)
+        h = re.sub(r'((?:href|src|poster|data-poster-mobil|data-full|content="0;url)=?"?)(/[^"\s]*)', lambda m: m.group(1) + rel(m.group(2), depth) if not m.group(2).startswith("//") else m.group(0), h)
         h = re.sub(r'"/assets/', '"' + "../" * depth + "assets/", h)  # Pfade in JSON-Daten (Film)
         h = re.sub(r'<script>location\.replace\([^<]*</script>', "", h)  # Weiterleitungs-Platzhalter: Meta-Refresh genügt
         h = re.sub(r'<link rel="preload"[^>]*>', "", h)  # Preload mit crossorigin stört unter file://

@@ -12,7 +12,7 @@ Dann im Browser http://localhost:8080/ öffnen. Die Seite braucht einen Server, 
 - Texte und Seiten: `src/build.py`
 - Danach `python3 src/build.py` (erzeugt dist/ neu) und `python3 src/check.py` (prüft Links, Anker, Preise, H1, Titel, Canonicals, Sitemap).
 - Design und Skripte: `src/assets/` (css, js, fonts, img, film). Der Build kopiert sie nach `dist/assets/`, Änderungen nur in `src/assets/` vornehmen.
-- Startseitenfilm: Szenen, Karten, Gewichte und Material in `src/film-szenen.json`, Austausch pro Szene siehe `audit/FILM-MATERIAL.md`.
+- Startseiten-Video: `src/assets/video/` (Vorschau, erzeugt mit `python3 src/video/build_preview_video.py`). Austausch und fehlendes Material: `audit/FILM-MATERIAL.md`. Zum Testen des Springens im Video: `python3 src/video/testserver.py dist 8080` (unterstützt HTTP-Range).
 - Die Aktion „Waschset zur Keramik“ verschwindet nach dem 31.12.2026 automatisch, beim nächsten Build und im Browser.
 
 ## Aufbau

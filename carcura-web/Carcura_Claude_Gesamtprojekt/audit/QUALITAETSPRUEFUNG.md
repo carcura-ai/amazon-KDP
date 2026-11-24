@@ -158,3 +158,24 @@ Bestanden laut Prüfer: Vor-/Rückwärtsscrollen in 3 Durchgängen × 29 Messpun
 - **Verdeckung:** Keine Karte über Schaum, Auto, Applikator, Tuch, Wasser oder Perlen (Desktop-Sichtprüfung). Mobil stehen die Karten unter dem Bild.
 - **Weitere Prüfungen:** Build aus leerem Ordner ✔; `src/check.py` ohne Befunde ✔; /leistungen/ ohne `<img>`, `<picture>`, Bildunterschriften, leere Container und CSS-Hintergrundbilder ✔.
 - **Nicht getestet:** echte Geräte und echte Mobilfunkverbindung.
+
+## Nachtest Außenwäsche-Video (24.11.2026)
+- **ffprobe 1920×1080:** h264 High, yuv420p, 30/1, 399 Bilder, 13,3 s, 2.201.486 Byte, `moov` vor `mdat` (faststart) ✔. Die Mobil- und WebM-Fassungen sind geprüft.
+- **Einzelbilder:** 10 aus dem fertigen MP4 extrahiert und angesehen (`audit/video-frames/`). Halle stabil, Phasen erkennbar.
+  - Befund 1: In der ersten Fassung wirkten die Schaumausläufer wie dünne weiße Streifen. Kante weicher und breiter gemacht, neu gerendert, erneut geprüft.
+  - Befund 2: Die Hochrechnung ist in der Vollansicht sichtbar weich (Detailausschnitt 6,6 s).
+- **Website** bei 390 × 844, 768 × 1024, 1440 × 900 und 1920 × 1080:
+  - Video spielt (Handy-Quelle bei 390/768, Desktop-Quelle bei 1440/1920).
+  - Das Video liegt unter der Navigation und ist ganz sichtbar, die Steuerleiste ist sichtbar.
+  - Sprung „Abspülen“ → 5,8 s ✔; Pause und Weiter ✔.
+  - Download 200, `video/mp4`, 2,2 MB ✔.
+  - Reduzierte Bewegung: pausiert, Handy-Poster, Button „Abspielen“ ✔.
+  - Browser vor und zurück ✔.
+- **Hinweis zum Springen:** Das braucht HTTP-Range. Python `http.server` kann das nicht, getestet wurde mit `src/video/testserver.py` (Aufruf: `python3 src/video/testserver.py dist 8080`). Übliche Webserver können Range.
+- **Alle 31 Seiten** bei 390 und 768 px:
+  - kein Überlauf
+  - kein Fließtext unter 16 px
+  - Tippflächen ≥ 40 px (außer Fließtext-Links)
+  - keine abgeschnittenen Überschriften
+- **Alle 31 Seiten** bei 1440 und 1920 px: keine JS-Fehler, keine Konsolenfehler, keine 4xx/5xx, kein Überlauf ✔.
+- **Nicht getestet:** echte iPhone/Android-Geräte, Safari, langsame Mobilfunkverbindung.

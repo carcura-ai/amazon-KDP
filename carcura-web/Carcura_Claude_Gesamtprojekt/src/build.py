@@ -300,31 +300,33 @@ FILM_PRICE = {"handwaesche": ("Handwäsche inkl. Felgen " + ab("handwaesche"), "
               "keramik": ("Keramik inkl. 1-stufiger Politur " + ab("keramik"), "/keramikversiegelung/", "Was enthalten ist")}
 
 
-FILMDATEN = json.load(open(os.path.join(HERE, "film-szenen.json"), encoding="utf8"))
+VIDEO = {"d_mp4": "/assets/video/carcura-aussenwaesche-1920x1080.mp4", "d_webm": "/assets/video/carcura-aussenwaesche-1920x1080.webm",
+         "m_mp4": "/assets/video/carcura-aussenwaesche-mobil.mp4", "m_webm": "/assets/video/carcura-aussenwaesche-mobil.webm",
+         "d_poster": "/assets/video/carcura-aussenwaesche-1920x1080-poster.jpg", "m_poster": "/assets/video/carcura-aussenwaesche-mobil-poster.jpg"}
+PHASEN = [("Verschmutzt", 0.0), ("Schaum", 2.0), ("Abspülen", 5.8), ("Nass", 8.4), ("Sauber", 11.7)]
 
 
-def film_section():
-    """Startseitenfilm aus src/film-szenen.json. Karten sind echtes HTML (auch ohne Animation lesbar)."""
-    K = FILMDATEN["kapitel"]
-    data = [{"id": z["id"], "ch": z["kapitel"], "w": z["gewicht"], "tr": z["uebergang"],
-             "d": z["sequenz"] or [z["desktop"]], "m": z.get("mobil_sequenz") or ([z["mobil"]] if z.get("mobil") else None)} for z in FILMDATEN["szenen"]]
-    cards = "".join(f'''<article class="fcard pos-{k["pos"]}"><p class="fcard-step">{n + 1} / {len(K)}</p><h2>{E(k["name"])}</h2>
-<p>{E(k["text"])}</p><p class="fcard-price">{ab(k["preis"])}</p><a class="tlink" href="{k["link"]}">{E(k["linktext"])}</a></article>''' for n, k in enumerate(K))
-    first = FILMDATEN["szenen"][0]
-    stills = "".join(f'''<figure><div class="photo ratio-32"><img src="{z["desktop"]}" alt="{E(z["inhalt"])}" loading="lazy"></div><figcaption class="cap">{E(z["inhalt"])}</figcaption></figure>'''
-                     for z in FILMDATEN["szenen"] if z["id"] in ("01-schaum", "06-innen-vorher", "08-politur-vorher", "13-perlen"))
-    return f'''<section class="film" id="film" aria-label="Film: so bereiten wir dein Auto auf" style="--w:{sum(d["w"] for d in data)}">
-<div class="film-stage">
- <img class="f-base" src="{first["desktop"]}" alt="Porsche in der Carcura-Halle, verschmutzt vor der Aufbereitung (KI-Inszenierung)" width="762" height="506" fetchpriority="high">
- <img class="f-top" alt="" width="762" height="506" style="opacity:0">
- <span class="film-spray" aria-hidden="true"></span><div class="film-vignette" aria-hidden="true"></div>
- <div class="fcards" aria-live="polite">{cards}</div>
- <p class="film-ki">KI-Inszenierung</p>
- <a class="film-skip" href="#einstieg">Film überspringen</a>
- <div class="film-bar" aria-hidden="true"></div>
-</div>
-<div class="film-static"><div class="wrap"><p class="label">So bereiten wir dein Auto auf · KI-Inszenierung</p><div class="grid g4">{stills}</div></div></div>
-<script type="application/json" id="film-data">{json.dumps(data, ensure_ascii=False)}</script>
+def video_section():
+    """Außenwäsche-Film als echtes <video>. Dateien: src/assets/video (Vorschau, erzeugt mit src/video/build_preview_video.py)."""
+    size = round(os.path.getsize(os.path.join(HERE, "assets", VIDEO["d_mp4"].replace("/assets/", ""))) / 1048576, 1)
+    chips = "".join(f'<button type="button" class="vchip" data-t="{t}" aria-pressed="{"true" if k == 0 else "false"}">{n}</button>' for k, (n, t) in enumerate(PHASEN))
+    return f'''<section class="hero-video" id="film" aria-labelledby="film-h">
+ <h2 class="sr" id="film-h">Film: Außenwäsche in der Carcura-Halle</h2>
+ <figure class="vframe">
+  <div class="vbox"><video id="wash" autoplay muted loop playsinline preload="auto" width="1920" height="1080" poster="{VIDEO["d_poster"]}" data-poster-mobil="{VIDEO["m_poster"]}" aria-describedby="vcap">
+   <source src="{VIDEO["m_mp4"]}" type="video/mp4" media="(max-width: 809px)">
+   <source src="{VIDEO["m_webm"]}" type="video/webm" media="(max-width: 809px)">
+   <source src="{VIDEO["d_mp4"]}" type="video/mp4">
+   <source src="{VIDEO["d_webm"]}" type="video/webm">
+   <a href="{VIDEO["d_mp4"]}" download>Film als MP4 herunterladen</a>
+  </video></div>
+  <div class="vctl" role="group" aria-label="Filmsteuerung">
+   <button type="button" class="vplay" aria-pressed="false" aria-label="Film pausieren"><span class="vplay-i" aria-hidden="true"></span><span class="vplay-t">Pause</span></button>
+   <div class="vchips" role="group" aria-label="Zu Phase springen">{chips}</div>
+   <a class="vdl" href="{VIDEO["d_mp4"]}" download>MP4 herunterladen <span>({str(size).replace(".", ",")} MB)</span></a>
+  </div>
+  <figcaption id="vcap" class="vcap">Außenwäsche in unserer Halle: verschmutzt, Schaumvorwäsche, Abspülen, nass, sauber. Vorschau aus KI-generierten Bildzuständen, kein Kundenfahrzeug.</figcaption>
+ </figure>
 </section>'''
 
 
@@ -351,7 +353,7 @@ def home():
         ("Muss ich Umsatzsteuer dazurechnen?", "Nein. Alle Preise sind Endpreise. Als Kleinunternehmer nach § 19 UStG weisen wir keine Umsatzsteuer aus."),
     ]
     body = f'''
-{film_section()}
+{video_section()}
 
 <section class="sec intro studio" id="einstieg" aria-labelledby="h1"><div class="wrap">
   <p class="label">Carcura · Walterschen · Westerwald</p>
@@ -417,7 +419,7 @@ def home():
 '''
     page("/", "Fahrzeugaufbereitung Westerwald mit Abholung | Carcura",
          f"Innenreinigung {ab('innen-normal')}, Handwäsche {ab('handwaesche')}, Politur {ab('politur-1')}, Keramik {ab('keramik')}. Von Hand in unserer Halle in Walterschen. Abholung bis 10 km gratis.",
-         body, ld=[faq_ld(faq)], js=("film.js",), css=("carcura-finish.css",), body_class="carcura-finish home-film")
+         body, ld=[faq_ld(faq)], js=("video.js",), css=("carcura-finish.css",), body_class="carcura-finish home-video")
 
 
 def calc_html(start=15):
@@ -1076,7 +1078,8 @@ def sitemap():
 
 if __name__ == "__main__":
     import shutil
-    shutil.copytree(os.path.join(HERE, "assets"), os.path.join(DIST, "assets"), dirs_exist_ok=True)  # Assets-Quelle: src/assets
+    shutil.rmtree(os.path.join(DIST, "assets"), ignore_errors=True)
+    shutil.copytree(os.path.join(HERE, "assets"), os.path.join(DIST, "assets"), ignore=shutil.ignore_patterns("film"))  # film/ = Quellbilder fürs Video  # Assets-Quelle: src/assets
     home()
     leistungen()
     build_services()
