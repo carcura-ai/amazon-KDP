@@ -2,7 +2,7 @@
 
 **Abo-Adresse (fest, nie ändern):** https://carcura.info/kalender-1d9dad6f1b082a1f.ics
 → Rank-Math-Weiterleitung **ID 4** (302) auf die aktuelle Datei in der Mediathek.
-Aktuelle Datei: Medien-ID **1815**, https://carcura.info/wp-content/uploads/2026/11/cal-1d9dad6f1b082a1f.ics
+Aktuelle Datei: Medien-ID **1817**, https://carcura.info/wp-content/uploads/2026/11/cal-1d9dad6f1b082a1f-1.ics
 
 **Privat-Kalender** (blau): https://carcura.info/kalender-a0bc309d2176a0e6.ics → Weiterleitung **ID 5**, Medien-ID **1816**, Quelle `termine-privat.json`, bauen mit `python3 build_ics.py privat`, hochladen als `cal-a0bc309d2176a0e6.ics`.
 
