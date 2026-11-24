@@ -71,3 +71,5 @@ Termin hat Vorrang, Billigpreise zeitlich begrenzen, Anzahlung bei großen Auftr
 - Platzierungen: Feeds und Instagram Stories; Facebook Reels und Marketplace
   nur nach Test, da dort viele Fehlklicks entstehen.
 - Budget erhöhen nur nach Freigabe des Nutzers.
+- Ablauf und weitere Regeln: Skill `meta-werbung` (`/meta-werbung` oder „Werbung: …“).
+  Ziel nur Instant-Formular oder Chat, nie Profilbesuche, Interaktionen oder Videoaufrufe.
