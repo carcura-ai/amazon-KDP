@@ -1,0 +1,62 @@
+<!DOCTYPE html><html lang="de"><head><meta charset="utf-8"><title>Rechnung Fahrschule – Entwurf</title>
+<style>
+@page{size:A4;margin:0}
+*{box-sizing:border-box}
+body{margin:0;font:10.5pt/1.45 "Helvetica Neue",Arial,sans-serif;color:#1b1b1f}
+.page{width:210mm;min-height:297mm;padding:18mm 20mm 16mm;position:relative}
+.top{display:flex;justify-content:space-between;align-items:flex-start}
+.brand{font-size:22pt;font-weight:800;letter-spacing:.04em}
+.brand span{display:block;font-size:8.5pt;font-weight:500;letter-spacing:.02em;color:#666}
+.from{font-size:8.5pt;text-align:right;color:#444}
+.sender{font-size:7.5pt;color:#777;border-bottom:1px solid #bbb;display:inline-block;margin:16mm 0 2mm}
+.addr{min-height:30mm}
+.meta{display:flex;justify-content:space-between;align-items:flex-end;margin:8mm 0 6mm}
+h1{font-size:17pt;margin:0}
+.meta table td{padding:1px 0 1px 10mm;font-size:9.5pt}
+.meta table td:first-child{color:#666;padding-left:0}
+.fill{background:#fff3a0;padding:0 3px;border-radius:2px}
+table.pos{width:100%;border-collapse:collapse;margin-top:4mm}
+.pos th{text-align:left;font-size:8.5pt;color:#666;font-weight:600;border-bottom:1.5px solid #1b1b1f;padding:5px 4px}
+.pos td{border-bottom:1px solid #ddd;padding:7px 4px;vertical-align:top}
+.pos .r{text-align:right;white-space:nowrap}
+.pos .d{font-size:8.5pt;color:#555}
+.sum{width:75mm;margin:5mm 0 0 auto;border-collapse:collapse}
+.sum td{padding:4px}
+.sum tr.t td{border-top:1.5px solid #1b1b1f;font-weight:700;font-size:12pt}
+.note{margin-top:8mm}
+.foot{position:absolute;left:20mm;right:20mm;bottom:12mm;border-top:1px solid #ccc;padding-top:3mm;display:flex;justify-content:space-between;font-size:7.5pt;color:#555}
+</style></head><body><div class="page">
+<div class="top">
+ <div class="brand">CARCURA<span>Fahrzeugaufbereitung · Walterschen</span></div>
+ <div class="from">Carcura GbR<br>Hauptstr. 7<br>57632 Walterschen<br>0170 6669516<br>carcura@web.de<br>carcura.info</div>
+</div>
+<div class="sender">Carcura GbR · Hauptstr. 7 · 57632 Walterschen</div>
+<div class="addr"><span class="fill">Name der Fahrschule</span><br><span class="fill">Straße Hausnummer</span><br><span class="fill">PLZ Ort</span></div>
+<div class="meta">
+ <h1>Rechnung</h1>
+ <table>
+  <tr><td>Rechnungsnummer</td><td><span class="fill">RE-…</span></td></tr>
+  <tr><td>Rechnungsdatum</td><td>25.11.2026</td></tr>
+  <tr><td>Leistungsdatum</td><td><span class="fill">TT.MM.2026</span></td></tr>
+ </table>
+</div>
+<p>Sehr geehrte Damen und Herren,<br>vielen Dank für Ihren Auftrag. Für die Aufbereitung Ihrer Fahrschulfahrzeuge berechnen wir:</p>
+<table class="pos">
+ <tr><th>Pos.</th><th>Leistung</th><th class="r">Menge</th><th class="r">Einzelpreis</th><th class="r">Gesamt</th></tr>
+ <tr><td>1</td><td><b>Aufbereitung innen + außen inkl. einstufiger Politur – Skoda Octavia</b><div class="d">Innenraumreinigung, Hand- und Felgenwäsche, Lack dekontaminiert und geknetet, einstufige Maschinenpolitur am gesamten Fahrzeug.</div></td><td class="r">1</td><td class="r">200,00 €</td><td class="r">200,00 €</td></tr>
+ <tr><td>2</td><td><b>Aufbereitung innen + außen inkl. einstufiger Politur – Opel Mokka</b><div class="d">Leistungsumfang wie Pos. 1.</div></td><td class="r">2</td><td class="r">200,00 €</td><td class="r">400,00 €</td></tr>
+</table>
+<table class="sum">
+ <tr class="t"><td>Rechnungsbetrag</td><td class="r" style="text-align:right">600,00 €</td></tr>
+</table>
+<div class="note">
+ <p>Gemäß § 19 UStG wird keine Umsatzsteuer berechnet.</p>
+ <p>Bitte überweisen Sie den Betrag innerhalb von 14 Tagen ohne Abzug unter Angabe der Rechnungsnummer auf das unten genannte Konto.</p>
+ <p>Mit freundlichen Grüßen<br>Alexander Fuchs und Richy Schumacher<br>Carcura GbR</p>
+</div>
+<div class="foot">
+ <div>Carcura GbR · Gesellschafter: Alexander Fuchs, Richy Schumacher<br>Hauptstr. 7 · 57632 Walterschen</div>
+ <div>Steuernummer: <span class="fill">…</span></div>
+ <div>Bank: <span class="fill">…</span><br>IBAN: <span class="fill">DE..</span></div>
+</div>
+</div></body></html>
