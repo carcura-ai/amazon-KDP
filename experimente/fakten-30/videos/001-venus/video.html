@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<title>Fakten 001 – Venus</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800;900&display=block" rel="stylesheet">
+<style>html,body{margin:0;background:#05060A}canvas{display:block}</style>
+</head>
+<body>
+<canvas id="c" width="1080" height="1920"></canvas>
+<script>
+/* Fakten 001: „Auf der Venus dauert ein Tag länger als ein Jahr.“ 9:16, Zeiten aus woerter.json (Sprecher).
+   Schutzzonen für Shorts/Reels/TikTok: wichtige Inhalte zwischen y 270 und y 1530, rechts 140 px frei. */
+const W = 1080, H = 1920, AKZENT = '#FFB23F', CYAN = '#5FE3FF';
+const c = document.getElementById('c'), x = c.getContext('2d');
+const cl = (v, a = 0, b = 1) => Math.min(b, Math.max(a, v));
+const p = (t, a, b) => b <= a ? (t >= a ? 1 : 0) : cl((t - a) / (b - a));
+const eo = v => 1 - Math.pow(1 - v, 3), eio = v => v < .5 ? 4 * v * v * v : 1 - Math.pow(-2 * v + 2, 3) / 2;
+const eback = v => { const k = 1.70158; return 1 + (k + 1) * Math.pow(v - 1, 3) + k * Math.pow(v - 1, 2); };
+const lerp = (a, b, v) => a + (b - a) * v;
+const sicht = (t, a, b, ein = .3, aus = .3) => Math.min(p(t, a, a + ein), 1 - p(t, b - aus, b));
+function rng(s) { return function () { s |= 0; s = s + 0x6D2B79F5 | 0; let r = Math.imul(s ^ s >>> 15, 1 | s); r = r + Math.imul(r ^ r >>> 7, 61 | r) ^ r; return ((r ^ r >>> 14) >>> 0) / 4294967296; }; }
+
+// ---------- Zeiten ----------
+let WORTE = [], S = [], DAUER = 24;
+const SATZ_WOERTER = [10, 11, 9, 10, 10, 8];          // Wörter je Skriptzeile (wird beim Start aus der Datei überschrieben)
+function zeitenSetzen(d) {
+  WORTE = d.woerter; DAUER = d.dauer + 1.2;
+  const zaehl = d.satzWoerter || SATZ_WOERTER;
+  S = []; let i = 0;
+  for (const n of zaehl) { const a = WORTE[Math.min(i, WORTE.length - 1)][1]; i += n; const e = WORTE[Math.min(i - 1, WORTE.length - 1)][2]; S.push({ a, e }); }
+  for (let k = 0; k < S.length; k++) S[k].n = k + 1 < S.length ? S[k + 1].a : DAUER;
+}
+const wort = stamm => { const f = WORTE.find(w => w[0].startsWith(stamm)); return f ? f[1] : 0; };
+
+// ---------- Hintergrund: Sterne ----------
+const R = rng(3), STERNE = Array.from({ length: 260 }, () => ({ x: R() * W, y: R() * H, r: .5 + R() * 1.8, a: .2 + R() * .7, f: .5 + R() * 2, ph: R() * 6.3, z: .2 + R() * .8 }));
+function himmel(t, schub) {
+  const g = x.createLinearGradient(0, 0, 0, H); g.addColorStop(0, '#070A16'); g.addColorStop(1, '#030308');
+  x.fillStyle = g; x.fillRect(0, 0, W, H);
+  for (const s of STERNE) {
+    x.globalAlpha = s.a * (.6 + .4 * Math.sin(t * s.f + s.ph)); x.fillStyle = '#fff';
+    x.beginPath(); x.arc(s.x, (s.y + t * 6 * s.z + schub * s.z) % H, s.r, 0, Math.PI * 2); x.fill();
+  }
+  x.globalAlpha = 1;
+}
+
+// ---------- Venus ----------
+const RV = rng(9), BAENDER = Array.from({ length: 14 }, (_, i) => ({ y: -1 + (i + .5) * 2 / 14 + (RV() - .5) * .05, b: .05 + RV() * .09, h: RV(), s: .5 + RV() }));
+function venus(cx, cy, r, dreh, a = 1, glow = 1) {
+  if (a <= 0) return;
+  x.save(); x.globalAlpha = a;
+  const gl = x.createRadialGradient(cx, cy, r * .9, cx, cy, r * 1.6); gl.addColorStop(0, `rgba(255,190,90,${.35 * glow})`); gl.addColorStop(1, 'rgba(255,190,90,0)');
+  x.fillStyle = gl; x.beginPath(); x.arc(cx, cy, r * 1.6, 0, Math.PI * 2); x.fill();
+  x.beginPath(); x.arc(cx, cy, r, 0, Math.PI * 2); x.clip();
+  const g = x.createLinearGradient(cx - r, cy - r, cx + r, cy + r); g.addColorStop(0, '#FFE2A6'); g.addColorStop(.5, '#E9A24E'); g.addColorStop(1, '#8E4F1D');
+  x.fillStyle = g; x.fillRect(cx - r, cy - r, 2 * r, 2 * r);
+  for (const b of BAENDER) {                       // Wolkenbänder ziehen mit der Drehung
+    x.globalAlpha = a * .32; x.fillStyle = b.h > .5 ? '#FFF1CF' : '#B8662A';
+    const yy = cy + b.y * r, off = ((dreh * b.s * r) % (2 * r) + 2 * r) % (2 * r);
+    for (let k = -1; k < 2; k++) { x.beginPath(); x.ellipse(cx - r + off + k * 2 * r, yy, r * 1.05, b.b * r, 0, 0, Math.PI * 2); x.fill(); }
+  }
+  x.globalAlpha = a;
+  const sch = x.createRadialGradient(cx - r * .35, cy - r * .35, r * .1, cx, cy, r * 1.05); sch.addColorStop(0, 'rgba(255,255,255,.18)'); sch.addColorStop(.6, 'rgba(0,0,0,0)'); sch.addColorStop(1, 'rgba(0,0,0,.55)');
+  x.fillStyle = sch; x.fillRect(cx - r, cy - r, 2 * r, 2 * r);
+  x.restore();
+}
+function sonne(cx, cy, r, a = 1) {
+  if (a <= 0) return;
+  x.save(); x.globalAlpha = a;
+  const g = x.createRadialGradient(cx, cy, 0, cx, cy, r * 3.2); g.addColorStop(0, 'rgba(255,230,150,.75)'); g.addColorStop(.35, 'rgba(255,170,60,.25)'); g.addColorStop(1, 'rgba(255,140,40,0)');
+  x.fillStyle = g; x.beginPath(); x.arc(cx, cy, r * 3.2, 0, Math.PI * 2); x.fill();
+  const k = x.createRadialGradient(cx - r * .2, cy - r * .2, 0, cx, cy, r); k.addColorStop(0, '#FFFBEA'); k.addColorStop(.6, '#FFD66E'); k.addColorStop(1, '#FF9F2E');
+  x.fillStyle = k; x.shadowColor = '#FFB23F'; x.shadowBlur = 50; x.beginPath(); x.arc(cx, cy, r, 0, Math.PI * 2); x.fill();
+  x.restore();
+}
+function pfeilBogen(cx, cy, r, start, laenge, richtung, a, farbe) {   // Drehpfeil um einen Kreis
+  if (a <= 0) return;
+  x.save(); x.globalAlpha = a; x.strokeStyle = farbe; x.lineWidth = 9; x.lineCap = 'round';
+  const e = start + laenge * richtung;
+  x.beginPath(); x.arc(cx, cy, r, start, e, richtung < 0); x.stroke();
+  const px = cx + Math.cos(e) * r, py = cy + Math.sin(e) * r, tang = e + richtung * Math.PI / 2;
+  x.fillStyle = farbe; x.beginPath(); x.moveTo(px + Math.cos(tang) * 28, py + Math.sin(tang) * 28);
+  x.lineTo(px + Math.cos(tang + 2.5) * 22, py + Math.sin(tang + 2.5) * 22); x.lineTo(px + Math.cos(tang - 2.5) * 22, py + Math.sin(tang - 2.5) * 22); x.closePath(); x.fill();
+  x.restore();
+}
+
+// ---------- Text ----------
+function text(s, X, Y, o = {}) {
+  const { size = 60, w = 800, col = '#fff', a = 1, sc = 1, glow = 0, ls = -2, align = 'center' } = o; if (a <= 0) return;
+  x.save(); x.globalAlpha = a; x.translate(X, Y); x.scale(sc, sc); x.font = `${w} ${size}px Poppins`; x.letterSpacing = ls + 'px';
+  x.textAlign = align; x.textBaseline = 'middle'; x.fillStyle = col; if (glow) { x.shadowColor = col; x.shadowBlur = glow; }
+  x.fillText(s, 0, 0); x.restore();
+}
+function zaehler(t, t0, ziel, X, Y, einheit, farbe, a) {             // Zahl zählt hoch
+  const v = Math.round(ziel * eo(p(t, t0, t0 + 1.4)));
+  text(String(v), X, Y, { size: 190, w: 900, col: farbe, a, glow: 30, ls: -6 });
+  text(einheit, X, Y + 130, { size: 50, w: 700, col: '#fff', a: a * .9, ls: 0 });
+}
+
+// ---------- Untertitel: Wort für Wort ----------
+function untertitel(t) {
+  if (!WORTE.length) return;
+  let i = WORTE.findIndex(w => w[1] > t) - 1; if (i < -1) i = WORTE.length - 1; if (i < 0) return;
+  const gruppe = Math.floor(i / 3) * 3, teil = WORTE.slice(gruppe, gruppe + 3);
+  const ende = teil[teil.length - 1][2]; if (t > ende + .6) return;
+  const roh = document.querySelector('#skript').textContent.split(/\s+/).filter(Boolean);
+  const anzeige = teil.map((w, k) => (roh[gruppe + k] || w[0]).replace(/[.,:]$/, ''));
+  x.save(); x.font = '900 74px Poppins'; x.letterSpacing = '-1px'; x.textBaseline = 'middle';
+  const breiten = anzeige.map(s => x.measureText(s.toUpperCase()).width), luecke = 22, ges = breiten.reduce((a, b) => a + b, 0) + luecke * (anzeige.length - 1);
+  let X = (W - ges) / 2;
+  anzeige.forEach((s, k) => {
+    const aktiv = gruppe + k === i, sc = aktiv ? 1 + .08 * (1 - p(t, WORTE[gruppe + k][1], WORTE[gruppe + k][1] + .15)) : 1;
+    x.save(); x.translate(X + breiten[k] / 2, 1430); x.scale(sc, sc);
+    x.lineWidth = 14; x.strokeStyle = 'rgba(0,0,0,.85)'; x.lineJoin = 'round'; x.textAlign = 'center';
+    x.strokeText(s.toUpperCase(), 0, 0); x.fillStyle = aktiv ? AKZENT : '#fff'; x.fillText(s.toUpperCase(), 0, 0); x.restore();
+    X += breiten[k] + luecke;
+  });
+  x.restore();
+}
+
+// ---------- Ein Bild ----------
+function render(t) {
+  const [s1, s2, s3, s4, s5, s6] = S;
+  himmel(t, 0);
+  // Szene 1: Hook – Venus groß, „1 TAG > 1 JAHR“
+  const a1 = sicht(t, -1, s2.a + .2, .01, .4);
+  venus(540, 960, lerp(230, 270, eo(p(t, 0, 1.2))), t * .02, a1);
+  text('1 TAG', 540, 370, { size: 140, w: 900, col: '#fff', a: a1 * p(t, .1, .4), sc: eback(p(t, .1, .5)) });
+  text('>', 540, 480, { size: 110, w: 900, col: AKZENT, a: a1 * p(t, wort('länger') - .1, wort('länger') + .2), glow: 20 });
+  text('1 JAHR', 540, 590, { size: 140, w: 900, col: '#fff', a: a1 * p(t, wort('jahr') - .15, wort('jahr') + .15), sc: eback(p(t, wort('jahr') - .15, wort('jahr') + .3)) });
+  text('AUF DER VENUS', 540, 1290, { size: 54, w: 700, col: AKZENT, ls: 8, a: a1 * p(t, .3, .7) });
+  // Szene 2: Drehung – 243 Tage
+  const a2 = sicht(t, s2.a - .1, s3.a + .1, .4, .4);
+  if (a2 > 0) {
+    const dreh = (t - s2.a) * .25;
+    venus(540, 780, 260, dreh, a2);
+    pfeilBogen(540, 780, 330, -2.4, 1.7, 1, a2 * p(t, s2.a + .3, s2.a + .8), CYAN);
+    text('EINE UMDREHUNG', 540, 340, { size: 52, w: 700, col: CYAN, ls: 6, a: a2 });
+    zaehler(t, wort('243') - .2, 243, 540, 1150, 'ERDENTAGE', CYAN, a2 * p(t, wort('243') - .3, wort('243')));
+  }
+  // Szene 3: Umlauf – 225 Tage, Vergleich
+  const a3 = sicht(t, s3.a - .1, s4.a + .1, .4, .4);
+  if (a3 > 0) {
+    const w = (t - s3.a) * 1.1;
+    x.save(); x.globalAlpha = a3 * .35; x.strokeStyle = '#fff'; x.setLineDash([8, 14]); x.lineWidth = 3;
+    x.beginPath(); x.ellipse(540, 760, 340, 340, 0, 0, Math.PI * 2); x.stroke(); x.restore();
+    sonne(540, 760, 95, a3);
+    venus(540 + Math.cos(w - 1.6) * 340, 760 + Math.sin(w - 1.6) * 340, 70, t * .05, a3, .6);
+    text('EINE RUNDE UM DIE SONNE', 540, 300, { size: 46, w: 700, col: AKZENT, ls: 4, a: a3 });
+    const tz = wort('225');
+    zaehler(t, tz - .2, 225, 540, 1230, 'ERDENTAGE', AKZENT, a3 * p(t, tz - .3, tz));
+  }
+  // Szene 4: falsch herum – Pfeil kippt
+  const a4 = sicht(t, s4.a - .1, s5.a + .1, .4, .4);
+  if (a4 > 0) {
+    const tk = wort('falsch'), kipp = eio(p(t, tk - .1, tk + .5));
+    venus(540, 820, 280, (t - s4.a) * .3 * (1 - 2 * kipp), a4);
+    pfeilBogen(540, 820, 350, -2.4, 1.7, 1, a4 * (1 - kipp), '#ffffff');
+    pfeilBogen(540, 820, 350, -.7, 1.7, -1, a4 * kipp, '#FF5D5D');
+    text('ALLE PLANETEN', 540, 330, { size: 52, w: 700, col: '#fff', ls: 4, a: a4 * (1 - kipp) });
+    text('DIE VENUS: RÜCKWÄRTS', 540, 330, { size: 60, w: 900, col: '#FF5D5D', ls: 2, a: a4 * kipp, sc: eback(p(t, tk, tk + .4)) });
+  }
+  // Szene 5: Sonnenaufgang im Westen – Venus-Oberfläche
+  const a5 = sicht(t, s5.a - .1, s6.a + .1, .4, .4);
+  if (a5 > 0) {
+    x.save(); x.globalAlpha = a5;
+    const hg = x.createLinearGradient(0, 400, 0, 1200); hg.addColorStop(0, '#5A2A10'); hg.addColorStop(1, '#E59A4A');
+    x.fillStyle = hg; x.fillRect(0, 0, W, H);
+    const tw = wort('westen'), tu = wort('osten');
+    const auf = eo(p(t, tw - .6, tw + .6)), unter = eio(p(t, tu - .2, s6.a));
+    const sx = lerp(220, 860, unter), sy = lerp(1120, 650, auf) + unter * 470;
+    sonne(sx, sy, 80, 1);
+    x.fillStyle = '#3B1A08'; x.beginPath(); x.moveTo(0, 1080);
+    for (let X = 0; X <= W; X += 40) x.lineTo(X, 1060 + Math.sin(X * .012) * 30 + Math.sin(X * .031) * 14);
+    x.lineTo(W, H); x.lineTo(0, H); x.closePath(); x.fill();
+    x.restore();
+    text('WESTEN', 210, 1180, { size: 52, w: 800, col: AKZENT, a: a5 * p(t, tw - .2, tw + .2), ls: 4 });
+    text('OSTEN', 870, 1180, { size: 52, w: 800, col: '#fff', a: a5 * p(t, tu - .2, tu + .2), ls: 4 });
+    text('SONNENAUFGANG', 540, 340, { size: 58, w: 900, col: '#fff', a: a5, ls: 4 });
+  }
+  // Szene 6: Abschluss
+  const a6 = sicht(t, s6.a - .1, 99, .4, .1);
+  if (a6 > 0) {
+    venus(540, 820, 220, t * .03, a6);
+    text('FOLGEN', 540, 360, { size: 120, w: 900, col: AKZENT, a: a6, sc: eback(p(t, s6.a, s6.a + .4)), glow: 24 });
+    text('für mehr Fakten', 540, 480, { size: 60, w: 700, col: '#fff', a: a6 * p(t, s6.a + .3, s6.a + .7), ls: 0 });
+  }
+  untertitel(t);
+  const v = x.createRadialGradient(W / 2, H * .45, H * .3, W / 2, H * .45, H * .85); v.addColorStop(0, 'rgba(0,0,0,0)'); v.addColorStop(1, 'rgba(0,0,0,.5)');
+  x.fillStyle = v; x.fillRect(0, 0, W, H);
+}
+window.render = render; window.starte = d => { zeitenSetzen(d); window.DAUER = DAUER; };
+Promise.all(['700', '800', '900'].map(w => document.fonts.load(`${w} 40px Poppins`))).then(() => { window.schriftOk = document.fonts.check('900 40px Poppins'); window.bereit = true; });
+</script>
+<script type="text/plain" id="skript"></script>
+</body>
+</html>
