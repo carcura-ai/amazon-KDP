@@ -13,7 +13,7 @@
    Problem (0–3,2) → Folge (3,2–8) → Lösung (8–14) → Angebot (14–21) → Abschluss (21–24,5).
    Wichtige Texte liegen zwischen 14 % von oben (y 269) und 20 % von unten (y 1536).
    Nur freigegebene Aussagen: Streusalz/Regen/Baumharz, stumpfer Lack, Wasserflecken, hauchdünn, glasklar, Wasser perlt ab,
-   von Hand in Walterschen, ab 700 € inkl. Handwäsche/Kneten/Politur/Pflegeset, Waschset bei Buchung bis 31.12.2026, Gutschein. */
+   von Hand in Walterschen, ab 700 € inkl. Handwäsche/Kneten/Politur, Waschset bei Buchung bis 31.12.2026, Gutschein. */
 const W = 1080, H = 1920, DAUER = 26.8;
 const T = { folge: 3.7, loesung: 8.0, wasser: 9.6, hand: 12.3, angebot: 15.2, schluss: 23.1 };
 const GELB = '#E8F320', INK = '#09090A', GRAU = '#AEB2B9', HELL = '#D5D7DB', ROT = '#FF5A4F';
@@ -272,7 +272,7 @@ function angebotBlock(y0, e) {                      // e(k) → [alpha, skalieru
   logo(y0, 400, e(0)[0]);
   text('Keramikversiegelung', y0 + 270, { size: 78, w: 700, ls: -2, a: e(1)[0] });
   text('ab 700 €', y0 + 445, { size: 172, w: 800, col: GELB, ls: -5, a: e(2)[0], sc: e(2)[1], glow: 18 });
-  text('inkl. Handwäsche, Kneten, Politur und Pflegeset', y0 + 535, { size: 38, col: HELL, a: e(3)[0] });
+  text('inkl. Handwäsche, Kneten und Politur', y0 + 535, { size: 38, col: HELL, a: e(3)[0] });
   geschenkChip(y0 + 685, e(4)[0], e(4)[1]);
   text('bei Buchung bis 31.12.2026', y0 + 795, { size: 38, w: 600, col: HELL, a: e(5)[0] });
 }

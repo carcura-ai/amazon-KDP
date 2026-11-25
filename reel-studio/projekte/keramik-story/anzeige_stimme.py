@@ -16,7 +16,7 @@ SAETZE = [
     ("folge", 3.85, 7.6, "Die Folge: stumpfer Lack und Wasserflecken."),
     ("loesung", 8.0, 12.25, "Die Lösung: Keramikversiegelung. Hauchdünn und glasklar."),
     ("hand", 12.3, 15.2, "Komplett von Hand, in unserer Halle in Walterschen."),
-    ("angebot", 15.3, 23.1, "Ab siebenhundert Euro, mit Handwäsche, Kneten, Politur und Pflegeset. Bei Buchung bis Jahresende: Waschset geschenkt."),
+    ("angebot", 15.3, 23.1, "Ab siebenhundert Euro, mit Handwäsche, Kneten und Politur. Bei Buchung bis Jahresende: Waschset geschenkt."),
     ("schluss", 23.2, 26.6, "Auch als Gutschein. Jetzt Angebot anfordern."),
 ]
 

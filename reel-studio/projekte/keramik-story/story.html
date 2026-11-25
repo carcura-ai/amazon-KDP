@@ -415,7 +415,7 @@ function ablauf(t) {
     if (hk > 0) { x.strokeStyle = letzte ? GELB : '#7CE38B'; x.lineWidth = 7; x.lineCap = 'round'; x.lineJoin = 'round'; x.setLineDash([80, 80]); x.lineDashOffset = 80 * (1 - hk); x.beginPath(); x.moveTo(300, 2); x.lineTo(322, 24); x.lineTo(356, -22); x.stroke(); }
     x.restore();
   });
-  const ts = S('set'), v = p(t, ts.a - .1, ts.a + .35);
+  const ts = S('set'), v = 0 * p(t, ts.a - .1, ts.a + .35);   // Pflegeset gibt es nicht dauerhaft (Alex, 24.11.)
   if (v > 0) {
     x.save(); x.globalAlpha = a * cl(v * 1.5); x.translate(W / 2, 1330); x.scale(eback(v), eback(v));
     x.font = '600 40px Poppins'; const tx = '+ Pflegeset für zu Hause', bw = x.measureText(tx).width + 90;
@@ -452,7 +452,7 @@ function angebot(t) {
   rein(t, s.a - .1, AE, (aa, dy) => text('Keramikversiegelung', 720, { size: 76, w: 700, ls: -2, a: aa, dy }));
   const tp = wortSuche('preis', '700', 2, 4);
   rein(t, tp - .15, AE, (aa, dy, sc) => text('ab 700 €', 890, { size: 160, w: 800, col: GELB, ls: -5, a: aa, sc, glow: 18 }));
-  rein(t, tp + .3, AE, (aa, dy) => text('inkl. Handwäsche, Kneten, Politur und Pflegeset', 975, { size: 34, col: GRAU, a: aa, dy }));
+  rein(t, tp + .3, AE, (aa, dy) => text('inkl. Handwäsche, Kneten und Politur', 975, { size: 34, col: GRAU, a: aa, dy }));
   const c0 = S('cta').a;
   rein(t, c0 - .1, AE, (aa, dy, sc) => {
     const puls = 1 + .02 * Math.sin((t - c0) * 5);

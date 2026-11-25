@@ -75,7 +75,7 @@ Die beiden Firmen-Einträge zu **einem** `AutomotiveBusiness` zusammenführen. `
 - Öffnungszeiten: Mo–Do 17–22 Uhr, Fr 14–21 Uhr, Sa 8–20 Uhr
 
 ## Leistungen und Preise
-- [Keramikversiegelung](https://carcura.info/keramikversiegelung/): ab 700 € inkl. Handwäsche, Kneten, Politur und Pflegeset
+- [Keramikversiegelung](https://carcura.info/keramikversiegelung/): ab 700 € inkl. Handwäsche, Kneten und Politur (bis 31.12.2026: Waschset geschenkt)
 - [Autopolitur](https://carcura.info/autopolitur/): ab 349 €, Lackkorrektur ab 549 €
 - [Auto-Innenreinigung](https://carcura.info/auto-innenreinigung/): ab 90 €
 - [Scheinwerfer aufbereiten](https://carcura.info/scheinwerfer-aufbereiten/): 69 € für beide

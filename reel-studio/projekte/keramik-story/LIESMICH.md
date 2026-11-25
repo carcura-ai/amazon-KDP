@@ -12,7 +12,7 @@ Alles selbst erzeugt: Animation (Code), Stimmen (KI), Musik und Effekte (Synthes
 
 Sprechertext (Stand 12.11.): Dein Handy steckt in einer Hülle. · Aber dein Auto? Das steht jeden Tag draußen. Ohne extra Schutz. · [Pause] Bleib kurz dran: Am Ende wartet ein Geschenk auf dich. · Die Probleme sind: Sonne, Regen, Streusalz und Vogelkot. · Und irgendwann siehst du es … · Der Lack wird stumpf. Wasser hinterlässt Flecken. Und der Dreck geht kaum noch runter. · Das Problem sitzt ganz oben, im Klarlack. Er schützt deine Farbe. Aber wer schützt ihn? · Genau da setzen wir an. · Mit einer Keramikversiegelung. · Eine hauchdünne, glasklare Schutzschicht, die sich fest mit deinem Lack verbindet. · Die Sonne bleicht den Lack langsamer aus. · Wasser perlt einfach ab. · Und Dreck findet weniger Halt. Die Wäsche geht viel leichter. · Bei uns in Walterschen, direkt bei Altenkirchen, machen wir alles von Hand: waschen, kneten, polieren. Erst dann kommt die Keramik drauf. · Keramikversiegelung ab siebenhundert Euro. · Und wenn du bis Jahresende buchst, schenken wir dir ein Waschset dazu. · Schick uns einfach drei Fotos von deinem Lack per WhatsApp. Dann bekommst du unser Angebot und weißt vorher, was es kostet. · Du hast noch kein Weihnachtsgeschenk für einen Autoliebhaber? Dann buch jetzt, auch als Gutschein. · [Weihnachtsmann: „Ho, ho, ho!“] · Gönn deinem Lack die Hülle, die er verdient.
 
-**Aktion (von Alex am 12.11. bestätigt):** Waschset geschenkt, zusätzlich zum Pflegeset, bei Buchung bis 31.12.2026 (Termin darf später liegen). Die Bedingung steht im Bild („bei Buchung bis 31.12.2026“). **Nach dem 31.12. darf dieses Video nicht mehr laufen** (Highlight entfernen oder Fassung ohne Aktion rendern).
+**Aktion (von Alex am 12.11. bestätigt):** Waschset geschenkt bei Buchung bis 31.12.2026. **Korrektur 24.11.:** Ein dauerhaftes Pflegeset gibt es NICHT, das Waschset ist das einzige Set. Die Pflegeset-Einblendung ist aus Story und Anzeige entfernt (Termin darf später liegen). Die Bedingung steht im Bild („bei Buchung bis 31.12.2026“). **Nach dem 31.12. darf dieses Video nicht mehr laufen** (Highlight entfernen oder Fassung ohne Aktion rendern).
 
 **Stimme seit 12.11. mittags: „der Kumpel“** (von Alex nach Hörprobe gewählt): neu entworfene Stimme, Mann um 30, locker, leicht rau (`stimmproben.py`, Referenz `ausgabe/stimmproben/ref_kumpel.wav`). Einsprechen: `STIMME=kumpel <qwen-venv>/bin/python stimme_klon.py erzeugen 3`, dann `STIMME=kumpel python3 stimme_klon.py waehlen`. Aktuelle Längen: ganz 86,7 s, Teil 1 30,7 s, Teil 2 56,1 s, -14,7 LUFS. Ohne `STIMME` gilt die frühere Stimme (Take 33).
 
@@ -29,7 +29,7 @@ Stimme: Satz für Satz mit `stimme_klon.py` (gleiche Stimme wie Take 33, 4–8 F
 | Wende | „Genau da setzen wir an.“ | Polierlicht läuft drüber, Schäden verschwinden, Riser |
 | Lösung | „Mit einer Keramikversiegelung. Eine hauchdünne, glasklare Schutzschicht, die sich fest mit deinem Lack verbindet.“ | Aufschlag: gelbe Schicht landet, Musik wechselt nach Dur |
 | Nutzen | UV, Wasser, Schmutz (links ohne, rechts mit) | Sonne/Strahlen, Perlen rollen ab, Welle spült Dreck weg |
-| Beweis | „Bei uns in Walterschen machen wir alles von Hand: waschen, kneten, polieren …“ + Pflegeset | 4 Schritte haken sich ab |
+| Beweis | „Bei uns in Walterschen machen wir alles von Hand: waschen, kneten, polieren …“ | 4 Schritte haken sich ab |
 | Angebot | „Keramikversiegelung ab siebenhundert Euro. Schick uns einfach drei Fotos … per WhatsApp. Du weißt vorher, was es kostet.“ | Logo, Preis, WhatsApp-Knopf |
 | Schluss | „Gönn deinem Lack die Hülle, die er verdient.“ | Pfeil „Termin anfragen“ → **hier den Link-Sticker setzen** |
 
@@ -61,7 +61,7 @@ Ohne Ton verständlich (alle Aussagen als Text), keine Sprache, Musik und Effekt
 | 0–3,2 s | „Streusalz, Regen, Baumharz – jeden Tag auf deinem Lack.“ Auto-Symbol; Salz, Regen und Harz fallen, der Lack wird stumpf und fleckig |
 | 3,2–8 s | ✕ Stumpfer Lack (3,5 s), ✕ Wasserflecken (4,7 s); Lackschichten „OHNE“ |
 | 8–14 s | „Keramikversiegelung. Hauchdünn. Glasklar.“ OHNE / MIT KERAMIK, Wasser perlt ab (ab 9,6 s), „Komplett von Hand – in unserer Halle in Walterschen.“ (ab 11,6 s) |
-| 14–21 s | Logo, „Keramikversiegelung ab 700 €“, „inkl. Handwäsche, Kneten, Politur und Pflegeset“, „+ Waschset geschenkt“, „bei Buchung bis 31.12.2026“. Ab 15,9 s vollständig, steht 5,1 s |
+| 14–21 s | Logo, „Keramikversiegelung ab 700 €“, „inkl. Handwäsche, Kneten und Politur“, „+ Waschset geschenkt“, „bei Buchung bis 31.12.2026“. Ab 15,9 s vollständig, steht 5,1 s |
 | 21–24,5 s | „Auch als Gutschein. Das Weihnachtsgeschenk für Autoliebhaber.“, Knopf „Jetzt Angebot anfordern“, leichter Schnee |
 
 Gegenüber der langen Story gestrichen: Handy-Aufhänger, „Geschenk am Ende“, Sonne/UV, Vogelkot, „Dreck bleibt hängen“, Ursache im Klarlack, Kontaktwinkel 165°, Schmutz-Welle, die vier Arbeitsschritte, WhatsApp-Knopf, Weihnachtsmann, Sprecher.
@@ -69,5 +69,5 @@ Neu rendern: `<venv>/bin/python anzeige_ton.py` → `node anzeige_render.js vide
 **Laufzeit der Anzeige spätestens am 31.12.2026 beenden** (Aktion endet).
 
 **Nachtrag 12.11.: Anzeige mit Sprecher** (Stimme „Kumpel“, `anzeige_stimme.py`), auf Wunsch von Alex. Dadurch 26,8 s statt 24,5 s. Zeiten jetzt: Problem 0–3,7 s · Folge 3,7–8 s · Lösung 8–15,2 s („von Hand“ ab 12,3 s) · Angebot 15,2–23,1 s · Abschluss 23,1–26,8 s. Die Zeittabelle oben gilt für die erste Fassung ohne Sprecher.
-Sprechertext: Streusalz, Regen, Baumharz. Jeden Tag auf deinem Lack. · Die Folge: stumpfer Lack und Wasserflecken. · Die Lösung: Keramikversiegelung. Hauchdünn und glasklar. · Komplett von Hand, in unserer Halle in Walterschen. · Ab siebenhundert Euro, mit Handwäsche, Kneten, Politur und Pflegeset. Bei Buchung bis Jahresende: Waschset geschenkt. · Auch als Gutschein. Jetzt Angebot anfordern.
+Sprechertext: Streusalz, Regen, Baumharz. Jeden Tag auf deinem Lack. · Die Folge: stumpfer Lack und Wasserflecken. · Die Lösung: Keramikversiegelung. Hauchdünn und glasklar. · Komplett von Hand, in unserer Halle in Walterschen. · Ab siebenhundert Euro, mit Handwäsche, Kneten und Politur. Bei Buchung bis Jahresende: Waschset geschenkt. · Auch als Gutschein. Jetzt Angebot anfordern.
 Ablauf: `anzeige_stimme.py erzeugen` (Qwen-venv) → `python3 anzeige_stimme.py bauen` → `anzeige_ton.py` → rendern.

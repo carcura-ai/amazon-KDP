@@ -37,7 +37,7 @@ Absatz unter der Einleitung:
 
 > Auch aus Bad Marienberg, Nistertal und Umgebung holen wir dein Auto ab. Ob Keramikversiegelung, Politur oder Innenreinigung: Wir machen alles von Hand in unserer Halle in Walterschen und bringen dir das Auto aufbereitet zurück.
 
-Neue FAQ: **Macht ihr auch Keramikversiegelung für Bad Marienberg?** – Ja. Die Keramikversiegelung kostet ab 700 €, mit Handwäsche, Kneten, Politur und Pflegeset. Wir holen dein Auto in Bad Marienberg ab; die Kosten für die Abholung nennen wir dir vorher. [Abholkosten nach Entfernung ergänzen: bis 10 km kostenlos, darüber 2 € pro km]
+Neue FAQ: **Macht ihr auch Keramikversiegelung für Bad Marienberg?** – Ja. Die Keramikversiegelung kostet ab 700 €, mit Handwäsche, Kneten und Politur. Wir holen dein Auto in Bad Marienberg ab; die Kosten für die Abholung nennen wir dir vorher. [Abholkosten nach Entfernung ergänzen: bis 10 km kostenlos, darüber 2 € pro km]
 
 ### Nr. 5: Neue Seite /fahrzeugaufbereitung-waldbroel/
 
