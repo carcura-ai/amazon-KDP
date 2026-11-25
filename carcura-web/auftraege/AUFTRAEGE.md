@@ -12,3 +12,4 @@ Preis = vereinbarter Endpreis (Kleinunternehmer, keine USt). Direkte Kosten (Spr
 | Nr. | Termin | Kunde (Vorname) | Fahrzeug | Leistung | Preis | Abholung | Direkte Kosten | Status | Notiz |
 |---|---|---|---|---|---|---|---|---|---|
 | 001 | Di 01.12.2026, 17:30–20:00 | ? | ? | Motorwäsche | 80 € | ? | ? | geplant | Kunde, Fahrzeug, Abholung noch nachtragen |
+| 002 | ? (Rechnung 25.11.2026) | Fahrschule | Skoda Octavia, 2× Opel Mokka | innen + außen + Politur einstufig, je 200 € | 600 € | ? | ? | erledigt | Rechnung als Entwurf: carcura-web/rechnungen/ – Name, Anschrift, Leistungsdatum, Rechnungsnummer offen |
