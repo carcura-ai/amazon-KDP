@@ -4,7 +4,7 @@
   "start": "2026-11-27T09:00",
   "minuten": 15,
   "titel": "Carcura: Meta-Anzeigen prüfen",
-  "text": "Claude schickt um 9 Uhr die Zahlen der Keramik-Anzeigen. Messenger-Postfach ansehen und entscheiden: Formular-Kampagne (Mini, BMW 340i, Leasing) starten – ja/nein."
+  "text": "Claude schickt um 9 Uhr die Zahlen der Keramik-Anzeigen und der Formular-Kampagne (läuft seit 26.11.). Messenger-Postfach und Leads-Center ansehen."
  },
  {
   "uid": "carcura-meta-blackweek-20261201",
@@ -20,5 +20,30 @@
   "erinnern_min": 60,
   "titel": "Carcura: Auftrag – Motorwäsche (80 €)",
   "text": "Auftrag Nr. 001: Motorwäsche, 17:30–20:00 Uhr, vereinbart 80 €. Fahrzeug und Abholung noch offen, Details im Auftragsbuch."
+ },
+ {
+  "uid": "carcura-auftrag-003-annahme-20261202",
+  "start": "2026-12-02T18:00",
+  "minuten": 60,
+  "erinnern_min": 60,
+  "titel": "Carcura: Auftrag – Wohnmobil, Keramikversiegelung (850 €) – Annahme",
+  "text": "Auftrag Nr. 003: Wohnmobil kommt in die Halle, Keramikversiegelung, voraussichtlich 850 €. Bleibt bis Donnerstag. Uhrzeit angenommen, Details im Auftragsbuch."
+ },
+ {
+  "uid": "carcura-auftrag-003-halle-20261202",
+  "ganztag": true,
+  "start": "2026-12-02",
+  "ende": "2026-12-03",
+  "alarm": false,
+  "titel": "Carcura: Wohnmobil in der Halle (Keramik)",
+  "text": "Auftrag Nr. 003: Wohnmobil steht Mi–Do in der Halle für die Keramikversiegelung."
+ },
+ {
+  "uid": "carcura-auftrag-003-rueckgabe-20261203",
+  "start": "2026-12-03T18:00",
+  "minuten": 60,
+  "erinnern_min": 60,
+  "titel": "Carcura: Auftrag – Wohnmobil fertig, Übergabe",
+  "text": "Auftrag Nr. 003: Wohnmobil fertig, Übergabe an den Kunden. Zahlung 850 € (voraussichtlich). Uhrzeit angenommen."
  }
 ]
