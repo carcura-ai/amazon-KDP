@@ -2,7 +2,7 @@
 
 | Kampagne / Anzeige | ID | Ziel | Budget | Status (26.11.2026) |
 |---|---|---|---|---|
-| Keramik, Anzeigengruppe | 52569171540007 | Chat (Messenger) | 5 €/Tag gesamt | läuft |
+| Keramik, Anzeigengruppe | 52569171540007 | Chat (Messenger) | 5 €/Tag gesamt | **pausiert 26.11.** (ersetzt durch Keramik-Formular) |
 | Keramik waschset (Black Week) | 52569171539607 | Chat | – | läuft, Pause am 01.12. 08:00 geplant |
 | Keramik Erklärvideo BMW M2 | 52570166271407 | Chat | – | läuft bis 31.12. |
 | **Anfragen-Formular 35 km bis 20.12.** | Kampagne 52570635936607, Gruppe 52570635994407 | Leads (Sofort-Formular, hohe Absicht) | 7 €/Tag | **aktiv seit 26.11.2026** (Freigabe Nutzer), Prüfung 04.12. 09:00 |
@@ -11,9 +11,9 @@
 | Formular · Innen & außen · Audi A6 | 52570636782607 | | | pausiert 26.11. (alte Halle im Bild) |
 | Formular · Leasingrückgabe · Mercedes E 300 | 52570636829007 | | | pausiert 26.11. (alte Halle im Bild) |
 
-| **Keramik Formular** (Gruppe in Formular-Kampagne) | 52570680200007 | Leads, bis 31.12. | 5 €/Tag | angelegt, pausiert, wartet auf OK |
-| Keramik Formular · Erklärvideo M2 schwarz | 52570680775207 | | | pausiert |
-| Keramik Formular · Waschset-Reel | 52570680778607 | | | pausiert |
+| **Keramik Formular** (Gruppe in Formular-Kampagne) | 52570680200007 | Leads, bis 31.12. | 5 €/Tag | **aktiv seit 26.11.** (OK Nutzer) |
+| Keramik Formular · Erklärvideo M2 schwarz | 52570680775207 | | | aktiv bis 31.12. |
+| Keramik Formular · Waschset-Reel | 52570680778607 | | | aktiv, Pause 01.12. 08:00 geplant („Black Week“ im Video) |
 
 Keramik-Formular: 2377165203033618 (Auto, Vorname, Telefon; Abschlussseite öffnet WhatsApp wa.me/491706669516).
 Formular: 981696971359791 „Carcura Anfrage kurz“ (hohe Absicht), Fragen: Woran Interesse, Auto (Marke/Modell), Vorname, Telefon.
