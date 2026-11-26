@@ -10,7 +10,8 @@
 | Formular · Innen & außen · Audi A6 | 52570636782607 | | | pausiert |
 | Formular · Leasingrückgabe · Mercedes E 300 | 52570636829007 | | | pausiert |
 
-Formular: 1521642603148705 „Carcura Anfrage 35 km (hohe Absicht) 11/2026“, Fragen: Leistung, Auto, Zeitraum, PLZ, Name, Telefon.
+Formular: 981696971359791 „Carcura Anfrage kurz“ (hohe Absicht), Fragen: Woran Interesse, Auto (Marke/Modell), Vorname, Telefon.
+Altes Formular 1521642603148705 (mit Zeitraum, PLZ, voller Name) am 26.11. archiviert, auf Wunsch des Nutzers gekürzt.
 Leads landen in der Meta Business Suite → Leads-Center. Rückruf am selben Tag.
 
 ## Änderungen
