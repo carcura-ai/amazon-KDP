@@ -26,7 +26,9 @@ Fehlt etwas: sinnvoll annehmen (5 €/Tag, 14 Tage, letzter passender Post) und 
 - Text: Ort, Leistung, echter Ab-Preis aus CARCURA-DATA.json, Frist, Handlungsaufforderung. Kein Festpreisversprechen,
   Kleinunternehmer-Endpreis, Waschset-Wert nicht nennen, KI-Bilder kennzeichnen.
 - Platzierungen: Feeds + Instagram Stories. Reels/Marketplace nur als Test.
-- **Keine Motive mit der alten Halle** (Beiträge vor ca. September 2026: Rolltor, nasser grauer Boden, z. B. Audi A6, Mercedes E 300, Cupra, Fiat). Nur neuere Videos aus der fertigen Halle (heller Boden, Lichtleisten).
+- **Keine Motive aus der Anfangszeit der Halle** (Beiträge vor ca. September 2026, z. B. Audi A6, Mercedes E 300, Cupra, Fiat). Neuere Videos bevorzugen; der Nutzer wählt gern selbst nach Aufrufen (z. B. schwarzer M2).
+- Reels mit Musik aus der Instagram-Bibliothek lassen sich nicht als Anzeige laden (Meta-Fehler 222, z. B. M2 G87 vom 07.10., Mini vom 05.06.). Dann Originalvideo ohne Musik vom Nutzer anfordern.
+- Keramik-Anzeigen laufen als Formular (Auto, Vorname, Telefon) mit WhatsApp-Link auf der Abschlussseite (Formular 2377165203033618).
 - Lieber **eine** Dauerkampagne mit wechselnden Anzeigen als viele Kurzkampagnen (jede startet die Lernphase neu).
 - Bewertet wird nach Anfragen aus dem Umkreis, nicht nach Klicks oder „Interaktionen“.
 - Abbruchregel: 50 € ohne Anfrage → Angebot/Video tauschen, nicht Budget erhöhen.
