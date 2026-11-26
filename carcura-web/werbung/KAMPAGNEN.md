@@ -7,6 +7,7 @@
 | Keramik Erklärvideo BMW M2 | 52570166271407 | Chat | – | läuft bis 31.12. |
 | **Anfragen-Formular 35 km bis 20.12.** | Kampagne 52570635936607, Gruppe 52570635994407 | Leads (Sofort-Formular, hohe Absicht) | 7 €/Tag | **aktiv seit 26.11.2026** (Freigabe Nutzer), Prüfung 04.12. 09:00 |
 | Formular · Innen & außen · BMW 340i | 52570636686807 | | | aktiv |
+| Formular · Allgemein · BMW M2 schwarz Schaum (Original ohne Ton, Meta-Video 1148615624483490) | 52570682157807 | | | aktiv seit 26.11. |
 | Formular · Innen & außen · Audi A6 | 52570636782607 | | | pausiert 26.11. (alte Halle im Bild) |
 | Formular · Leasingrückgabe · Mercedes E 300 | 52570636829007 | | | pausiert 26.11. (alte Halle im Bild) |
 
