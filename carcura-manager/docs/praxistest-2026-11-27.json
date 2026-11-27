@@ -1,0 +1,909 @@
+[
+ {
+  "nr": 2,
+  "branche": "Stationäre Aufbereitung",
+  "getestet": [
+   "Leistungen anlegen (4)",
+   "Anfrage, Konvertierung zum Kunden",
+   "Fahrzeug, Termin",
+   "Annahmeprotokoll mit Schaden, Unterschriften, Abschluss",
+   "Auftrag, Rechnung ausstellen, Teilzahlungen, PDF",
+   "Angebot, Lager, Aufgabe, Dashboard, Monatsbericht, CSV-Export"
+  ],
+  "gut": [
+   "Ablauf Anfrage bis Rechnung läuft glatt und schnell",
+   "MwSt und Summen korrekt (1273,30 €)",
+   "Überzahlung wird sauber abgelehnt, Teilzahlungen funktionieren",
+   "Schadenserfassung nach Bereich und Schwere passt zur Aufbereitung",
+   "Fortlaufende Rechnungsnummer, DATEV-nahe CSV, PDF vorhanden"
+  ],
+  "fehlt": [
+   "Terminwarnung bei Doppelbelegung oder Boxen/Hebebühnen-Kapazität",
+   "Warnung bei doppeltem Kennzeichen",
+   "Verbrauchsmaterial automatisch pro Leistung vom Lager abbuchen",
+   "Schadensfotos im Annahmeprotokoll, Vorher/Nachher-Vergleich",
+   "Pflegeabos, Wiedervorlage Keramik-Wartung nach 12 Monaten",
+   "Mehrtägige Aufträge mit Fahrzeug-Abholzeit und Status-SMS"
+  ],
+  "fehler": [
+   {
+    "endpunkt": "POST /api/appointments",
+    "beschreibung": "Zweiter Termin überlappend ohne Warnung angelegt, kein Konfliktcheck",
+    "status": "200"
+   },
+   {
+    "endpunkt": "POST /api/vehicles",
+    "beschreibung": "Gleiches Kennzeichen beim selben Kunden doppelt angelegt",
+    "status": "200"
+   }
+  ],
+  "hilft_es": "teilweise",
+  "hilft_begruendung": "Dokumentation und Rechnungen gut, aber Werkstattplanung, Materialverbrauch und Wartungsabos fehlen noch.",
+  "wichtigste_wunschfunktion": "Kapazitätsplanung mit Stellplätzen plus automatische Keramik-Wartungserinnerung per Nachricht",
+  "geschaetzte_mehrauftraege": {
+   "min_pro_monat": 1,
+   "max_pro_monat": 4,
+   "annahme": "Erinnerungen und sauberes Angebotswesen holen einige Stammkunden zurück; Schätzung."
+  },
+  "zahlungsbereitschaft_eur_monat": {
+   "min": 29,
+   "max": 59,
+   "bedingung": "Planung mit Konfliktcheck, Fotos im Protokoll und Erinnerungen vorhanden."
+  }
+ },
+ {
+  "nr": 1,
+  "branche": "Mobiler Solo-Detailer, ländlich (Glanzmobil Kühn, Daaden)",
+  "getestet": [
+   "Leistungen anlegen",
+   "Anfrage zu Kunde",
+   "Fahrzeug und Termin",
+   "Annahmeprotokoll mit Schaden, Unterschriften, PDF",
+   "Auftrag aus Termin",
+   "Rechnung ausstellen, Teilzahlung, PDF",
+   "Angebot, PDF, Umwandlung",
+   "Lager, Aufgabe, Ausgabe, Dashboard, Bericht, CSV-Export"
+  ],
+  "gut": [
+   "Kompletter Ablauf von Anfrage bis bezahlter Rechnung funktioniert ohne Absturz",
+   "Mehrwertsteuer korrekt: 26.800 netto wird 31.892 brutto",
+   "Annahmeprotokoll-PDF mit Schaden und Unterschrift sofort verfügbar",
+   "Dashboard zeigt Anfragen, Termine, Aufgaben übersichtlich",
+   "Preisanalyse pro Leistung hilft bei Kalkulation"
+  ],
+  "fehlt": [
+   "Anfahrt/Kilometerpauschale und Einsatzort als eigene Position",
+   "Folien-/Materialverbrauch je Auftrag mit automatischer Lagerabbuchung",
+   "Abos/Pflegeverträge und Reifeneinlagerung nicht gefunden",
+   "Versicherungsfall-Abwicklung und Händler-Sammelaufträge nicht gefunden",
+   "Routenplanung für Termine am Kundenstandort",
+   "Auftragsfotos vorher/nachher im Test nicht geprüft"
+  ],
+  "fehler": [
+   {
+    "endpunkt": "POST /api/invoices/:id/payments",
+    "beschreibung": "Nach Teilzahlung bleibt Status 'open' statt 'teilbezahlt'; unklar für Mahnwesen.",
+    "status": "unklar"
+   },
+   {
+    "endpunkt": "POST /api/offers/:id/convert",
+    "beschreibung": "Leerer Body ergibt 400 FST_ERR statt Standardverhalten; Feld 'to' nötig und unklar.",
+    "status": "400"
+   }
+  ],
+  "hilft_es": "teilweise",
+  "hilft_begruendung": "Papierkram von Annahme bis Rechnung sauber, aber mobile Anfahrt, Material und Abos fehlen für meinen Alltag.",
+  "wichtigste_wunschfunktion": "Anfahrtspauschale nach Entfernung plus Materialverbrauch pro Auftrag mit Lagerabbuchung.",
+  "geschaetzte_mehrauftraege": {
+   "min_pro_monat": 0,
+   "max_pro_monat": 2,
+   "annahme": "Solo-Betrieb ist ausgelastet; Gewinn liegt eher in Zeitersparnis und Angeboten, die schneller rausgehen."
+  },
+  "zahlungsbereitschaft_eur_monat": {
+   "min": 15,
+   "max": 29,
+   "bedingung": "Nur bei mobilem Smartphone-Einsatz, Anfahrtspauschale und Materialabbuchung; sonst eher 0."
+  }
+ },
+ {
+  "nr": 4,
+  "branche": "Aufbereitung für Autohäuser (B2B)",
+  "getestet": [
+   "Leistungen anlegen",
+   "Anfrage zu Kunde konvertieren",
+   "Fahrzeug, Termin, Auftrag",
+   "Annahmeprotokoll mit Schaden, Signaturen, Abschluss",
+   "Rechnung ausstellen, Teilzahlung, Vollzahlung, PDF",
+   "Angebot, Lager, Aufgabe, Dashboard, Bericht, CSV-Export"
+  ],
+  "gut": [
+   "Rechnungsberechnung und MwSt stimmen",
+   "Ablauf Anfrage bis Rechnung durchgängig",
+   "Überzahlung und Minusbestand sauber abgelehnt",
+   "Nummernkreise und PDFs vorhanden",
+   "Dashboard und Finanzübersicht sofort nutzbar"
+  ],
+  "fehlt": [
+   "Sammelauftrag/Sammelrechnung pro Autohaus mit mehreren Fahrzeugen",
+   "Rahmenvertrag mit Händler-Staffelpreisen",
+   "Mehrere Standorte/Abholservice",
+   "Wiederkehrende Aufträge/Abos",
+   "Versicherungs-/Gutachtenfall",
+   "Reifeneinlagerung"
+  ],
+  "fehler": [
+   {
+    "endpunkt": "POST /api/vehicles",
+    "beschreibung": "Doppeltes Kennzeichen beim selben Kunden wird ohne Warnung angelegt",
+    "status": "unklar"
+   }
+  ],
+  "hilft_es": "teilweise",
+  "hilft_begruendung": "Einzelaufträge sauber abbildbar, aber B2B-Sammelabrechnung und Händlerverträge fehlen.",
+  "wichtigste_wunschfunktion": "Sammelrechnung monatlich pro Autohaus mit Fahrzeugliste und Staffelpreisen",
+  "geschaetzte_mehrauftraege": {
+   "min_pro_monat": 2,
+   "max_pro_monat": 6,
+   "annahme": "Weniger Nachfass-Verluste und schnellere Angebote bei Händleranfragen"
+  },
+  "zahlungsbereitschaft_eur_monat": {
+   "min": 29,
+   "max": 59,
+   "bedingung": "Nur mit Sammelrechnung und Händler-Rahmenpreisen"
+  }
+ },
+ {
+  "nr": 3,
+  "branche": "Premium-Detailer Keramikversiegelung (Ceramic Studio Rhein, Koblenz)",
+  "getestet": [
+   "Leistungen anlegen",
+   "Anfrage zu Kunde",
+   "Fahrzeug, Termin, Auftrag",
+   "Annahmeprotokoll mit Schaden, Signaturen, PDF",
+   "Rechnung, Teilzahlungen, Überzahlungsschutz, PDF",
+   "Angebot zu Auftrag, Lager, Dashboard, Bericht, CSV"
+  ],
+  "gut": [
+   "Kompletter Ablauf Anfrage bis bezahlte Rechnung lief ohne Fehler",
+   "MwSt und Teilzahlungen korrekt berechnet",
+   "Überzahlung wird sauber abgelehnt",
+   "Protokoll-PDF mit Schäden und Unterschriften vorhanden",
+   "Lagerbestand verhindert Minusbuchung verständlich",
+   "Dashboard und Suche zeigen Umsatz und Fahrzeug sofort"
+  ],
+  "fehlt": [
+   "Versicherungsfall/Gutachten-Abrechnung mit Schadennummer und Versicherer",
+   "Garantie-/Zertifikatsverwaltung mit Laufzeit und Nachkontrolle-Erinnerung",
+   "Materialverbrauch pro Auftrag automatisch vom Lager abbuchen",
+   "Mehrere Standorte und Mitarbeiter-Zeiterfassung pro Auftrag",
+   "Vorher-Nachher-Fotos pro Fahrzeug sichtbar im Protokoll",
+   "Abos/Pflegeverträge und Händler-Sammelaufträge"
+  ],
+  "fehler": [],
+  "hilft_es": "teilweise",
+  "hilft_begruendung": "Alltag Annahme bis Rechnung sauber abgedeckt; Garantie, Versicherung und Materialverbrauch fehlen für Keramik-Spezialisten.",
+  "wichtigste_wunschfunktion": "Garantie-Zertifikat mit Laufzeit, Pflegeintervallen und automatischer Nachkontrolle-Erinnerung je Fahrzeug",
+  "geschaetzte_mehrauftraege": {
+   "min_pro_monat": 1,
+   "max_pro_monat": 3,
+   "annahme": "Weniger vergessene Nachfassungen und Nachkontrollen; Folgeaufträge bei Pflegeintervallen, ca. 1.000 Euro je Auftrag."
+  },
+  "zahlungsbereitschaft_eur_monat": {
+   "min": 29,
+   "max": 59,
+   "bedingung": "Nur mit Garantie-Erinnerungen, Materialverbrauch und Versicherungsfall-Abrechnung; sonst eher 29 Euro."
+  }
+ },
+ {
+  "nr": 5,
+  "branche": "Fuhrpark-/Flottenpflege (FleetClean GmbH, Köln)",
+  "getestet": [
+   "Leistungen anlegen",
+   "Anfrage zu Kunde konvertieren",
+   "Fahrzeuge anlegen (2)",
+   "Termin und Auftrag 25x/5x",
+   "Annahmeprotokoll mit Schaden, Unterschriften, Abschluss",
+   "Rechnung ausstellen, Teilzahlungen, PDF",
+   "Angebot, Lager, Aufgabe",
+   "Dashboard, Monatsbericht, CSV-Export",
+   "Wiederkehrende Aufträge, Standorte, Sammelimport Fahrzeuge"
+  ],
+  "gut": [
+   "Auftragssumme und 19 % USt korrekt berechnet",
+   "Ablauf Anfrage bis Rechnung läuft flüssig",
+   "Protokoll mit Schäden und Unterschriften, PDFs erzeugt",
+   "Teilzahlungen auf Rechnung möglich",
+   "Fehlermeldungen nennen das falsche Feld"
+  ],
+  "fehlt": [
+   "Sammel-Import oder Bulk-Anlage für Fahrzeuge (Fuhrpark 25+)",
+   "Wiederkehrende Aufträge/Abos (wöchentliche Wäsche)",
+   "Mehrere Standorte/Depots",
+   "Sammelrechnung pro Monat über mehrere Aufträge",
+   "Fahrzeug-Wartungs-/Prüffristen (TÜV, UVV) mit Erinnerung",
+   "Rahmenvertrag mit Staffelpreisen pro Kunde"
+  ],
+  "fehler": [],
+  "hilft_es": "teilweise",
+  "hilft_begruendung": "Einzelauftrag sauber, aber Flotten-Alltag (Serien, Sammelrechnung, viele Fahrzeuge) fehlt.",
+  "wichtigste_wunschfunktion": "Wiederkehrende Serientermine/Aufträge pro Flotte mit automatischer Monatssammelrechnung",
+  "geschaetzte_mehrauftraege": {
+   "min_pro_monat": 2,
+   "max_pro_monat": 6,
+   "annahme": "Besseres Nachfassen und Angebote bringen einzelne Zusatzaufträge; Flottenverträge bräuchten Serienfunktion."
+  },
+  "zahlungsbereitschaft_eur_monat": {
+   "min": 30,
+   "max": 70,
+   "bedingung": "Bei Serienaufträgen, Sammelrechnung und Fahrzeug-Massenimport bis ca. 70 Euro."
+  }
+ },
+ {
+  "nr": 6,
+  "branche": "Folierer Car-Wrapping",
+  "getestet": [
+   "Leistungen",
+   "Anfrage zu Kunde",
+   "Fahrzeug",
+   "Termin 5 Tage",
+   "Annahmeprotokoll mit Unterschriften, PDF",
+   "Auftrag",
+   "Rechnung, Teilzahlung, PDF",
+   "Angebot",
+   "Lager",
+   "Aufgabe, Dashboard, Bericht, CSV"
+  ],
+  "gut": [
+   "Ablauf Anfrage bis Rechnung läuft ohne Bruch",
+   "MwSt und Summen stimmen (3.498,60 brutto)",
+   "Überzahlung und Lager-Minus werden sauber abgelehnt",
+   "Protokoll-PDF und Rechnungs-PDF sofort da",
+   "Mehrtagestermin (4 Tage) wird akzeptiert",
+   "Fehlermeldungen auf Deutsch und verständlich"
+  ],
+  "fehlt": [
+   "Leistungsdauer max. 24 Std., Wrap dauert mehrere Tage",
+   "Kein Folienmaterial je Auftrag/Rollenverbrauch mit Chargennummer",
+   "Keine Versicherungsfall-/Gutachten-Abwicklung",
+   "Keine Standorte, Abos, Händler-Sammelaufträge",
+   "Keine Bildablage Vorher/Nachher per API getestet",
+   "Kein Folien-Meterverbrauch und Marge je Auftrag"
+  ],
+  "fehler": [
+   {
+    "endpunkt": "POST /api/appointments",
+    "beschreibung": "Antwort enthielt Steuerzeichen, ungültiges JSON beim Parsen (Zeilenumbruch in Text)",
+    "status": "unsicher"
+   }
+  ],
+  "hilft_es": "teilweise",
+  "hilft_begruendung": "Kern Kunde, Protokoll, Rechnung gut; Material und Mehrtagesaufträge für Wrapper unzureichend abgebildet.",
+  "wichtigste_wunschfunktion": "Folienverbrauch je Auftrag mit Rolle/Charge, Kostenmarge und mehrtägiger Leistungsdauer",
+  "geschaetzte_mehrauftraege": {
+   "min_pro_monat": 0,
+   "max_pro_monat": 2,
+   "annahme": "Hauptnutzen ist Ordnung und Zeitersparnis, kaum direkte Neukunden"
+  },
+  "zahlungsbereitschaft_eur_monat": {
+   "min": 29,
+   "max": 59,
+   "bedingung": "Nur wenn Materialverwaltung und Mehrtagesleistungen ergänzt werden"
+  }
+ },
+ {
+  "nr": 7,
+  "branche": "Lackschutzfolie (PPF)",
+  "getestet": [
+   "Leistungen",
+   "Anfrage zu Kunde",
+   "Fahrzeug, Termin",
+   "Annahmeprotokoll mit Schaden, Unterschriften, Abschluss, PDF",
+   "Auftrag, Rechnung, Teilzahlung, PDF",
+   "Angebot, Lager, Aufgabe, Dashboard, Bericht, CSV"
+  ],
+  "gut": [
+   "Durchgängiger Ablauf Anfrage bis Rechnung ohne Brüche",
+   "MwSt-Berechnung korrekt, Rechnungsnummern sauber",
+   "Überzahlung wird sinnvoll abgelehnt",
+   "Protokoll-PDF mit Unterschriften funktioniert",
+   "Preisanalyse nach Leistung vorhanden"
+  ],
+  "fehlt": [
+   "Versicherungsfall-Verwaltung (Gutachten, Kaskoabrechnung)",
+   "Folienverbrauch pro Auftrag mit Rollen- und Verschnittrechnung",
+   "Mehrere Standorte (keine Route gefunden)",
+   "Abos oder Wiederholungsaufträge (keine Route gefunden)",
+   "Garantie- und Folienpass mit Nachkontroll-Erinnerung",
+   "Händler-Sammelaufträge und Sammelrechnung"
+  ],
+  "fehler": [],
+  "hilft_es": "teilweise",
+  "hilft_begruendung": "Alltagsbasis solide, aber PPF-Spezifika wie Material, Garantie, Versicherung fehlen.",
+  "wichtigste_wunschfunktion": "Folienverbrauch und Materialkosten je Auftrag mit Rollenbestand und Marge",
+  "geschaetzte_mehrauftraege": {
+   "min_pro_monat": 1,
+   "max_pro_monat": 3,
+   "annahme": "Schnellere Angebote und Nachfassen per Aufgaben; kleiner Betrieb, wenige Aufträge pro Woche."
+  },
+  "zahlungsbereitschaft_eur_monat": {
+   "min": 29,
+   "max": 59,
+   "bedingung": "Mit Materialverbrauch, Garantiepass und Versicherungsfällen; sonst eher 29."
+  }
+ },
+ {
+  "nr": 8,
+  "branche": "Scheibentönung",
+  "getestet": [
+   "Leistungen anlegen",
+   "Anfrage zu Kunde",
+   "Fahrzeug, Termin, Auftrag",
+   "Annahmeprotokoll mit Schaden, Unterschriften, Abschluss, PDF",
+   "Rechnung ausstellen, Teilzahlung, Überzahlung, PDF",
+   "Angebot, Lager, Aufgabe, Dashboard, Bericht, CSV-Export"
+  ],
+  "gut": [
+   "Kompletter Ablauf Anfrage bis Rechnung funktioniert ohne Umwege",
+   "Annahmeprotokoll mit Glasschäden und Unterschrift passt zum Alltag",
+   "Überzahlung wird sinnvoll abgelehnt",
+   "MwSt-Berechnung korrekt: 290 Euro netto, 345,10 Euro brutto",
+   "PDFs für Protokoll und Rechnung werden erzeugt"
+  ],
+  "fehlt": [
+   "Mehrere Standorte nicht gefunden",
+   "Kein Versicherungs- bzw. Gutachten-Fall",
+   "Keine Garantie- oder Folien-Zertifikat-Verwaltung (ABE, Folienlot)",
+   "Keine Fahrzeug-/Scheibenmaße oder Folienverbrauch pro Auftrag",
+   "Kein Abo-/Wiederkehrfunktion",
+   "Kein automatischer Lagerabzug bei Auftrag"
+  ],
+  "fehler": [],
+  "hilft_es": "teilweise",
+  "hilft_begruendung": "Kernablauf solide, aber Folienverbrauch, Garantiezertifikat und Nachkontrolle sind nicht branchenspezifisch abgebildet.",
+  "wichtigste_wunschfunktion": "Garantiezertifikat mit Folientyp, ABE-Nummer und Verbrauch je Auftrag, inklusive Lagerabzug",
+  "geschaetzte_mehrauftraege": {
+   "min_pro_monat": 1,
+   "max_pro_monat": 4,
+   "annahme": "Bessere Nachfassung von Anfragen und Angebotserinnerungen; kleiner Betrieb mit etwa 40 Aufträgen monatlich"
+  },
+  "zahlungsbereitschaft_eur_monat": {
+   "min": 19,
+   "max": 39,
+   "bedingung": "Wenn Garantiezertifikat, Folienverbrauch und Lagerabzug je Auftrag enthalten sind"
+  }
+ },
+ {
+  "nr": 9,
+  "branche": "Lackierer/Karosseriebau mit Versicherungsschäden",
+  "getestet": [
+   "Leistungen anlegen",
+   "Anfrage, Konvertierung, Fahrzeug, Termin",
+   "Auftrag mit Freipos.",
+   "Annahmeprotokoll, Unterschriften, Abschluss",
+   "Rechnung, Teilzahlungen, PDF",
+   "Angebot, Aufgabe, Dashboard, Bericht, CSV, Suche"
+  ],
+  "gut": [
+   "Rechnung, MwSt und Teilzahlung rechnen korrekt",
+   "Ablauf Anfrage bis Rechnung flüssig",
+   "Protokoll mit Schadensarten passt zum Alltag",
+   "CSV-Export mit deutschem Format, DATEV-nah",
+   "Suche nach Kennzeichen und Modell funktioniert"
+  ],
+  "fehlt": [
+   "Versicherungsfall/Schadennummer, Gutachten, Kostenübernahme, Abtretung an Werkstatt",
+   "Direktabrechnung mit Versicherung, Kürzungs-/Differenzverwaltung",
+   "Lackcode, Farbmischung, Materialkosten je Auftrag",
+   "Fotos je Schaden im Protokoll, Leihwagen, Mehrstandorte",
+   "Arbeitswerte (AW) und Stundenverrechnungssätze, Kalkulation im DATEV/Audatex-Stil"
+  ],
+  "fehler": [
+   {
+    "endpunkt": "POST /api/inventory",
+    "beschreibung": "Einheit 'l' abgelehnt, nur deutsche Namen wie Liter erlaubt; Meldung knapp, kein Fehler im engeren Sinn",
+    "status": "400"
+   }
+  ],
+  "hilft_es": "teilweise",
+  "hilft_begruendung": "Grundablauf stark, aber Versicherungsabwicklung als Kernalltag fehlt komplett.",
+  "wichtigste_wunschfunktion": "Versicherungsakte mit Schadennummer, Gutachten, Kostenübernahme und Direktabrechnung je Auftrag.",
+  "geschaetzte_mehrauftraege": {
+   "min_pro_monat": 1,
+   "max_pro_monat": 4,
+   "annahme": "Weniger vergessene Nachfasser und schnellere Angebote bei ca. 60 Aufträgen im Monat."
+  },
+  "zahlungsbereitschaft_eur_monat": {
+   "min": 30,
+   "max": 60,
+   "bedingung": "Mit Versicherungsakte und Direktabrechnung eher 60, sonst 30."
+  }
+ },
+ {
+  "nr": 10,
+  "branche": "Smart Repair mobil",
+  "getestet": [
+   "Leistungen anlegen",
+   "Anfrage zu Kunde",
+   "Fahrzeug und Termin",
+   "Auftrag mit Positionen",
+   "Annahmeprotokoll mit Schaden, Unterschriften, Abschluss, PDF",
+   "Rechnung ausstellen, Teilzahlung, PDF",
+   "Angebot in Auftrag wandeln",
+   "Lager, Aufgabe, Ausgabe",
+   "Dashboard, Monatsbericht, CSV-Export"
+  ],
+  "gut": [
+   "Rechnungsbeträge und 19 % USt korrekt",
+   "Protokoll-PDF und Rechnungs-PDF erzeugt",
+   "Teilzahlung führt sauber zu Status bezahlt",
+   "Ablauf Anfrage bis Rechnung durchgängig",
+   "Lagerabgang rechnet richtig (10 minus 4)"
+  ],
+  "fehlt": [
+   "Versicherungsfall-Felder (Schadennummer, Kasko, Abrechnung mit Versicherung)",
+   "Mehrere Standorte oder Einsatzorte/Anfahrt",
+   "Anfahrtspauschale und Routenplanung für mobile Einsätze",
+   "Abos oder Wiederkehrende Leistungen",
+   "Fotos pro Schaden direkt am Protokoll nicht geprüft",
+   "Händler-Sammelaufträge mit Sammelrechnung"
+  ],
+  "fehler": [
+   {
+    "endpunkt": "POST /api/orders",
+    "beschreibung": "Unbekannte Felder wie Schadennummer werden still akzeptiert, aber nicht erkennbar gespeichert",
+    "status": "200"
+   }
+  ],
+  "hilft_es": "teilweise",
+  "hilft_begruendung": "Kernablauf sauber, aber mobile Einsätze und Versicherungsabwicklung fehlen.",
+  "wichtigste_wunschfunktion": "Versicherungsfall mit Schadennummer, Selbstbeteiligung und Abrechnung an Versicherer",
+  "geschaetzte_mehrauftraege": {
+   "min_pro_monat": 1,
+   "max_pro_monat": 4,
+   "annahme": "Bessere Angebotsnachverfolgung und Termin-Erinnerungen; Einzelbetrieb ohne Mitarbeiter, wenige Leads."
+  },
+  "zahlungsbereitschaft_eur_monat": {
+   "min": 15,
+   "max": 35,
+   "bedingung": "Nur mit Versicherungsfall und Anfahrt als Position; sonst unter 20 Euro."
+  }
+ },
+ {
+  "nr": 11,
+  "branche": "Dellendrücker (PDR)",
+  "getestet": [
+   "Leistungen anlegen",
+   "Anfrage zu Kunde",
+   "Fahrzeug und Termin",
+   "Annahmeprotokoll mit Schäden, Signaturen, Abschluss",
+   "Auftrag zu Rechnung, Zahlung, PDF",
+   "Angebot, Lager, Aufgabe",
+   "Dashboard, Monatsbericht, CSV-Export"
+  ],
+  "gut": [
+   "Grundablauf Anfrage bis Rechnung läuft fehlerfrei",
+   "MwSt-Berechnung korrekt (780 netto, 928,20 brutto)",
+   "Rechnung bezahlt-Status nach Teilzahlungen korrekt",
+   "Annahmeprotokoll mit Schadensbereichen passt gut zu Dellen",
+   "PDFs und DATEV-nahe CSV vorhanden"
+  ],
+  "fehlt": [
+   "Dellen-Zähler und Preis nach Dellenanzahl/Größe (Kalkulation)",
+   "Versicherungsfall mit Gutachten, Selbstbeteiligung, Direktabrechnung",
+   "Hagel-Sammelaufträge mit vielen Fahrzeugen und Fotos je Delle",
+   "Mobile Außendiensttermine mit Ort und Fahrtzeit",
+   "Terminkonflikt-Warnung bei überlappenden Zeiten",
+   "Fotos direkt im Annahmeprotokoll am Fahrzeugschema"
+  ],
+  "fehler": [
+   {
+    "endpunkt": "POST /api/appointments",
+    "beschreibung": "Überlappender Termin ohne Mitarbeiter/Warnung akzeptiert, kein Konflikthinweis",
+    "status": "200"
+   }
+  ],
+  "hilft_es": "teilweise",
+  "hilft_begruendung": "Büroablauf sauber, aber Dellenkalkulation, Versicherung und Hagel-Großaufträge fehlen noch.",
+  "wichtigste_wunschfunktion": "Dellenkalkulation nach Anzahl und Größe mit Fotos, Versicherungs- und Hagelabrechnung",
+  "geschaetzte_mehrauftraege": {
+   "min_pro_monat": 1,
+   "max_pro_monat": 3,
+   "annahme": "Weniger Nachfassen bei Anfragen und Angeboten, schnellere Rechnungen; keine Akquise-Funktion."
+  },
+  "zahlungsbereitschaft_eur_monat": {
+   "min": 15,
+   "max": 39,
+   "bedingung": "Mit Dellenkalkulation und Versicherungsabwicklung eher 39 Euro, sonst 15."
+  }
+ },
+ {
+  "nr": 13,
+  "branche": "Reifenservice mit Einlagerung",
+  "getestet": [
+   "Leistungen anlegen",
+   "Anfrage zu Kunde",
+   "Fahrzeug, Termin, Auftrag",
+   "Annahmeprotokoll mit Schaden, Unterschriften, PDF",
+   "Rechnung ausstellen, Zahlung, PDF",
+   "Angebot, Lager, Aufgabe, Dashboard, Bericht, CSV-Export"
+  ],
+  "gut": [
+   "Beträge und MwSt korrekt berechnet",
+   "Annahmeprotokoll mit Felgenschaden und PDF funktioniert",
+   "Ablauf Anfrage bis bezahlte Rechnung reibungslos",
+   "Lagerbestand und Bewegungen funktionieren",
+   "Dashboard mit Anfragequellen und Terminen nützlich"
+  ],
+  "fehlt": [
+   "Reifeneinlagerung mit Lagerplatz, Reifensatz und Einlagerungsdatum je Fahrzeug",
+   "Saisonale Erinnerung zum Radwechsel per Mail oder SMS",
+   "Reifenmaße, DOT und Profiltiefe im Protokoll",
+   "Einheit Satz im Lager; nur Stück, Liter usw.",
+   "Mehrere Standorte und Abos nicht gefunden",
+   "Online-Terminbuchung für Kunden"
+  ],
+  "fehler": [],
+  "hilft_es": "teilweise",
+  "hilft_begruendung": "Auftrag, Protokoll und Rechnung gut; Einlagerungsverwaltung und Saisonerinnerung als Kerngeschäft fehlen.",
+  "wichtigste_wunschfunktion": "Einlagerungsverwaltung mit Lagerplatz, Reifendaten und automatischer Erinnerung zum Saisonwechsel",
+  "geschaetzte_mehrauftraege": {
+   "min_pro_monat": 0,
+   "max_pro_monat": 15,
+   "annahme": "Mit Saisonerinnerungen an Einlagerungskunden in der Wechselsaison; sonst kaum Effekt."
+  },
+  "zahlungsbereitschaft_eur_monat": {
+   "min": 20,
+   "max": 50,
+   "bedingung": "Bei vorhandener Einlagerungsverwaltung und Erinnerungen; sonst eher 20 Euro."
+  }
+ },
+ {
+  "nr": 12,
+  "branche": "Freie Kfz-Werkstatt",
+  "getestet": [
+   "Leistungen anlegen",
+   "Anfrage zu Kunde konvertieren",
+   "Fahrzeug und Termin",
+   "Auftrag mit Positionen",
+   "Annahmeprotokoll mit Schäden, Unterschriften, Abschluss",
+   "Rechnung ausstellen, Barzahlung, PDF",
+   "Angebot, Lager (Ein/Aus), Aufgabe, Dashboard, Bericht, CSV-Export"
+  ],
+  "gut": [
+   "Ablauf Anfrage bis Rechnung läuft durchgängig und schnell",
+   "MwSt-Berechnung korrekt (20.900 netto, 3.971 USt)",
+   "Annahmeprotokoll mit Schadensfeldern und Unterschrift passt zur Werkstatt",
+   "Rechnungs-PDF wird erzeugt",
+   "Dashboard zeigt offene Beträge richtig"
+  ],
+  "fehlt": [
+   "HU/AU-Fälligkeitserinnerung mit automatischer Kundenansprache",
+   "HSN/TSN, Fahrzeugschein-Scan, FIN-Dekodierung",
+   "Teilebestellung beim Großhandel mit Preisen und Aufschlägen",
+   "Arbeitswerte und Stundenverrechnungssatz statt Festpreis",
+   "Reifeneinlagerung mit Saisonwechsel-Erinnerung",
+   "Lagerabbuchung automatisch aus dem Auftrag"
+  ],
+  "fehler": [],
+  "hilft_es": "teilweise",
+  "hilft_begruendung": "Grundablauf stimmt, aber HU/AU, Teilehandel und Arbeitswerte fehlen noch.",
+  "wichtigste_wunschfunktion": "Automatische HU/AU- und Reifenwechsel-Erinnerung per SMS/Mail an Kunden",
+  "geschaetzte_mehrauftraege": {
+   "min_pro_monat": 3,
+   "max_pro_monat": 10,
+   "annahme": "Erinnerungen und schnelle Angebote holen Stammkunden zurück; kleiner Betrieb, 2 Mitarbeiter."
+  },
+  "zahlungsbereitschaft_eur_monat": {
+   "min": 29,
+   "max": 59,
+   "bedingung": "Bis 59 Euro nur mit Erinnerungen, Teilebestellung und Arbeitswerten; sonst eher 29."
+  }
+ },
+ {
+  "nr": 15,
+  "branche": "Wohnmobil-Aufbereitung",
+  "getestet": [
+   "Leistungen anlegen",
+   "Anfrage zu Kunde",
+   "Fahrzeug und Termin",
+   "Annahmeprotokoll mit Schaden, Unterschriften, PDF",
+   "Auftrag zu Rechnung, Zahlungen, PDF",
+   "Angebot, Lager, Aufgabe, Dashboard, Bericht, CSV"
+  ],
+  "gut": [
+   "Rechnungsbeträge und MwSt korrekt",
+   "Teilzahlung führt sauber zu Status bezahlt",
+   "Protokoll-Ablauf mit Unterschrift und PDF flüssig",
+   "Lager verhindert Überbuchung mit klarer Meldung",
+   "Rechnungsnummern und CSV-Export brauchbar"
+  ],
+  "fehlt": [
+   "Standorte/Hallen-Verwaltung",
+   "Abos und Einlagerungs-Verträge mit wiederkehrender Abrechnung",
+   "Versicherungsfall-/Gutachten-Modul",
+   "Fahrzeugmaße als Preisbasis (Länge/Höhe)",
+   "Automatischer Materialverbrauch aus Auftrag ins Lager",
+   "Sammelaufträge für Händler"
+  ],
+  "fehler": [],
+  "hilft_es": "teilweise",
+  "hilft_begruendung": "Grundablauf sauber und schnell; Einlagerung, Abos und Preise nach Fahrzeuglänge fehlen für meinen Alltag.",
+  "wichtigste_wunschfunktion": "Preis nach Fahrzeuglänge plus Einlagerungs-Abo mit automatischer Monatsrechnung",
+  "geschaetzte_mehrauftraege": {
+   "min_pro_monat": 0,
+   "max_pro_monat": 2,
+   "annahme": "Nur durch bessere Nachfassung und Angebote; Auslastung hängt an Saison, nicht Software."
+  },
+  "zahlungsbereitschaft_eur_monat": {
+   "min": 20,
+   "max": 50,
+   "bedingung": "Mit Einlagerungs-Abos und Fahrzeuglängen-Preisen eher 50, sonst 20."
+  }
+ },
+ {
+  "nr": 14,
+  "branche": "Handwaschanlage",
+  "getestet": [
+   "Leistungen anlegen (4 Wäschen/Extras)",
+   "Anfrage, Konvertierung zu Firmenkunde, Fahrzeug, Termin",
+   "Annahmeprotokoll mit Schaden, 2 Unterschriften, Abschluss",
+   "Auftrag mit 5 Positionen, Rechnung ausstellen, Teilzahlung+Barzahlung, PDF",
+   "Angebot Monatsabo, Lager mit Mindestbestand und Minusbuchung, Aufgabe",
+   "Dashboard, Finanzübersicht, Monatsbericht, Rechnungs-CSV, Suche"
+  ],
+  "gut": [
+   "Rechnungsrechnung korrekt: 249,50 netto, 47,41 USt, 296,91 brutto",
+   "Überzahlung wird sinnvoll abgelehnt, Teilzahlung korrekt",
+   "Lagerwarnung und Minusbestand-Sperre mit deutscher Meldung",
+   "Annahmeprotokoll mit Schäden und Unterschrift schützt vor Streit",
+   "CSV-Export mit deutschem Format, DATEV-nah"
+  ],
+  "fehlt": [
+   "Abos/Waschclub mit wiederkehrender Abbuchung (Monatskarte)",
+   "Mehrere Standorte bzw. Waschstraßen-Auslastung",
+   "Gutscheine/Waschkarten und Treuepunkte",
+   "Sammelrechnung über mehrere Fahrzeuge pro Kunde je Auftrag",
+   "Kassen-/Schnellverkauf ohne Termin (Laufkundschaft, TSE-Kasse)",
+   "Mehrere Fahrzeuge in einem Auftrag, Auftrag hängt nur an einem Fahrzeug"
+  ],
+  "fehler": [],
+  "hilft_es": "teilweise",
+  "hilft_begruendung": "Gut für Firmenkunden und Flotten, aber für Laufkundschaft und Abos im Alltag zu schwerfällig.",
+  "wichtigste_wunschfunktion": "Waschclub-Abos mit wiederkehrender Abrechnung und Schnellkasse für Laufkundschaft",
+  "geschaetzte_mehrauftraege": {
+   "min_pro_monat": 5,
+   "max_pro_monat": 20,
+   "annahme": "Nur Flotten- und Firmenkunden besser nachverfolgt; Laufkundschaft bleibt unberührt."
+  },
+  "zahlungsbereitschaft_eur_monat": {
+   "min": 0,
+   "max": 39,
+   "bedingung": "Bis 39 Euro nur mit Abos und Schnellkasse; ohne diese eher 0 bis 15 Euro."
+  }
+ },
+ {
+  "nr": 16,
+  "branche": "Oldtimer-Pflege",
+  "getestet": [
+   "Leistungen anlegen",
+   "Anfrage zu Kunde",
+   "Fahrzeug, Termin",
+   "Annahmeprotokoll mit Schäden, Unterschriften",
+   "Auftrag, Rechnung, Teilzahlung, PDF",
+   "Angebot-PDF, Lager, Aufgabe, Dashboard, Bericht, CSV"
+  ],
+  "gut": [
+   "Rechnungsrechnung korrekt: 981 netto, 19 % USt, 1167,39 brutto",
+   "Annahmeprotokoll mit Schäden und Signatur ging reibungslos",
+   "PDFs für Auftrag, Rechnung, Angebot erzeugt",
+   "Lager lehnt Überentnahme verständlich ab",
+   "Suche findet Fahrzeug per Modell und Kennzeichen"
+  ],
+  "fehlt": [
+   "Einlagerung/Standplatz-Verwaltung mit Monatsabrechnung (Abo)",
+   "Versicherungsfall/Wertgutachten-Dokumentation",
+   "Fahrzeughistorie mit Fotos und Restaurierungsdoku",
+   "Mehrere Standorte/Hallen",
+   "Saisonale Erinnerungen (Winterlager, Frühjahrs-Pflege)",
+   "Materialverbrauch automatisch aus Auftrag ins Lager buchen"
+  ],
+  "fehler": [
+   {
+    "endpunkt": "POST /api/invoices/:id/payments",
+    "beschreibung": "Nach Teilzahlung bleibt Status 'open'; kein 'teilbezahlt' sichtbar.",
+    "status": "200"
+   }
+  ],
+  "hilft_es": "teilweise",
+  "hilft_begruendung": "Kernablauf von Annahme bis Rechnung funktioniert gut, aber Einlagerung, Versicherung und Fahrzeugakte fehlen.",
+  "wichtigste_wunschfunktion": "Einlagerung mit Stellplatz, Abo-Abrechnung und Saisonerinnerungen",
+  "geschaetzte_mehrauftraege": {
+   "min_pro_monat": 1,
+   "max_pro_monat": 3,
+   "annahme": "Weniger Rückfragen, schnellere Angebote und Nachfass-Erinnerungen bei kleinem Betrieb."
+  },
+  "zahlungsbereitschaft_eur_monat": {
+   "min": 29,
+   "max": 49,
+   "bedingung": "Mit Einlagerungsverwaltung und Fahrzeugakte mit Fotos eher 49 Euro."
+  }
+ },
+ {
+  "nr": 17,
+  "branche": "Motorrad-Aufbereitung",
+  "getestet": [
+   "Leistungen, Anfrage, Kunde, Fahrzeug, Termin, Auftrag",
+   "Annahmeprotokoll mit Schäden, Unterschriften, Abschluss, PDF",
+   "Rechnung ausstellen, Teilzahlung, PDF, Storno",
+   "Angebot, Lager mit Ausbuchung, Aufgabe, Ausgabe",
+   "Dashboard, Monatsbericht, Rechnungs-CSV"
+  ],
+  "gut": [
+   "Annahmeprotokoll mit Schäden und Unterschrift passt zu Motorrad",
+   "Rechnung und Angebot rechnen korrekt (19 % USt)",
+   "Lagerbestand verhindert Minusbuchung mit klarer Meldung",
+   "Dashboard zeigt Anfragen, Termine, Quote übersichtlich"
+  ],
+  "fehlt": [
+   "Schadenbereiche für Motorrad (Tank, Felge, Auspuff, Verkleidung)",
+   "Einlagerung Winterstellplatz oder Reifenhotel",
+   "Versicherungsfall-/Gutachten-Abwicklung",
+   "Mehrere Standorte, Abo-/Pflegeverträge",
+   "Material je Auftrag automatisch vom Lager abbuchen"
+  ],
+  "fehler": [
+   {
+    "endpunkt": "POST /api/invoices/:id/payments",
+    "beschreibung": "Status bleibt nach Teilzahlung 'open', kein 'teilbezahlt' sichtbar",
+    "status": "200"
+   }
+  ],
+  "hilft_es": "teilweise",
+  "hilft_begruendung": "Kernablauf von Anfrage bis Rechnung funktioniert; branchenspezifische Motorrad-Funktionen fehlen noch.",
+  "wichtigste_wunschfunktion": "Winter-Einlagerung mit Stellplatz, Zeitraum und automatischer Wiederholungsrechnung",
+  "geschaetzte_mehrauftraege": {
+   "min_pro_monat": 1,
+   "max_pro_monat": 3,
+   "annahme": "Weniger Rückfragen, schnellere Angebote, Nachfass-Aufgaben nutzen; Kleinbetrieb"
+  },
+  "zahlungsbereitschaft_eur_monat": {
+   "min": 20,
+   "max": 39,
+   "bedingung": "Motorrad-Schadenbereiche und Einlagerung vorhanden, einfache Bedienung"
+  }
+ },
+ {
+  "nr": 18,
+  "branche": "Innenraum-/Geruchsspezialist",
+  "getestet": [
+   "Leistungen anlegen",
+   "Anfrage zu Kunde konvertieren",
+   "Fahrzeug und Termin",
+   "Annahmeprotokoll mit Schäden, Unterschriften, Abschluss",
+   "Auftrag mit USt-Berechnung",
+   "Rechnung ausstellen, Teilzahlung, Überzahlung, PDF",
+   "Angebot, Aufgabe, Lager, Dashboard, Bericht, CSV, Preisanalyse"
+  ],
+  "gut": [
+   "Kernablauf Anfrage bis Rechnung lief ohne Fehler",
+   "Umsatzsteuer und Summen im Auftrag stimmen",
+   "Überzahlung wird verständlich mit Restbetrag abgelehnt",
+   "Rechnungs-PDF und CSV-Export funktionieren",
+   "Preisanalyse je Leistung mit Marge nützlich"
+  ],
+  "fehlt": [
+   "Abos/Wiederholungstermine (Ozon-Auffrischung, Firmenflotten)",
+   "Geruchsmesswerte und Vorher-Nachher-Fotos im Protokoll",
+   "Mehrere Standorte beziehungsweise Mobil-Einsatzplanung",
+   "Verbrauchsmaterial automatisch pro Leistung abbuchen",
+   "Automatische Nachkontroll-Erinnerung nach Behandlung",
+   "Händler-Sammelaufträge und Sammelrechnung"
+  ],
+  "fehler": [],
+  "hilft_es": "teilweise",
+  "hilft_begruendung": "Kernabläufe und Rechnungen gut; geruchsspezifische Messwerte, Abos und Materialverbrauch fehlen.",
+  "wichtigste_wunschfunktion": "Wiederkehrende Auffrischungs-Abos mit automatischer Terminerinnerung und Materialabbuchung pro Leistung",
+  "geschaetzte_mehrauftraege": {
+   "min_pro_monat": 1,
+   "max_pro_monat": 4,
+   "annahme": "Bessere Nachfassung und Erinnerungen holen einzelne verlorene Anfragen zurück"
+  },
+  "zahlungsbereitschaft_eur_monat": {
+   "min": 19,
+   "max": 39,
+   "bedingung": "Wenn Abos, Erinnerungen und Fotodokumentation funktionieren"
+  }
+ },
+ {
+  "nr": 19,
+  "branche": "Gebrauchtwagenhändler mit eigener Aufbereitung",
+  "getestet": [
+   "Leistungen anlegen",
+   "Anfrage zu Kunde",
+   "Fahrzeug, Termin",
+   "Annahmeprotokoll mit Schäden, Unterschriften, Abschluss",
+   "Auftrag zu Rechnung, Zahlung, PDF",
+   "Angebot, Lager, Aufgabe, Dashboard, Bericht, CSV-Export"
+  ],
+  "gut": [
+   "Ablauf Anfrage bis Rechnung läuft glatt",
+   "Rechnungssummen und MwSt korrekt",
+   "Protokoll-Nummern und PDFs funktionieren",
+   "Dashboard und Monatsbericht sofort nutzbar",
+   "Globale Suche findet Kunden schnell"
+  ],
+  "fehlt": [
+   "Fahrzeugbestand mit Einkaufspreis, Verkaufspreis, Standzeit",
+   "Differenzbesteuerung nach §25a UStG",
+   "Mehrere Standorte, Händler-Sammelaufträge, Abos nicht gefunden",
+   "Inzahlungnahme und Kaufvertrag",
+   "Fahrzeugdaten wie VIN, Erstzulassung, TÜV-Termin"
+  ],
+  "fehler": [
+   {
+    "endpunkt": "POST /api/inventory",
+    "beschreibung": "Einheit 'l' abgelehnt, nur Stück/Liter etc.; Meldung wenig verständlich"
+   }
+  ],
+  "hilft_es": "teilweise",
+  "hilft_begruendung": "Gut für Aufbereitung und Dokumentation, aber der Fahrzeughandel selbst fehlt komplett.",
+  "wichtigste_wunschfunktion": "Fahrzeugbestand mit Einkauf, Aufbereitungskosten, Marge und §25a-Rechnung",
+  "geschaetzte_mehrauftraege": {
+   "min_pro_monat": 1,
+   "max_pro_monat": 3,
+   "annahme": "Mehr Aufbereitungsaufträge für Kunden durch Angebote und Nachfassen; Handel unberührt"
+  },
+  "zahlungsbereitschaft_eur_monat": {
+   "min": 0,
+   "max": 49,
+   "bedingung": "Über 30 Euro nur mit Fahrzeugbestand und §25a-Unterstützung"
+  }
+ },
+ {
+  "nr": 20,
+  "branche": "Aufbereiter, 3 Standorte (Frankfurt)",
+  "getestet": [
+   "Leistungen anlegen",
+   "Anfrage zu Kunde konvertieren",
+   "Fahrzeug und Termin",
+   "Annahmeprotokoll mit Schaden, Signaturen, Abschluss, PDF",
+   "Auftrag, Rechnung ausstellen, Teilzahlungen, PDF",
+   "Angebot zu Auftrag, Lager, Aufgabe, Dashboard, Bericht, CSV-Export"
+  ],
+  "gut": [
+   "Durchgängiger Ablauf Anfrage bis bezahlte Rechnung funktioniert reibungslos",
+   "MwSt-Berechnung korrekt, Nummernkreise sauber",
+   "Teilzahlung und Überzahlungsschutz sinnvoll",
+   "Lagerbestand verhindert Überentnahme mit klarer Meldung",
+   "PDFs für Protokoll und Rechnung vorhanden"
+  ],
+  "fehlt": [
+   "Standort-/Filialverwaltung nicht gefunden (keine Route), für 3 Standorte kritisch",
+   "Versicherungsfall-/Schadenabwicklung nicht gefunden",
+   "Abos/Wiederkehrende Leistungen nicht gefunden",
+   "Preise nur netto; Endkundenpreise brutto erwartet",
+   "Materialverbrauch (Folie, Keramik) nicht automatisch pro Auftrag verbucht",
+   "Reifeneinlagerung und Händler-Sammelaufträge nicht erkennbar"
+  ],
+  "fehler": [
+   {
+    "endpunkt": "POST /api/reports/generate",
+    "beschreibung": "Monatsbericht im Nov. liefert Vormonat Oktober, nicht laufenden Monat; unklar",
+    "status": "200"
+   }
+  ],
+  "hilft_es": "teilweise",
+  "hilft_begruendung": "Kern-Workflow solide, aber Mehrstandort, Versicherung, Abos und Materialverbrauch fehlen.",
+  "wichtigste_wunschfunktion": "Mehrstandort-Verwaltung mit Standort pro Termin, Auftrag und Auswertung",
+  "geschaetzte_mehrauftraege": {
+   "min_pro_monat": 5,
+   "max_pro_monat": 20,
+   "annahme": "Weniger verlorene Anfragen durch Follow-up-Aufgaben und Angebote, drei Standorte, Basis rund 600 Aufträge/Monat"
+  },
+  "zahlungsbereitschaft_eur_monat": {
+   "min": 60,
+   "max": 150,
+   "bedingung": "Nur mit Standortverwaltung; ohne maximal etwa 60 Euro für alle Standorte"
+  }
+ }
+]
